@@ -1,0 +1,3087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avery's College Planning Dashboard</title>
+<style>
+  :root {
+    --bg: #f4f7fa;
+    --surface: #ffffff;
+    --primary: #4a7c8a;
+    --primary-dark: #3a6270;
+    --primary-light: #e8f1f4;
+    --accent: #7aae8e;
+    --accent-light: #eaf5ee;
+    --text: #2c3e50;
+    --text-light: #6b7c8a;
+    --border: #dce4ea;
+    --danger: #c0504d;
+    --warn: #d4a843;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #2c5364 0%, #4a7c8a 40%, #7aae8e 100%);
+    color: #fff;
+    padding: 32px 36px 24px;
+    box-shadow: 0 4px 24px rgba(44,83,100,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60%;
+    left: 20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(122,174,142,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  header .header-content { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  header h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  header .header-icon { font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15)); }
+  header p { opacity: 0.9; font-size: 0.88rem; margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 500; }
+  header .header-badge { display: inline-block; background: rgba(255,255,255,0.18); backdrop-filter: blur(4px); padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; margin-top: 8px; border: 1px solid rgba(255,255,255,0.15); }
+
+  /* ── Tabs ── */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    padding: 8px 24px 0;
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 11px 22px;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border-radius: 8px 8px 0 0;
+  }
+  .tab-btn:hover { color: var(--primary); background: var(--primary-light); }
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--primary-light);
+  }
+
+  /* ── Subtabs ── */
+  .subtab-bar {
+    display: flex;
+    gap: 2px;
+    background: var(--bg);
+    padding: 6px 18px 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 18px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .subtab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border-radius: 6px 6px 0 0;
+  }
+  .subtab-btn:hover { color: var(--accent); background: var(--accent-light); }
+  .subtab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* ── Content ── */
+  .content { padding: 24px; max-width: 1340px; margin: 0 auto; }
+  .tab-group { display: none; }
+  .tab-group.active { display: block; }
+  .sub-panel { display: none; }
+  .sub-panel.active { display: block; }
+
+  /* ── Section Header ── */
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .section-head h2 { font-size: 1.3rem; color: var(--primary-dark); }
+  .section-head p { font-size: 0.88rem; color: var(--text-light); width: 100%; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,124,138,0.3); }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px; font-size: 0.78rem; }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+  .btn-icon { background: none; border: none; color: var(--text-light); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; }
+  .btn-icon:hover { color: var(--danger); background: #fce8e8; }
+  .btn-export { background: #3a7a50; color: #fff; }
+  .btn-export:hover { background: #2e6340; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(58,122,80,0.3); }
+
+  /* ── Table ── */
+  .table-wrap {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: auto;
+    max-height: calc(100vh - 180px);
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+  th {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 8px 6px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    line-height: 1.3;
+  }
+  td {
+    padding: 7px 6px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafcfd; }
+  td.logo-cell { text-align: center; width: 38px; padding: 4px; }
+  .school-logo { width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: #f0f3f5; vertical-align: middle; }
+  .logo-fallback { width: 28px; height: 28px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.65rem; color: #fff; }
+  td.notes-cell { max-width: 200px; }
+  td.notes-cell span { display: block; max-height: 3.6em; overflow: hidden; text-overflow: ellipsis; }
+  td.notes-cell span:focus { max-height: none; overflow: visible; position: relative; z-index: 1; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); border-radius: 6px; padding: 8px; }
+  td.compact { white-space: nowrap; text-align: center; }
+
+  /* ── Editable cells ── */
+  [contenteditable] {
+    outline: none;
+    padding: 2px 4px;
+    border-radius: 4px;
+    min-width: 40px;
+    display: inline-block;
+    transition: background 0.15s;
+  }
+  [contenteditable]:hover { background: var(--primary-light); }
+  [contenteditable]:focus { background: #fff; box-shadow: 0 0 0 2px var(--primary); }
+
+  /* ── Status badges ── */
+  select.status-sel {
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    appearance: auto;
+  }
+  select.status-sel.s-researching { background: #eef4ff; color: #3b6db5; border-color: #b3cde8; }
+  select.status-sel.s-applying { background: #fff8e6; color: #9a7b1e; border-color: #e8d68b; }
+  select.status-sel.s-accepted { background: var(--accent-light); color: #3a7a50; border-color: #a3d4b3; }
+  select.status-sel.s-rejected { background: #fce8e8; color: var(--danger); border-color: #e8b3b3; }
+  select.status-sel.s-waitlisted { background: #f3eefa; color: #6a4fa0; border-color: #c9b8e8; }
+
+  /* ── Cards (visits, test prep) ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    border-left: 4px solid var(--primary);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .card h3 { font-size: 1.05rem; margin-bottom: 10px; color: var(--primary-dark); }
+  .card-field { margin-bottom: 8px; }
+  .card-field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+  .card-field [contenteditable],
+  .card-field input {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 4px 6px;
+  }
+  .card-field input[type="date"] {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-family: inherit;
+  }
+  .card-actions { margin-top: 12px; text-align: right; }
+
+  /* ── Checklist ── */
+  .checklist-school {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .checklist-header {
+    background: var(--primary-light);
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--primary-dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .checklist-header:hover { background: #d8e8ef; }
+  .checklist-header .progress {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .checklist-header .chevron {
+    display: inline-block;
+    transition: transform 0.25s ease;
+    font-size: 0.75rem;
+    color: var(--text-light);
+  }
+  .checklist-school.open .checklist-header .chevron { transform: rotate(90deg); }
+  .checklist-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .checklist-school.open .checklist-body { max-height: 2000px; }
+  .checklist-items { padding: 8px 12px; }
+  .checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #f0f3f5;
+    transition: background 0.15s;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item:hover { background: #fafcfd; }
+  .checklist-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .checklist-item .item-text {
+    flex: 1;
+    font-size: 0.9rem;
+  }
+  .checklist-item .item-text.done { text-decoration: line-through; color: var(--text-light); }
+  .checklist-item .delete-item { cursor: pointer; color: var(--text-light); font-size: 1rem; padding: 0 4px; }
+  .checklist-item .delete-item:hover { color: var(--danger); }
+  .add-item-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .add-item-row input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 0.88rem;
+    font-family: inherit;
+  }
+
+  /* ── Milestone cards ── */
+  .milestone-card { border-left-color: var(--accent); }
+  .milestone-card.past { opacity: 0.6; border-left-color: var(--text-light); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 28px;
+    width: 90%;
+    max-width: 520px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal h3 { font-size: 1.15rem; margin-bottom: 18px; color: var(--primary-dark); }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-light); margin-bottom: 4px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(74,124,138,0.12);
+  }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel { background: #eee; color: var(--text); }
+  .btn-cancel:hover { background: #ddd; }
+
+  /* ── Autocomplete dropdown ── */
+  .ac-wrap { position: relative; }
+  .ac-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    display: none;
+  }
+  .ac-list.open { display: block; }
+  .ac-item {
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #f0f3f5;
+    transition: background 0.1s;
+  }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover, .ac-item.highlighted { background: var(--primary-light); }
+  .ac-item .ac-loc { font-size: 0.76rem; color: var(--text-light); margin-left: 6px; }
+  .ac-hint {
+    font-size: 0.76rem;
+    color: var(--text-light);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ── Misc ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-light);
+  }
+  .empty-state svg { width: 56px; height: 56px; opacity: 0.3; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.95rem; }
+
+  /* ── Visit Evaluation ── */
+  .eval-school-picker { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .eval-school-picker select { padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.92rem; font-family: inherit; min-width: 240px; }
+  .eval-section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
+  .eval-section-header { background: var(--primary-light); padding: 12px 18px; font-weight: 700; font-size: 0.95rem; color: var(--primary-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .eval-section-header .weight-badge { font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 20px; background: var(--primary); color: #fff; }
+  .eval-section-header .subtotal { font-size: 0.85rem; font-weight: 600; color: var(--accent); }
+  .eval-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; border-bottom: 1px solid #f0f3f5; }
+  .eval-row:last-child { border-bottom: none; }
+  .eval-row label { flex: 1; font-size: 0.88rem; }
+  .eval-stars { display: flex; gap: 4px; }
+  .eval-stars button { background: none; border: 1px solid var(--border); border-radius: 6px; width: 34px; height: 34px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.15s; color: var(--text-light); }
+  .eval-stars button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .eval-stars button:hover { border-color: var(--primary); color: var(--primary); }
+  .eval-stars button.active:hover { background: var(--primary-dark); }
+  .eval-text textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.88rem; resize: vertical; min-height: 60px; }
+  .eval-text { padding: 10px 18px; }
+  .eval-text label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
+  .eval-total-bar { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .eval-total-bar .total-score { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); }
+  .eval-total-bar .total-label { font-size: 0.85rem; color: var(--text-light); }
+  .eval-grade-picker select { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.92rem; font-weight: 600; font-family: inherit; }
+
+  /* ── Summary comparison table ── */
+  .summary-table { width: 100%; border-collapse: collapse; }
+  .summary-table th { background: var(--primary-light); color: var(--primary-dark); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 10px 12px; text-align: center; }
+  .summary-table th:first-child { text-align: left; }
+  .summary-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: center; font-size: 0.88rem; }
+  .summary-table td:first-child { text-align: left; font-weight: 600; }
+  .summary-table tr:hover td { background: #fafcfd; }
+  .summary-table .rank-cell { font-weight: 700; color: var(--primary); font-size: 1rem; }
+
+  /* ── Rankings ── */
+  .rank-table { width: 100%; border-collapse: collapse; }
+  .rank-table th { background: var(--primary-light); color: var(--primary-dark); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; padding: 10px 8px; text-align: center; }
+  .rank-table th:first-child, .rank-table th:nth-child(2) { text-align: left; }
+  .rank-table td { padding: 8px; border-bottom: 1px solid var(--border); text-align: center; font-size: 0.85rem; }
+  .rank-table td:first-child { text-align: center; font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+  .rank-table td:nth-child(2) { text-align: left; font-weight: 600; }
+  .rank-table tr:hover td { background: #fafcfd; }
+  .rank-table select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; text-align: center; }
+  .rank-notes-input { border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.82rem; font-family: inherit; width: 100%; min-width: 140px; }
+  .rank-weights { display: flex; gap: 16px; flex-wrap: wrap; padding: 14px 18px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; font-size: 0.82rem; color: var(--text-light); }
+  .rank-weights span { font-weight: 600; color: var(--primary-dark); }
+
+  /* ── Visit Notes ── */
+  .visit-notes-section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
+  .visit-notes-section h4 { background: var(--accent-light); padding: 12px 18px; font-size: 0.92rem; color: #3a7a50; margin: 0; }
+  .visit-notes-prompt { padding: 12px 18px; border-bottom: 1px solid #f0f3f5; }
+  .visit-notes-prompt:last-child { border-bottom: none; }
+  .visit-notes-prompt label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-light); margin-bottom: 6px; }
+  .visit-notes-prompt textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.88rem; resize: vertical; min-height: 50px; }
+
+  /* ── Executive Summary ── */
+  .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+  .profile-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .profile-card h3 { font-size: 1rem; color: var(--primary-dark); margin-bottom: 12px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px; }
+  .profile-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.88rem; border-bottom: 1px solid #f5f7fa; }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row .label { color: var(--text-light); }
+  .profile-row .value { font-weight: 600; }
+  .insight-box { background: linear-gradient(135deg, #e8f4f8 0%, #eaf5ee 100%); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 22px; font-size: 0.9rem; }
+  .insight-box strong { color: var(--primary-dark); }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+  .badge-safety { background: #eaf5ee; color: #2d6e3f; }
+  .badge-match { background: #e8f1f4; color: #3a6270; }
+  .badge-reach { background: #fce8e8; color: #b04040; }
+  .badge-funded { background: #eaf5ee; color: #2d6e3f; }
+  .badge-affordable { background: #e8f1f4; color: #3a6270; }
+  .badge-stretch { background: #fff3e0; color: #b87a1e; }
+  .badge-vet-yes { background: #e8f1f4; color: var(--primary-dark); }
+  .badge-vet-no { background: #f5f5f5; color: #888; }
+  .badge-booked { background: #eaf5ee; color: #2d6e3f; }
+  .scenarios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-top: 18px; }
+  .scenario-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px; }
+  .scenario-card .scenario-label { font-size: 0.78rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px; }
+  .scenario-card .scenario-value { font-size: 0.92rem; font-weight: 600; color: var(--primary-dark); }
+
+  /* ── Financial Analysis ── */
+  .fin-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+  .fin-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; text-align: center; }
+  .fin-card .fin-amount { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); }
+  .fin-card .fin-label { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; }
+  .fin-card input { border: none; text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); width: 100%; background: transparent; font-family: inherit; }
+  .fin-card input:focus { outline: none; background: var(--primary-light); border-radius: 6px; }
+  .fin-group-header { background: var(--primary-light); color: var(--primary-dark); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .fin-group-header td { padding: 8px 10px !important; }
+
+  /* ── Road Trip ── */
+  .trip-stats { display: flex; gap: 18px; margin-bottom: 22px; flex-wrap: wrap; }
+  .trip-stat { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 20px; text-align: center; flex: 1; min-width: 140px; }
+  .trip-stat .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--primary-dark); }
+  .trip-stat .stat-lbl { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+  .trip-day { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+  .trip-day-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .trip-day-header .day-label { font-weight: 700; font-size: 1rem; color: var(--primary-dark); }
+  .trip-day-header .day-date { font-size: 0.85rem; color: var(--text-light); }
+  .trip-day-body { padding: 0 20px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .trip-detail { font-size: 0.88rem; }
+  .trip-detail .td-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.3px; margin-bottom: 2px; }
+  .trip-detail .td-value { color: var(--text); }
+  .trip-notes textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: inherit; font-size: 0.85rem; resize: vertical; min-height: 40px; }
+  .trip-tips { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; margin-top: 8px; }
+  .trip-tips h3 { font-size: 1rem; color: var(--primary-dark); margin-bottom: 10px; }
+  .trip-tips li { font-size: 0.88rem; margin-bottom: 6px; line-height: 1.5; }
+
+  /* ── Tour Checklist ── */
+  .tour-section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
+  .tour-section-header { background: var(--primary-light); padding: 14px 20px; font-weight: 700; font-size: 0.95rem; color: var(--primary-dark); display: flex; justify-content: space-between; }
+  .tour-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-bottom: 1px solid #f0f3f5; font-size: 0.9rem; }
+  .tour-item:last-child { border-bottom: none; }
+  .tour-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .tour-item .tour-text { flex: 1; }
+  .tour-item .tour-text.checked { text-decoration: line-through; color: var(--text-light); }
+  .tour-add-row { display: flex; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--border); }
+  .tour-add-row input { flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.88rem; font-family: inherit; }
+
+  /* ── Admission Strategy ── */
+  .strat-explainer { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px; margin-bottom: 22px; font-size: 0.9rem; line-height: 1.65; }
+  .strat-explainer h3 { font-size: 1.05rem; color: var(--primary-dark); margin-bottom: 10px; }
+  .strat-highlight { background: linear-gradient(135deg, #e8f4f8, #eaf5ee); padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+
+  @media (max-width: 768px) {
+    header { padding: 20px 16px 16px; }
+    header h1 { font-size: 1.3rem; }
+    .content { padding: 16px; }
+    .tab-btn { padding: 10px 14px; font-size: 0.82rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .profile-grid { grid-template-columns: 1fr; }
+    .fin-summary { grid-template-columns: 1fr 1fr; }
+    .trip-day-body { grid-template-columns: 1fr; }
+    .scenarios-grid { grid-template-columns: 1fr; }
+    .subtab-bar { padding: 4px 12px 0; }
+    .subtab-btn { padding: 7px 10px; font-size: 0.76rem; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <div>
+      <h1>Avery's College Planning Dashboard</h1>
+      <p>Pre-Veterinary Program Search &amp; Application Tracker</p>
+      <span class="header-badge">Class of 2031 &bull; Animal Science &bull; DVM Track</span>
+    </div>
+    <div class="header-icon">&#127891;</div>
+  </div>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" data-group="group-overview">Overview</button>
+  <button class="tab-btn" data-group="group-schools">Schools</button>
+  <button class="tab-btn" data-group="group-visits">Visits</button>
+  <button class="tab-btn" data-group="group-apps">Applications</button>
+</nav>
+
+<main class="content">
+
+  <!-- ═══════════ GROUP: OVERVIEW ═══════════ -->
+  <div id="group-overview" class="tab-group active">
+  <div id="summary" class="sub-panel active">
+    <div class="section-head"><h2>Executive Summary</h2></div>
+    <div class="profile-grid">
+      <div class="profile-card">
+        <h3>Student Profile</h3>
+        <div class="profile-row"><span class="label">Student</span><span class="value">Avery Denney</span></div>
+        <div class="profile-row"><span class="label">GPA</span><span class="value">3.74 Weighted</span></div>
+        <div class="profile-row"><span class="label">Target ACT</span><span class="value">27</span></div>
+        <div class="profile-row"><span class="label">Intended Major</span><span class="value">Animal Science / Pre-Veterinary</span></div>
+        <div class="profile-row"><span class="label">Goal</span><span class="value">Doctor of Veterinary Medicine (DVM)</span></div>
+        <div class="profile-row"><span class="label">Residency</span><span class="value">Georgia (In-State for UGA)</span></div>
+      </div>
+      <div class="profile-card">
+        <h3>Financial Resources</h3>
+        <div class="profile-row"><span class="label">529 Balance</span><span class="value">$175,000</span></div>
+        <div class="profile-row"><span class="label">Annual Cash Flow</span><span class="value">$37,000/year</span></div>
+        <div class="profile-row"><span class="label">4-Year Cash Flow</span><span class="value">$148,000</span></div>
+        <div class="profile-row"><span class="label">Total Available</span><span class="value" style="color:var(--accent);font-size:1.05rem;">$323,000</span></div>
+      </div>
+    </div>
+    <div class="insight-box"><strong>Key Insight:</strong> Applying to Animal Science (vs. Engineering/CS/Business) provides 15-25 percentage point admission advantage at most schools.</div>
+    <div class="section-head"><h2>Comprehensive School Rankings</h2></div>
+    <div class="table-wrap" style="max-height:none;">
+      <table>
+        <thead><tr><th>Rank</th><th>School</th><th>Category</th><th>Vet School</th><th>Visit Status</th><th>4-Yr Cost</th><th>Verdict</th><th>Plan B</th><th>Key Notes</th></tr></thead>
+        <tbody id="summaryRankBody"></tbody>
+      </table>
+    </div>
+    <div class="section-head" style="margin-top:28px"><h2>Decision Scenarios</h2></div>
+    <div class="scenarios-grid">
+      <div class="scenario-card"><div class="scenario-label">If money matters most</div><div class="scenario-value">UGA &rarr; Kentucky &rarr; Auburn</div></div>
+      <div class="scenario-card"><div class="scenario-label">If program prestige matters most</div><div class="scenario-value">Texas A&amp;M &rarr; Purdue &rarr; NC State</div></div>
+      <div class="scenario-card"><div class="scenario-label">If she wants the 'away' experience</div><div class="scenario-value">Purdue &rarr; Ohio State &rarr; Virginia Tech</div></div>
+      <div class="scenario-card"><div class="scenario-label">If equine/large animal is her interest</div><div class="scenario-value">Kentucky &rarr; Texas A&amp;M &rarr; Auburn</div></div>
+      <div class="scenario-card"><div class="scenario-label">If Plan B resilience matters</div><div class="scenario-value">Texas A&amp;M &rarr; Purdue &rarr; Ohio State &rarr; UGA</div></div>
+      <div class="scenario-card"><div class="scenario-label">Best overall value-adjusted choice</div><div class="scenario-value" style="color:var(--accent);">UGA (and it's not close)</div></div>
+    </div>
+  </div>
+
+  </div><!-- /group-overview -->
+
+  <!-- ═══════════ GROUP: SCHOOLS ═══════════ -->
+  <div id="group-schools" class="tab-group">
+  <nav class="subtab-bar">
+    <button class="subtab-btn active" data-subtab="schools">Comparison</button>
+    <button class="subtab-btn" data-subtab="rankings">Rankings</button>
+    <button class="subtab-btn" data-subtab="financial">Financial Analysis</button>
+    <button class="subtab-btn" data-subtab="greeklife">Greek Life</button>
+  </nav>
+  <div id="schools" class="sub-panel active">
+    <div class="section-head">
+      <h2>School Comparison</h2>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="openModal('school')">+ Add School</button>
+        <button class="btn btn-export" onclick="exportToExcel()">Download Excel</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>School</th>
+            <th>Location</th>
+            <th>Program Notes</th>
+            <th>GPA</th>
+            <th>SAT/ACT</th>
+            <th>Accept&nbsp;%</th>
+            <th>Ag&nbsp;%</th>
+            <th>OOS&nbsp;%</th>
+            <th>OOS Ag&nbsp;%</th>
+            <th>In-State&nbsp;$</th>
+            <th>OOS&nbsp;$</th>
+            <th>Deadline</th>
+            <th>Early&nbsp;DL</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="schoolBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Rankings sub-panel -->
+  <div id="rankings" class="sub-panel">
+    <div class="section-head">
+      <h2>Final Rankings</h2>
+      <p>Combines your visit impressions (40%) with objective factors to produce a final ranking.</p>
+    </div>
+    <div class="rank-weights">
+      <div>Visit Score: <span>40%</span></div>
+      <div>Vet Program: <span>25%</span></div>
+      <div>Cost Score: <span>15%</span></div>
+      <div>Plan B Strength: <span>10%</span></div>
+      <div>Merit Aid Potential: <span>10%</span></div>
+      <div style="margin-left:auto;font-style:italic;">Rating key: 5 = Excellent, 4 = Strong, 3 = Average, 2 = Below Avg, 1 = Weak</div>
+    </div>
+    <div class="table-wrap" style="max-height:none;">
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>School</th>
+            <th>Visit Score</th>
+            <th>Visit Rank</th>
+            <th>Vet Program</th>
+            <th>Cost Score</th>
+            <th>Plan B</th>
+            <th>Merit Aid</th>
+            <th>Combined</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="rankingsBody"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="rankingsEmpty" style="display:none;">
+      <p>Add schools in the <strong>School Comparison</strong> tab to start ranking them.</p>
+    </div>
+  </div>
+
+  <!-- Financial Analysis sub-panel -->
+  <div id="financial" class="sub-panel">
+    <div class="section-head"><h2>Financial Analysis</h2></div>
+    <div class="fin-summary">
+      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="fin529" value="175000" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">529 Balance</div></div>
+      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="finCashflow" value="37000" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">Annual Cash Flow</div></div>
+      <div class="fin-card"><div class="fin-amount" id="fin4yr">$148,000</div><div class="fin-label">4-Year Cash Flow</div></div>
+      <div class="fin-card"><div class="fin-amount" id="finTotal" style="color:var(--accent)">$323,000</div><div class="fin-label">Total Available</div></div>
+    </div>
+    <div class="table-wrap" style="max-height:none;">
+      <table>
+        <thead><tr><th>School</th><th>Residency</th><th>Sticker COA/Yr</th><th>4-Yr Sticker</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th><th>Gap vs Total</th><th>Verdict</th></tr></thead>
+        <tbody id="finBody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:22px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;">
+      <h3 style="font-size:1rem;color:var(--primary-dark);margin-bottom:10px;">Merit Aid Notes</h3>
+      <ul style="font-size:0.88rem;line-height:1.7;color:var(--text);padding-left:18px;">
+        <li><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.7 GPA likely $14-18K/year.</li>
+        <li><strong>Auburn:</strong> Competitive Presidential and Academic scholarships. $8-16K realistic.</li>
+        <li><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats. $8-12K likely.</li>
+        <li><strong>UGA:</strong> Zell Miller (full tuition) or HOPE (partial) for Georgia residents meeting requirements.</li>
+        <li><strong>LSU:</strong> Generous automatic OOS merit. 3.7+ GPA likely qualifies for $12-16K/year.</li>
+        <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> Limited OOS merit. Don't bank on it.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Greek Life sub-panel -->
+  <div id="greeklife" class="sub-panel">
+    <div class="section-head"><h2>Greek Life</h2><p>Sorority overview for schools in your comparison list</p></div>
+    <div id="greekEmpty" class="empty-state" style="display:none;">Add schools in the School Comparison tab to see Greek life data.</div>
+    <div class="table-wrap" style="max-height:none;">
+      <table>
+        <thead><tr>
+          <th>School</th>
+          <th>% Women in Sororities</th>
+          <th>NPC Sororities</th>
+          <th>Total Sororities</th>
+          <th>Recruitment</th>
+          <th>Housing</th>
+          <th>Est. Annual Cost</th>
+          <th>Overall Greek %</th>
+          <th>Greek vs Campus GPA</th>
+          <th>Vibe</th>
+        </tr></thead>
+        <tbody id="greekBody"></tbody>
+      </table>
+    </div>
+  </div>
+  </div><!-- /group-schools -->
+
+  <!-- ═══════════ GROUP: VISITS ═══════════ -->
+  <div id="group-visits" class="tab-group">
+  <nav class="subtab-bar">
+    <button class="subtab-btn active" data-subtab="roadtrip">Road Trip</button>
+    <button class="subtab-btn" data-subtab="tourchk">Tour Checklist</button>
+    <button class="subtab-btn" data-subtab="evaluation">Evaluation</button>
+  </nav>
+
+  <!-- Road Trip sub-panel -->
+  <div id="roadtrip" class="sub-panel active">
+    <div class="section-head"><h2>March 2026 College Road Trip</h2><p>Pre-Vet / Animal Science Focus &mdash; All schools in session during visit!</p></div>
+    <div class="trip-stats">
+      <div class="trip-stat"><div class="stat-val">6</div><div class="stat-lbl">Days</div></div>
+      <div class="trip-stat"><div class="stat-val">5</div><div class="stat-lbl">Schools</div></div>
+      <div class="trip-stat"><div class="stat-val">25 hrs</div><div class="stat-lbl">Total Drive</div></div>
+      <div class="trip-stat"><div class="stat-val">$1,071</div><div class="stat-lbl">Hotels Total</div></div>
+      <div class="trip-stat"><div class="stat-val">~6,426</div><div class="stat-lbl">Bonvoy Points</div></div>
+    </div>
+    <div id="roadtripDays"></div>
+    <div class="trip-tips">
+      <h3>Trip Tips</h3>
+      <ul>
+        <li>Virginia Tech tour is short (1 hr) &mdash; download Hokies on Track app for self-guided tour after, grab lunch at The Cellar in downtown Blacksburg</li>
+        <li>Purdue is Avery's most anticipated campus &mdash; staying ON campus at Union Club Hotel (Best Boutique Hotel in America 2021)</li>
+        <li>Kentucky has a gap between tours (11:30am-3pm) &mdash; perfect for lunch and exploring campus/downtown Lexington</li>
+        <li>Ask about Gold Elite room upgrades at check-in, especially at Autograph properties (StateView, Union Club)</li>
+        <li>Late checkout (2pm) available with Gold status &mdash; helpful on days with morning drives</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tour Checklist sub-panel -->
+  <div id="tourchk" class="sub-panel">
+    <div class="section-head"><h2>Campus Visit Checklist</h2></div>
+    <div id="tourChecklistContainer"></div>
+  </div>
+
+  <!-- Visit Evaluation sub-panel -->
+  <div id="evaluation" class="sub-panel">
+    <div class="section-head">
+      <h2>Visit Evaluation</h2>
+      <p>Rate each school during or right after your campus visit. Scores auto-calculate using weighted categories.</p>
+    </div>
+    <div class="eval-school-picker">
+      <label style="font-weight:600;font-size:0.9rem;">Evaluating:</label>
+      <select id="evalSchoolSelect" onchange="renderEvaluation()"></select>
+    </div>
+    <div id="evalTotalBar"></div>
+    <div id="evalContainer"></div>
+    <div id="evalNotesContainer"></div>
+    <div class="empty-state" id="evalEmpty" style="display:none;">
+      <p>Add schools in the <strong>School Comparison</strong> tab, then evaluate them here after visiting.</p>
+    </div>
+
+    <div style="margin-top:32px">
+      <div class="section-head"><h2>Evaluation Summary</h2></div>
+      <div class="table-wrap" id="evalSummaryWrap" style="max-height:none;">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>School</th>
+              <th>Campus</th>
+              <th>Academic</th>
+              <th>Life</th>
+              <th>Practical</th>
+              <th>Weighted Total</th>
+              <th>Grade</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody id="evalSummaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div><!-- /group-visits -->
+
+  <!-- ═══════════ GROUP: APPLICATIONS ═══════════ -->
+  <div id="group-apps" class="tab-group">
+  <nav class="subtab-bar">
+    <button class="subtab-btn active" data-subtab="checklist">Checklist</button>
+    <button class="subtab-btn" data-subtab="strategy">Strategy</button>
+    <button class="subtab-btn" data-subtab="testprep">Test Prep</button>
+  </nav>
+
+  <!-- Application Checklist sub-panel -->
+  <div id="checklist" class="sub-panel active">
+    <div class="section-head" style="display:flex;justify-content:space-between;align-items:center">
+      <h2>Application Checklist</h2>
+      <div id="checklistToggleAll" style="display:none">
+        <button class="btn btn-sm" onclick="expandAllChecklists()" style="font-size:0.78rem;padding:4px 10px;margin-right:4px">Expand All</button>
+        <button class="btn btn-sm" onclick="collapseAllChecklists()" style="font-size:0.78rem;padding:4px 10px">Collapse All</button>
+      </div>
+    </div>
+    <div id="checklistContainer"></div>
+    <div class="empty-state" id="checklistEmpty" style="display:none;">
+      <p>No checklists yet. Add a school in the <strong>School Comparison</strong> tab to get started.</p>
+    </div>
+  </div>
+
+  <!-- Admission Strategy sub-panel -->
+  <div id="strategy" class="sub-panel">
+    <div class="section-head"><h2>Admission Strategy</h2><p>Why applying to Animal Science matters</p></div>
+    <div class="strat-explainer">
+      <h3>The Animal Science Advantage</h3>
+      <p>Avery gains <span class="strat-highlight">15-25 percentage points</span> in admission probability by applying to Animal Science vs. Engineering/CS/Business.</p>
+      <p style="margin-top:10px;">At "direct-admit" schools like Purdue and Texas A&amp;M, students are admitted to specific colleges, not the university as a whole. The College of Agriculture typically admits at 50-60% while Engineering admits at 30-35%. With Avery's 3.74 GPA and 27 ACT, she's competitive for Agriculture admits but below the median for Engineering. This strategy costs nothing and provides meaningful advantage.</p>
+    </div>
+    <div class="table-wrap" style="max-height:none;">
+      <table>
+        <thead><tr><th>School</th><th>Admission Type</th><th>Overall Rate</th><th>Engineering Rate</th><th>Ag/Bio Rate</th><th>Advantage</th><th>Recommended Major</th><th>Confidence</th></tr></thead>
+        <tbody id="strategyBody"></tbody>
+      </table>
+    </div>
+    <div class="strat-explainer" style="margin-top:22px;">
+      <h3>Can Avery Switch Majors Once Enrolled?</h3>
+      <p><strong>From Animal Science TO Biology/Biochemistry:</strong> EASY at all schools &mdash; these are lateral moves within related colleges.</p>
+      <p style="margin-top:8px;"><strong>From Animal Science TO Engineering/CS/Business:</strong> DIFFICULT at Purdue, Texas A&amp;M, NC State, Virginia Tech &mdash; competitive internal transfer processes.</p>
+      <p style="margin-top:8px;"><strong>Bottom Line:</strong> Since Avery is committed to pre-vet, this risk is essentially zero. The strategy has no downside for her goals.</p>
+    </div>
+  </div>
+
+  <!-- Test Prep sub-panel -->
+  <div id="testprep" class="sub-panel">
+    <div class="section-head">
+      <h2>Test Prep Tracker</h2>
+      <button class="btn btn-primary" onclick="openModal('testprep')">+ Add Milestone</button>
+    </div>
+    <div class="card-grid" id="testCards"></div>
+    <div class="empty-state" id="testEmpty" style="display:none;">
+      <p>No test prep milestones yet. Click <strong>+ Add Milestone</strong> to plan your prep timeline.</p>
+    </div>
+  </div>
+  </div><!-- /group-apps -->
+
+</main>
+
+<!-- ═══════════ MODALS ═══════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ─── Firebase ───
+const firebaseConfig = {
+  apiKey: "AIzaSyBKMJI-lQhXcuHY6A551Wy-xcq9vQkP01M",
+  authDomain: "avery-dashboard.firebaseapp.com",
+  projectId: "avery-dashboard",
+  storageBucket: "avery-dashboard.firebasestorage.app",
+  messagingSenderId: "230444135745",
+  appId: "1:230444135745:web:cd94280be7f51657971dc0"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const docRef = db.collection('dashboards').doc('main');
+let firestoreSyncEnabled = false;
+
+// ─── Data store ───
+const STORAGE_KEY = 'averyCollegePlanning';
+
+function loadData() {
+  const d = localStorage.getItem(STORAGE_KEY);
+  if (d) return JSON.parse(d);
+  return getDefaults();
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (firestoreSyncEnabled) {
+    docRef.set(JSON.parse(JSON.stringify(data))).catch(err => console.error('Firestore save:', err));
+  }
+}
+
+function getDefaults() {
+  return {
+    schools: [
+      {
+        id: uid(),
+        name: 'Texas A&M University',
+        domain: 'tamu.edu',
+        location: 'College Station, TX',
+        notes: 'Top-ranked College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program',
+        tuitionIn: '$11,892',
+        tuitionOut: '$40,526',
+        deadline: 'December 1',
+        earlyDecision: 'October 15',
+        testReq: 'SAT 1210-1410 / ACT 26-32',
+        acceptRate: '63%',
+        agAcceptRate: '72%',
+        oosAcceptRate: '47%',
+        oosAgAcceptRate: '54%',
+        avgGPA: '3.68',
+        status: 'researching'
+      },
+      {
+        id: uid(),
+        name: 'University of Georgia',
+        domain: 'uga.edu',
+        location: 'Athens, GA',
+        notes: 'Excellent pre-vet program with research opportunities; accredited College of Veterinary Medicine on campus',
+        tuitionIn: '$12,080',
+        tuitionOut: '$31,120',
+        deadline: 'January 1',
+        earlyDecision: 'October 15',
+        testReq: 'SAT 1250-1430 / ACT 28-33',
+        acceptRate: '43%',
+        agAcceptRate: '55%',
+        oosAcceptRate: '18%',
+        oosAgAcceptRate: '23%',
+        avgGPA: '4.0',
+        status: 'researching'
+      }
+    ],
+    visits: [
+      {
+        id: uid(),
+        school: 'Texas A&M University',
+        date: '2026-03-14',
+        scheduled: 'Campus tour, College of Vet Med info session, meet pre-vet advisor',
+        notes: ''
+      },
+      {
+        id: uid(),
+        school: 'University of Georgia',
+        date: '2026-03-21',
+        scheduled: 'General campus tour, vet school facilities walkthrough, lunch in dining hall',
+        notes: ''
+      }
+    ],
+    testprep: [
+      {
+        id: uid(),
+        title: 'Start SAT Prep',
+        date: '2026-03-01',
+        type: 'milestone',
+        description: 'Begin consistent study routine — 1 hour daily focused practice',
+        scoreGoal: ''
+      },
+      {
+        id: uid(),
+        title: 'Practice Test #1',
+        date: '2026-04-15',
+        type: 'practice',
+        description: 'Full-length timed practice SAT to set baseline score',
+        scoreGoal: '1200+'
+      },
+      {
+        id: uid(),
+        title: 'SAT Test Date',
+        date: '2026-06-06',
+        type: 'test',
+        description: 'First official SAT sitting',
+        scoreGoal: '1300+'
+      }
+    ],
+    evaluations: {},
+    visitNotes: {},
+    rankings: {},
+    checklists: [
+      {
+        id: uid(),
+        school: 'Texas A&M University',
+        items: [
+          { id: uid(), text: 'Request official transcripts', done: false },
+          { id: uid(), text: 'Write personal essay / Common App essay', done: false },
+          { id: uid(), text: 'Supplemental essay (Why Texas A&M)', done: false },
+          { id: uid(), text: 'Letter of recommendation — Science teacher', done: false },
+          { id: uid(), text: 'Letter of recommendation — Counselor', done: false },
+          { id: uid(), text: 'Submit SAT/ACT scores', done: false },
+          { id: uid(), text: 'Complete FAFSA', done: false },
+          { id: uid(), text: 'Scholarship applications', done: false }
+        ]
+      },
+      {
+        id: uid(),
+        school: 'University of Georgia',
+        items: [
+          { id: uid(), text: 'Request official transcripts', done: false },
+          { id: uid(), text: 'Write personal essay / Common App essay', done: false },
+          { id: uid(), text: 'Supplemental essay (Why UGA)', done: false },
+          { id: uid(), text: 'Letter of recommendation — Science teacher', done: false },
+          { id: uid(), text: 'Letter of recommendation — Counselor', done: false },
+          { id: uid(), text: 'Submit SAT/ACT scores', done: false },
+          { id: uid(), text: 'Complete FAFSA', done: false },
+          { id: uid(), text: 'Scholarship applications', done: false }
+        ]
+      }
+    ]
+  };
+}
+
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+// ─── Pre-Vet School Database ───
+const schoolDB = {
+  'Texas A&M University':           { domain:'tamu.edu', color:'#500000', location:'College Station, TX', notes:'Top-ranked College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program', tuitionIn:'$11,892', tuitionOut:'$40,526', deadline:'December 1', earlyDecision:'October 15', testReq:'SAT 1210-1410 / ACT 26-32', acceptRate:'63%', agAcceptRate:'72%', oosAcceptRate:'47%', oosAgAcceptRate:'54%', avgGPA:'3.68' },
+  'University of Georgia':          { domain:'uga.edu', color:'#BA0C2F', location:'Athens, GA', notes:'Excellent pre-vet program with research opportunities; accredited College of Veterinary Medicine on campus', tuitionIn:'$12,080', tuitionOut:'$31,120', deadline:'January 1', earlyDecision:'October 15', testReq:'SAT 1250-1430 / ACT 28-33', acceptRate:'43%', agAcceptRate:'55%', oosAcceptRate:'18%', oosAgAcceptRate:'23%', avgGPA:'4.0' },
+  'Cornell University':             { domain:'cornell.edu', color:'#B31B1B', location:'Ithaca, NY', notes:'Ivy League with top-5 vet school; undergrad Animal Science major feeds directly into Cornell CVM; outstanding research', tuitionIn:'$65,204', tuitionOut:'$65,204', deadline:'January 2', earlyDecision:'November 1', testReq:'SAT 1470-1560 / ACT 33-35', acceptRate:'9%', agAcceptRate:'12%', oosAcceptRate:'9%', oosAgAcceptRate:'12%', avgGPA:'3.9' },
+  'UC Davis':                       { domain:'ucdavis.edu', color:'#022851', location:'Davis, CA', notes:'#1 ranked vet school nationally; premier Animal Science & pre-vet advising; extensive hands-on animal facilities', tuitionIn:'$14,634', tuitionOut:'$44,932', deadline:'November 30', earlyDecision:'N/A', testReq:'SAT 1250-1470 / ACT 27-34', acceptRate:'37%', agAcceptRate:'45%', oosAcceptRate:'30%', oosAgAcceptRate:'36%', avgGPA:'3.97' },
+  'Colorado State University':      { domain:'colostate.edu', color:'#1E4D2B', location:'Fort Collins, CO', notes:'Top-5 vet school; Animal Science pre-vet track with early clinical exposure; strong equine and large animal programs', tuitionIn:'$12,694', tuitionOut:'$33,084', deadline:'February 1', earlyDecision:'N/A', testReq:'SAT 1120-1320 / ACT 23-29', acceptRate:'80%', agAcceptRate:'85%', oosAcceptRate:'72%', oosAgAcceptRate:'77%', avgGPA:'3.54' },
+  'University of Florida':          { domain:'ufl.edu', color:'#FA4616', location:'Gainesville, FL', notes:'Accredited CVM on campus; pre-vet specialization in Animal Sciences; UF early admission pathway to vet school', tuitionIn:'$6,381', tuitionOut:'$28,658', deadline:'November 1', earlyDecision:'N/A', testReq:'SAT 1300-1470 / ACT 29-33', acceptRate:'23%', agAcceptRate:'35%', oosAcceptRate:'15%', oosAgAcceptRate:'23%', avgGPA:'3.9' },
+  'Ohio State University':          { domain:'osu.edu', color:'#BB0000', location:'Columbus, OH', notes:'Top-10 vet school; strong pre-vet curriculum through Animal Sciences; veterinary teaching hospital on campus', tuitionIn:'$11,936', tuitionOut:'$35,019', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1250-1430 / ACT 27-32', acceptRate:'53%', agAcceptRate:'60%', oosAcceptRate:'45%', oosAgAcceptRate:'51%', avgGPA:'3.75' },
+  'University of Minnesota':        { domain:'umn.edu', color:'#7A0019', location:'Saint Paul, MN', notes:'Accredited CVM with pre-vet track; Animal Science major; strong research in companion and production animal medicine', tuitionIn:'$15,420', tuitionOut:'$35,238', deadline:'January 1', earlyDecision:'November 1', testReq:'SAT 1280-1460 / ACT 28-33', acceptRate:'75%', agAcceptRate:'80%', oosAcceptRate:'60%', oosAgAcceptRate:'64%', avgGPA:'3.7' },
+  'Purdue University':              { domain:'purdue.edu', color:'#000000', location:'West Lafayette, IN', notes:'Accredited vet school; pre-vet students in Animal Sciences get priority advising; PVM early admission program available', tuitionIn:'$9,992', tuitionOut:'$28,794', deadline:'January 1', earlyDecision:'November 1', testReq:'SAT 1190-1410 / ACT 25-32', acceptRate:'53%', agAcceptRate:'65%', oosAcceptRate:'45%', oosAgAcceptRate:'55%', avgGPA:'3.7' },
+  'Michigan State University':      { domain:'msu.edu', color:'#18453B', location:'East Lansing, MI', notes:'Top-ranked CVM; pre-vet concentration in Animal Science; large animal hospital and clinical rotations for undergrads', tuitionIn:'$14,460', tuitionOut:'$40,778', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1120-1330 / ACT 23-30', acceptRate:'76%', agAcceptRate:'82%', oosAcceptRate:'68%', oosAgAcceptRate:'73%', avgGPA:'3.6' },
+  'Virginia Tech':                  { domain:'vt.edu', color:'#861F41', location:'Blacksburg, VA', notes:'Virginia-Maryland CVM on campus; strong Animal & Poultry Sciences pre-vet path; rural setting with farm animal access', tuitionIn:'$14,478', tuitionOut:'$35,580', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1200-1390 / ACT 26-31', acceptRate:'57%', agAcceptRate:'65%', oosAcceptRate:'40%', oosAgAcceptRate:'46%', avgGPA:'3.9' },
+  'Iowa State University':          { domain:'iastate.edu', color:'#C8102E', location:'Ames, IA', notes:'Accredited CVM; pre-vet track in Animal Science; early admit program for exceptional undergrads; strong dairy/livestock', tuitionIn:'$9,896', tuitionOut:'$25,268', deadline:'January 1', earlyDecision:'N/A', testReq:'SAT 1120-1350 / ACT 23-29', acceptRate:'90%', agAcceptRate:'92%', oosAcceptRate:'85%', oosAgAcceptRate:'87%', avgGPA:'3.5' },
+  'North Carolina State University':{ domain:'ncsu.edu', color:'#CC0000', location:'Raleigh, NC', notes:'Top CVM; pre-vet students in Animal Science; teaching animal units on campus; guaranteed interview program', tuitionIn:'$9,128', tuitionOut:'$30,869', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1280-1430 / ACT 28-32', acceptRate:'47%', agAcceptRate:'55%', oosAcceptRate:'30%', oosAgAcceptRate:'35%', avgGPA:'3.8' },
+  'University of Wisconsin-Madison':{ domain:'wisc.edu', color:'#C5050C', location:'Madison, WI', notes:'School of Veterinary Medicine on campus; pre-vet through Animal & Dairy Sciences; strong research opportunities', tuitionIn:'$10,796', tuitionOut:'$39,427', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1310-1480 / ACT 28-33', acceptRate:'49%', agAcceptRate:'58%', oosAcceptRate:'35%', oosAgAcceptRate:'41%', avgGPA:'3.85' },
+  'Auburn University':              { domain:'auburn.edu', color:'#DD550C', location:'Auburn, AL', notes:'Accredited CVM; pre-vet in Animal Sciences; teaching hospital and farm; strong small animal and equine programs', tuitionIn:'$11,826', tuitionOut:'$33,382', deadline:'February 1', earlyDecision:'October 15', testReq:'SAT 1150-1320 / ACT 25-31', acceptRate:'76%', agAcceptRate:'82%', oosAcceptRate:'55%', oosAgAcceptRate:'59%', avgGPA:'3.6' },
+  'Kansas State University':        { domain:'k-state.edu', color:'#512888', location:'Manhattan, KS', notes:'Accredited CVM; pre-vet in Animal Sciences & Industry; early admission to vet school for top students', tuitionIn:'$10,984', tuitionOut:'$27,060', deadline:'January 1', earlyDecision:'N/A', testReq:'SAT 1060-1290 / ACT 22-28', acceptRate:'94%', agAcceptRate:'96%', oosAcceptRate:'90%', oosAgAcceptRate:'92%', avgGPA:'3.4' },
+  'Oklahoma State University':      { domain:'okstate.edu', color:'#FF6600', location:'Stillwater, OK', notes:'Center for Veterinary Health Sciences; pre-vet track in Animal Science; hands-on from freshman year', tuitionIn:'$9,585', tuitionOut:'$25,845', deadline:'February 1', earlyDecision:'N/A', testReq:'SAT 1080-1280 / ACT 22-28', acceptRate:'73%', agAcceptRate:'80%', oosAcceptRate:'65%', oosAgAcceptRate:'71%', avgGPA:'3.5' },
+  'Oregon State University':        { domain:'oregonstate.edu', color:'#DC4405', location:'Corvallis, OR', notes:'Carlson College of Veterinary Medicine; pre-vet in Animal Sciences; marine and exotic animal opportunities', tuitionIn:'$12,435', tuitionOut:'$33,013', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1110-1330 / ACT 22-29', acceptRate:'82%', agAcceptRate:'87%', oosAcceptRate:'75%', oosAgAcceptRate:'80%', avgGPA:'3.5' },
+  'Washington State University':    { domain:'wsu.edu', color:'#981E32', location:'Pullman, WA', notes:'Accredited CVM; pre-vet in Animal Sciences; large animal teaching hospital; rural and wildlife medicine focus', tuitionIn:'$11,841', tuitionOut:'$27,357', deadline:'January 31', earlyDecision:'N/A', testReq:'SAT 1080-1300 / ACT 21-28', acceptRate:'83%', agAcceptRate:'88%', oosAcceptRate:'75%', oosAgAcceptRate:'80%', avgGPA:'3.4' },
+  'Mississippi State University':   { domain:'msstate.edu', color:'#660000', location:'Starkville, MS', notes:'Accredited CVM; pre-vet in Animal & Dairy Sciences; wildlife and aquatic medicine specialties', tuitionIn:'$9,648', tuitionOut:'$26,878', deadline:'January 5', earlyDecision:'October 1', testReq:'SAT 1070-1270 / ACT 21-28', acceptRate:'80%', agAcceptRate:'85%', oosAcceptRate:'70%', oosAgAcceptRate:'74%', avgGPA:'3.4' },
+  'Louisiana State University':     { domain:'lsu.edu', color:'#461D7C', location:'Baton Rouge, LA', notes:'School of Veterinary Medicine on campus; pre-vet in Animal Sciences; unique aquatic and wildlife programs', tuitionIn:'$11,962', tuitionOut:'$28,639', deadline:'January 15', earlyDecision:'October 15', testReq:'SAT 1110-1300 / ACT 23-29', acceptRate:'76%', agAcceptRate:'82%', oosAcceptRate:'60%', oosAgAcceptRate:'65%', avgGPA:'3.5' },
+  'University of Illinois':         { domain:'illinois.edu', color:'#E84A27', location:'Champaign, IL', notes:'Accredited CVM; pre-vet in Animal Sciences; strong companion animal and food animal medicine programs', tuitionIn:'$15,094', tuitionOut:'$33,352', deadline:'January 5', earlyDecision:'November 1', testReq:'SAT 1210-1440 / ACT 26-32', acceptRate:'45%', agAcceptRate:'55%', oosAcceptRate:'38%', oosAgAcceptRate:'46%', avgGPA:'3.75' },
+  'Tufts University':               { domain:'tufts.edu', color:'#3E8EDE', location:'Medford, MA', notes:'Cummings School of Veterinary Medicine; pre-vet through Biology; wildlife clinic and unique international programs', tuitionIn:'$65,222', tuitionOut:'$65,222', deadline:'January 4', earlyDecision:'November 1', testReq:'SAT 1430-1540 / ACT 33-35', acceptRate:'10%', agAcceptRate:'~13%', oosAcceptRate:'10%', oosAgAcceptRate:'~13%', avgGPA:'3.9' },
+  'University of Pennsylvania':     { domain:'upenn.edu', color:'#011F5B', location:'Philadelphia, PA', notes:'Penn Vet — Ivy League vet school; pre-vet through Biology; New Bolton Center large animal facility; top research', tuitionIn:'$63,452', tuitionOut:'$63,452', deadline:'January 5', earlyDecision:'November 1', testReq:'SAT 1480-1570 / ACT 34-36', acceptRate:'6%', agAcceptRate:'~8%', oosAcceptRate:'6%', oosAgAcceptRate:'~8%', avgGPA:'3.95' },
+  'Tuskegee University':            { domain:'tuskegee.edu', color:'#8B0000', location:'Tuskegee, AL', notes:'Only HBCU with a vet school; pre-vet in Animal & Veterinary Sciences; small class sizes; strong community', tuitionIn:'$23,500', tuitionOut:'$23,500', deadline:'March 15', earlyDecision:'N/A', testReq:'SAT 940-1130 / ACT 17-22', acceptRate:'56%', agAcceptRate:'65%', oosAcceptRate:'56%', oosAgAcceptRate:'65%', avgGPA:'3.2' },
+  'University of Tennessee':        { domain:'utk.edu', color:'#FF8200', location:'Knoxville, TN', notes:'Accredited CVM; pre-vet in Animal Science; large teaching hospital; equine and farm animal strengths', tuitionIn:'$13,264', tuitionOut:'$31,544', deadline:'December 15', earlyDecision:'November 1', testReq:'SAT 1180-1360 / ACT 25-31', acceptRate:'80%', agAcceptRate:'85%', oosAcceptRate:'65%', oosAgAcceptRate:'69%', avgGPA:'3.65' },
+  'University of Missouri':         { domain:'missouri.edu', color:'#F1B82D', location:'Columbia, MO', notes:'Accredited CVM; pre-vet in Animal Sciences; strong food animal and equine programs; guaranteed admission track', tuitionIn:'$11,506', tuitionOut:'$30,248', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1160-1360 / ACT 24-30', acceptRate:'82%', agAcceptRate:'88%', oosAcceptRate:'72%', oosAgAcceptRate:'77%', avgGPA:'3.55' },
+  'Clemson University':             { domain:'clemson.edu', color:'#F56600', location:'Clemson, SC', notes:'Pre-vet through Animal & Veterinary Sciences; articulation with regional vet schools; hands-on farm and lab work', tuitionIn:'$15,558', tuitionOut:'$39,498', deadline:'January 2', earlyDecision:'November 1', testReq:'SAT 1230-1400 / ACT 27-32', acceptRate:'47%', agAcceptRate:'58%', oosAcceptRate:'32%', oosAgAcceptRate:'40%', avgGPA:'3.8' },
+  'Penn State University':          { domain:'psu.edu', color:'#041E42', location:'University Park, PA', notes:'Pre-vet through Animal Science; veterinary and biomedical sciences emphasis; strong advising for vet school apps', tuitionIn:'$19,286', tuitionOut:'$38,126', deadline:'January 1', earlyDecision:'November 1', testReq:'SAT 1210-1400 / ACT 27-32', acceptRate:'55%', agAcceptRate:'65%', oosAcceptRate:'40%', oosAgAcceptRate:'47%', avgGPA:'3.6' },
+  'University of Vermont':          { domain:'uvm.edu', color:'#154734', location:'Burlington, VT', notes:'Pre-vet through Animal & Veterinary Sciences; Morgan Horse Farm; dairy and equine focus; small class sizes', tuitionIn:'$18,802', tuitionOut:'$43,690', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1190-1370 / ACT 27-32', acceptRate:'68%', agAcceptRate:'75%', oosAcceptRate:'55%', oosAgAcceptRate:'61%', avgGPA:'3.6' },
+  // ── Schools without vet schools but with strong pre-vet undergrad programs ──
+  'University of Kentucky':         { domain:'uky.edu', color:'#0033A0', location:'Lexington, KY', notes:'No vet school but outstanding pre-vet advising through Animal & Food Sciences; nationally renowned equine science program leveraging Kentucky horse industry; students place well at Auburn, Tufts, and other DVMs', tuitionIn:'$12,859', tuitionOut:'$33,252', deadline:'February 15', earlyDecision:'December 1', testReq:'SAT 1120-1310 / ACT 23-29', acceptRate:'96%', agAcceptRate:'97%', oosAcceptRate:'90%', oosAgAcceptRate:'91%', avgGPA:'3.5' },
+  'Rutgers University':             { domain:'rutgers.edu', color:'#CC0033', location:'New Brunswick, NJ', notes:'No vet school; strong pre-vet track in Animal Sciences; active pre-vet club; proximity to research hospitals and NJ equine industry', tuitionIn:'$16,260', tuitionOut:'$33,963', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1250-1450 / ACT 28-33', acceptRate:'66%', agAcceptRate:'75%', oosAcceptRate:'50%', oosAgAcceptRate:'57%', avgGPA:'3.7' },
+  'University of Arizona':          { domain:'arizona.edu', color:'#CC0033', location:'Tucson, AZ', notes:'No vet school; pre-vet through Animal & Comparative Biomedical Sciences; unique desert/exotic animal exposure; partnership with local wildlife centers', tuitionIn:'$13,100', tuitionOut:'$38,217', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1120-1340 / ACT 22-29', acceptRate:'87%', agAcceptRate:'90%', oosAcceptRate:'80%', oosAgAcceptRate:'83%', avgGPA:'3.4' },
+  'University of Maryland':         { domain:'umd.edu', color:'#E03A3E', location:'College Park, MD', notes:'No vet school; pre-vet through Animal & Avian Sciences; proximity to USDA and NIH for research; strong science foundation', tuitionIn:'$11,233', tuitionOut:'$38,636', deadline:'January 20', earlyDecision:'November 1', testReq:'SAT 1310-1480 / ACT 29-34', acceptRate:'44%', agAcceptRate:'55%', oosAcceptRate:'35%', oosAgAcceptRate:'44%', avgGPA:'3.9' },
+  'Cal Poly San Luis Obispo':       { domain:'calpoly.edu', color:'#154734', location:'San Luis Obispo, CA', notes:'No vet school; learn-by-doing Animal Science program; campus ranch and farm units; exceptional hands-on experience from day one', tuitionIn:'$11,310', tuitionOut:'$29,490', deadline:'November 30', earlyDecision:'N/A', testReq:'SAT 1220-1420 / ACT 26-32', acceptRate:'30%', agAcceptRate:'38%', oosAcceptRate:'25%', oosAgAcceptRate:'32%', avgGPA:'3.85' },
+  'University of Connecticut':      { domain:'uconn.edu', color:'#000E2F', location:'Storrs, CT', notes:'No vet school; pre-vet through Animal Science; campus farms and equine facilities; strong placement at northeastern vet schools', tuitionIn:'$17,226', tuitionOut:'$40,434', deadline:'January 15', earlyDecision:'December 1', testReq:'SAT 1210-1390 / ACT 27-32', acceptRate:'56%', agAcceptRate:'65%', oosAcceptRate:'42%', oosAgAcceptRate:'49%', avgGPA:'3.7' },
+  'University of Nebraska-Lincoln': { domain:'unl.edu', color:'#D00000', location:'Lincoln, NE', notes:'No vet school; pre-vet through Animal Science; strong livestock and production animal focus; affordable with good vet school placement', tuitionIn:'$9,242', tuitionOut:'$26,292', deadline:'January 15', earlyDecision:'N/A', testReq:'SAT 1100-1320 / ACT 22-28', acceptRate:'80%', agAcceptRate:'85%', oosAcceptRate:'72%', oosAgAcceptRate:'77%', avgGPA:'3.5' },
+  'Montana State University':       { domain:'montana.edu', color:'#003875', location:'Bozeman, MT', notes:'No vet school; pre-vet in Animal & Range Sciences; large animal and ranch experience; proximity to wildlife and outdoor labs', tuitionIn:'$8,227', tuitionOut:'$27,279', deadline:'March 1', earlyDecision:'N/A', testReq:'SAT 1080-1290 / ACT 22-28', acceptRate:'83%', agAcceptRate:'88%', oosAcceptRate:'76%', oosAgAcceptRate:'81%', avgGPA:'3.4' },
+  'University of Delaware':         { domain:'udel.edu', color:'#00539F', location:'Newark, DE', notes:'No vet school; pre-vet through Animal & Food Sciences; small program with personalized advising; good placement at mid-Atlantic vet schools', tuitionIn:'$14,280', tuitionOut:'$36,550', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1190-1370 / ACT 26-31', acceptRate:'70%', agAcceptRate:'78%', oosAcceptRate:'55%', oosAgAcceptRate:'61%', avgGPA:'3.7' },
+  'University of New Hampshire':    { domain:'unh.edu', color:'#003DA5', location:'Durham, NH', notes:'No vet school; pre-vet through Biomedical Science or Animal Science; campus dairy and equine facilities; organic dairy research farm', tuitionIn:'$18,499', tuitionOut:'$36,379', deadline:'February 1', earlyDecision:'November 15', testReq:'SAT 1140-1320 / ACT 24-30', acceptRate:'78%', agAcceptRate:'83%', oosAcceptRate:'65%', oosAgAcceptRate:'69%', avgGPA:'3.5' },
+  'Berry College':                  { domain:'berry.edu', color:'#002855', location:'Mount Berry, GA', notes:'No vet school; Animal Science with hands-on focus; 27,000-acre campus with working farms and wildlife; exceptional undergrad animal experience', tuitionIn:'$40,920', tuitionOut:'$40,920', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1130-1310 / ACT 24-30', acceptRate:'58%', agAcceptRate:'65%', oosAcceptRate:'58%', oosAgAcceptRate:'65%', avgGPA:'3.6' },
+  'Delaware Valley University':     { domain:'delval.edu', color:'#006747', location:'Doylestown, PA', notes:'No vet school; dedicated pre-vet major — one of few schools offering it; small animal hospital on campus; A-Day hands-on tradition; strong DVM acceptance rate', tuitionIn:'$44,760', tuitionOut:'$44,760', deadline:'Rolling', earlyDecision:'N/A', testReq:'SAT 990-1180 / ACT 19-25', acceptRate:'72%', agAcceptRate:'80%', oosAcceptRate:'72%', oosAgAcceptRate:'80%', avgGPA:'3.3' },
+  'University of Wyoming':          { domain:'uwyo.edu', color:'#492F24', location:'Laramie, WY', notes:'No vet school; pre-vet in Animal & Veterinary Sciences; WWAMI partnership region; ranch and wildlife exposure; very affordable', tuitionIn:'$6,240', tuitionOut:'$20,220', deadline:'January 5', earlyDecision:'N/A', testReq:'SAT 1060-1270 / ACT 21-27', acceptRate:'96%', agAcceptRate:'97%', oosAcceptRate:'92%', oosAgAcceptRate:'93%', avgGPA:'3.4' },
+};
+const schoolNames = Object.keys(schoolDB);
+// Aliases so common abbreviations also match
+const schoolAliases = {
+  'North Carolina State University': ['nc state','ncsu'],
+  'UC Davis': ['university of california davis','california davis','ucd'],
+  'Texas A&M University': ['tamu'],
+  'University of Georgia': ['uga'],
+  'University of Florida': ['uf','gators'],
+  'Ohio State University': ['osu'],
+  'Michigan State University': ['msu'],
+  'Virginia Tech': ['vt','virginia polytechnic'],
+  'Iowa State University': ['isu'],
+  'Penn State University': ['psu','pennsylvania state'],
+  'Louisiana State University': ['lsu'],
+  'University of Illinois': ['uiuc','u of i'],
+  'University of Minnesota': ['u of m','umn'],
+  'University of Wisconsin-Madison': ['uw madison','badgers'],
+  'University of Tennessee': ['ut knoxville','vols'],
+  'University of Missouri': ['mizzou'],
+  'Oklahoma State University': ['osu stillwater','okstate'],
+  'Washington State University': ['wsu','wazzu'],
+  'Mississippi State University': ['miss state'],
+  'University of Kentucky': ['uk','wildcats'],
+  'Rutgers University': ['rutgers'],
+  'University of Arizona': ['u of a','uarizona'],
+  'University of Maryland': ['umd','terps'],
+  'Cal Poly San Luis Obispo': ['cal poly','cal poly slo','cpslo'],
+  'University of Connecticut': ['uconn','huskies'],
+  'University of Nebraska-Lincoln': ['unl','huskers'],
+  'Montana State University': ['msu bozeman','montana state'],
+  'University of Delaware': ['ud','udel'],
+  'University of New Hampshire': ['unh'],
+  'Delaware Valley University': ['del val','delval'],
+  'University of Wyoming': ['uwyo'],
+};
+
+function setupSchoolAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ac-wrap';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+
+  const list = document.createElement('div');
+  list.className = 'ac-list';
+  wrap.appendChild(list);
+
+  const hint = document.createElement('div');
+  hint.className = 'ac-hint';
+  hint.textContent = 'Start typing to see suggestions, or enter any school name';
+  wrap.parentNode.insertBefore(hint, wrap.nextSibling);
+
+  let highlightIdx = -1;
+
+  function render(matches) {
+    if (matches.length === 0) { list.classList.remove('open'); return; }
+    list.innerHTML = matches.map((name, i) =>
+      `<div class="ac-item${i === highlightIdx ? ' highlighted' : ''}" data-name="${esc(name)}">${esc(name)}<span class="ac-loc">${esc(schoolDB[name].location)}</span></div>`
+    ).join('');
+    list.classList.add('open');
+    list.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        pick(item.dataset.name);
+      });
+    });
+  }
+
+  function pick(name) {
+    input.value = name;
+    list.classList.remove('open');
+    highlightIdx = -1;
+    populateFromDB(name);
+  }
+
+  function populateFromDB(name) {
+    const info = schoolDB[name];
+    if (!info) return;
+    const fields = { m_location:'location', m_notes:'notes', m_tuitionIn:'tuitionIn', m_tuitionOut:'tuitionOut', m_deadline:'deadline', m_earlyDecision:'earlyDecision', m_testReq:'testReq', m_acceptRate:'acceptRate', m_agAcceptRate:'agAcceptRate', m_oosAcceptRate:'oosAcceptRate', m_oosAgAcceptRate:'oosAgAcceptRate', m_avgGPA:'avgGPA' };
+    for (const [elId, key] of Object.entries(fields)) {
+      const el = document.getElementById(elId);
+      if (el) el.value = info[key] || '';
+    }
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    highlightIdx = -1;
+    if (q.length === 0) { list.classList.remove('open'); return; }
+    const matches = schoolNames.filter(n =>
+      n.toLowerCase().includes(q) ||
+      (schoolAliases[n] && schoolAliases[n].some(a => a.includes(q)))
+    ).slice(0, 8);
+    render(matches);
+  });
+
+  input.addEventListener('keydown', e => {
+    const items = list.querySelectorAll('.ac-item');
+    if (!list.classList.contains('open') || items.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+      items.forEach((it, i) => it.classList.toggle('highlighted', i === highlightIdx));
+      items[highlightIdx]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightIdx = Math.max(highlightIdx - 1, 0);
+      items.forEach((it, i) => it.classList.toggle('highlighted', i === highlightIdx));
+      items[highlightIdx]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter' && highlightIdx >= 0) {
+      e.preventDefault();
+      pick(items[highlightIdx].dataset.name);
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => list.classList.remove('open'), 150);
+  });
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length > 0) input.dispatchEvent(new Event('input'));
+  });
+}
+
+let data = loadData();
+
+// ─── Migrate: ensure new data structures exist ───
+if (!data.evaluations) data.evaluations = {};
+if (!data.visitNotes) data.visitNotes = {};
+if (!data.rankings) data.rankings = {};
+if (!data.tripNotes) data.tripNotes = {};
+if (!data.tourChecklist) data.tourChecklist = null;
+if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
+
+// ─── Migrate: backfill new fields from schoolDB for existing saved schools ───
+(function migrate() {
+  const newFields = ['domain','color','acceptRate','agAcceptRate','oosAcceptRate','oosAgAcceptRate','avgGPA'];
+  let changed = false;
+  data.schools.forEach(s => {
+    const db = schoolDB[s.name];
+    if (!db) return;
+    newFields.forEach(f => {
+      if (!s[f] && db[f]) { s[f] = db[f]; changed = true; }
+    });
+  });
+  if (changed) saveData();
+})();
+
+// ─── Main Tabs ───
+document.querySelectorAll('.tab-btn[data-group]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn[data-group]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-group').forEach(g => g.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.group).classList.add('active');
+  });
+});
+
+// ─── Subtabs ───
+document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const group = btn.closest('.tab-group');
+    group.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+    group.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    group.querySelector('#' + btn.dataset.subtab).classList.add('active');
+  });
+});
+
+// ─── School Comparison ───
+function renderSchools() {
+  const tbody = document.getElementById('schoolBody');
+  tbody.innerHTML = data.schools.map(s => {
+    const dbEntry = schoolDB[s.name];
+    const schoolColor = s.color || (dbEntry && dbEntry.color) || '#4a7c8a';
+    const initials = s.name.split(' ').map(w => w[0]).filter(c => c && c === c.toUpperCase()).slice(0,2).join('');
+    return `
+    <tr data-id="${s.id}">
+      <td class="logo-cell">${schoolLogoHTML(s.name)}</td>
+      <td style="white-space:nowrap"><span contenteditable="true" data-field="name">${esc(s.name)}</span></td>
+      <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
+      <td class="notes-cell"><span contenteditable="true" data-field="notes">${esc(s.notes)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
+      <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="acceptRate">${esc(s.acceptRate)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="agAcceptRate">${esc(s.agAcceptRate)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="oosAcceptRate">${esc(s.oosAcceptRate)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="oosAgAcceptRate">${esc(s.oosAgAcceptRate)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="tuitionIn">${esc(s.tuitionIn)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="tuitionOut">${esc(s.tuitionOut)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="deadline">${esc(s.deadline)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="earlyDecision">${esc(s.earlyDecision)}</span></td>
+      <td>
+        <select class="status-sel s-${s.status}" onchange="updateSchoolStatus('${s.id}', this)">
+          <option value="researching" ${s.status==='researching'?'selected':''}>Researching</option>
+          <option value="applying" ${s.status==='applying'?'selected':''}>Applying</option>
+          <option value="accepted" ${s.status==='accepted'?'selected':''}>Accepted</option>
+          <option value="rejected" ${s.status==='rejected'?'selected':''}>Rejected</option>
+          <option value="waitlisted" ${s.status==='waitlisted'?'selected':''}>Waitlisted</option>
+        </select>
+      </td>
+      <td><button class="btn-icon" title="Remove school" onclick="deleteSchool('${s.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></td>
+    </tr>`;
+  }).join('');
+
+  // Bind inline edits
+  tbody.querySelectorAll('[contenteditable]').forEach(el => {
+    el.addEventListener('blur', () => {
+      const row = el.closest('tr');
+      const school = data.schools.find(s => s.id === row.dataset.id);
+      if (school) {
+        school[el.dataset.field] = el.textContent.trim();
+        saveData();
+      }
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    });
+  });
+}
+
+function updateSchoolStatus(id, sel) {
+  const school = data.schools.find(s => s.id === id);
+  if (school) {
+    school.status = sel.value;
+    sel.className = 'status-sel s-' + sel.value;
+    saveData();
+  }
+}
+
+function deleteSchool(id) {
+  if (!confirm('Remove this school?')) return;
+  data.schools = data.schools.filter(s => s.id !== id);
+  saveData();
+  renderSchools();
+  syncChecklists();
+  renderEvaluation();
+  renderRankings();
+  renderGreekLife();
+}
+
+// ─── Test Prep ───
+function renderTestPrep() {
+  const container = document.getElementById('testCards');
+  const empty = document.getElementById('testEmpty');
+  if (data.testprep.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const sorted = [...data.testprep].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const typeColors = { milestone: 'var(--primary)', practice: 'var(--warn)', test: 'var(--accent)' };
+  const typeLabels = { milestone: 'Milestone', practice: 'Practice Test', test: 'Official Test' };
+
+  container.innerHTML = sorted.map(t => {
+    const isPast = new Date(t.date) < new Date();
+    return `
+    <div class="card milestone-card ${isPast ? 'past' : ''}" data-id="${t.id}" style="border-left-color:${typeColors[t.type] || 'var(--primary)'}">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+        <h3 contenteditable="true" data-field="title" data-ctype="testprep" data-cid="${t.id}">${esc(t.title)}</h3>
+        <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:${typeColors[t.type]}22;color:${typeColors[t.type]}">${typeLabels[t.type] || t.type}</span>
+      </div>
+      <div class="card-field">
+        <label>Date</label>
+        <input type="date" value="${t.date}" onchange="updateTestDate('${t.id}', this.value)">
+      </div>
+      <div class="card-field">
+        <label>Description</label>
+        <div contenteditable="true" data-field="description" data-ctype="testprep" data-cid="${t.id}">${esc(t.description)}</div>
+      </div>
+      <div class="card-field">
+        <label>Score Goal</label>
+        <div contenteditable="true" data-field="scoreGoal" data-ctype="testprep" data-cid="${t.id}" style="font-weight:600;color:var(--accent)">${esc(t.scoreGoal) || '<span style="color:var(--text-light)">Set a goal...</span>'}</div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-icon" title="Remove milestone" onclick="deleteTestPrep('${t.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+      </div>
+    </div>`;
+  }).join('');
+
+  bindCardEdits('testprep', data.testprep);
+}
+
+function updateTestDate(id, val) {
+  const t = data.testprep.find(x => x.id === id);
+  if (t) { t.date = val; saveData(); renderTestPrep(); }
+}
+
+function deleteTestPrep(id) {
+  if (!confirm('Remove this milestone?')) return;
+  data.testprep = data.testprep.filter(t => t.id !== id);
+  saveData();
+  renderTestPrep();
+}
+
+// ─── Application Checklist ───
+const checklistOpenState = {};
+
+function toggleChecklist(clId) {
+  checklistOpenState[clId] = !checklistOpenState[clId];
+  const el = document.querySelector(`.checklist-school[data-id="${clId}"]`);
+  if (el) el.classList.toggle('open');
+}
+
+function expandAllChecklists() {
+  data.checklists.forEach(cl => { checklistOpenState[cl.id] = true; });
+  document.querySelectorAll('.checklist-school').forEach(el => el.classList.add('open'));
+}
+
+function collapseAllChecklists() {
+  data.checklists.forEach(cl => { checklistOpenState[cl.id] = false; });
+  document.querySelectorAll('.checklist-school').forEach(el => el.classList.remove('open'));
+}
+
+function renderChecklists() {
+  const container = document.getElementById('checklistContainer');
+  const empty = document.getElementById('checklistEmpty');
+  const toggleAll = document.getElementById('checklistToggleAll');
+  if (data.checklists.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; if (toggleAll) toggleAll.style.display = 'none'; return; }
+  empty.style.display = 'none';
+  if (toggleAll) toggleAll.style.display = '';
+
+  container.innerHTML = data.checklists.map(cl => {
+    const doneCount = cl.items.filter(i => i.done).length;
+    const total = cl.items.length;
+    const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+    const isOpen = checklistOpenState[cl.id];
+    return `
+    <div class="checklist-school${isOpen ? ' open' : ''}" data-id="${cl.id}">
+      <div class="checklist-header" onclick="toggleChecklist('${cl.id}')">
+        <span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(cl.school, 22)} ${esc(cl.school)}</span>
+        <span class="progress">${doneCount}/${total} complete (${pct}%) <span class="chevron">&#9654;</span></span>
+      </div>
+      <div class="checklist-body">
+        <div class="checklist-items">
+          ${cl.items.map(item => `
+            <div class="checklist-item" data-iid="${item.id}">
+              <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleCheckItem('${cl.id}','${item.id}',this.checked)">
+              <span class="item-text ${item.done ? 'done' : ''}" contenteditable="true" data-clid="${cl.id}" data-iid="${item.id}">${esc(item.text)}</span>
+              <span class="delete-item" onclick="deleteCheckItem('${cl.id}','${item.id}')">&times;</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="add-item-row">
+          <input type="text" placeholder="Add new item..." id="newItem_${cl.id}" onkeydown="if(event.key==='Enter')addCheckItem('${cl.id}')">
+          <button class="btn btn-primary btn-sm" onclick="addCheckItem('${cl.id}')">Add</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Bind checklist inline edits
+  container.querySelectorAll('.item-text[contenteditable]').forEach(el => {
+    el.addEventListener('blur', () => {
+      const cl = data.checklists.find(c => c.id === el.dataset.clid);
+      if (cl) {
+        const item = cl.items.find(i => i.id === el.dataset.iid);
+        if (item) { item.text = el.textContent.trim(); saveData(); }
+      }
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    });
+  });
+}
+
+function toggleCheckItem(clId, itemId, checked) {
+  const cl = data.checklists.find(c => c.id === clId);
+  if (cl) {
+    const item = cl.items.find(i => i.id === itemId);
+    if (item) { item.done = checked; saveData(); renderChecklists(); }
+  }
+}
+
+function addCheckItem(clId) {
+  const input = document.getElementById('newItem_' + clId);
+  const text = input.value.trim();
+  if (!text) return;
+  const cl = data.checklists.find(c => c.id === clId);
+  if (cl) {
+    cl.items.push({ id: uid(), text, done: false });
+    saveData();
+    renderChecklists();
+  }
+}
+
+function deleteCheckItem(clId, itemId) {
+  const cl = data.checklists.find(c => c.id === clId);
+  if (cl) {
+    cl.items = cl.items.filter(i => i.id !== itemId);
+    saveData();
+    renderChecklists();
+  }
+}
+
+
+// ─── Shared card edit binding ───
+function bindCardEdits(type, arr) {
+  document.querySelectorAll(`[data-ctype="${type}"][contenteditable]`).forEach(el => {
+    el.addEventListener('focus', () => {
+      // Clear placeholder text
+      if (el.querySelector('span')) el.textContent = '';
+    });
+    el.addEventListener('blur', () => {
+      const id = el.dataset.cid || el.closest('.card')?.dataset.id;
+      const item = arr.find(x => x.id === id);
+      if (item) {
+        item[el.dataset.field] = el.textContent.trim();
+        saveData();
+      }
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+    });
+  });
+}
+
+// ─── Modals ───
+function openModal(type) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+
+  const templates = {
+    school: `
+      <h3>Add New School</h3>
+      <div class="form-group"><label>School Name</label><input id="m_name" placeholder="e.g., Cornell University"></div>
+      <div class="form-group"><label>Location</label><input id="m_location" placeholder="e.g., Ithaca, NY"></div>
+      <div class="form-group"><label>Pre-Vet Program Notes</label><textarea id="m_notes" placeholder="What makes their program stand out?"></textarea></div>
+      <div class="form-group"><label>Average GPA</label><input id="m_avgGPA" placeholder="e.g., 3.75"></div>
+      <div class="form-group"><label>SAT/ACT Requirements</label><input id="m_testReq" placeholder="e.g., SAT 1200-1400 / ACT 25-31"></div>
+      <div class="form-group"><label>Overall Acceptance Rate</label><input id="m_acceptRate" placeholder="e.g., 53%"></div>
+      <div class="form-group"><label>Ag School Acceptance Rate</label><input id="m_agAcceptRate" placeholder="e.g., 65%"></div>
+      <div class="form-group"><label>Out-of-State Acceptance Rate</label><input id="m_oosAcceptRate" placeholder="e.g., 40%"></div>
+      <div class="form-group"><label>OOS Ag School Inferred Rate</label><input id="m_oosAgAcceptRate" placeholder="e.g., 49%"></div>
+      <div class="form-group"><label>In-State Tuition</label><input id="m_tuitionIn" placeholder="e.g., $15,000"></div>
+      <div class="form-group"><label>Out-of-State Tuition</label><input id="m_tuitionOut" placeholder="e.g., $38,000"></div>
+      <div class="form-group"><label>Application Deadline</label><input id="m_deadline" placeholder="e.g., January 15"></div>
+      <div class="form-group"><label>Early Decision Deadline</label><input id="m_earlyDecision" placeholder="e.g., November 1"></div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addSchool()">Add School</button>
+      </div>`,
+
+    testprep: `
+      <h3>Add Test Prep Milestone</h3>
+      <div class="form-group"><label>Title</label><input id="m_ttitle" placeholder="e.g., SAT Practice Test #2"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="m_tdate"></div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="m_ttype">
+          <option value="milestone">Study Milestone</option>
+          <option value="practice">Practice Test</option>
+          <option value="test">Official Test Date</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="m_tdesc" placeholder="What's the plan for this milestone?"></textarea></div>
+      <div class="form-group"><label>Score Goal</label><input id="m_tscore" placeholder="e.g., 1350+"></div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addTestPrep()">Add Milestone</button>
+      </div>`,
+
+  };
+
+  content.innerHTML = templates[type];
+  overlay.classList.add('open');
+
+  // Setup autocomplete for school name fields
+  if (type === 'school') {
+    setTimeout(() => { setupSchoolAutocomplete('m_name'); document.getElementById('m_name')?.focus(); }, 50);
+  } else {
+    setTimeout(() => content.querySelector('input,textarea')?.focus(), 100);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function addSchool() {
+  const name = document.getElementById('m_name').value.trim();
+  if (!name) { alert('Please enter a school name.'); return; }
+  const dbEntry = schoolDB[name];
+  data.schools.push({
+    id: uid(),
+    name,
+    domain: dbEntry ? dbEntry.domain : '',
+    location: document.getElementById('m_location').value.trim(),
+    notes: document.getElementById('m_notes').value.trim(),
+    avgGPA: document.getElementById('m_avgGPA').value.trim(),
+    testReq: document.getElementById('m_testReq').value.trim(),
+    acceptRate: document.getElementById('m_acceptRate').value.trim(),
+    agAcceptRate: document.getElementById('m_agAcceptRate').value.trim(),
+    oosAcceptRate: document.getElementById('m_oosAcceptRate').value.trim(),
+    oosAgAcceptRate: document.getElementById('m_oosAgAcceptRate').value.trim(),
+    tuitionIn: document.getElementById('m_tuitionIn').value.trim(),
+    tuitionOut: document.getElementById('m_tuitionOut').value.trim(),
+    deadline: document.getElementById('m_deadline').value.trim(),
+    earlyDecision: document.getElementById('m_earlyDecision').value.trim(),
+    status: 'researching'
+  });
+  saveData();
+  renderSchools();
+  syncChecklists();
+  renderEvaluation();
+  renderRankings();
+  renderGreekLife();
+  closeModal();
+}
+
+function addTestPrep() {
+  const title = document.getElementById('m_ttitle').value.trim();
+  if (!title) { alert('Please enter a title.'); return; }
+  data.testprep.push({
+    id: uid(),
+    title,
+    date: document.getElementById('m_tdate').value,
+    type: document.getElementById('m_ttype').value,
+    description: document.getElementById('m_tdesc').value.trim(),
+    scoreGoal: document.getElementById('m_tscore').value.trim()
+  });
+  saveData();
+  renderTestPrep();
+  closeModal();
+}
+
+// ─── Verified school-specific checklists (researched per school) ───
+const SCHOOL_CHECKLISTS = {
+  'Texas A&M University': [
+    { text: 'Apply by Oct 15 (Early Action) or Dec 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via ApplyTexas or Common App — $75 fee', cat: 'app' },
+    { text: 'Complete Self-Reported Transcript and Academic Record (STAR)', cat: 'app' },
+    { text: 'Write personal essay (ApplyTexas Topic A or Common App essay)', cat: 'app' },
+    { text: 'Complete 5 optional scholarship short-answer essays (strongly recommended for merit aid)', cat: 'scholarship' },
+    { text: 'SAT/ACT — OPTIONAL but strongly encouraged (target: SAT 1210-1410 / ACT 26-32)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL (first 2 received will be considered)', cat: 'app' },
+    { text: 'Complete FAFSA (priority deadline: Jan 15)', cat: 'financial' },
+    { text: 'Research College of Ag & Life Sciences pre-vet advising track & DVM pipeline', cat: 'program' },
+    { text: 'Explore Texas A&M CVM scholarships ($2.9M+ awarded annually)', cat: 'scholarship' },
+  ],
+  'University of Georgia': [
+    { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or UGA portal — $70 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
+    { text: 'Write UGA supplemental essay (200-300 words) — book that impacted you in high school', cat: 'app' },
+    { text: 'SAT/ACT — REQUIRED (superscored; target: SAT 1250-1430 / ACT 28-33)', cat: 'test' },
+    { text: 'Counselor recommendation — REQUIRED; teacher recommendation optional', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (CSS required for UGA institutional need-based aid)', cat: 'financial' },
+    { text: 'Research UGA pre-vet program & CVM research opportunities', cat: 'program' },
+    { text: 'Explore CAES (College of Ag & Environmental Sciences) scholarships', cat: 'scholarship' },
+  ],
+  'Cornell University': [
+    { text: 'Apply by Nov 1 (Early Decision — binding) or Jan 2 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $85 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
+    { text: 'Write Cornell community essay (350 words) — how a community has shaped you', cat: 'app' },
+    { text: 'Write CALS-specific essay (500 words) — why your major, why Cornell CALS', cat: 'app' },
+    { text: 'SAT/ACT — REQUIRED (target: SAT 1470-1560 / ACT 33-35)', cat: 'test' },
+    { text: '3 letters of recommendation REQUIRED — 1 counselor + 2 teachers', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (both required for Cornell financial aid)', cat: 'financial' },
+    { text: 'Apply to CALS Animal Science major (select your college at application time)', cat: 'program' },
+    { text: 'Research Cornell CVM DVM pipeline & undergraduate research opportunities', cat: 'program' },
+  ],
+  'UC Davis': [
+    { text: 'File UC Application by November 30 (single deadline for all UC campuses)', cat: 'deadline' },
+    { text: 'Submit via UC Application — $80 fee per campus', cat: 'app' },
+    { text: 'Write 4 Personal Insight Questions (choose 4 of 8 prompts, 350 words each)', cat: 'app' },
+    { text: 'SAT/ACT — NOT CONSIDERED (UC system is permanently test-free)', cat: 'test' },
+    { text: 'Letters of recommendation — not accepted for freshman review', cat: 'app' },
+    { text: 'Complete FAFSA (or CA Dream Act Application)', cat: 'financial' },
+    { text: 'Select Animal Science or related major at application time (admission is major-specific)', cat: 'program' },
+    { text: 'Research UC Davis #1-ranked veterinary program & pre-vet advising', cat: 'program' },
+  ],
+  'Colorado State University': [
+    { text: 'Apply by Feb 1 (priority; rolling admissions)', cat: 'deadline' },
+    { text: 'Submit application via Common App or CSU portal — $50 fee (free for CO residents)', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write personal statement / Common App essay', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (not required for admission or scholarship review)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research CSU top-5 vet program & pre-vet track with early clinical exposure', cat: 'program' },
+    { text: 'Explore CSU equine and large animal program opportunities', cat: 'program' },
+  ],
+  'University of Florida': [
+    { text: 'Apply by Nov 1 (only application deadline — no Regular Decision round)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $30 fee', cat: 'app' },
+    { text: 'Complete Self-Reported Student Academic Record (SSAR) after submitting application', cat: 'app' },
+    { text: 'Write 1 required short essay (250 words) — most meaningful extracurricular commitment', cat: 'app' },
+    { text: 'SAT/ACT — REQUIRED (target: SAT 1300-1470 / ACT 29-33)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT ACCEPTED (Florida state university policy)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research UF pre-vet specialization in Animal Sciences & early admission pathway to CVM', cat: 'program' },
+    { text: 'Consider UF Honors Program application (separate supplemental essays required)', cat: 'scholarship' },
+  ],
+  'Ohio State University': [
+    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $60 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (no additional supplemental essays required)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (considered if submitted)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL (up to 2 via counselor)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Complete ScholarshipUniverse profile for OSU scholarship matching', cat: 'scholarship' },
+    { text: 'Apply to CFAES (College of Food, Ag & Environmental Sciences) for pre-vet', cat: 'program' },
+    { text: 'Research OSU CVM veterinary teaching hospital & undergrad research', cat: 'program' },
+  ],
+  'University of Minnesota': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $55 fee (automatic fee waivers available)', cat: 'app' },
+    { text: 'Self-report academic record in application', cat: 'app' },
+    { text: 'Write 2 short supplemental essays (150 words each): academic interests + diversity contribution', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2027)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Apply to CFANS for pre-vet track (College of Food, Ag & Natural Resource Sciences)', cat: 'program' },
+    { text: 'Research UMN CVM pipeline & companion/production animal research opportunities', cat: 'program' },
+  ],
+  'Purdue University': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $60 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 2 required short answers (100 words each) — why your major & why Purdue', cat: 'app' },
+    { text: 'Write 1 optional essay (250 words) — additional context about yourself (recommended)', cat: 'app' },
+    { text: 'SAT/ACT — REQUIRED (superscored; target: SAT 1190-1410 / ACT 25-32)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL', cat: 'app' },
+    { text: 'Complete FAFSA (note: Purdue has frozen tuition since 2012 — the "Purdue Pledge")', cat: 'financial' },
+    { text: 'Apply to College of Agriculture, Animal Sciences major for pre-vet', cat: 'program' },
+    { text: 'Research PVM early admission program for pre-vet undergrads', cat: 'program' },
+  ],
+  'Michigan State University': [
+    { text: 'Apply by Nov 1 for maximum scholarship consideration (final deadline: Apr 1)', cat: 'deadline' },
+    { text: 'Submit application via Common App, Coalition App, or MSU app — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write application essay (250-650 words)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (considered if submitted)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Explore Alumni Distinguished Scholarship (full-ride; invited applicants by Nov 1)', cat: 'scholarship' },
+    { text: 'Research MSU CVM pre-vet concentration in Animal Science', cat: 'program' },
+    { text: 'Explore CVM large animal hospital & undergrad clinical rotation opportunities', cat: 'program' },
+  ],
+  'Virginia Tech': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $60 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 4 "Ut Prosim Profile" short answers (120 words each): community, inclusion, leadership, goals', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2028)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED or considered', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research Virginia-Maryland CVM on-campus pre-vet pathway', cat: 'program' },
+    { text: 'Explore Animal & Poultry Sciences program & farm animal access', cat: 'program' },
+  ],
+  'Iowa State University': [
+    { text: 'Apply early for scholarship priority (rolling admissions — no hard deadline)', cat: 'deadline' },
+    { text: 'Submit application via Common App or ISU portal — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No personal essay or supplemental essays required', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research ISU CVM early admit program for exceptional pre-vet undergrads', cat: 'program' },
+    { text: 'Explore dairy, livestock, and large animal programs', cat: 'program' },
+  ],
+  'North Carolina State University': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Coalition — $85 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 2 short essays (~250 words each): why first-choice major + why second-choice major at NC State', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL if weighted GPA is 2.8 or above (scores only enhance application)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED (except for Park Scholarship)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Consider Park Scholarship application (full ride — separate essays, recs, interviews)', cat: 'scholarship' },
+    { text: 'Research NC State CVM guaranteed interview program for pre-vet students', cat: 'program' },
+    { text: 'Explore teaching animal units on campus & hands-on opportunities', cat: 'program' },
+  ],
+  'University of Wisconsin-Madison': [
+    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or UW System App — $80 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 1 supplemental essay (300-650 words) — why UW-Madison and why your major', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through Spring 2027)', cat: 'test' },
+    { text: '1 letter of recommendation REQUIRED (from teacher, counselor, or faculty)', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (NEW for 2026-27; CSS priority deadline Dec 1; $25 fee)', cat: 'financial' },
+    { text: 'Research School of Veterinary Medicine pre-vet track through Animal & Dairy Sciences', cat: 'program' },
+    { text: 'Explore undergrad research opportunities in veterinary medicine', cat: 'program' },
+  ],
+  'Auburn University': [
+    { text: 'Apply by Nov 15 (EA I) or Dec 1 (EA II) — MUST be admitted EA for scholarship eligibility', cat: 'deadline' },
+    { text: 'Submit application via Common App or Auburn portal — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No supplemental essays required (Honors College has separate essays)', cat: 'app' },
+    { text: 'SAT/ACT — STRONGLY RECOMMENDED (test-optional only for 3.6+ GPA; required starting Fall 2027)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research Auburn CVM pre-vet track in Animal Sciences', cat: 'program' },
+    { text: 'Explore CVM teaching hospital, small animal & equine programs', cat: 'program' },
+  ],
+  'Kansas State University': [
+    { text: 'Apply early for best scholarship consideration (rolling admissions)', cat: 'deadline' },
+    { text: 'Submit application via Common App or K-State app — ~$40 fee (watch for Apply Free Days)', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No personal essay or supplemental essays required', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (assured admission with 3.25+ GPA or ACT 21+ / SAT 1060+)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research K-State CVM early admission program for top pre-vet students', cat: 'program' },
+    { text: 'Explore Animal Sciences & Industry program', cat: 'program' },
+  ],
+  'Oklahoma State University': [
+    { text: 'Apply early for best scholarship consideration (opens July 1)', cat: 'deadline' },
+    { text: 'Submit application via Common App or OSU portal — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 1 essay (250-650 words, 7 prompt choices) — recommended for scholarship consideration', cat: 'app' },
+    { text: 'Submit leadership/involvement resume via OSU portal for full scholarship review', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional with 3.0+ GPA)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL (considered if submitted)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research Center for Veterinary Health Sciences pre-vet track', cat: 'program' },
+    { text: 'Explore hands-on animal science opportunities starting freshman year', cat: 'program' },
+  ],
+  'Oregon State University': [
+    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (priority deadline)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Oregon State app — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript (verify 2 years foreign language requirement)', cat: 'app' },
+    { text: 'Complete short-answer responses: 3 activities (100 words each) + knowledge descriptions', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (never sole reason for admission decision)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research Carlson College of Veterinary Medicine pre-vet path', cat: 'program' },
+    { text: 'Explore marine and exotic animal opportunities', cat: 'program' },
+  ],
+  'Washington State University': [
+    { text: 'Apply by Jan 31 (Regular Decision); apply early for scholarship priority', cat: 'deadline' },
+    { text: 'Submit application via Common App or WSU portal — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 1 supplemental essay (~150 words) — team/community involvement', cat: 'app' },
+    { text: 'SAT/ACT — NOT CONSIDERED (WSU is test-blind; scores will not be reviewed)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research WSU CVM pre-vet path & large animal teaching hospital', cat: 'program' },
+    { text: 'Explore rural and wildlife medicine programs', cat: 'program' },
+  ],
+  'Mississippi State University': [
+    { text: 'Apply by Oct 1 (Early Action) or Jan 5 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or MSU portal — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No supplemental essays required', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL but encouraged for scholarship consideration', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research MSU CVM pre-vet track in Animal & Dairy Sciences', cat: 'program' },
+    { text: 'Explore wildlife and aquatic medicine specialties', cat: 'program' },
+  ],
+  'Louisiana State University': [
+    { text: 'Apply by Oct 15 (Early Action) or Feb 1 (Regular Decision); Dec 15 scholarship priority', cat: 'deadline' },
+    { text: 'Submit application via Common App — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No supplemental essays required (optional essay available)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional with comprehensive review)', cat: 'test' },
+    { text: '1 letter of recommendation REQUIRED (from academic source; also used for scholarship review)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research LSU School of Veterinary Medicine pre-vet track', cat: 'program' },
+    { text: 'Explore unique aquatic and wildlife programs', cat: 'program' },
+  ],
+  'University of Illinois': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 5 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 2 major-specific short essays (~150 words each): experience related to major + career goals', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED and not considered (essays carry extra weight)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research UIUC CVM pre-vet track in Animal Sciences', cat: 'program' },
+    { text: 'Explore companion and food animal medicine programs', cat: 'program' },
+  ],
+  'Tufts University': [
+    { text: 'Apply by Nov 1 (Early Decision I) or Jan 4 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App, Coalition App, or QuestBridge — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
+    { text: 'Write "Why Tufts" supplemental essay (250 words)', cat: 'app' },
+    { text: 'Write 1 additional short essay (200-250 words) — choose from 3 prompts', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2027)', cat: 'test' },
+    { text: '2 letters of recommendation REQUIRED — 1 teacher + 1 counselor', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (both required for Tufts financial aid)', cat: 'financial' },
+    { text: 'Research Cummings School of Veterinary Medicine pre-vet path through Biology', cat: 'program' },
+    { text: 'Explore wildlife clinic and international veterinary programs', cat: 'program' },
+  ],
+  'University of Pennsylvania': [
+    { text: 'Apply by Nov 1 (Early Decision) or Jan 5 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Coalition App — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
+    { text: 'Write 3 Penn supplemental short essays (150-200 words each): thank-you note, community at Penn, school-specific', cat: 'app' },
+    { text: 'SAT/ACT — REQUIRED', cat: 'test' },
+    { text: '3 letters of recommendation REQUIRED — 1 counselor + 2 teachers', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (both required; CSS requires info from all biological/adoptive parents)', cat: 'financial' },
+    { text: 'Research Penn Vet pre-vet track through Biology', cat: 'program' },
+    { text: 'Explore New Bolton Center large animal facility & research opportunities', cat: 'program' },
+  ],
+  'Tuskegee University': [
+    { text: 'Apply by Mar 15 (Regular Decision; rolling admissions)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Common Black College App — $40 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (650 words max; note: plagiarism/AI detection is used)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL for admission (3.0+ GPA) but REQUIRED for Presidential/Merit Scholarships', cat: 'test' },
+    { text: '1 letter of recommendation REQUIRED (counselor, teacher, or community leader)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research Tuskegee CVM (only HBCU with accredited vet school) pre-vet track', cat: 'program' },
+    { text: 'Explore small class sizes and close-knit pre-vet community', cat: 'program' },
+  ],
+  'University of Tennessee': [
+    { text: 'Apply by Nov 15 (priority) or Dec 15 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No supplemental essays required for general admission', cat: 'app' },
+    { text: 'Write optional CASNR scholarship essay if applying as Animal Science major (recommended)', cat: 'scholarship' },
+    { text: 'SAT/ACT — REQUIRED (self-report by Jan 15; only tests through Dec 2025 accepted)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research UT CVM pre-vet track & large teaching hospital', cat: 'program' },
+    { text: 'Explore equine and farm animal program strengths', cat: 'program' },
+  ],
+  'University of Missouri': [
+    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Mizzou portal — $55 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'If test-optional: 1 required short essay; if submitting scores: no supplemental essays', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional applicants must write additional short essay)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED (may be needed for competitive scholarships)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research Mizzou CVM guaranteed admission track for pre-vet students', cat: 'program' },
+    { text: 'Explore strong food animal and equine programs', cat: 'program' },
+  ],
+  'Clemson University': [
+    { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision & scholarship deadline)', cat: 'deadline' },
+    { text: 'Submit application via Common App, Coalition, or Clemson Direct — $70 fee', cat: 'app' },
+    { text: 'Complete STARS (Self-Reported Transcript); official transcript required only upon enrollment', cat: 'app' },
+    { text: 'No supplemental essays required (optional personal statement via portal)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (can toggle preference until Jan 10 materials deadline)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED (Honors College requires 2)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research pre-vet track through Animal & Veterinary Sciences', cat: 'program' },
+    { text: 'Explore articulation agreements with regional vet schools', cat: 'program' },
+  ],
+  'Penn State University': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or MyPennState — $65 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 1 optional personal statement (recommended)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2027; self-report if submitting)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED and not used in review', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research pre-vet track through Animal Science in College of Ag Sciences', cat: 'program' },
+    { text: 'Explore veterinary and biomedical sciences emphasis & vet school advising', cat: 'program' },
+  ],
+  'University of Vermont': [
+    { text: 'Apply by Nov 1 (EA I), Dec 1 (EA II), or Jan 15 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Coalition App — $55 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay + 1 optional UVM supplemental (choose from 6 prompts)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL', cat: 'test' },
+    { text: '1 letter of recommendation REQUIRED (from counselor or teacher)', cat: 'app' },
+    { text: 'Complete FAFSA (priority deadline: Feb 1)', cat: 'financial' },
+    { text: 'Research pre-vet track through Animal & Veterinary Sciences', cat: 'program' },
+    { text: 'Explore Morgan Horse Farm, dairy & equine facilities', cat: 'program' },
+  ],
+  'University of Kentucky': [
+    { text: 'Apply by Dec 1 for scholarship consideration (Regular Decision: Feb 15)', cat: 'deadline' },
+    { text: 'Submit application via Common App or UK portal — $50 fee', cat: 'app' },
+    { text: 'Request official high school transcript (6+ semesters)', cat: 'app' },
+    { text: 'Write Common App personal essay', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through 2028-29, but higher scores unlock bigger merit scholarships)', cat: 'test' },
+    { text: 'Letter of recommendation — OPTIONAL (considered in holistic review but not required)', cat: 'app' },
+    { text: 'Complete competitive scholarship section of application (for Presidential/Singletary awards)', cat: 'scholarship' },
+    { text: 'Write Lewis Honors College essay — 500 words, "common good" prompt (due Dec 1 for priority)', cat: 'scholarship' },
+    { text: 'Complete FAFSA — not required for merit aid but strongly recommended for need-based aid', cat: 'financial' },
+    { text: 'Research UK equine program opportunities (unmatched equine program)', cat: 'program' },
+    { text: 'Research UK pre-vet track & vet school pipeline options', cat: 'program' },
+  ],
+  'Rutgers University': [
+    { text: 'Apply by Dec 1 for honors/merit scholarship consideration; Feb 1 Regular Decision', cat: 'deadline' },
+    { text: 'Submit application via Common App or Rutgers Direct — $70 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (no additional supplemental essays)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional with test-blind options available)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED (2 encouraged but not formally used)', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (CSS REQUIRED for institutional need-based aid; priority: Feb 15)', cat: 'financial' },
+    { text: 'Research pre-vet track in Animal Sciences', cat: 'program' },
+    { text: 'Explore NJ equine industry connections & pre-vet club', cat: 'program' },
+  ],
+  'University of Arizona': [
+    { text: 'Apply by Nov 1 (Early Action — recommended) for best admission/merit/Honors consideration', cat: 'deadline' },
+    { text: 'Submit application via Common App or UA portal — $80 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write 1 supplemental essay (500 words) — why Arizona and your academic area (strongly encouraged)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (not required for admission, scholarships, or Honors)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED for general admission', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research pre-vet through Animal & Comparative Biomedical Sciences', cat: 'program' },
+    { text: 'Explore desert/exotic animal exposure & wildlife center partnerships', cat: 'program' },
+  ],
+  'University of Maryland': [
+    { text: 'Apply by Nov 1 (Early Action — strongly encouraged) or Jan 20 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
+    { text: 'Complete 6 required short-answer prompts (650 characters each) — travel, academic interests, research, diversity', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2027)', cat: 'test' },
+    { text: '2 letters of recommendation REQUIRED — 1 counselor + 1 teacher', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research pre-vet through Animal & Avian Sciences', cat: 'program' },
+    { text: 'Explore proximity to USDA and NIH for research opportunities', cat: 'program' },
+  ],
+  'Cal Poly San Luis Obispo': [
+    { text: 'Apply Oct 1 through Nov 30 via Cal State Apply (only application window)', cat: 'deadline' },
+    { text: 'Submit application via Cal State Apply (NOT Common App) — $70 fee', cat: 'app' },
+    { text: 'No essays required or accepted', cat: 'app' },
+    { text: 'SAT/ACT — NOT CONSIDERED (CSU system is permanently test-free)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT ACCEPTED', cat: 'app' },
+    { text: 'Must declare major at application time (admission is major-specific & competitive)', cat: 'app' },
+    { text: 'Complete FAFSA (or CA Dream Act Application; priority: Mar 2)', cat: 'financial' },
+    { text: 'Apply to Animal Science major for pre-vet (major selection is critical)', cat: 'program' },
+    { text: 'Research learn-by-doing program & campus ranch/farm units', cat: 'program' },
+  ],
+  'University of Connecticut': [
+    { text: 'Apply by Jan 15 (Regular Decision); apply Nov 1 = Fee Free Day (saves $80)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Coalition App — $80 fee (FREE if submitted Nov 1)', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (no additional supplemental essays)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional pilot program)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL but recommended (2 preferred: junior-year teachers)', cat: 'app' },
+    { text: 'Complete FAFSA (priority deadline: Feb 15)', cat: 'financial' },
+    { text: 'Verify HS course requirements (4 English, 3 Math through Alg II, 2 lab science, 2 foreign language)', cat: 'app' },
+    { text: 'Research pre-vet through Animal Science; explore campus farms and equine facilities', cat: 'program' },
+  ],
+  'University of Nebraska-Lincoln': [
+    { text: 'Apply by Nov 1 (priority for best scholarship/aid packaging)', cat: 'deadline' },
+    { text: 'Submit application via Common App or UNL Direct — $45 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No supplemental essays required (1 optional essay available)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (encouraged; UNL uses whichever yields better scholarship: GPA alone or GPA + scores)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED (up to 3 optional)', cat: 'app' },
+    { text: 'Complete FAFSA (priority: Feb 1)', cat: 'financial' },
+    { text: 'Research pre-vet track through Animal Science', cat: 'program' },
+    { text: 'Explore livestock and production animal focus', cat: 'program' },
+  ],
+  'Montana State University': [
+    { text: 'Apply early for scholarship consideration (rolling admissions; ~2-week turnaround)', cat: 'deadline' },
+    { text: 'Submit application via Common App or MSU Direct — $38 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No personal essay or supplemental essays required', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (encouraged for scholarship placement)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA (priority: Dec 1)', cat: 'financial' },
+    { text: 'Research pre-vet in Animal & Range Sciences', cat: 'program' },
+    { text: 'Explore large animal/ranch experience & wildlife/outdoor lab opportunities', cat: 'program' },
+  ],
+  'University of Delaware': [
+    { text: 'Apply by Dec 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Coalition App — $75 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'If test-optional: 3 supplemental essays REQUIRED as evidence of academic readiness', cat: 'app' },
+    { text: 'If submitting test scores: no supplemental essays beyond Common App essay', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (but going test-optional triggers 3 extra essays — weigh the tradeoff)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL (counselor letter recommended)', cat: 'app' },
+    { text: 'Complete FAFSA (recommended by Feb 15)', cat: 'financial' },
+    { text: 'Research pre-vet through Animal & Food Sciences', cat: 'program' },
+    { text: 'Explore personalized advising & mid-Atlantic vet school placement', cat: 'program' },
+  ],
+  'University of New Hampshire': [
+    { text: 'Apply by Nov 15 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App — $65 fee', cat: 'app' },
+    { text: 'Self-report grades via STARS system (official transcript sent later)', cat: 'app' },
+    { text: 'Write Common App personal essay (no supplemental essays required)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL', cat: 'test' },
+    { text: '1 letter of recommendation REQUIRED (counselor or core academic teacher; max 2 total)', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research pre-vet through Biomedical Science or Animal Science', cat: 'program' },
+    { text: 'Explore campus dairy, equine facilities & organic dairy research farm', cat: 'program' },
+  ],
+  'Berry College': [
+    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or Berry Direct — FREE (no application fee)', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay + optional "Why Berry" essay (recommended to show interest)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (not required for admission or scholarships)', cat: 'test' },
+    { text: 'Letters of recommendation — OPTIONAL', cat: 'app' },
+    { text: 'Complete FAFSA (priority: Feb 15 for need-based aid)', cat: 'financial' },
+    { text: 'Research Animal Science program with hands-on focus', cat: 'program' },
+    { text: 'Explore 27,000-acre campus with working farms and wildlife', cat: 'program' },
+  ],
+  'Delaware Valley University': [
+    { text: 'Apply anytime (rolling admissions — no fixed deadline; apply early for best aid)', cat: 'deadline' },
+    { text: 'Submit application via Common App or DelVal Direct — FREE (no application fee)', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App personal essay (no supplemental essays required)', cat: 'app' },
+    { text: 'SAT/ACT — OPTIONAL (test-optional applicants may be asked for on-campus interview)', cat: 'test' },
+    { text: '1 letter of recommendation REQUIRED', cat: 'app' },
+    { text: 'Complete FAFSA (file early for best aid packaging)', cat: 'financial' },
+    { text: 'Research dedicated pre-vet major (one of few schools offering it as standalone)', cat: 'program' },
+    { text: 'Explore small animal hospital on campus & Experience360 hands-on program', cat: 'program' },
+  ],
+  'University of Wyoming': [
+    { text: 'Apply early for scholarship consideration (rolling admissions; final deadline Jun 1)', cat: 'deadline' },
+    { text: 'Submit application via Common App or UW Direct — $40 fee', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'No personal essay or supplemental essays required (Honors College has separate essay)', cat: 'app' },
+    { text: 'SAT/ACT — EXPECTED for applicants under 21 (assured admission: 3.0 GPA + ACT 21+ / SAT 980+)', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED or considered', cat: 'app' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research pre-vet in Animal & Veterinary Sciences', cat: 'program' },
+    { text: 'Explore ranch and wildlife exposure opportunities', cat: 'program' },
+  ],
+};
+
+function buildChecklistItems(school) {
+  const name = school.name;
+
+  // Use verified school-specific checklist if available
+  if (SCHOOL_CHECKLISTS[name]) {
+    return SCHOOL_CHECKLISTS[name].map(item => ({
+      id: uid(), text: item.text, done: false
+    }));
+  }
+
+  // ── Fallback: generic builder for schools not yet individually researched ──
+  const db = schoolDB[name] || {};
+  const deadline = school.deadline || db.deadline || '';
+  const earlyDecision = school.earlyDecision || db.earlyDecision || '';
+  const testReq = school.testReq || db.testReq || '';
+  const notes = school.notes || db.notes || '';
+  const tuitionOut = school.tuitionOut || db.tuitionOut || '';
+  const shortName = name.split(' ')[0];
+
+  const hasVetSchool = notes && !notes.toLowerCase().includes('no vet school');
+  const isPrivate = tuitionOut && (db.tuitionIn === db.tuitionOut);
+
+  const items = [];
+
+  // ── Deadlines ──
+  if (earlyDecision && earlyDecision !== 'N/A') {
+    items.push({ id: uid(), text: 'Early Action / Early Decision — due ' + earlyDecision, done: false });
+  }
+  if (deadline && deadline !== 'Rolling') {
+    items.push({ id: uid(), text: 'Submit application by ' + deadline, done: false });
+  } else if (deadline === 'Rolling') {
+    items.push({ id: uid(), text: 'Submit application (rolling admissions — apply early for best chances)', done: false });
+  }
+
+  // ── Core application materials ──
+  items.push({ id: uid(), text: 'Request official high school transcript', done: false });
+  items.push({ id: uid(), text: 'Write personal essay / Common App essay', done: false });
+
+  // ── Test scores (generic — needs per-school verification) ──
+  if (testReq) {
+    items.push({ id: uid(), text: 'Check test score policy & submit SAT/ACT if required (target: ' + testReq + ')', done: false });
+  } else {
+    items.push({ id: uid(), text: 'Check SAT/ACT score requirements & submit if required', done: false });
+  }
+
+  // ── Pre-vet & program-specific ──
+  if (hasVetSchool) {
+    items.push({ id: uid(), text: 'Research ' + name + ' pre-vet advising track & DVM pipeline', done: false });
+  } else {
+    items.push({ id: uid(), text: 'Research ' + name + ' pre-vet articulation agreements with vet schools', done: false });
+  }
+
+  if (/early admit|early admission/i.test(notes)) {
+    items.push({ id: uid(), text: 'Look into ' + shortName + ' early admission to vet school program', done: false });
+  }
+  if (/guaranteed (interview|admission)/i.test(notes)) {
+    items.push({ id: uid(), text: 'Check eligibility for ' + shortName + ' guaranteed ' + (notes.match(/guaranteed (interview|admission)/i)[1]) + ' program', done: false });
+  }
+  if (/equine/i.test(notes)) {
+    items.push({ id: uid(), text: 'Explore ' + shortName + ' equine program opportunities', done: false });
+  }
+  if (/wildlife/i.test(notes)) {
+    items.push({ id: uid(), text: 'Look into ' + shortName + ' wildlife medicine/research programs', done: false });
+  }
+
+  // ── Financial ──
+  items.push({ id: uid(), text: 'Complete FAFSA', done: false });
+  if (isPrivate) {
+    items.push({ id: uid(), text: 'Complete CSS Profile (private school — may be required for aid)', done: false });
+  }
+  items.push({ id: uid(), text: 'Research ' + name + ' scholarships & financial aid', done: false });
+
+  return items;
+}
+
+function syncChecklists() {
+  const schoolNameList = data.schools.map(s => s.name);
+  // Remove checklists for schools that no longer exist
+  data.checklists = data.checklists.filter(cl => schoolNameList.includes(cl.school));
+  // Add checklists for new schools
+  for (const s of data.schools) {
+    if (!data.checklists.find(cl => cl.school === s.name)) {
+      data.checklists.push({
+        id: uid(),
+        school: s.name,
+        items: buildChecklistItems(s)
+      });
+    }
+  }
+  saveData();
+  renderChecklists();
+}
+
+// ─── Visit Evaluation ───
+const EVAL_CATEGORIES = {
+  gutCheck: {
+    label: 'Gut Check', weight: 0, note: 'Complete immediately after visit',
+    items: [
+      { key: 'seeMyself', label: 'Could see myself here 4 years?' },
+      { key: 'comfortable', label: 'Felt comfortable walking around?' },
+      { key: 'myPeople', label: "Students seemed like 'my people'?" }
+    ]
+  },
+  campus: {
+    label: 'Campus & Facilities', weight: 1.0,
+    items: [
+      { key: 'beauty', label: 'Overall campus beauty/aesthetics' },
+      { key: 'sizeFeels', label: 'Campus size feels right' },
+      { key: 'buildings', label: 'Building & classroom quality' },
+      { key: 'agFacilities', label: 'Animal science / ag facilities' },
+      { key: 'dorms', label: 'Dorms & residential areas' },
+      { key: 'dining', label: 'Dining options' },
+      { key: 'fitness', label: 'Fitness / recreation facilities' },
+      { key: 'library', label: 'Library & study spaces' },
+      { key: 'upkeep', label: 'General upkeep & cleanliness' }
+    ]
+  },
+  academic: {
+    label: 'Academic & Pre-Vet', weight: 1.5,
+    items: [
+      { key: 'tourGuideKnowledge', label: 'Tour guide knowledge of pre-vet' },
+      { key: 'animalAccess', label: 'Access to animals / hands-on opps' },
+      { key: 'research', label: 'Research opportunities mentioned' },
+      { key: 'vetConnection', label: 'Vet school connection (if applicable)' },
+      { key: 'classSizes', label: 'Class sizes seem manageable' },
+      { key: 'academicSupport', label: 'Academic support resources' },
+      { key: 'facultyAccess', label: 'Faculty accessibility' }
+    ]
+  },
+  studentLife: {
+    label: 'Student Life & Vibe', weight: 1.25,
+    items: [
+      { key: 'happy', label: 'Students seemed happy/engaged' },
+      { key: 'friendly', label: 'Friendliness of students' },
+      { key: 'diversity', label: 'Diversity of student body' },
+      { key: 'clubs', label: 'Club & activity options' },
+      { key: 'spirit', label: 'School spirit / community' },
+      { key: 'social', label: 'Social scene feels right' },
+      { key: 'town', label: 'Town / surrounding area appeal' },
+      { key: 'safety', label: 'Safety — felt comfortable' }
+    ]
+  },
+  practical: {
+    label: 'Practical Factors', weight: 0.75,
+    items: [
+      { key: 'distance', label: 'Distance from home manageable' },
+      { key: 'climate', label: 'Weather/climate seems livable' },
+      { key: 'gettingAround', label: 'Ease of getting around campus' },
+      { key: 'transportation', label: 'Transportation options' }
+    ]
+  }
+};
+
+function getEvalForSchool(name) {
+  if (!data.evaluations[name]) {
+    data.evaluations[name] = { visitDate: '', weather: '', tourGuide: '', letterGrade: '' };
+    for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
+      data.evaluations[name][catKey] = {};
+      cat.items.forEach(it => data.evaluations[name][catKey][it.key] = 0);
+    }
+    data.evaluations[name].intangibles = { bestThing: '', biggestConcern: '', surprised: '', vibeWords: '' };
+  }
+  return data.evaluations[name];
+}
+
+function getVisitNotesForSchool(name) {
+  if (!data.visitNotes[name]) {
+    data.visitNotes[name] = { loved: '', concerned: '', answered: '', openQuestions: '', happyHere: '' };
+  }
+  return data.visitNotes[name];
+}
+
+function calcCategorySubtotal(evalData, catKey) {
+  const cat = EVAL_CATEGORIES[catKey];
+  if (!cat || !evalData[catKey]) return 0;
+  return cat.items.reduce((sum, it) => sum + (evalData[catKey][it.key] || 0), 0);
+}
+
+function calcWeightedTotal(evalData) {
+  let total = 0;
+  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
+    if (cat.weight === 0) continue;
+    total += calcCategorySubtotal(evalData, catKey) * cat.weight;
+  }
+  return Math.round(total * 10) / 10;
+}
+
+function calcMaxWeightedTotal() {
+  let max = 0;
+  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
+    if (cat.weight === 0) continue;
+    max += cat.items.length * 5 * cat.weight;
+  }
+  return max;
+}
+
+function renderEvalSchoolPicker() {
+  const sel = document.getElementById('evalSchoolSelect');
+  const prev = sel.value;
+  sel.innerHTML = data.schools.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
+  if (prev && data.schools.find(s => s.name === prev)) sel.value = prev;
+}
+
+function renderEvaluation() {
+  const sel = document.getElementById('evalSchoolSelect');
+  const container = document.getElementById('evalContainer');
+  const notesContainer = document.getElementById('evalNotesContainer');
+  const totalBar = document.getElementById('evalTotalBar');
+  const empty = document.getElementById('evalEmpty');
+
+  renderEvalSchoolPicker();
+
+  if (data.schools.length === 0) {
+    container.innerHTML = '';
+    notesContainer.innerHTML = '';
+    totalBar.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const schoolName = sel.value;
+  if (!schoolName) return;
+  const ev = getEvalForSchool(schoolName);
+  const maxTotal = calcMaxWeightedTotal();
+  const weightedTotal = calcWeightedTotal(ev);
+
+  // Total bar
+  totalBar.innerHTML = `
+    <div class="eval-total-bar">
+      <div>
+        <div class="total-score">${weightedTotal} <span style="font-size:0.85rem;font-weight:400;color:var(--text-light)">/ ${maxTotal}</span></div>
+        <div class="total-label">Weighted Total Score</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="eval-grade-picker">
+          <label style="font-size:0.78rem;font-weight:600;color:var(--text-light);margin-right:6px;">Letter Grade:</label>
+          <select onchange="setEvalField('${esc(schoolName)}','letterGrade',this.value)">
+            <option value="">—</option>
+            ${['A','A-','B+','B','B-','C+','C','D','F'].map(g => `<option value="${g}" ${ev.letterGrade===g?'selected':''}>${g}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`;
+
+  // Visit info
+  let html = `
+    <div class="eval-section">
+      <div class="eval-section-header">Visit Information</div>
+      <div class="eval-text">
+        <label>Visit Date</label>
+        <input type="date" value="${ev.visitDate||''}" onchange="setEvalField('${esc(schoolName)}','visitDate',this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;">
+      </div>
+      <div class="eval-text">
+        <label>Weather That Day</label>
+        <input type="text" value="${esc(ev.weather||'')}" onchange="setEvalField('${esc(schoolName)}','weather',this.value)" placeholder="e.g., Sunny, 72°F" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;">
+      </div>
+      <div class="eval-text">
+        <label>Tour Guide Name</label>
+        <input type="text" value="${esc(ev.tourGuide||'')}" onchange="setEvalField('${esc(schoolName)}','tourGuide',this.value)" placeholder="Name of your tour guide" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;">
+      </div>
+    </div>`;
+
+  // Rating categories
+  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
+    const subtotal = calcCategorySubtotal(ev, catKey);
+    const maxSub = cat.items.length * 5;
+    html += `
+    <div class="eval-section">
+      <div class="eval-section-header">
+        <span>${cat.label} ${cat.weight > 0 ? `<span class="weight-badge">${cat.weight}x weight</span>` : ''}</span>
+        <span class="subtotal">${subtotal} / ${maxSub}</span>
+      </div>
+      ${cat.note ? `<div style="padding:8px 18px;font-size:0.8rem;color:var(--text-light);font-style:italic;">${cat.note}</div>` : ''}
+      ${cat.items.map(it => `
+      <div class="eval-row">
+        <label>${it.label}</label>
+        <div class="eval-stars">
+          ${[1,2,3,4,5].map(n => `<button class="${(ev[catKey][it.key]||0)>=n?'active':''}" onclick="setEvalRating('${esc(schoolName)}','${catKey}','${it.key}',${n})">${n}</button>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  // Intangibles
+  const intang = ev.intangibles || {};
+  html += `
+    <div class="eval-section">
+      <div class="eval-section-header">Intangibles (Open Response)</div>
+      <div class="eval-text"><label>Best thing about this school</label><textarea onchange="setEvalIntangible('${esc(schoolName)}','bestThing',this.value)">${esc(intang.bestThing||'')}</textarea></div>
+      <div class="eval-text"><label>Biggest concern</label><textarea onchange="setEvalIntangible('${esc(schoolName)}','biggestConcern',this.value)">${esc(intang.biggestConcern||'')}</textarea></div>
+      <div class="eval-text"><label>What surprised you</label><textarea onchange="setEvalIntangible('${esc(schoolName)}','surprised',this.value)">${esc(intang.surprised||'')}</textarea></div>
+      <div class="eval-text"><label>The 'vibe' in 3 words</label><input type="text" value="${esc(intang.vibeWords||'')}" onchange="setEvalIntangible('${esc(schoolName)}','vibeWords',this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;"></div>
+    </div>`;
+
+  container.innerHTML = html;
+
+  // Visit Notes
+  const vn = getVisitNotesForSchool(schoolName);
+  notesContainer.innerHTML = `
+    <div class="visit-notes-section">
+      <h4>Visit Notes — ${esc(schoolName)}</h4>
+      <div class="visit-notes-prompt"><label>What I loved</label><textarea onchange="setVisitNote('${esc(schoolName)}','loved',this.value)">${esc(vn.loved||'')}</textarea></div>
+      <div class="visit-notes-prompt"><label>What concerned me</label><textarea onchange="setVisitNote('${esc(schoolName)}','concerned',this.value)">${esc(vn.concerned||'')}</textarea></div>
+      <div class="visit-notes-prompt"><label>Questions answered</label><textarea onchange="setVisitNote('${esc(schoolName)}','answered',this.value)">${esc(vn.answered||'')}</textarea></div>
+      <div class="visit-notes-prompt"><label>Questions still open</label><textarea onchange="setVisitNote('${esc(schoolName)}','openQuestions',this.value)">${esc(vn.openQuestions||'')}</textarea></div>
+      <div class="visit-notes-prompt"><label>Would I be happy here? Why/why not</label><textarea onchange="setVisitNote('${esc(schoolName)}','happyHere',this.value)">${esc(vn.happyHere||'')}</textarea></div>
+    </div>`;
+
+  // Summary table
+  renderEvalSummary();
+}
+
+function setEvalRating(school, catKey, itemKey, val) {
+  const ev = getEvalForSchool(school);
+  ev[catKey][itemKey] = (ev[catKey][itemKey] === val) ? 0 : val;
+  saveData();
+  renderEvaluation();
+}
+
+function setEvalField(school, field, val) {
+  const ev = getEvalForSchool(school);
+  ev[field] = val;
+  saveData();
+}
+
+function setEvalIntangible(school, field, val) {
+  const ev = getEvalForSchool(school);
+  if (!ev.intangibles) ev.intangibles = {};
+  ev.intangibles[field] = val;
+  saveData();
+}
+
+function setVisitNote(school, field, val) {
+  const vn = getVisitNotesForSchool(school);
+  vn[field] = val;
+  saveData();
+}
+
+function renderEvalSummary() {
+  const tbody = document.getElementById('evalSummaryBody');
+  if (data.schools.length === 0) { tbody.innerHTML = ''; return; }
+
+  const rows = data.schools.map(s => {
+    const ev = getEvalForSchool(s.name);
+    return {
+      name: s.name,
+      campus: calcCategorySubtotal(ev, 'campus'),
+      academic: calcCategorySubtotal(ev, 'academic'),
+      life: calcCategorySubtotal(ev, 'studentLife'),
+      practical: calcCategorySubtotal(ev, 'practical'),
+      total: calcWeightedTotal(ev),
+      grade: ev.letterGrade || '—'
+    };
+  });
+
+  rows.sort((a, b) => b.total - a.total);
+  rows.forEach((r, i) => r.rank = i + 1);
+
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
+      <td>${r.campus}</td>
+      <td>${r.academic}</td>
+      <td>${r.life}</td>
+      <td>${r.practical}</td>
+      <td style="font-weight:700">${r.total}</td>
+      <td>${r.grade}</td>
+      <td class="rank-cell">#${r.rank}</td>
+    </tr>`).join('');
+}
+
+// ─── Final Rankings ───
+const RANK_WEIGHTS = { visit: 0.40, vetProgram: 0.25, costScore: 0.15, planB: 0.10, meritAid: 0.10 };
+
+function getRankingForSchool(name) {
+  if (!data.rankings[name]) {
+    // Pre-fill from spreadsheet data for known schools
+    const presets = {
+      // ── Top-13 schools from Executive Summary / Financial Analysis ──
+      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:5, notes:'In-state Zell Miller. 3+1 fast-track. Best value overall.' },
+      'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit.' },
+      'Purdue University':               { vetProgram:5, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
+      'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. Top-10 vet school.' },
+      'North Carolina State University': { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Research Triangle biotech jobs. Guaranteed interview program.' },
+      'Auburn University':               { vetProgram:4, costScore:4, planB:3, meritAid:4, notes:'Close to home. Strong equine & small animal.' },
+      'University of Kentucky':          { vetProgram:4, costScore:5, planB:3, meritAid:5, notes:'Best OOS merit aid. Unmatched equine program.' },
+      'Virginia Tech':                   { vetProgram:4, costScore:3, planB:3, meritAid:2, notes:'VA-MD CVM on campus. Beautiful but isolated.' },
+      'Clemson University':              { vetProgram:3, costScore:3, planB:3, meritAid:3, notes:'No vet school. Close to home, good culture.' },
+      'Louisiana State University':      { vetProgram:4, costScore:4, planB:2, meritAid:4, notes:'3+1 fast-track. Generous OOS merit.' },
+      'University of Tennessee':         { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Solid SEC safety.' },
+      'University of Florida':           { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Excellent program but hardest admission, limited merit.' },
+      'University of Wisconsin-Madison': { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Great vet school. Very limited OOS merit.' },
+      // ── Other schools with vet schools ──
+      'Cornell University':              { vetProgram:5, costScore:1, planB:5, meritAid:2, notes:'Ivy League top-5 vet. Very expensive.' },
+      'UC Davis':                        { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'#1 ranked vet school. Limited OOS merit.' },
+      'Colorado State University':       { vetProgram:5, costScore:3, planB:3, meritAid:3, notes:'Top-5 vet. Strong equine & large animal.' },
+      'University of Minnesota':         { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Accredited CVM. Strong research.' },
+      'Michigan State University':       { vetProgram:5, costScore:3, planB:4, meritAid:2, notes:'Top-ranked CVM. Large animal hospital.' },
+      'Iowa State University':           { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Early admit program. Affordable.' },
+      'Kansas State University':         { vetProgram:4, costScore:5, planB:3, meritAid:4, notes:'Accredited CVM. Very affordable OOS.' },
+      'Oklahoma State University':       { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Vet health sciences center. Hands-on early.' },
+      'Oregon State University':         { vetProgram:4, costScore:3, planB:3, meritAid:2, notes:'CVM on campus. Marine & exotic animal opps.' },
+      'Washington State University':     { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Rural/wildlife focus.' },
+      'Mississippi State University':    { vetProgram:4, costScore:4, planB:2, meritAid:3, notes:'Accredited CVM. Wildlife & aquatic specialties.' },
+      'University of Illinois':          { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Accredited CVM. Strong companion animal.' },
+      'University of Missouri':          { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Guaranteed admission track.' },
+      'Tuskegee University':             { vetProgram:3, costScore:3, planB:2, meritAid:3, notes:'Only HBCU with vet school. Small classes.' },
+      'Tufts University':                { vetProgram:5, costScore:1, planB:4, meritAid:1, notes:'Top vet school. Very expensive private.' },
+      'University of Pennsylvania':      { vetProgram:5, costScore:1, planB:5, meritAid:1, notes:'Penn Vet Ivy League. Very expensive.' },
+      // ── Schools without vet schools ──
+      'Penn State University':           { vetProgram:2, costScore:3, planB:5, meritAid:2, notes:'No vet school. Strong Animal Science advising.' },
+      'University of Vermont':           { vetProgram:2, costScore:2, planB:3, meritAid:2, notes:'No vet school. Morgan Horse Farm. Small classes.' },
+      'University of Massachusetts Amherst': { vetProgram:2, costScore:3, planB:3, meritAid:2, notes:'No vet school. Pre-vet track available.' },
+      'Rutgers University':              { vetProgram:2, costScore:3, planB:4, meritAid:2, notes:'No vet school. NJ equine industry proximity.' },
+      'University of Arizona':           { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'No vet school. Desert/exotic animal exposure.' },
+      'University of Maryland':          { vetProgram:2, costScore:3, planB:4, meritAid:2, notes:'No vet school. Near USDA & NIH.' },
+      'Cal Poly San Luis Obispo':        { vetProgram:2, costScore:4, planB:3, meritAid:2, notes:'No vet school. Exceptional hands-on learn-by-doing.' },
+      'University of Connecticut':       { vetProgram:2, costScore:2, planB:3, meritAid:2, notes:'No vet school. Campus farms & equine.' },
+      'University of Nebraska-Lincoln':  { vetProgram:2, costScore:4, planB:3, meritAid:3, notes:'No vet school. Affordable. Good placement.' },
+      'Montana State University':        { vetProgram:2, costScore:4, planB:2, meritAid:3, notes:'No vet school. Ranch & wildlife. Very affordable.' },
+      'University of Delaware':          { vetProgram:2, costScore:3, planB:3, meritAid:2, notes:'No vet school. Small personalized program.' },
+      'University of New Hampshire':     { vetProgram:2, costScore:2, planB:3, meritAid:2, notes:'No vet school. Campus dairy & equine.' },
+      'Berry College':                   { vetProgram:2, costScore:2, planB:2, meritAid:3, notes:'No vet school. 27K-acre campus. Hands-on.' },
+      'Delaware Valley University':      { vetProgram:3, costScore:2, planB:2, meritAid:3, notes:'Dedicated pre-vet major. Small animal hospital.' },
+      'University of Wyoming':           { vetProgram:2, costScore:5, planB:2, meritAid:3, notes:'No vet school. Most affordable. Ranch & wildlife.' }
+    };
+    data.rankings[name] = presets[name] || { vetProgram:3, costScore:3, planB:3, meritAid:3, notes:'' };
+  }
+  return data.rankings[name];
+}
+
+function renderRankings() {
+  const tbody = document.getElementById('rankingsBody');
+  const empty = document.getElementById('rankingsEmpty');
+  if (data.schools.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  const maxTotal = calcMaxWeightedTotal();
+
+  const rows = data.schools.map(s => {
+    const ev = getEvalForSchool(s.name);
+    const rk = getRankingForSchool(s.name);
+    const visitScore = calcWeightedTotal(ev);
+    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    return {
+      name: s.name,
+      visitScore,
+      visitNorm: Math.round(visitNorm * 10) / 10,
+      vetProgram: rk.vetProgram || 3,
+      costScore: rk.costScore || 3,
+      planB: rk.planB || 3,
+      meritAid: rk.meritAid || 3,
+      notes: rk.notes || '',
+      combined: 0
+    };
+  });
+
+  // Calculate visit ranks
+  const visitSorted = [...rows].sort((a, b) => b.visitScore - a.visitScore);
+  visitSorted.forEach((r, i) => r.visitRank = i + 1);
+
+  // Calculate combined scores
+  rows.forEach(r => {
+    r.combined = Math.round((
+      r.visitNorm * RANK_WEIGHTS.visit +
+      r.vetProgram * RANK_WEIGHTS.vetProgram +
+      r.costScore * RANK_WEIGHTS.costScore +
+      r.planB * RANK_WEIGHTS.planB +
+      r.meritAid * RANK_WEIGHTS.meritAid
+    ) * 100) / 100;
+  });
+
+  rows.sort((a, b) => b.combined - a.combined);
+  rows.forEach((r, i) => r.finalRank = i + 1);
+
+  function ratingSelect(school, field, val) {
+    return `<select onchange="setRankingField('${esc(school)}','${field}',parseInt(this.value))">
+      ${[1,2,3,4,5].map(n => `<option value="${n}" ${val===n?'selected':''}>${n}</option>`).join('')}
+    </select>`;
+  }
+
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.finalRank}</td>
+      <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
+      <td>${r.visitScore}</td>
+      <td>#${r.visitRank}</td>
+      <td>${ratingSelect(r.name,'vetProgram',r.vetProgram)}</td>
+      <td>${ratingSelect(r.name,'costScore',r.costScore)}</td>
+      <td>${ratingSelect(r.name,'planB',r.planB)}</td>
+      <td>${ratingSelect(r.name,'meritAid',r.meritAid)}</td>
+      <td style="font-weight:700">${r.combined}</td>
+      <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(r.name)}','notes',this.value)"></td>
+    </tr>`).join('');
+}
+
+function setRankingField(school, field, val) {
+  const rk = getRankingForSchool(school);
+  rk[field] = val;
+  saveData();
+  renderRankings();
+}
+
+// ─── Executive Summary Rankings ───
+const SUMMARY_SCHOOLS = [
+  { rank:1,  name:'University of Georgia',  cat:'MATCH',  vet:'Yes', visit:'Visited', cost:'$100-120K', verdict:'FULLY FUNDED', planB:'Strong', notes:'Zell Miller eligible. 3+1 fast-track. In-state = huge savings for vet school.' },
+  { rank:2,  name:'Texas A&M University',   cat:'MATCH',  vet:'Yes', visit:'Visited', cost:'$224K', verdict:'AFFORDABLE', planB:'Excellent', notes:'Best pre-vet reputation. Aggie network legendary.' },
+  { rank:3,  name:'Purdue University',      cat:'MATCH',  vet:'Yes', visit:'Road Trip 3/5', cost:'$172K', verdict:'AFFORDABLE', planB:'Excellent', notes:'Top program, new facilities. Strong co-op culture.' },
+  { rank:4,  name:'Ohio State University',  cat:'MATCH',  vet:'Yes', visit:'Road Trip 3/4', cost:'$208K', verdict:'AFFORDABLE', planB:'Excellent', notes:'Massive resources and network.' },
+  { rank:5,  name:'North Carolina State University', cat:'MATCH', vet:'Yes', visit:'Road Trip 3/2', cost:'$192K', verdict:'AFFORDABLE', planB:'Strong', notes:'Underrated. Research Triangle = biotech jobs.' },
+  { rank:6,  name:'Auburn University',      cat:'SAFETY', vet:'Yes', visit:'Day Trip', cost:'$160K', verdict:'FULLY FUNDED', planB:'Good', notes:'Close to home, strong program.' },
+  { rank:7,  name:'University of Kentucky', cat:'SAFETY', vet:'No (pipeline)', visit:'Road Trip 3/6', cost:'$144K', verdict:'FULLY FUNDED', planB:'Good', notes:'Best OOS value. Unmatched equine program.' },
+  { rank:8,  name:'Virginia Tech',          cat:'MATCH',  vet:'Regional (VA-MD)', visit:'Road Trip 3/3', cost:'$208K', verdict:'AFFORDABLE', planB:'Good', notes:'Beautiful campus, strong CALS.' },
+  { rank:9,  name:'Clemson University',     cat:'MATCH',  vet:'No', visit:'Day Trip', cost:'$192K', verdict:'AFFORDABLE', planB:'Good', notes:'Close to home, good culture.' },
+  { rank:10, name:'Louisiana State University', cat:'SAFETY', vet:'Yes', visit:'Apply Only', cost:'$156K', verdict:'FULLY FUNDED', planB:'Fair', notes:'3+1 fast-track. Generous OOS merit.' },
+  { rank:11, name:'University of Tennessee', cat:'SAFETY', vet:'No', visit:'Day Trip', cost:'$160K', verdict:'FULLY FUNDED', planB:'Fair', notes:'Solid SEC option.' },
+  { rank:12, name:'University of Florida',  cat:'REACH',  vet:'Yes', visit:'Separate Trip', cost:'$192K', verdict:'STRETCH', planB:'Strong', notes:'Excellent program but hardest to get in.' },
+  { rank:13, name:'University of Wisconsin-Madison', cat:'REACH', vet:'Yes', visit:'Fly-Out', cost:'$224K', verdict:'STRETCH', planB:'Good', notes:'Great school, very limited merit.' }
+];
+
+function renderSummary() {
+  const tbody = document.getElementById('summaryRankBody');
+  tbody.innerHTML = SUMMARY_SCHOOLS.map(s => {
+    const catClass = s.cat === 'SAFETY' ? 'badge-safety' : s.cat === 'REACH' ? 'badge-reach' : 'badge-match';
+    const verdictClass = s.verdict === 'FULLY FUNDED' ? 'badge-funded' : s.verdict === 'AFFORDABLE' ? 'badge-affordable' : 'badge-stretch';
+    const vetClass = s.vet === 'Yes' ? 'badge-vet-yes' : 'badge-vet-no';
+    return `<tr>
+      <td class="compact" style="font-weight:700;color:var(--primary)">${s.rank}</td>
+      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name, 22)} ${esc(s.name)}</span></td>
+      <td class="compact"><span class="badge ${catClass}">${s.cat}</span></td>
+      <td class="compact"><span class="badge ${vetClass}">${esc(s.vet)}</span></td>
+      <td class="compact" style="font-size:0.8rem">${esc(s.visit)}</td>
+      <td class="compact" style="font-weight:600">${s.cost}</td>
+      <td class="compact"><span class="badge ${verdictClass}">${s.verdict}</span></td>
+      <td class="compact">${s.planB}</td>
+      <td style="font-size:0.82rem;max-width:260px">${esc(s.notes)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Financial Analysis ───
+const FIN_DATA = [
+  { group:'SAFETY SCHOOLS' },
+  { school:'University of Georgia', res:'In-State', sticker:30000, merit:5000, notes:'Zell Miller' },
+  { school:'Auburn University', res:'OOS', sticker:52000, merit:12000 },
+  { school:'University of Kentucky', res:'OOS', sticker:52000, merit:16000 },
+  { school:'University of Tennessee', res:'OOS', sticker:50000, merit:10000 },
+  { school:'Louisiana State University', res:'OOS', sticker:53000, merit:14000 },
+  { group:'MATCH SCHOOLS' },
+  { school:'Texas A&M University', res:'OOS', sticker:58000, merit:2000 },
+  { school:'Purdue University', res:'OOS', sticker:46000, merit:3000 },
+  { school:'North Carolina State University', res:'OOS', sticker:52000, merit:4000 },
+  { school:'Virginia Tech', res:'OOS', sticker:55000, merit:3000 },
+  { school:'Ohio State University', res:'OOS', sticker:56000, merit:4000 },
+  { school:'Clemson University', res:'OOS', sticker:54000, merit:6000 },
+  { group:'REACH SCHOOLS' },
+  { school:'University of Florida', res:'OOS', sticker:50000, merit:2000 },
+  { school:'University of Wisconsin-Madison', res:'OOS', sticker:58000, merit:2000 }
+];
+
+function recalcFinancials() {
+  const b529 = parseInt(document.getElementById('fin529').value.replace(/,/g, '')) || 0;
+  const cashPerYr = parseInt(document.getElementById('finCashflow').value.replace(/,/g, '')) || 0;
+  const fourYrCash = cashPerYr * 4;
+  const total = b529 + fourYrCash;
+  document.getElementById('fin4yr').textContent = '$' + fourYrCash.toLocaleString();
+  document.getElementById('finTotal').textContent = '$' + total.toLocaleString();
+  // Save to data
+  data.finConfig = { b529, cashPerYr };
+  saveData();
+  renderFinancials(total);
+}
+
+function renderFinancials(totalOverride) {
+  const b529 = data.finConfig ? data.finConfig.b529 : 175000;
+  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 37000;
+  const total = totalOverride || (b529 + cashPerYr * 4);
+  document.getElementById('fin529').value = b529.toLocaleString();
+  document.getElementById('finCashflow').value = cashPerYr.toLocaleString();
+  document.getElementById('fin4yr').textContent = '$' + (cashPerYr * 4).toLocaleString();
+  document.getElementById('finTotal').textContent = '$' + total.toLocaleString();
+
+  const tbody = document.getElementById('finBody');
+  tbody.innerHTML = FIN_DATA.map(row => {
+    if (row.group) return `<tr class="fin-group-header"><td colspan="9">${row.group}</td></tr>`;
+    const realistic = row.sticker - row.merit;
+    const fourYrSticker = row.sticker * 4;
+    const fourYrRealistic = realistic * 4;
+    const gap = total - fourYrRealistic;
+    const verdict = gap >= 150000 ? 'FULLY FUNDED' : gap >= 50000 ? 'AFFORDABLE' : 'STRETCH';
+    const verdictClass = verdict === 'FULLY FUNDED' ? 'badge-funded' : verdict === 'AFFORDABLE' ? 'badge-affordable' : 'badge-stretch';
+    return `<tr>
+      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(row.school, 22)} ${esc(row.school)}</span></td>
+      <td class="compact">${row.res}</td>
+      <td class="compact">$${row.sticker.toLocaleString()}</td>
+      <td class="compact">$${fourYrSticker.toLocaleString()}</td>
+      <td class="compact">$${row.merit.toLocaleString()}</td>
+      <td class="compact">$${realistic.toLocaleString()}</td>
+      <td class="compact" style="font-weight:600">$${fourYrRealistic.toLocaleString()}</td>
+      <td class="compact" style="font-weight:600;color:${gap>=0?'var(--accent)':'var(--danger)'}">+$${gap.toLocaleString()} surplus</td>
+      <td class="compact"><span class="badge ${verdictClass}">${verdict}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Road Trip ───
+const TRIP_DAYS = [
+  { day:1, date:'Sun, March 1', school:'-', tourTime:'-', tourDetails:'Travel day', driveAfter:'Atlanta → Raleigh', driveTime:'6 hrs', hotel:'StateView Hotel, Autograph Collection', hotelCity:'Raleigh', hotelCost:160, booked:true },
+  { day:2, date:'Mon, March 2', school:'NC State', tourTime:'9am-11am', tourDetails:'Campus tour & info session', driveAfter:'Raleigh → Blacksburg', driveTime:'3 hrs', hotel:'Residence Inn Blacksburg-University', hotelCity:'Blacksburg', hotelCost:135, booked:true, tourLink:'admissions.ncsu.edu/visit' },
+  { day:3, date:'Tue, March 3', school:'Virginia Tech', tourTime:'8:30am-9:30am', tourDetails:'Walking tour (short — consider self-guided app after)', driveAfter:'Blacksburg → Columbus', driveTime:'4.5 hrs', hotel:'Marriott Columbus OSU', hotelCity:'Columbus', hotelCost:215, booked:true, tourLink:'admit.vt.edu/portal/campus-visits' },
+  { day:4, date:'Wed, March 4', school:'Ohio State', tourTime:'9am-11am', tourDetails:'Campus tour & info session', driveAfter:'Columbus → W. Lafayette', driveTime:'3 hrs', hotel:'Union Club Hotel, Autograph Collection', hotelCity:'West Lafayette', hotelCost:334, booked:true, tourLink:'campusvisit.osu.edu' },
+  { day:5, date:'Thu, March 5', school:'Purdue', tourTime:'AM + 2:30pm-4:30pm', tourDetails:'Morning: College of Ag tour + staff 1-on-1; Afternoon: Campus visit', driveAfter:'W. Lafayette → Lexington', driveTime:'3 hrs', hotel:'Lexington Marriott City Center', hotelCity:'Lexington', hotelCost:227, booked:true, tourLink:'admissions.purdue.edu/visit' },
+  { day:6, date:'Fri, March 6', school:'Kentucky', tourTime:'9:30am-11:30am + 3pm', tourDetails:'Morning: Campus tour; 3pm: College of Arts & Sciences', driveAfter:'Lexington → Atlanta', driveTime:'5.5 hrs', hotel:'— Home —', hotelCity:'', hotelCost:0, booked:false, tourLink:'visit.uky.edu' }
+];
+
+function renderRoadTrip() {
+  if (!data.tripNotes) data.tripNotes = {};
+  const container = document.getElementById('roadtripDays');
+  container.innerHTML = TRIP_DAYS.map(d => {
+    const noteKey = 'day' + d.day;
+    const noteVal = data.tripNotes[noteKey] || '';
+    const tripSchoolMap = {'NC State':'North Carolina State University','Kentucky':'University of Kentucky','Purdue':'Purdue University','Ohio State':'Ohio State University','Virginia Tech':'Virginia Tech'};
+    const fullName = tripSchoolMap[d.school] || d.school;
+    const schoolColor = d.school !== '-' ? (schoolDB[fullName]||{}).color||'var(--primary)' : 'var(--primary)';
+    const logoHtml = d.school !== '-' ? schoolLogoHTML(fullName, 24) : '';
+    return `
+    <div class="trip-day" style="border-left:4px solid ${schoolColor}">
+      <div class="trip-day-header">
+        <div style="display:flex;align-items:center;gap:8px">${logoHtml}<span class="day-label">Day ${d.day}${d.school !== '-' ? ' — ' + d.school : ''}</span></div>
+        <div><span class="day-date">${d.date}</span></div>
+      </div>
+      <div class="trip-day-body">
+        <div class="trip-detail"><div class="td-label">Tour Time</div><div class="td-value">${d.tourTime}</div></div>
+        <div class="trip-detail"><div class="td-label">Details</div><div class="td-value">${esc(d.tourDetails)}</div></div>
+        <div class="trip-detail"><div class="td-label">Drive After</div><div class="td-value">${d.driveAfter} (${d.driveTime})</div></div>
+        <div class="trip-detail"><div class="td-label">Hotel</div><div class="td-value">${d.hotel}${d.hotelCost ? ' — $' + d.hotelCost : ''} ${d.booked ? '<span class="badge badge-booked" style="margin-left:6px">BOOKED</span>' : ''}</div></div>
+        ${d.tourLink ? `<div class="trip-detail" style="grid-column:1/-1"><div class="td-label">Registration</div><div class="td-value" style="font-size:0.82rem;color:var(--primary)">${d.tourLink}</div></div>` : ''}
+        <div class="trip-notes" style="grid-column:1/-1"><div class="td-label" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:var(--text-light);letter-spacing:0.3px;margin-bottom:4px;">Notes</div><textarea placeholder="Add notes for this day..." onchange="data.tripNotes['${noteKey}']=this.value;saveData()">${esc(noteVal)}</textarea></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Tour Checklist ───
+const TOUR_CHECKLIST_DEFAULTS = {
+  before: [
+    'Register for campus tours at each school',
+    'Request College of Agriculture/Animal Science sessions',
+    'Book hotels in Raleigh, Blacksburg, Columbus, West Lafayette, Lexington',
+    "Check each school's parking instructions",
+    'Download campus maps to phone',
+    'Prepare questions for admissions counselors'
+  ],
+  questions: [
+    'What pre-vet advising is available?',
+    'What animal handling/research opportunities exist?',
+    "What's the vet school acceptance rate for undergrads?",
+    'What scholarships are available for out-of-state students?',
+    "What's the average class size for animal science courses?",
+    'Are there on-campus animal facilities?'
+  ],
+  notice: [
+    'Campus feel — does it feel like home?',
+    'Student energy and engagement',
+    'Quality of dorms and dining',
+    'Distance between classes',
+    'Surrounding town/city vibe',
+    'Athletic facilities and game day culture'
+  ]
+};
+
+function getTourChecklist() {
+  if (!data.tourChecklist) {
+    data.tourChecklist = {};
+    for (const [section, items] of Object.entries(TOUR_CHECKLIST_DEFAULTS)) {
+      data.tourChecklist[section] = items.map(text => ({ id: uid(), text, done: false }));
+    }
+    saveData();
+  }
+  return data.tourChecklist;
+}
+
+function renderTourChecklist() {
+  const tc = getTourChecklist();
+  const labels = { before: 'Before the Trip', questions: 'Questions to Ask', notice: 'Things to Notice' };
+  const container = document.getElementById('tourChecklistContainer');
+  container.innerHTML = Object.entries(labels).map(([key, label]) => {
+    const items = tc[key] || [];
+    const doneCount = items.filter(i => i.done).length;
+    return `
+    <div class="tour-section">
+      <div class="tour-section-header"><span>${label}</span><span style="font-size:0.82rem;font-weight:600;color:var(--accent)">${doneCount}/${items.length}</span></div>
+      ${items.map(item => `
+        <div class="tour-item">
+          <input type="checkbox" ${item.done?'checked':''} onchange="toggleTourItem('${key}','${item.id}',this.checked)">
+          <span class="tour-text ${item.done?'checked':''}">${esc(item.text)}</span>
+          <span class="delete-item" onclick="deleteTourItem('${key}','${item.id}')" style="cursor:pointer;color:var(--text-light);padding:0 4px">&times;</span>
+        </div>`).join('')}
+      <div class="tour-add-row">
+        <input type="text" placeholder="Add item..." id="tourAdd_${key}" onkeydown="if(event.key==='Enter')addTourItem('${key}')">
+        <button class="btn btn-primary btn-sm" onclick="addTourItem('${key}')">Add</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleTourItem(section, itemId, checked) {
+  const tc = getTourChecklist();
+  const item = (tc[section]||[]).find(i => i.id === itemId);
+  if (item) { item.done = checked; saveData(); renderTourChecklist(); }
+}
+
+function addTourItem(section) {
+  const input = document.getElementById('tourAdd_' + section);
+  const text = input.value.trim();
+  if (!text) return;
+  const tc = getTourChecklist();
+  if (!tc[section]) tc[section] = [];
+  tc[section].push({ id: uid(), text, done: false });
+  saveData();
+  renderTourChecklist();
+}
+
+function deleteTourItem(section, itemId) {
+  const tc = getTourChecklist();
+  if (tc[section]) tc[section] = tc[section].filter(i => i.id !== itemId);
+  saveData();
+  renderTourChecklist();
+}
+
+// ─── Admission Strategy ───
+const STRATEGY_DATA = [
+  { school:'Purdue University', type:'Direct to Major', overall:'43%', eng:'30-35%', ag:'55-56%', adv:'+20-25 pts', major:'Animal Sciences (Pre-Vet)', conf:'HIGH' },
+  { school:'Texas A&M University', type:'College-Level', overall:'63%', eng:'10-15%', ag:'~65%', adv:'+45-50 pts', major:'Animal Science', conf:'HIGH' },
+  { school:'Virginia Tech', type:'College-Level', overall:'55%', eng:'35-40%', ag:'60-65%', adv:'+20-25 pts', major:'Animal & Poultry Sciences', conf:'MEDIUM' },
+  { school:'NC State', type:'University-Wide', overall:'47%', eng:'30-35%', ag:'55-60%', adv:'+20-25 pts', major:'Animal Science', conf:'MEDIUM' },
+  { school:'Ohio State', type:'College-Level', overall:'51%', eng:'35-40%', ag:'55-60%', adv:'+15-20 pts', major:'Animal Sciences', conf:'MEDIUM' },
+  { school:'UGA', type:'Holistic', overall:'43%', eng:'~30%', ag:'50-55%', adv:'+20-25 pts', major:'Animal Health / Animal & Dairy Science', conf:'MEDIUM' },
+  { school:'Auburn', type:'College-Level', overall:'44%', eng:'~35%', ag:'55-60%', adv:'+20 pts', major:'Animal Sciences', conf:'MEDIUM' },
+  { school:'Clemson', type:'College-Level', overall:'43%', eng:'~30%', ag:'~55%', adv:'+20-25 pts', major:'Animal & Veterinary Sciences', conf:'MEDIUM' },
+  { school:'Kentucky', type:'University-Wide', overall:'90%+', eng:'N/A', ag:'N/A', adv:'Minimal', major:'Animal Science', conf:'HIGH' },
+  { school:'Tennessee', type:'University-Wide', overall:'80%+', eng:'N/A', ag:'N/A', adv:'Minimal', major:'Animal Science', conf:'HIGH' },
+  { school:'LSU', type:'University-Wide', overall:'75%+', eng:'N/A', ag:'N/A', adv:'Minimal', major:'Animal Sciences', conf:'HIGH' },
+  { school:'Florida', type:'University-Wide', overall:'23%', eng:'15-18%', ag:'30-35%', adv:'+15 pts', major:'Animal Sciences', conf:'MEDIUM' },
+  { school:'Wisconsin', type:'University-Wide', overall:'49%', eng:'~35%', ag:'55-60%', adv:'+20 pts', major:'Animal Sciences', conf:'MEDIUM' }
+];
+
+function renderStrategy() {
+  const tbody = document.getElementById('strategyBody');
+  tbody.innerHTML = STRATEGY_DATA.map(s => {
+    const confColor = s.conf === 'HIGH' ? 'var(--accent)' : 'var(--warn)';
+    return `<tr>
+      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.school, 22)} ${esc(s.school)}</span></td>
+      <td class="compact">${esc(s.type)}</td>
+      <td class="compact">${s.overall}</td>
+      <td class="compact">${s.eng}</td>
+      <td class="compact" style="font-weight:600;color:var(--accent)">${s.ag}</td>
+      <td class="compact" style="font-weight:700;color:var(--primary)">${s.adv}</td>
+      <td style="font-size:0.82rem">${esc(s.major)}</td>
+      <td class="compact" style="color:${confColor};font-weight:600">${s.conf}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Escape HTML ───
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function schoolLogoHTML(name, size) {
+  size = size || 28;
+  const db = schoolDB[name] || {};
+  const domain = db.domain || '';
+  const color = db.color || '#4a7c8a';
+  const initials = name.split(' ').map(w => w[0]).filter(c => c && c === c.toUpperCase()).slice(0,2).join('');
+  return `<img class="school-logo" style="width:${size}px;height:${size}px" src="https://www.google.com/s2/favicons?domain=${domain}&sz=128" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="logo-fallback" style="background:${color};display:none;width:${size}px;height:${size}px">${initials}</div>`;
+}
+
+// ─── Keyboard shortcut: Escape closes modal ───
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─── Export to Excel ───
+function exportToExcel() {
+  const statusLabels = { researching:'Researching', applying:'Applying', accepted:'Accepted', rejected:'Rejected', waitlisted:'Waitlisted' };
+  const headers = ['School Name','Location','Pre-Vet Program Notes','Avg GPA','SAT/ACT Requirements','Overall Accept %','Ag School Accept %','Out-of-State Accept %','OOS Ag Inferred %','In-State Tuition','Out-of-State Tuition','Application Deadline','Early Decision Deadline','Status'];
+  const rows = data.schools.map(s => [s.name, s.location, s.notes, s.avgGPA, s.testReq, s.acceptRate, s.agAcceptRate, s.oosAcceptRate, s.oosAgAcceptRate, s.tuitionIn, s.tuitionOut, s.deadline, s.earlyDecision, statusLabels[s.status] || s.status]);
+
+  function xmlCell(val) {
+    const v = (val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return `<Cell><Data ss:Type="String">${v}</Data></Cell>`;
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+<Styles>
+ <Style ss:ID="hdr"><Font ss:Bold="1" ss:Size="11"/><Interior ss:Color="#E8F1F4" ss:Pattern="Solid"/></Style>
+</Styles>
+<Worksheet ss:Name="School Comparison">
+<Table>
+<Row ss:StyleID="hdr">${headers.map(h => xmlCell(h)).join('')}</Row>
+${rows.map(r => `<Row>${r.map(c => xmlCell(c)).join('')}</Row>`).join('\n')}
+</Table>
+</Worksheet>
+</Workbook>`;
+
+  const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'School_Comparison.xls';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── One-time migration: regenerate checklists with tailored items ───
+if (!localStorage.getItem('checklistV5')) {
+  data.checklists = [];
+  localStorage.setItem('checklistV5', 'true');
+}
+// ─── One-time migration: reset rankings to use detailed presets ───
+if (!localStorage.getItem('rankingsV2')) {
+  data.rankings = {};
+  localStorage.setItem('rankingsV2', 'true');
+  saveData();
+}
+
+// ─── Greek Life Data ───
+const GREEK_LIFE_DATA = {
+  'Texas A&M University': { pctWomen: '~10%', npc: 14, total: '20+', recruitment: 'Fall (Aug)', housing: '12 houses on Sorority Row; live-in optional soph/jr', cost: '$2,000\u2013$5,000', greekPct: '~11%', gpa: 'At or above campus avg', vibe: 'One of many social avenues; Aggie traditions dominate campus culture more than Greek life' },
+  'University of Georgia': { pctWomen: '~35%', npc: 20, total: '30+', recruitment: 'Fall (early Aug)', housing: 'Mansion houses on Milledge Ave; live-in soph year', cost: '$2,200\u2013$8,700', greekPct: '~28%', gpa: '3.65 sorority vs campus avg (higher)', vibe: 'Central to social life; one of the most prominent Greek systems in the SEC' },
+  'Cornell University': { pctWomen: '~28%', npc: 11, total: '17', recruitment: 'Deferred \u2014 Spring (Jan)', housing: 'Most NPC chapters have houses; live-in soph', cost: '$700\u2013$1,000', greekPct: '~35%', gpa: '3.65 vs 3.44 campus', vibe: 'Most prominent Greek scene in the Ivy League; deferred rush gives freshmen a semester first' },
+  'UC Davis': { pctWomen: '~7%', npc: 10, total: '22', recruitment: 'Fall', housing: 'Most sororities lack houses; no Greek Row', cost: '$1,000\u2013$2,000', greekPct: '~10%', gpa: 'Not reported', vibe: 'Low-key; one of many social options; academically focused and service-oriented' },
+  'Colorado State University': { pctWomen: '~12%', npc: 8, total: '20', recruitment: 'Fall (mid-Sept)', housing: 'All PHA chapters have houses; some require live-in', cost: '$400\u2013$2,400', greekPct: '~12%', gpa: '3.33 PHA vs ~3.16 campus', vibe: 'Present but not dominant; outdoor rec and brewery culture compete for social time' },
+  'University of Florida': { pctWomen: '~24%', npc: 18, total: '30+', recruitment: 'Fall (mid-Aug)', housing: 'Sorority Row with ~15 houses; live-in soph+', cost: '$3,000\u2013$5,000', greekPct: '~15%', gpa: '3.50 vs 3.43 campus', vibe: 'Significant; Sorority Row is iconic; game-day culture and competitive recruitment' },
+  'Ohio State University': { pctWomen: '~11%', npc: 19, total: '28', recruitment: 'Spring (Jan)', housing: 'Off-campus, privately owned; varies by chapter', cost: '$2,500+', greekPct: '~11%', gpa: 'Above campus avg 45 consecutive terms', vibe: 'Growing rapidly but not dominant at a 60K+ campus; spring rush gives freshmen a semester first' },
+  'University of Minnesota': { pctWomen: '~13%', npc: 14, total: '21', recruitment: 'Fall', housing: 'Over half have off-campus houses', cost: '$500\u2013$1,500', greekPct: '~11%', gpa: '3.47 vs 3.32 campus', vibe: 'Present but not dominant; urban campus with many non-Greek social options' },
+  'Purdue University': { pctWomen: '~19%', npc: 21, total: '30+', recruitment: 'Fall (two weekends)', housing: 'Large historic houses; live-in soph/jr', cost: '$2,000\u2013$4,000', greekPct: '~18%', gpa: '3.18 PHA vs 3.10 all women', vibe: 'Major part of campus culture; one of largest Greek systems nationally; impressive historic houses' },
+  'Michigan State University': { pctWomen: '~11%', npc: 14, total: '23', recruitment: 'Fall', housing: 'Chapter houses off-campus; live-in varies', cost: '$1,000\u2013$2,000', greekPct: '~13%', gpa: '3.43 PHA avg', vibe: 'Well-established but not dominant at a 50K+ campus; one of many social options' },
+  'Virginia Tech': { pctWomen: '~19%', npc: 13, total: '62 orgs', recruitment: 'Deferred \u2014 Spring (Jan)', housing: 'Oak Lane on-campus Greek housing; 2-semester live-in req', cost: '$1,200\u2013$2,000', greekPct: '~19%', gpa: 'Data in annual scorecard', vibe: 'Significant but not dominant; Hokie athletics and outdoor culture share the stage' },
+  'Iowa State University': { pctWomen: '~15%', npc: 17, total: '65 orgs', recruitment: 'Fall (pre-classes, Aug)', housing: 'Chapter houses; move in soph year', cost: '$1,500\u2013$2,500', greekPct: '~17%', gpa: '3.22 Greek vs 3.11 campus', vibe: 'Solid but not dominant; classic college-town Greek presence' },
+  'North Carolina State University': { pctWomen: '~11%', npc: 13, total: '50+ orgs', recruitment: 'Fall (Labor Day wknd)', housing: 'Greek Village on campus', cost: '$400\u2013$2,000/sem', greekPct: '~12%', gpa: '~3.4 target', vibe: 'Relatively low-key; STEM culture and Raleigh city life provide many alternatives' },
+  'University of Wisconsin-Madison': { pctWomen: '~13%', npc: 14, total: '60+ orgs', recruitment: 'Fall', housing: 'Historic houses on Langdon St Greek Row', cost: '$1,500\u2013$3,000', greekPct: '~14%', gpa: 'Report available', vibe: 'Visible with iconic Langdon St houses; but State St nightlife and athletics also huge' },
+  'Auburn University': { pctWomen: '~49%', npc: 18, total: '53 orgs', recruitment: 'Fall (Aug)', housing: 'Halls in The Village (on-campus); ~40 beds/chapter', cost: '$1,600\u2013$1,900', greekPct: '~35%', gpa: '3.45 vs 3.35 all women', vibe: 'Absolutely central \u2014 nearly half of women are in sororities; dominates social life' },
+  'Kansas State University': { pctWomen: '~22%', npc: 13, total: '32', recruitment: 'Fall (week before classes)', housing: 'Off-campus chapter houses; walking distance', cost: '$2,000\u2013$4,000', greekPct: '~20%', gpa: 'Higher than campus avg 30+ consecutive yrs', vibe: 'Prominent in small-town setting; major social pathway' },
+  'Oklahoma State University': { pctWomen: '~22%', npc: 12, total: '51 orgs', recruitment: 'Fall (week before classes)', housing: 'Greek Neighborhood (univ-approved; freshmen OK)', cost: '$1,500\u2013$3,000', greekPct: '~20%', gpa: '3.49 vs 3.25 non-Greek', vibe: 'Prominent; Greek members hold 50%+ of campus leadership positions' },
+  'Oregon State University': { pctWomen: '~15%', npc: 11, total: '45+ orgs', recruitment: 'Fall', housing: 'All 11 PHC chapters are housed', cost: '$1,200\u2013$2,500', greekPct: '~11%', gpa: 'Report available', vibe: 'Present but low-key; PNW outdoor culture is the main social driver' },
+  'Washington State University': { pctWomen: '~25%', npc: 14, total: '20+', recruitment: 'Fall (late Aug)', housing: 'Greek Row with residential chapter houses', cost: '$2,000\u2013$4,000', greekPct: '~25%', gpa: '3.17 sorority vs 3.16 all women', vibe: 'Central; largest student org on campus; Greek Row is a social hub in small college town' },
+  'Mississippi State University': { pctWomen: '~28%', npc: 9, total: '13+', recruitment: 'Fall (mid-Aug)', housing: '7 of 13 sororities have houses', cost: '$3,700\u2013$6,200', greekPct: '~22%', gpa: 'Not publicly aggregated', vibe: 'Significant SEC presence; intertwined with football and tailgating culture' },
+  'Louisiana State University': { pctWomen: '~29%', npc: 13, total: '18+', recruitment: 'Fall (mid-Aug)', housing: 'Chapter houses on Greek Row; mandatory meal plans', cost: '$3,800\u2013$5,600', greekPct: '~22%', gpa: '3.17 Greek vs 2.95 campus', vibe: 'Very central; PHC alone has 4,000+ women; deeply tied to SEC football culture' },
+  'University of Illinois': { pctWomen: '~24%', npc: 'Large', total: '36', recruitment: 'Fall', housing: 'Historic Greek Row houses; live-in soph year', cost: '$2,000\u2013$3,000', greekPct: '~24%', gpa: '3.53 Greek vs 3.53 campus', vibe: 'Major presence with one of oldest/largest Greek systems nationally; beautiful historic houses' },
+  'Tufts University': { pctWomen: '~12%', npc: 2, total: '5', recruitment: 'Deferred \u2014 Soph year+', housing: 'Very limited; Jr/Sr only', cost: '$500\u2013$1,500', greekPct: '~13%', gpa: 'Not reported', vibe: 'Low-key; only 2 NPC sororities; progressive campus does not revolve around Greek life' },
+  'University of Pennsylvania': { pctWomen: '~25%', npc: 7, total: '14', recruitment: 'Deferred \u2014 Spring (Jan)', housing: 'Some chapters have houses', cost: '$1,000\u2013$3,000', greekPct: '~25%', gpa: 'Not reported', vibe: 'Present and visible but not dominant; urban Philadelphia setting offers many alternatives' },
+  'Tuskegee University': { pctWomen: '~5% (NPHC)', npc: 0, total: '4 NPHC', recruitment: 'NPHC intake (varies)', housing: 'No chapter houses', cost: '$300\u2013$800', greekPct: '~5%', gpa: 'Not reported', vibe: 'Completely different model \u2014 Divine Nine orgs only; service-focused, no traditional rush' },
+  'University of Tennessee': { pctWomen: '~37%', npc: 14, total: '20+', recruitment: 'Fall (Aug)', housing: '30 fraternity/sorority houses on campus', cost: '$2,500\u2013$5,000', greekPct: '~30%', gpa: '3.0 min for bids', vibe: 'Very central; one of strongest SEC Greek communities; 3,000+ women register for rush' },
+  'University of Missouri': { pctWomen: '~32%', npc: 14, total: '20', recruitment: 'Fall', housing: 'Greektown houses; move in second year', cost: '$2,000\u2013$4,000', greekPct: '~27%', gpa: 'Above campus avg', vibe: 'Central; Greektown is "where the action is"; SEC football culture amplifies Greek scene' },
+  'Clemson University': { pctWomen: '~36%', npc: 13, total: '16', recruitment: 'Fall (mid-Aug)', housing: 'No standalone houses; dorm floors/wings', cost: '$1,000\u2013$1,400', greekPct: '~26%', gpa: '3.6\u20133.7 PHA avg', vibe: 'Significant and growing; no-house model keeps costs low; game-day culture is big' },
+  'Penn State University': { pctWomen: '~20%', npc: 21, total: '25+', recruitment: 'Deferred \u2014 Spring', housing: 'Dorm floors in South Residence Halls', cost: '$900\u2013$1,400', greekPct: '~17%', gpa: '~3.2\u20133.3 new member avg', vibe: 'Well-established but not dominant at 40K+; THON is huge; broad social scene' },
+  'University of Vermont': { pctWomen: '~7%', npc: 6, total: '6', recruitment: 'Fall (Sept)', housing: 'Some chapters have houses; varies', cost: '$500\u2013$1,500', greekPct: '~8%', gpa: 'Not reported', vibe: 'Very small and low-key; Burlington social scene dominates; inclusive and progressive' },
+  'University of Kentucky': { pctWomen: '~27%', npc: 14, total: '14+', recruitment: 'Fall', housing: 'Greek Park chapter houses', cost: '$2,000\u2013$9,600', greekPct: '~23%', gpa: 'Higher + 3x retention rate', vibe: 'Moderately central; well-established SEC system; Greek Park is traditional' },
+  'Rutgers University': { pctWomen: '~10%', npc: 8, total: '30+', recruitment: 'Spring (Jan)', housing: 'Private off-campus houses; varies', cost: '$600\u2013$1,000', greekPct: '~10%', gpa: 'Above all-women avg', vibe: 'Modest presence; strong multicultural Greek community; social life is diverse' },
+  'University of Arizona': { pctWomen: '~17%', npc: 12, total: '15+', recruitment: 'Fall (late Aug)', housing: 'Historic Greek Row (since 1900); mostly social space', cost: '$500\u2013$1,000', greekPct: '~13%', gpa: 'Meets or exceeds campus avg', vibe: 'Visible with historic Greek Row; warm-weather social culture; not dominant at 48K campus' },
+  'University of Maryland': { pctWomen: '~16%', npc: 16, total: '20+', recruitment: 'Spring (primary) + Fall informal', housing: 'Leased chapter houses on Fraternity Row', cost: '$400\u2013$900', greekPct: '~16%', gpa: '~3.32 sorority avg', vibe: 'Moderate; D.C. proximity provides vast non-Greek social/professional opportunities' },
+  'Cal Poly San Luis Obispo': { pctWomen: '~20%', npc: 9, total: '12+', recruitment: 'Fall (quarter start)', housing: 'Some scattered houses; no Greek Row (proposed)', cost: '$1,200\u2013$2,500', greekPct: '~20%', gpa: 'Above all-women avg', vibe: 'Significant; SLO beach/outdoor lifestyle blends with Greek culture; quarter system' },
+  'University of Connecticut': { pctWomen: '~11%', npc: 9, total: '20', recruitment: 'Fall (primary)', housing: 'Husky Village (purpose-built; 301 beds)', cost: '$600\u2013$1,600', greekPct: '~10%', gpa: '56% earned 3.5+ GPA', vibe: 'Moderate; Husky athletics especially basketball are the bigger social draw' },
+  'University of Nebraska-Lincoln': { pctWomen: '~20%', npc: 13, total: '16+', recruitment: 'Fall (mid-Aug)', housing: '12 sorority houses; well-established Greek Row', cost: '$2,000\u2013$13,000', greekPct: '~20%', gpa: '3.44 sorority vs 3.23 campus', vibe: 'Very central; one of largest Greek systems nationally; 1,100+ women rush' },
+  'Montana State University': { pctWomen: '~2%', npc: 5, total: '5', recruitment: 'Fall (late Aug)', housing: 'All 5 have houses; cheaper than dorms', cost: '$700\u2013$1,300', greekPct: '~3%', gpa: 'Not reported', vibe: 'Very small niche; outdoor recreation drives social life; laid-back option' },
+  'University of Delaware': { pctWomen: '~27%', npc: 13, total: '22', recruitment: 'Spring (primary)', housing: 'Limited; 7 university-owned houses + some off-campus', cost: '~$1,700', greekPct: '~27%', gpa: '3.32 all-sorority avg', vibe: 'Moderately important; deferred spring rush; 117-year-old system' },
+  'University of New Hampshire': { pctWomen: '~10%', npc: 8, total: '8', recruitment: 'Fall (Sept)', housing: 'Some houses on Madbury Rd', cost: 'Not published', greekPct: '~18%', gpa: 'Tracked via chapter scorecards', vibe: 'Present but low-key; 63% say Greek life is average; diverse social scene' },
+  'Berry College': { pctWomen: '0%', npc: 0, total: '0', recruitment: 'N/A', housing: 'N/A', cost: 'N/A', greekPct: '0%', gpa: 'N/A', vibe: 'No Greek life \u2014 intentional institutional choice; community built through residential living' },
+  'Delaware Valley University': { pctWomen: '~4%', npc: 2, total: '3', recruitment: 'Informal/continuous', housing: 'No chapter houses', cost: 'Modest', greekPct: '~3%', gpa: 'Not reported', vibe: 'Extremely small; 2 social sororities on a small ag-focused campus' },
+  'University of Wyoming': { pctWomen: '~5%', npc: 4, total: '6', recruitment: 'Fall (late Aug)', housing: 'Houses on Fraternity & Sorority Mall', cost: '$200\u2013$2,000', greekPct: '~6%', gpa: 'Not reported', vibe: 'Small but active; outdoor recreation and small-town Laramie vibe dominate social life' },
+};
+
+function renderGreekLife() {
+  const tb = document.getElementById('greekBody');
+  const empty = document.getElementById('greekEmpty');
+  if (!tb) return;
+  const schools = data.schools;
+  if (schools.length === 0) { empty.style.display = ''; tb.parentElement.style.display = 'none'; return; }
+  empty.style.display = 'none'; tb.parentElement.style.display = '';
+  tb.innerHTML = schools.map(s => {
+    const g = GREEK_LIFE_DATA[s.name];
+    if (!g) return `<tr><td>${esc(s.name)}</td><td colspan="9" style="color:#999;">No Greek life data available</td></tr>`;
+    return `<tr>
+      <td><strong>${esc(s.name)}</strong></td>
+      <td>${esc(g.pctWomen)}</td>
+      <td>${g.npc}</td>
+      <td>${esc(String(g.total))}</td>
+      <td>${esc(g.recruitment)}</td>
+      <td style="font-size:0.82em;">${esc(g.housing)}</td>
+      <td>${esc(g.cost)}</td>
+      <td>${esc(g.greekPct)}</td>
+      <td style="font-size:0.82em;">${esc(g.gpa)}</td>
+      <td style="font-size:0.82em;max-width:220px;">${esc(g.vibe)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── Initial render ───
+function renderAll() {
+  renderSummary();
+  renderSchools();
+  renderFinancials();
+  renderRoadTrip();
+  renderTourChecklist();
+  renderEvaluation();
+  renderRankings();
+  renderStrategy();
+  syncChecklists();
+  renderTestPrep();
+  renderGreekLife();
+}
+renderAll();
+
+// ─── Firestore real-time sync ───
+docRef.onSnapshot(snap => {
+  if (snap.metadata.hasPendingWrites) return;
+  if (snap.exists) {
+    const remote = snap.data();
+    if (JSON.stringify(remote) !== JSON.stringify(data)) {
+      data = remote;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      renderAll();
+    }
+  } else if (!firestoreSyncEnabled) {
+    docRef.set(JSON.parse(JSON.stringify(data)));
+  }
+  firestoreSyncEnabled = true;
+});
+</script>
+</body>
+</html>
