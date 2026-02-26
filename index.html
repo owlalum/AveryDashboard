@@ -193,6 +193,9 @@
     z-index: 2;
     line-height: 1.3;
   }
+  th.sortable { cursor: pointer; user-select: none; }
+  th.sortable:hover { background: #dce8ed; }
+  .sort-hint { color: #bbb; font-size: 0.55rem; margin-left: 3px; }
   td {
     padding: 7px 6px;
     border-bottom: 1px solid var(--border);
@@ -673,26 +676,7 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>School</th>
-            <th>Location</th>
-            <th>Program Notes</th>
-            <th>GPA</th>
-            <th>SAT/ACT</th>
-            <th>Accept&nbsp;%</th>
-            <th>Ag&nbsp;%</th>
-            <th>OOS&nbsp;%</th>
-            <th>OOS Ag&nbsp;%</th>
-            <th>In-State&nbsp;$</th>
-            <th>OOS&nbsp;$</th>
-            <th>Deadline</th>
-            <th>Early&nbsp;DL</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead id="schoolHead"></thead>
         <tbody id="schoolBody"></tbody>
       </table>
     </div>
@@ -1356,6 +1340,68 @@ const schoolAliases = {
   'University of Wyoming': ['uwyo'],
 };
 
+// ─── Distance from Atlanta ───
+const ATLANTA_COORDS = { lat: 33.749, lng: -84.388 };
+const cityCoords = {
+  'College Station, TX': { lat: 30.628, lng: -96.334 },
+  'Athens, GA': { lat: 33.951, lng: -83.357 },
+  'Ithaca, NY': { lat: 42.444, lng: -76.500 },
+  'Davis, CA': { lat: 38.545, lng: -121.741 },
+  'Fort Collins, CO': { lat: 40.585, lng: -105.084 },
+  'Gainesville, FL': { lat: 29.652, lng: -82.325 },
+  'Columbus, OH': { lat: 39.961, lng: -82.999 },
+  'Saint Paul, MN': { lat: 44.954, lng: -93.090 },
+  'West Lafayette, IN': { lat: 40.426, lng: -86.908 },
+  'East Lansing, MI': { lat: 42.737, lng: -84.484 },
+  'Blacksburg, VA': { lat: 37.230, lng: -80.414 },
+  'Ames, IA': { lat: 42.034, lng: -93.620 },
+  'Raleigh, NC': { lat: 35.780, lng: -78.638 },
+  'Madison, WI': { lat: 43.074, lng: -89.384 },
+  'Auburn, AL': { lat: 32.610, lng: -85.481 },
+  'Manhattan, KS': { lat: 39.184, lng: -96.572 },
+  'Stillwater, OK': { lat: 36.116, lng: -97.058 },
+  'Corvallis, OR': { lat: 44.565, lng: -123.263 },
+  'Pullman, WA': { lat: 46.732, lng: -117.180 },
+  'Starkville, MS': { lat: 33.451, lng: -88.818 },
+  'Baton Rouge, LA': { lat: 30.451, lng: -91.187 },
+  'Champaign, IL': { lat: 40.116, lng: -88.243 },
+  'Medford, MA': { lat: 42.419, lng: -71.106 },
+  'Philadelphia, PA': { lat: 39.953, lng: -75.164 },
+  'Tuskegee, AL': { lat: 32.430, lng: -85.691 },
+  'Knoxville, TN': { lat: 35.961, lng: -83.921 },
+  'Columbia, MO': { lat: 38.952, lng: -92.334 },
+  'Clemson, SC': { lat: 34.684, lng: -82.837 },
+  'University Park, PA': { lat: 40.793, lng: -77.860 },
+  'Burlington, VT': { lat: 44.476, lng: -73.213 },
+  'Lexington, KY': { lat: 38.040, lng: -84.504 },
+  'New Brunswick, NJ': { lat: 40.486, lng: -74.445 },
+  'Tucson, AZ': { lat: 32.222, lng: -110.975 },
+  'College Park, MD': { lat: 38.981, lng: -76.937 },
+  'San Luis Obispo, CA': { lat: 35.283, lng: -120.660 },
+  'Storrs, CT': { lat: 41.808, lng: -72.250 },
+  'Lincoln, NE': { lat: 40.813, lng: -96.703 },
+  'Bozeman, MT': { lat: 45.680, lng: -111.044 },
+  'Newark, DE': { lat: 39.684, lng: -75.750 },
+  'Durham, NH': { lat: 43.134, lng: -70.926 },
+  'Mount Berry, GA': { lat: 34.275, lng: -85.200 },
+  'Doylestown, PA': { lat: 40.310, lng: -75.130 },
+  'Laramie, WY': { lat: 41.312, lng: -105.587 },
+};
+
+function getDistanceFromAtlanta(location) {
+  const coords = cityCoords[location];
+  if (!coords) return null;
+  const R = 3959;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(coords.lat - ATLANTA_COORDS.lat);
+  const dLng = toRad(coords.lng - ATLANTA_COORDS.lng);
+  const a = Math.sin(dLat/2) ** 2 +
+    Math.cos(toRad(ATLANTA_COORDS.lat)) * Math.cos(toRad(coords.lat)) *
+    Math.sin(dLng/2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.round(R * c * 1.3);
+}
+
 function setupSchoolAutocomplete(inputId) {
   const input = document.getElementById(inputId);
   if (!input) return;
@@ -1527,17 +1573,121 @@ document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
 })();
 
 // ─── School Comparison ───
+let schoolSort = { field: null, dir: 'asc' };
+
+const SCHOOL_COLUMNS = [
+  { field: null,              label: '',               sortType: null },
+  { field: 'name',            label: 'School',         sortType: 'text' },
+  { field: 'location',        label: 'Location',       sortType: 'text' },
+  { field: '_distance',       label: 'Distance',       sortType: 'numeric' },
+  { field: 'notes',           label: 'Program Notes',  sortType: 'text' },
+  { field: 'avgGPA',          label: 'GPA',            sortType: 'numeric' },
+  { field: 'testReq',         label: 'SAT/ACT',        sortType: 'text' },
+  { field: 'acceptRate',      label: 'Accept\u00a0%',  sortType: 'percent' },
+  { field: 'agAcceptRate',    label: 'Ag\u00a0%',      sortType: 'percent' },
+  { field: 'oosAcceptRate',   label: 'OOS\u00a0%',     sortType: 'percent' },
+  { field: 'oosAgAcceptRate', label: 'OOS Ag\u00a0%',  sortType: 'percent' },
+  { field: 'tuitionIn',       label: 'In-State\u00a0$',sortType: 'currency' },
+  { field: 'tuitionOut',      label: 'OOS\u00a0$',     sortType: 'currency' },
+  { field: 'deadline',        label: 'Deadline',       sortType: 'date' },
+  { field: 'earlyDecision',   label: 'Early\u00a0DL',  sortType: 'date' },
+  { field: 'status',          label: 'Status',         sortType: 'status' },
+  { field: null,              label: '',               sortType: null },
+];
+
+function parseSortValue(val, sortType) {
+  if (val == null || val === '') return -Infinity;
+  const s = String(val).trim();
+  if (sortType === 'percent') {
+    const n = parseFloat(s.replace(/[%~]/g, ''));
+    return isNaN(n) ? -Infinity : n;
+  }
+  if (sortType === 'currency') {
+    const n = parseFloat(s.replace(/[$,]/g, ''));
+    return isNaN(n) ? -Infinity : n;
+  }
+  if (sortType === 'numeric') {
+    const n = parseFloat(s);
+    return isNaN(n) ? -Infinity : n;
+  }
+  if (sortType === 'date') {
+    if (!s || s === 'N/A' || s.toLowerCase() === 'rolling') return Infinity;
+    const months = { january:1, february:2, march:3, april:4, may:5, june:6, july:7, august:8, september:9, october:10, november:11, december:12 };
+    const m = s.match(/^(\w+)\s+(\d+)/);
+    if (m) {
+      const mo = months[m[1].toLowerCase()] || 0;
+      return mo * 100 + parseInt(m[2]);
+    }
+    return -Infinity;
+  }
+  if (sortType === 'status') {
+    const order = { accepted:1, waitlisted:2, applying:3, researching:4, rejected:5 };
+    return order[s.toLowerCase()] || 99;
+  }
+  return s.toLowerCase();
+}
+
+function sortSchools(field, dir) {
+  data.schools.sort((a, b) => {
+    const col = SCHOOL_COLUMNS.find(c => c.field === field);
+    if (!col) return 0;
+    let va, vb;
+    if (field === '_distance') {
+      va = getDistanceFromAtlanta(a.location) ?? Infinity;
+      vb = getDistanceFromAtlanta(b.location) ?? Infinity;
+    } else {
+      va = parseSortValue(a[field], col.sortType);
+      vb = parseSortValue(b[field], col.sortType);
+    }
+    let cmp;
+    if (typeof va === 'string' && typeof vb === 'string') {
+      cmp = va.localeCompare(vb);
+    } else {
+      cmp = (va < vb ? -1 : va > vb ? 1 : 0);
+    }
+    return dir === 'desc' ? -cmp : cmp;
+  });
+  saveData();
+  renderSchools();
+}
+
 function renderSchools() {
+  // Build dynamic thead
+  const thead = document.getElementById('schoolHead');
+  thead.innerHTML = '<tr>' + SCHOOL_COLUMNS.map(col => {
+    if (!col.sortType) return `<th>${col.label}</th>`;
+    const isActive = schoolSort.field === col.field;
+    const arrow = isActive ? (schoolSort.dir === 'asc' ? ' ▲' : ' ▼') : '';
+    const hint = !isActive ? ' <span class="sort-hint">▲▼</span>' : '';
+    return `<th class="sortable" data-field="${col.field}">${col.label}${arrow}${hint}</th>`;
+  }).join('') + '</tr>';
+
+  thead.querySelectorAll('.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const field = th.dataset.field;
+      if (schoolSort.field === field) {
+        schoolSort.dir = schoolSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        schoolSort.field = field;
+        schoolSort.dir = 'asc';
+      }
+      sortSchools(schoolSort.field, schoolSort.dir);
+    });
+  });
+
   const tbody = document.getElementById('schoolBody');
   tbody.innerHTML = data.schools.map(s => {
     const dbEntry = schoolDB[s.name];
     const schoolColor = s.color || (dbEntry && dbEntry.color) || '#4a7c8a';
     const initials = s.name.split(' ').map(w => w[0]).filter(c => c && c === c.toUpperCase()).slice(0,2).join('');
+    const dist = getDistanceFromAtlanta(s.location);
+    const distDisplay = dist != null ? dist + ' mi' : '\u2014';
     return `
     <tr data-id="${s.id}">
       <td class="logo-cell">${schoolLogoHTML(s.name)}</td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="name">${esc(s.name)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
+      <td class="compact">${distDisplay}</td>
       <td class="notes-cell"><span contenteditable="true" data-field="notes">${esc(s.notes)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span></td>
@@ -3172,8 +3322,8 @@ document.addEventListener('keydown', e => {
 // ─── Export to Excel ───
 function exportToExcel() {
   const statusLabels = { researching:'Researching', applying:'Applying', accepted:'Accepted', rejected:'Rejected', waitlisted:'Waitlisted' };
-  const headers = ['School Name','Location','Pre-Vet Program Notes','Avg GPA','SAT/ACT Requirements','Overall Accept %','Ag School Accept %','Out-of-State Accept %','OOS Ag Inferred %','In-State Tuition','Out-of-State Tuition','Application Deadline','Early Decision Deadline','Status'];
-  const rows = data.schools.map(s => [s.name, s.location, s.notes, s.avgGPA, s.testReq, s.acceptRate, s.agAcceptRate, s.oosAcceptRate, s.oosAgAcceptRate, s.tuitionIn, s.tuitionOut, s.deadline, s.earlyDecision, statusLabels[s.status] || s.status]);
+  const headers = ['School Name','Location','Distance (mi)','Pre-Vet Program Notes','Avg GPA','SAT/ACT Requirements','Overall Accept %','Ag School Accept %','Out-of-State Accept %','OOS Ag Inferred %','In-State Tuition','Out-of-State Tuition','Application Deadline','Early Decision Deadline','Status'];
+  const rows = data.schools.map(s => { const d = getDistanceFromAtlanta(s.location); return [s.name, s.location, d != null ? String(d) : '', s.notes, s.avgGPA, s.testReq, s.acceptRate, s.agAcceptRate, s.oosAcceptRate, s.oosAgAcceptRate, s.tuitionIn, s.tuitionOut, s.deadline, s.earlyDecision, statusLabels[s.status] || s.status]; });
 
   function xmlCell(val) {
     const v = (val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
