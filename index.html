@@ -661,6 +661,7 @@
     <button class="subtab-btn" data-subtab="rankings">Rankings</button>
     <button class="subtab-btn" data-subtab="financial">Financial Analysis</button>
     <button class="subtab-btn" data-subtab="greeklife">Greek Life</button>
+    <button class="subtab-btn" data-subtab="methodology">Methodology</button>
   </nav>
   <div id="schools" class="sub-panel active">
     <div class="section-head">
@@ -785,6 +786,198 @@
       </table>
     </div>
   </div>
+
+  <!-- Methodology sub-panel -->
+  <div id="methodology" class="sub-panel">
+    <div class="section-head"><h2>Methodology</h2><p>How rankings, costs, and categories are calculated</p></div>
+
+    <div class="insight-box">
+      <strong>Why this exists:</strong> Every number on this dashboard follows a documented formula. This page explains exactly how schools are ranked, what "Budget Fit" means, and where the data comes from &mdash; so Avery and Carey can evaluate whether the rankings match their own priorities.
+    </div>
+
+    <!-- Student Profile -->
+    <div class="strat-explainer">
+      <h3>Student Profile (Inputs)</h3>
+      <p>All calculations use Avery's current stats as inputs:</p>
+      <table style="width:100%;margin-top:10px;font-size:0.88rem;">
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Weighted GPA</td><td>3.85</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Score</td><td>27</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Residency</td><td>Georgia (OOS everywhere except UGA)</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Intended Major</td><td>Pre-Veterinary / Animal Science</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Target Career</td><td>Veterinarian (DVM)</td></tr>
+      </table>
+    </div>
+
+    <!-- Ranking Formula -->
+    <div class="strat-explainer">
+      <h3>Ranking Formula</h3>
+      <p>Each school receives a <strong>composite score</strong> from 1&ndash;5 based on four weighted factors:</p>
+      <table style="width:100%;margin-top:10px;font-size:0.88rem;border-collapse:collapse;">
+        <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
+          <th style="padding:6px 12px 6px 0;">Factor</th>
+          <th style="padding:6px 12px;">Weight</th>
+          <th style="padding:6px 12px;">Why This Weight</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Vet School Quality &amp; Access</td>
+            <td style="padding:8px 12px;">35%</td>
+            <td style="padding:8px 12px;">The entire purpose of undergrad is to get into vet school</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;">4-Year Cost</td>
+            <td style="padding:8px 12px;">35%</td>
+            <td style="padding:8px 12px;">Must still afford 4 years of vet school after undergrad</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Admission Likelihood</td>
+            <td style="padding:8px 12px;">10%</td>
+            <td style="padding:8px 12px;">Most schools are accessible; low weight avoids over-penalizing reaches</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Plan B Strength</td>
+            <td style="padding:8px 12px;">20%</td>
+            <td style="padding:8px 12px;">If vet school doesn't happen, the degree should still have strong career value</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Formula:</strong> Score = (Vet &times; 0.35) + (Cost &times; 0.35) + (Admission &times; 0.10) + (Plan B &times; 0.20)</p>
+    </div>
+
+    <!-- Scoring Rubrics -->
+    <div class="strat-explainer">
+      <h3>Scoring Rubrics (1&ndash;5 Scale)</h3>
+
+      <h4 style="margin-top:14px;margin-bottom:6px;color:var(--primary);">Vet School Quality &amp; Access</h4>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Guaranteed or early admission to own CVM (e.g., UGA, Clemson guarantee programs)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Top-ranked CVM with guaranteed interview or strong pipeline (e.g., Cornell, Purdue)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Has an accredited CVM on campus (e.g., Auburn, Kentucky, Tennessee)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>No CVM but strong pre-vet advising or regional pipeline to nearby CVM</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>No CVM, limited pre-vet infrastructure</td></tr>
+      </table>
+
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">4-Year Cost</h4>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Under $140K (well within budget, leaves cushion for vet school)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>$140K &ndash; $170K</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>$170K &ndash; $200K</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>$200K &ndash; $220K</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>Over $220K (significant gap vs. family budget)</td></tr>
+      </table>
+
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Admission Likelihood</h4>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>SAFETY &mdash; acceptance rate &gt;70% or Avery's GPA well above average</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>MATCH &mdash; acceptance rate 40&ndash;70% and GPA near average</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>REACH &mdash; acceptance rate &lt;30% or GPA below average</td></tr>
+      </table>
+
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Plan B Strength</h4>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Excellent &mdash; degree leads directly to strong careers outside vet (e.g., Purdue engineering)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Strong &mdash; well-regarded program with good job placement</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Good &mdash; solid program, regional reputation</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Fair &mdash; limited career options if vet school doesn't work out</td></tr>
+      </table>
+    </div>
+
+    <!-- Budget Fit Criteria -->
+    <div class="strat-explainer">
+      <h3>Budget Fit Criteria</h3>
+      <p>Based on the family's total 4-year education budget of <strong>$323,000</strong>:</p>
+      <table style="width:100%;margin-top:8px;font-size:0.88rem;border-collapse:collapse;">
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">529 Plan Balance</td><td>$175,000</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Annual Cash Flow</td><td>$37,000 &times; 4 years = $148,000</td></tr>
+        <tr style="border-top:2px solid var(--border);"><td style="padding:8px 12px 4px 0;font-weight:700;">Total Available</td><td style="padding-top:8px;font-weight:700;">$323,000</td></tr>
+      </table>
+      <p style="margin-top:14px;">Schools are labeled based on their estimated 4-year cost (after merit aid):</p>
+      <table style="width:100%;margin-top:8px;font-size:0.88rem;border-collapse:collapse;">
+        <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
+          <th style="padding:6px 12px 6px 0;">Label</th>
+          <th style="padding:6px 12px;">4-Year Cost</th>
+          <th style="padding:6px 12px;">Meaning</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#16a34a;">FULLY FUNDED</td>
+            <td style="padding:8px 12px;">&le; $160,000</td>
+            <td style="padding:8px 12px;">529 + cash flow covers everything with money left for vet school savings</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">AFFORDABLE</td>
+            <td style="padding:8px 12px;">$160,000 &ndash; $200,000</td>
+            <td style="padding:8px 12px;">Within budget but uses most of the available funds</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">STRETCH</td>
+            <td style="padding:8px 12px;">&gt; $200,000</td>
+            <td style="padding:8px 12px;">Exceeds comfortable budget; may require loans or reduced vet school savings</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Admission Categories -->
+    <div class="strat-explainer">
+      <h3>Admission Categories</h3>
+      <p>Each school is classified as SAFETY, MATCH, or REACH based on how Avery's profile compares:</p>
+      <table style="width:100%;margin-top:10px;font-size:0.88rem;border-collapse:collapse;">
+        <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
+          <th style="padding:6px 12px 6px 0;">Category</th>
+          <th style="padding:6px 12px;">Criteria</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#16a34a;">SAFETY</td>
+            <td style="padding:8px 12px;">Acceptance rate &gt;70%, or Avery's 3.85 GPA is well above the school's middle 50% range</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">MATCH</td>
+            <td style="padding:8px 12px;">Acceptance rate 40&ndash;70%, GPA and ACT near or within the school's middle 50%</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">REACH</td>
+            <td style="padding:8px 12px;">Acceptance rate &lt;30%, or Avery's stats below the school's middle 50% (e.g., Cornell at 7% acceptance)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Note:</strong> Applying to Animal Science (vs. Engineering/CS/Business) provides a 15&ndash;25 percentage point admission advantage at most schools, which is factored into these classifications.</p>
+    </div>
+
+    <!-- Data Sources & Assumptions -->
+    <div class="strat-explainer">
+      <h3>Data Sources &amp; Assumptions</h3>
+      <table style="width:100%;font-size:0.88rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 12px 8px 0;font-weight:600;width:180px;vertical-align:top;">Tuition &amp; Fees</td>
+          <td style="padding:8px 12px;">Published 2025&ndash;26 rates from each university's official website</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Room &amp; Board</td>
+          <td style="padding:8px 12px;">Estimated $17,000&ndash;$21,000/year depending on location; uses school-published COA when available</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Merit Aid</td>
+          <td style="padding:8px 12px;">Based on published automatic scholarship grids for Avery's GPA/ACT ranges; conservative estimates used when ranges are ambiguous</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Acceptance Rates</td>
+          <td style="padding:8px 12px;">Common Data Set or IPEDS most recent available year</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Vet School Rankings</td>
+          <td style="padding:8px 12px;">AVMA accreditation status; U.S. News veterinary school rankings where applicable</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Cost Calculation</td>
+          <td style="padding:8px 12px;">4-Year Cost = (Annual Tuition + Room/Board + Fees &minus; Merit Aid) &times; 4. Assumes no tuition increases (conservative for comparison purposes).</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
   </div><!-- /group-schools -->
 
   <!-- ═══════════ GROUP: VISITS ═══════════ -->
