@@ -2783,7 +2783,7 @@ function renderRoadTrip() {
         <div class="trip-detail"><div class="td-label">Details</div><div class="td-value">${esc(d.tourDetails)}</div></div>
         <div class="trip-detail"><div class="td-label">Drive After</div><div class="td-value">${d.driveAfter} (${d.driveTime})</div></div>
         <div class="trip-detail"><div class="td-label">Hotel</div><div class="td-value">${d.hotel}${d.hotelCost ? ' — $' + d.hotelCost : ''} ${d.booked ? '<span class="badge badge-booked" style="margin-left:6px">BOOKED</span>' : ''}</div></div>
-        ${d.tourLink ? `<div class="trip-detail" style="grid-column:1/-1"><div class="td-label">Registration</div><div class="td-value" style="font-size:0.82rem;color:var(--primary)">${d.tourLink}</div></div>` : ''}
+        ${d.tourLink ? `<div class="trip-detail" style="grid-column:1/-1"><div class="td-label">Registration</div><div class="td-value" style="font-size:0.82rem"><a href="https://${d.tourLink}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:underline">${d.tourLink}</a></div></div>` : ''}
         <div class="trip-notes" style="grid-column:1/-1"><div class="td-label" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;color:var(--text-light);letter-spacing:0.3px;margin-bottom:4px;">Notes</div><textarea placeholder="Add notes for this day..." onchange="data.tripNotes['${noteKey}']=this.value;saveData()">${esc(noteVal)}</textarea></div>
       </div>
     </div>`;
