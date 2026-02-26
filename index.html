@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Avery's College Planning Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Avery College">
+<meta name="theme-color" content="#2c5364">
 <style>
   :root {
     --bg: #f4f7fa;
@@ -177,6 +183,7 @@
     box-shadow: var(--shadow);
     overflow: auto;
     max-height: calc(100vh - 180px);
+    -webkit-overflow-scrolling: touch;
   }
   table { width: 100%; border-collapse: collapse; min-width: 1100px; }
   th {
@@ -574,18 +581,52 @@
   .strat-explainer h3 { font-size: 1.05rem; color: var(--primary-dark); margin-bottom: 10px; }
   .strat-highlight { background: linear-gradient(135deg, #e8f4f8, #eaf5ee); padding: 3px 8px; border-radius: 4px; font-weight: 600; }
 
+  /* ── PWA standalone safe areas ── */
+  @supports (padding: env(safe-area-inset-top)) {
+    header { padding-top: calc(32px + env(safe-area-inset-top)); padding-left: calc(36px + env(safe-area-inset-left)); padding-right: calc(36px + env(safe-area-inset-right)); }
+    .content { padding-left: calc(24px + env(safe-area-inset-left)); padding-right: calc(24px + env(safe-area-inset-right)); padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+    .tab-bar { padding-left: calc(24px + env(safe-area-inset-left)); padding-right: calc(24px + env(safe-area-inset-right)); }
+  }
+
   @media (max-width: 768px) {
     header { padding: 20px 16px 16px; }
     header h1 { font-size: 1.3rem; }
     .content { padding: 16px; }
-    .tab-btn { padding: 10px 14px; font-size: 0.82rem; }
+    .tab-btn { padding: 10px 14px; font-size: 0.82rem; min-height: 44px; }
     .card-grid { grid-template-columns: 1fr; }
     .profile-grid { grid-template-columns: 1fr; }
     .fin-summary { grid-template-columns: 1fr 1fr; }
     .trip-day-body { grid-template-columns: 1fr; }
     .scenarios-grid { grid-template-columns: 1fr; }
     .subtab-bar { padding: 4px 12px 0; }
-    .subtab-btn { padding: 7px 10px; font-size: 0.76rem; }
+    .subtab-btn { padding: 7px 10px; font-size: 0.76rem; min-height: 40px; }
+    .btn { min-height: 44px; }
+    table { min-width: 800px; }
+  }
+
+  @media (max-width: 480px) {
+    header { padding: 14px 12px 10px; }
+    header h1 { font-size: 1.1rem; }
+    header p { font-size: 0.75rem; }
+    header .header-icon { font-size: 1.6rem; }
+    header .header-badge { font-size: 0.7rem; padding: 3px 10px; margin-top: 4px; }
+    .content { padding: 10px; }
+    .tab-bar { padding: 4px 8px 0; gap: 2px; }
+    .tab-btn { padding: 8px 10px; font-size: 0.75rem; }
+    .subtab-bar { padding: 2px 8px 0; }
+    .subtab-btn { padding: 6px 8px; font-size: 0.7rem; }
+    .section-head h2 { font-size: 1.1rem; }
+    .card { padding: 14px; }
+    .card h3 { font-size: 0.95rem; }
+    .fin-summary { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    @supports (padding: env(safe-area-inset-top)) {
+      header { padding-top: calc(20px + env(safe-area-inset-top)); padding-left: calc(16px + env(safe-area-inset-left)); padding-right: calc(16px + env(safe-area-inset-right)); }
+      .content { padding-left: calc(16px + env(safe-area-inset-left)); padding-right: calc(16px + env(safe-area-inset-right)); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+      .tab-bar { padding-left: calc(8px + env(safe-area-inset-left)); padding-right: calc(8px + env(safe-area-inset-right)); }
+    }
   }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -3469,6 +3510,10 @@ docRef.onSnapshot(snap => {
   }
   firestoreSyncEnabled = true;
 });
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
