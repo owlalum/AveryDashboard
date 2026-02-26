@@ -618,7 +618,7 @@
       <div class="profile-card">
         <h3>Student Profile</h3>
         <div class="profile-row"><span class="label">Student</span><span class="value">Avery Denney</span></div>
-        <div class="profile-row"><span class="label">GPA</span><span class="value">3.74 Weighted</span></div>
+        <div class="profile-row"><span class="label">GPA</span><span class="value">3.85 Weighted</span></div>
         <div class="profile-row"><span class="label">Target ACT</span><span class="value">27</span></div>
         <div class="profile-row"><span class="label">Intended Major</span><span class="value">Animal Science / Pre-Veterinary</span></div>
         <div class="profile-row"><span class="label">Goal</span><span class="value">Doctor of Veterinary Medicine (DVM)</span></div>
@@ -752,11 +752,11 @@
     <div style="margin-top:22px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;">
       <h3 style="font-size:1rem;color:var(--primary-dark);margin-bottom:10px;">Merit Aid Notes</h3>
       <ul style="font-size:0.88rem;line-height:1.7;color:var(--text);padding-left:18px;">
-        <li><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.7 GPA likely $14-18K/year.</li>
+        <li><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.85 GPA likely $16-20K/year.</li>
         <li><strong>Auburn:</strong> Competitive Presidential and Academic scholarships. $8-16K realistic.</li>
         <li><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats. $8-12K likely.</li>
         <li><strong>UGA:</strong> Zell Miller (full tuition) or HOPE (partial) for Georgia residents meeting requirements.</li>
-        <li><strong>LSU:</strong> Generous automatic OOS merit. 3.7+ GPA likely qualifies for $12-16K/year.</li>
+        <li><strong>LSU:</strong> Generous automatic OOS merit. 3.85 GPA comfortably qualifies for $14-18K/year.</li>
         <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> Limited OOS merit. Don't bank on it.</li>
       </ul>
     </div>
@@ -892,7 +892,7 @@
     <div class="strat-explainer">
       <h3>The Animal Science Advantage</h3>
       <p>Avery gains <span class="strat-highlight">15-25 percentage points</span> in admission probability by applying to Animal Science vs. Engineering/CS/Business.</p>
-      <p style="margin-top:10px;">At "direct-admit" schools like Purdue and Texas A&amp;M, students are admitted to specific colleges, not the university as a whole. The College of Agriculture typically admits at 50-60% while Engineering admits at 30-35%. With Avery's 3.74 GPA and 27 ACT, she's competitive for Agriculture admits but below the median for Engineering. This strategy costs nothing and provides meaningful advantage.</p>
+      <p style="margin-top:10px;">At "direct-admit" schools like Purdue and Texas A&amp;M, students are admitted to specific colleges, not the university as a whole. The College of Agriculture typically admits at 50-60% while Engineering admits at 30-35%. With Avery's 3.85 GPA and 27 ACT, she's competitive for Agriculture admits at nearly every school and well below the median for Engineering. This strategy costs nothing and provides meaningful advantage.</p>
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table>
@@ -2682,13 +2682,13 @@ const SUMMARY_SCHOOLS = [
   { rank:4,  name:'Ohio State University',  cat:'MATCH',  vet:'Yes', visit:'Road Trip 3/4', cost:'$208K', verdict:'AFFORDABLE', planB:'Excellent', notes:'Massive resources and network.' },
   { rank:5,  name:'North Carolina State University', cat:'MATCH', vet:'Yes', visit:'Road Trip 3/2', cost:'$192K', verdict:'AFFORDABLE', planB:'Strong', notes:'Underrated. Research Triangle = biotech jobs.' },
   { rank:6,  name:'Auburn University',      cat:'SAFETY', vet:'Yes', visit:'Day Trip', cost:'$160K', verdict:'FULLY FUNDED', planB:'Good', notes:'Close to home, strong program.' },
-  { rank:7,  name:'University of Kentucky', cat:'SAFETY', vet:'No (pipeline)', visit:'Road Trip 3/6', cost:'$144K', verdict:'FULLY FUNDED', planB:'Good', notes:'Best OOS value. Unmatched equine program.' },
+  { rank:7,  name:'University of Kentucky', cat:'SAFETY', vet:'No (pipeline)', visit:'Road Trip 3/6', cost:'$136K', verdict:'FULLY FUNDED', planB:'Good', notes:'Best OOS value. Unmatched equine program. Higher GPA tier = stronger merit.' },
   { rank:8,  name:'Virginia Tech',          cat:'MATCH',  vet:'Regional (VA-MD)', visit:'Road Trip 3/3', cost:'$208K', verdict:'AFFORDABLE', planB:'Good', notes:'Beautiful campus, strong CALS.' },
   { rank:9,  name:'Clemson University',     cat:'MATCH',  vet:'No', visit:'Day Trip', cost:'$192K', verdict:'AFFORDABLE', planB:'Good', notes:'Close to home, good culture.' },
-  { rank:10, name:'Louisiana State University', cat:'SAFETY', vet:'Yes', visit:'Apply Only', cost:'$156K', verdict:'FULLY FUNDED', planB:'Fair', notes:'3+1 fast-track. Generous OOS merit.' },
-  { rank:11, name:'University of Tennessee', cat:'SAFETY', vet:'No', visit:'Day Trip', cost:'$160K', verdict:'FULLY FUNDED', planB:'Fair', notes:'Solid SEC option.' },
+  { rank:10, name:'Louisiana State University', cat:'SAFETY', vet:'Yes', visit:'Apply Only', cost:'$148K', verdict:'FULLY FUNDED', planB:'Fair', notes:'3+1 fast-track. Generous OOS merit.' },
+  { rank:11, name:'University of Tennessee', cat:'SAFETY', vet:'No', visit:'Day Trip', cost:'$152K', verdict:'FULLY FUNDED', planB:'Fair', notes:'Solid SEC option.' },
   { rank:12, name:'University of Florida',  cat:'REACH',  vet:'Yes', visit:'Separate Trip', cost:'$192K', verdict:'STRETCH', planB:'Strong', notes:'Excellent program but hardest to get in.' },
-  { rank:13, name:'University of Wisconsin-Madison', cat:'REACH', vet:'Yes', visit:'Fly-Out', cost:'$224K', verdict:'STRETCH', planB:'Good', notes:'Great school, very limited merit.' }
+  { rank:13, name:'University of Wisconsin-Madison', cat:'MATCH', vet:'Yes', visit:'Fly-Out', cost:'$224K', verdict:'STRETCH', planB:'Good', notes:'Great school, very limited merit. GPA now matches their avg.' }
 ];
 
 function renderSummary() {
@@ -2716,9 +2716,9 @@ const FIN_DATA = [
   { group:'SAFETY SCHOOLS' },
   { school:'University of Georgia', res:'In-State', sticker:30000, merit:5000, notes:'Zell Miller' },
   { school:'Auburn University', res:'OOS', sticker:52000, merit:12000 },
-  { school:'University of Kentucky', res:'OOS', sticker:52000, merit:16000 },
-  { school:'University of Tennessee', res:'OOS', sticker:50000, merit:10000 },
-  { school:'Louisiana State University', res:'OOS', sticker:53000, merit:14000 },
+  { school:'University of Kentucky', res:'OOS', sticker:52000, merit:18000 },
+  { school:'University of Tennessee', res:'OOS', sticker:50000, merit:12000 },
+  { school:'Louisiana State University', res:'OOS', sticker:53000, merit:16000 },
   { group:'MATCH SCHOOLS' },
   { school:'Texas A&M University', res:'OOS', sticker:58000, merit:2000 },
   { school:'Purdue University', res:'OOS', sticker:46000, merit:3000 },
@@ -2726,9 +2726,9 @@ const FIN_DATA = [
   { school:'Virginia Tech', res:'OOS', sticker:55000, merit:3000 },
   { school:'Ohio State University', res:'OOS', sticker:56000, merit:4000 },
   { school:'Clemson University', res:'OOS', sticker:54000, merit:6000 },
+  { school:'University of Wisconsin-Madison', res:'OOS', sticker:58000, merit:2000 },
   { group:'REACH SCHOOLS' },
-  { school:'University of Florida', res:'OOS', sticker:50000, merit:2000 },
-  { school:'University of Wisconsin-Madison', res:'OOS', sticker:58000, merit:2000 }
+  { school:'University of Florida', res:'OOS', sticker:50000, merit:2000 }
 ];
 
 function recalcFinancials() {
