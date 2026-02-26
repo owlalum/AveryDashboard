@@ -1282,6 +1282,7 @@ document.querySelectorAll('.tab-btn[data-group]').forEach(btn => {
     document.querySelectorAll('.tab-group').forEach(g => g.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.group).classList.add('active');
+    sessionStorage.setItem('activeTab', btn.dataset.group);
   });
 });
 
@@ -1293,8 +1294,31 @@ document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
     group.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     group.querySelector('#' + btn.dataset.subtab).classList.add('active');
+    sessionStorage.setItem('activeSubtab', btn.dataset.subtab);
   });
 });
+
+// ─── Restore active tab on refresh ───
+(function restoreTab() {
+  const savedTab = sessionStorage.getItem('activeTab');
+  const savedSub = sessionStorage.getItem('activeSubtab');
+  if (savedTab) {
+    document.querySelectorAll('.tab-btn[data-group]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-group').forEach(g => g.classList.remove('active'));
+    const tabBtn = document.querySelector(`.tab-btn[data-group="${savedTab}"]`);
+    if (tabBtn) { tabBtn.classList.add('active'); document.getElementById(savedTab).classList.add('active'); }
+  }
+  if (savedSub) {
+    const subBtn = document.querySelector(`.tab-group.active .subtab-btn[data-subtab="${savedSub}"]`);
+    if (subBtn) {
+      const group = subBtn.closest('.tab-group');
+      group.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+      group.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+      subBtn.classList.add('active');
+      group.querySelector('#' + savedSub).classList.add('active');
+    }
+  }
+})();
 
 // ─── School Comparison ───
 function renderSchools() {
