@@ -693,7 +693,7 @@
     <div class="section-head"><h2>Comprehensive School Rankings</h2></div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>Rank</th><th>School</th><th>Category</th><th>Vet School</th><th>Visit Status</th><th>4-Yr Cost</th><th>Budget Fit</th><th>Plan B</th><th>Key Notes</th></tr></thead>
+        <thead><tr><th>Rank</th><th>School</th><th>Category</th><th>Visit Score</th><th>Vet School</th><th>4-Yr Cost</th><th>Budget Fit</th><th>Score</th><th>Key Notes</th></tr></thead>
         <tbody id="summaryRankBody"></tbody>
       </table>
     </div>
@@ -2903,6 +2903,8 @@ function setEvalRating(school, catKey, itemKey, val) {
   ev[catKey][itemKey] = (ev[catKey][itemKey] === val) ? 0 : val;
   saveData();
   renderEvaluation();
+  renderRankings();
+  renderSummary();
 }
 
 function setEvalField(school, field, val) {
@@ -3090,38 +3092,61 @@ function setRankingField(school, field, val) {
 }
 
 // ─── Executive Summary Rankings ───
-// ─── Ranking Formula: Vet School 35% | Cost 35% | Admission 10% | Plan B 20% ───
+// ─── Ranking Formula: Visit 40% | Vet Program 25% | Cost 15% | Plan B 10% | Merit Aid 10% ───
 const SUMMARY_SCHOOLS = [
-  { rank:1,  name:'University of Georgia',  cat:'REACH',  vet:'Yes (3+1 fast-track)', visit:'Visited', cost:'$100-120K', budgetFit:'FULLY FUNDED', planB:'Strong', notes:'Zell Miller eligible. 3+1 fast-track. In-state = huge savings for vet school. ACT 27 below 25th %ile (30). Score: 4.40' },
-  { rank:2,  name:'Purdue University',      cat:'MATCH',  vet:'Yes (early admit program)', visit:'Road Trip 3/5', cost:'$172K', budgetFit:'AFFORDABLE', planB:'Excellent', notes:'Early admit to vet school. Frozen tuition 14 yrs. Best value elite pre-vet. Score: 4.10' },
-  { rank:3,  name:'Louisiana State University', cat:'SAFETY', vet:'Yes (3+1 fast-track)', visit:'Apply Only', cost:'$148K', budgetFit:'FULLY FUNDED', planB:'Fair', notes:'3+1 fast-track saves a full year. Generous OOS merit. Score: 4.05' },
-  { rank:4,  name:'North Carolina State University', cat:'MATCH', vet:'Yes (guaranteed interview)', visit:'Road Trip 3/2', cost:'$192K', budgetFit:'AFFORDABLE', planB:'Strong', notes:'Guaranteed interview for pre-vet. Research Triangle = biotech jobs. Score: 3.55' },
-  { rank:5,  name:'University of Kentucky', cat:'SAFETY', vet:'No (equine pipeline)', visit:'Road Trip 3/6', cost:'$136K', budgetFit:'FULLY FUNDED', planB:'Good', notes:'Best OOS value. Unmatched equine program. No CVM but strong pipeline. Score: 3.55' },
-  { rank:6,  name:'Ohio State University',  cat:'MATCH',  vet:'Yes (top-10)', visit:'Road Trip 3/4', cost:'$208K', budgetFit:'STRETCH', planB:'Excellent', notes:'Top-10 CVM. Massive resources. Cost keeps it from top 5. Score: 3.40' },
-  { rank:7,  name:'Auburn University',      cat:'MATCH',  vet:'Yes (on-campus CVM)', visit:'Day Trip', cost:'$160K', budgetFit:'FULLY FUNDED', planB:'Good', notes:'Close to home. Strong CVM. Accept rate now 46%; ACT 27 at low end of range. Score: 3.35' },
-  { rank:8,  name:'University of Tennessee', cat:'MATCH', vet:'Yes (equine & large animal)', visit:'Day Trip', cost:'$152K', budgetFit:'FULLY FUNDED', planB:'Fair', notes:'Accredited CVM on campus. Good value. OOS accept rate ~31% makes it a match. Score: 3.15' },
-  { rank:9,  name:'Texas A&M University',   cat:'MATCH',  vet:'Yes (top reputation)', visit:'Visited', cost:'$224K', budgetFit:'STRETCH', planB:'Excellent', notes:'Best pre-vet reputation. But $224K is hardest to justify when vet school adds $200K+. Score: 3.05' },
-  { rank:10, name:'Clemson University',     cat:'MATCH',  vet:'Yes (new CVM Fall 2026)', visit:'Day Trip', cost:'$192K', budgetFit:'AFFORDABLE', planB:'Good', notes:'Brand-new $230M vet school opening Fall 2026. Ground-floor opportunity. Score: 3.00' },
-  { rank:11, name:'Virginia Tech',          cat:'MATCH',  vet:'Yes (VA-MD joint CVM on campus)', visit:'Road Trip 3/3', cost:'$208K', budgetFit:'STRETCH', planB:'Good', notes:'VA-MD CVM on campus. Beautiful campus. Cost limits ranking. Score: 2.65' },
-  { rank:12, name:'University of Wisconsin-Madison', cat:'MATCH', vet:'Yes (research focus)', visit:'Fly-Out', cost:'$224K', budgetFit:'STRETCH', planB:'Good', notes:'CVM on campus but $224K with limited merit. Score: 2.30' }
+  { name:'University of Georgia',  cat:'REACH',  vet:'Yes (3+1 fast-track)', cost:'$100-120K', budgetFit:'FULLY FUNDED', notes:'Zell Miller eligible. 3+1 fast-track. In-state = huge savings for vet school. ACT 27 below 25th %ile (30).' },
+  { name:'Purdue University',      cat:'MATCH',  vet:'Yes (early admit program)', cost:'$172K', budgetFit:'AFFORDABLE', notes:'Early admit to vet school. Frozen tuition 14 yrs. Best value elite pre-vet.' },
+  { name:'Louisiana State University', cat:'SAFETY', vet:'Yes (3+1 fast-track)', cost:'$148K', budgetFit:'FULLY FUNDED', notes:'3+1 fast-track saves a full year. Generous OOS merit.' },
+  { name:'North Carolina State University', cat:'MATCH', vet:'Yes (guaranteed interview)', cost:'$192K', budgetFit:'AFFORDABLE', notes:'Guaranteed interview for pre-vet. Research Triangle = biotech jobs.' },
+  { name:'University of Kentucky', cat:'SAFETY', vet:'No (equine pipeline)', cost:'$136K', budgetFit:'FULLY FUNDED', notes:'Best OOS value. Unmatched equine program. No CVM but strong pipeline.' },
+  { name:'Ohio State University',  cat:'MATCH',  vet:'Yes (top-10)', cost:'$208K', budgetFit:'STRETCH', notes:'Top-10 CVM. Massive resources. Cost keeps it from top 5.' },
+  { name:'Auburn University',      cat:'MATCH',  vet:'Yes (on-campus CVM)', cost:'$160K', budgetFit:'FULLY FUNDED', notes:'Close to home. Strong CVM. Accept rate now 46%; ACT 27 at low end of range.' },
+  { name:'University of Tennessee', cat:'MATCH', vet:'Yes (equine & large animal)', cost:'$152K', budgetFit:'FULLY FUNDED', notes:'Accredited CVM on campus. Good value. OOS accept rate ~31% makes it a match.' },
+  { name:'Texas A&M University',   cat:'MATCH',  vet:'Yes (top reputation)', cost:'$224K', budgetFit:'STRETCH', notes:'Best pre-vet reputation. But $224K is hardest to justify when vet school adds $200K+.' },
+  { name:'Clemson University',     cat:'MATCH',  vet:'Yes (new CVM Fall 2026)', cost:'$192K', budgetFit:'AFFORDABLE', notes:'Brand-new $230M vet school opening Fall 2026. Ground-floor opportunity.' },
+  { name:'Virginia Tech',          cat:'MATCH',  vet:'Yes (VA-MD joint CVM on campus)', cost:'$208K', budgetFit:'STRETCH', notes:'VA-MD CVM on campus. Beautiful campus. Cost limits ranking.' },
+  { name:'University of Wisconsin-Madison', cat:'MATCH', vet:'Yes (research focus)', cost:'$224K', budgetFit:'STRETCH', notes:'CVM on campus but $224K with limited merit.' }
 ];
 
 function renderSummary() {
   const tbody = document.getElementById('summaryRankBody');
-  tbody.innerHTML = SUMMARY_SCHOOLS.map(s => {
-    const catClass = s.cat === 'SAFETY' ? 'badge-safety' : s.cat === 'REACH' ? 'badge-reach' : 'badge-match';
-    const budgetClass = s.budgetFit === 'FULLY FUNDED' ? 'badge-funded' : s.budgetFit === 'AFFORDABLE' ? 'badge-affordable' : 'badge-stretch';
-    const vetClass = s.vet === 'Yes' ? 'badge-vet-yes' : 'badge-vet-no';
+  const maxTotal = calcMaxWeightedTotal();
+
+  // Build rows with live scores
+  const rows = SUMMARY_SCHOOLS.map(s => {
+    const ev = getEvalForSchool(s.name);
+    const rk = getRankingForSchool(s.name);
+    const visitScore = calcWeightedTotal(ev);
+    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    const combined = Math.round((
+      visitNorm * RANK_WEIGHTS.visit +
+      (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
+      (rk.costScore || 3) * RANK_WEIGHTS.costScore +
+      (rk.planB || 3) * RANK_WEIGHTS.planB +
+      (rk.meritAid || 3) * RANK_WEIGHTS.meritAid
+    ) * 100) / 100;
+    return { ...s, visitNorm: Math.round(visitNorm * 10) / 10, visitScore, combined };
+  });
+
+  // Sort by combined score descending, assign ranks
+  rows.sort((a, b) => b.combined - a.combined);
+  rows.forEach((r, i) => r.rank = i + 1);
+
+  tbody.innerHTML = rows.map(r => {
+    const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
+    const budgetClass = r.budgetFit === 'FULLY FUNDED' ? 'badge-funded' : r.budgetFit === 'AFFORDABLE' ? 'badge-affordable' : 'badge-stretch';
+    const vetClass = r.vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
+    const visitDisplay = r.visitScore > 0 ? r.visitNorm.toFixed(1) : '\u2014';
     return `<tr>
-      <td class="compact" style="font-weight:700;color:var(--primary)">${s.rank}</td>
-      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name, 22)} ${esc(s.name)}</span></td>
-      <td class="compact"><span class="badge ${catClass}">${s.cat}</span></td>
-      <td class="compact"><span class="badge ${vetClass}">${esc(s.vet)}</span></td>
-      <td class="compact" style="font-size:0.8rem">${esc(s.visit)}</td>
-      <td class="compact" style="font-weight:600">${s.cost}</td>
-      <td class="compact"><span class="badge ${budgetClass}">${s.budgetFit}</span></td>
-      <td class="compact">${s.planB}</td>
-      <td style="font-size:0.82rem;max-width:260px">${esc(s.notes)}</td>
+      <td class="compact" style="font-weight:700;color:var(--primary)">${r.rank}</td>
+      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
+      <td class="compact"><span class="badge ${catClass}">${r.cat}</span></td>
+      <td class="compact" style="font-weight:600">${visitDisplay}</td>
+      <td class="compact"><span class="badge ${vetClass}">${esc(r.vet)}</span></td>
+      <td class="compact" style="font-weight:600">${r.cost}</td>
+      <td class="compact"><span class="badge ${budgetClass}">${r.budgetFit}</span></td>
+      <td class="compact" style="font-weight:700">${r.combined.toFixed(2)}</td>
+      <td style="font-size:0.82rem;max-width:260px">${esc(r.notes)}</td>
     </tr>`;
   }).join('');
 }
