@@ -1,4 +1,4 @@
-const CACHE_NAME = 'avery-dashboard-v3';
+const CACHE_NAME = 'avery-dashboard-v4';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -7,7 +7,7 @@ const PRECACHE_URLS = [
   './icons/icon-512.png'
 ];
 
-// Install: precache app shell
+// Install: precache app shell, activate immediately
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -16,7 +16,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate: clean old caches
+// Activate: clean old caches, take control immediately
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -25,29 +25,20 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: network-first for Firebase/external, cache-first for app shell
+// Listen for skip-waiting message from the page
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// Fetch: network-first for everything, cache fallback for offline
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-
-  // Network-first for Firebase and external APIs
-  if (url.origin !== location.origin) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Cache-first for local app files
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      const fetchPromise = fetch(event.request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(event.request).then(response => {
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+      }
+      return response;
+    }).catch(() => caches.match(event.request))
   );
 });

@@ -628,6 +628,11 @@
       .tab-bar { padding-left: calc(8px + env(safe-area-inset-left)); padding-right: calc(8px + env(safe-area-inset-right)); }
     }
   }
+  /* Update toast */
+  .update-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);background:#1e293b;color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.3);z-index:10000;display:flex;align-items:center;gap:12px;font-size:.9rem;transition:transform .35s ease;max-width:calc(100vw - 32px)}
+  .update-toast.show{transform:translateX(-50%) translateY(0)}
+  .update-toast button{background:#3b82f6;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;font-size:.85rem}
+  .update-toast button:active{background:#2563eb}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -641,7 +646,10 @@
       <p>Pre-Veterinary Program Search &amp; Application Tracker</p>
       <span class="header-badge">Class of 2031 &bull; Animal Science &bull; DVM Track</span>
     </div>
-    <div class="header-icon">&#127891;</div>
+    <div class="header-icon" style="display:flex;align-items:center;gap:10px">
+      <button onclick="checkForUpdates()" title="Check for updates" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center" aria-label="Check for updates">&#x21bb;</button>
+      <span>&#127891;</span>
+    </div>
   </div>
 </header>
 
@@ -3521,9 +3529,59 @@ docRef.onSnapshot(snap => {
   firestoreSyncEnabled = true;
 });
 
+// ─── Service Worker with update detection ───
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Check for updates every 30 minutes while app is open
+    setInterval(() => reg.update(), 30 * 60 * 1000);
+
+    // Detect when a new SW is waiting
+    function onNewSW() {
+      const toast = document.getElementById('updateToast');
+      if (toast) {
+        toast.classList.add('show');
+        document.getElementById('updateBtn').onclick = () => {
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        };
+      }
+    }
+    if (reg.waiting) onNewSW();
+    reg.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW.addEventListener('statechange', () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) onNewSW();
+      });
+    });
+  });
+
+  // Reload when the new SW takes over
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) { refreshing = true; location.reload(); }
+  });
+}
+
+// Manual check-for-updates function
+function checkForUpdates() {
+  if (!navigator.serviceWorker || !navigator.serviceWorker.controller) {
+    location.reload();
+    return;
+  }
+  navigator.serviceWorker.getRegistration().then(reg => {
+    if (reg) {
+      reg.update().then(() => {
+        // If no new SW found after update check, just hard-reload
+        if (!reg.waiting && !reg.installing) location.reload();
+      });
+    } else {
+      location.reload();
+    }
+  });
 }
 </script>
+<div id="updateToast" class="update-toast">
+  <span>A new version is available!</span>
+  <button id="updateBtn">Update Now</button>
+</div>
 </body>
 </html>
