@@ -2496,7 +2496,8 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research K-State CVM early admission program for top pre-vet students', cat: 'program' },
     { text: 'Explore Animal Sciences & Industry program', cat: 'program' },
-    { text: 'HONORS: Say yes to Honors on K-State app + essay + 1 rec letter. 3.75 GPA & 28 ACT minimums — Avery is 1 ACT point short but K-State encourages applying anyway.', cat: 'honors' },
+    { text: 'HONORS: Say yes to Honors on K-State app + essay. 3.75 GPA & 28 ACT minimums — Avery is 1 ACT point short but K-State encourages applying anyway.', cat: 'honors' },
+    { text: 'HONORS: Obtain 1 letter of recommendation (required for K-State Honors — regular app does NOT require recs)', cat: 'honors' },
   ],
   'Oklahoma State University': [
     { text: 'Apply early for best scholarship consideration (opens July 1)', cat: 'deadline' },
@@ -2635,7 +2636,8 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research pre-vet track through Animal & Veterinary Sciences', cat: 'program' },
     { text: 'Explore articulation agreements with regional vet schools', cat: 'program' },
-    { text: 'HONORS: Calhoun Honors College. Priority deadline Oct 22. Two 650-word essays + 2 rec letters. Test-optional but typical target ACT 32+. Stretch. Note: Dept. honors in Animal & Vet Sciences available through Calhoun once enrolled (3.4+ GPA, thesis).', cat: 'honors' },
+    { text: 'HONORS: Calhoun Honors College. Priority deadline Oct 22. Two 650-word essays. Test-optional but typical target ACT 32+. Stretch. Note: Dept. honors in Animal & Vet Sciences available through Calhoun once enrolled (3.4+ GPA, thesis).', cat: 'honors' },
+    { text: 'HONORS: Obtain 2 letters of recommendation (required for Calhoun Honors — regular app does NOT require recs)', cat: 'honors' },
   ],
   'Penn State University': [
     { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
@@ -2647,7 +2649,8 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research pre-vet track through Animal Science in College of Ag Sciences', cat: 'program' },
     { text: 'Explore veterinary and biomedical sciences emphasis & vet school advising', cat: 'program' },
-    { text: 'HONORS: Schreyer Honors College. Priority Nov 1, final Dec 1. 800-word essay + short answers + 2 recs. Test scores NOT used — STRONG FIT. $4,500/yr scholarship. Note: Dept. honors thesis (ANSC 494H) available through Schreyer once enrolled.', cat: 'honors' },
+    { text: 'HONORS: Schreyer Honors College. Priority Nov 1, final Dec 1. 800-word essay + short answers. Test scores NOT used — STRONG FIT. $4,500/yr scholarship. Note: Dept. honors thesis (ANSC 494H) available through Schreyer once enrolled.', cat: 'honors' },
+    { text: 'HONORS: Obtain 2 letters of recommendation (required for Schreyer — regular app does NOT require recs)', cat: 'honors' },
   ],
   'University of Vermont': [
     { text: 'Apply by Nov 1 (EA I), Dec 1 (EA II), or Jan 15 (Regular Decision)', cat: 'deadline' },
@@ -3713,10 +3716,10 @@ ${rows.map(r => `<Row>${r.map(c => xmlCell(c)).join('')}</Row>`).join('\n')}
 }
 
 // ─── One-time migration: regenerate checklists with tailored items ───
-if (!localStorage.getItem('checklistV8')) {
+if (!localStorage.getItem('checklistV9')) {
   data.checklists = [];
   if (!data.honorsOptOut) data.honorsOptOut = {};
-  localStorage.setItem('checklistV8', 'true');
+  localStorage.setItem('checklistV9', 'true');
 }
 // ─── One-time migration: reset rankings to use detailed presets ───
 if (!localStorage.getItem('rankingsV2')) {
