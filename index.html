@@ -1332,9 +1332,7 @@ function getDefaults() {
         earlyDecision: 'October 15',
         testReq: 'SAT 1210-1410 / ACT 26-32',
         acceptRate: '63%',
-        agAcceptRate: '72%',
         oosAcceptRate: '47%',
-        oosAgAcceptRate: '54%',
         avgGPA: '3.68',
         usNewsOverall: '#51',
         usNewsPublic: '#21',
@@ -1353,9 +1351,7 @@ function getDefaults() {
         earlyDecision: 'October 15',
         testReq: 'SAT 1250-1430 / ACT 28-33',
         acceptRate: '43%',
-        agAcceptRate: '55%',
         oosAcceptRate: '18%',
-        oosAgAcceptRate: '23%',
         avgGPA: '4.0',
         usNewsOverall: '#46',
         usNewsPublic: '#19',
@@ -1634,7 +1630,7 @@ function setupSchoolAutocomplete(inputId) {
   function populateFromDB(name) {
     const info = schoolDB[name];
     if (!info) return;
-    const fields = { m_location:'location', m_notes:'notes', m_tuitionIn:'tuitionIn', m_tuitionOut:'tuitionOut', m_deadline:'deadline', m_earlyDecision:'earlyDecision', m_testReq:'testReq', m_acceptRate:'acceptRate', m_agAcceptRate:'agAcceptRate', m_oosAcceptRate:'oosAcceptRate', m_oosAgAcceptRate:'oosAgAcceptRate', m_avgGPA:'avgGPA', m_usNewsOverall:'usNewsOverall', m_usNewsPublic:'usNewsPublic', m_vetSchoolRank:'vetSchoolRank' };
+    const fields = { m_location:'location', m_notes:'notes', m_tuitionIn:'tuitionIn', m_tuitionOut:'tuitionOut', m_deadline:'deadline', m_earlyDecision:'earlyDecision', m_testReq:'testReq', m_acceptRate:'acceptRate', m_oosAcceptRate:'oosAcceptRate', m_avgGPA:'avgGPA', m_usNewsOverall:'usNewsOverall', m_usNewsPublic:'usNewsPublic', m_vetSchoolRank:'vetSchoolRank' };
     for (const [elId, key] of Object.entries(fields)) {
       const el = document.getElementById(elId);
       if (el) el.value = info[key] || '';
@@ -1691,7 +1687,7 @@ if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
 
 // ─── Migrate: backfill new fields from schoolDB for existing saved schools ───
 (function migrate() {
-  const newFields = ['domain','color','acceptRate','agAcceptRate','oosAcceptRate','oosAgAcceptRate','avgGPA','usNewsOverall','usNewsPublic','vetSchoolRank'];
+  const newFields = ['domain','color','acceptRate','oosAcceptRate','avgGPA','usNewsOverall','usNewsPublic','vetSchoolRank'];
   let changed = false;
   data.schools.forEach(s => {
     const db = schoolDB[s.name];
@@ -1790,9 +1786,7 @@ const SCHOOL_COLUMNS = [
   { field: 'avgGPA',          label: 'GPA',            sortType: 'numeric' },
   { field: 'testReq',         label: 'SAT/ACT',        sortType: 'text' },
   { field: 'acceptRate',      label: 'Accept\u00a0%',  sortType: 'percent' },
-  { field: 'agAcceptRate',    label: 'Ag\u00a0%',      sortType: 'percent' },
   { field: 'oosAcceptRate',   label: 'OOS\u00a0%',     sortType: 'percent' },
-  { field: 'oosAgAcceptRate', label: 'OOS Ag\u00a0%',  sortType: 'percent' },
   { field: 'tuitionIn',       label: 'In-State\u00a0$',sortType: 'currency' },
   { field: 'tuitionOut',      label: 'OOS\u00a0$',     sortType: 'currency' },
   { field: 'deadline',        label: 'Deadline',       sortType: 'date' },
@@ -1905,9 +1899,7 @@ function renderSchools() {
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="acceptRate">${esc(s.acceptRate)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="agAcceptRate">${esc(s.agAcceptRate)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="oosAcceptRate">${esc(s.oosAcceptRate)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="oosAgAcceptRate">${esc(s.oosAgAcceptRate)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="tuitionIn">${esc(s.tuitionIn)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="tuitionOut">${esc(s.tuitionOut)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="deadline">${esc(s.deadline)}</span></td>
@@ -2203,9 +2195,7 @@ function openModal(type) {
       <div class="form-group"><label>Average GPA</label><input id="m_avgGPA" placeholder="e.g., 3.75"></div>
       <div class="form-group"><label>SAT/ACT Requirements</label><input id="m_testReq" placeholder="e.g., SAT 1200-1400 / ACT 25-31"></div>
       <div class="form-group"><label>Overall Acceptance Rate</label><input id="m_acceptRate" placeholder="e.g., 53%"></div>
-      <div class="form-group"><label>Ag School Acceptance Rate</label><input id="m_agAcceptRate" placeholder="e.g., 65%"></div>
       <div class="form-group"><label>Out-of-State Acceptance Rate</label><input id="m_oosAcceptRate" placeholder="e.g., 40%"></div>
-      <div class="form-group"><label>OOS Ag School Inferred Rate</label><input id="m_oosAgAcceptRate" placeholder="e.g., 49%"></div>
       <div class="form-group"><label>In-State Tuition</label><input id="m_tuitionIn" placeholder="e.g., $15,000"></div>
       <div class="form-group"><label>Out-of-State Tuition</label><input id="m_tuitionOut" placeholder="e.g., $38,000"></div>
       <div class="form-group"><label>Application Deadline</label><input id="m_deadline" placeholder="e.g., January 15"></div>
@@ -2264,9 +2254,7 @@ function addSchool() {
     avgGPA: document.getElementById('m_avgGPA').value.trim(),
     testReq: document.getElementById('m_testReq').value.trim(),
     acceptRate: document.getElementById('m_acceptRate').value.trim(),
-    agAcceptRate: document.getElementById('m_agAcceptRate').value.trim(),
     oosAcceptRate: document.getElementById('m_oosAcceptRate').value.trim(),
-    oosAgAcceptRate: document.getElementById('m_oosAgAcceptRate').value.trim(),
     tuitionIn: document.getElementById('m_tuitionIn').value.trim(),
     tuitionOut: document.getElementById('m_tuitionOut').value.trim(),
     deadline: document.getElementById('m_deadline').value.trim(),
@@ -3684,8 +3672,8 @@ document.addEventListener('keydown', e => {
 // ─── Export to Excel ───
 function exportToExcel() {
   const statusLabels = { researching:'Researching', applying:'Applying', accepted:'Accepted', rejected:'Rejected', waitlisted:'Waitlisted' };
-  const headers = ['School Name','Location','Distance (mi)','Pre-Vet Program Notes','US News Overall','US News Public','Vet School Rank','Avg GPA','SAT/ACT Requirements','Overall Accept %','Ag School Accept %','Out-of-State Accept %','OOS Ag Inferred %','In-State Tuition','Out-of-State Tuition','Application Deadline','Early Decision Deadline','Status'];
-  const rows = data.schools.map(s => { const d = getDistanceFromAtlanta(s.location); const db = schoolDB[s.name]; return [s.name, s.location, d != null ? String(d) : '', s.notes, s.usNewsOverall || (db && db.usNewsOverall) || '', s.usNewsPublic || (db && db.usNewsPublic) || '', s.vetSchoolRank || (db && db.vetSchoolRank) || '', s.avgGPA, s.testReq, s.acceptRate, s.agAcceptRate, s.oosAcceptRate, s.oosAgAcceptRate, s.tuitionIn, s.tuitionOut, s.deadline, s.earlyDecision, statusLabels[s.status] || s.status]; });
+  const headers = ['School Name','Location','Distance (mi)','Pre-Vet Program Notes','US News Overall','US News Public','Vet School Rank','Avg GPA','SAT/ACT Requirements','Overall Accept %','Out-of-State Accept %','In-State Tuition','Out-of-State Tuition','Application Deadline','Early Decision Deadline','Status'];
+  const rows = data.schools.map(s => { const d = getDistanceFromAtlanta(s.location); const db = schoolDB[s.name]; return [s.name, s.location, d != null ? String(d) : '', s.notes, s.usNewsOverall || (db && db.usNewsOverall) || '', s.usNewsPublic || (db && db.usNewsPublic) || '', s.vetSchoolRank || (db && db.vetSchoolRank) || '', s.avgGPA, s.testReq, s.acceptRate, s.oosAcceptRate, s.tuitionIn, s.tuitionOut, s.deadline, s.earlyDecision, statusLabels[s.status] || s.status]; });
 
   function xmlCell(val) {
     const v = (val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
