@@ -1817,6 +1817,16 @@ document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
 // ─── School Comparison ───
 let schoolSort = { field: null, dir: 'asc' };
 
+function getSuperscoreStatus(schoolName) {
+  const items = SCHOOL_CHECKLISTS[schoolName];
+  if (!items) return '\u2014';
+  const testItem = items.find(i => i.cat === 'test' && /superscore/i.test(i.text));
+  if (!testItem) return '\u2014';
+  if (/does NOT superscore|not superscore/i.test(testItem.text)) return 'No';
+  if (/SUPERSCORES/i.test(testItem.text)) return 'Yes';
+  return '\u2014';
+}
+
 const SCHOOL_COLUMNS = [
   { field: null,              label: '',               sortType: null },
   { field: 'name',            label: 'School',         sortType: 'text' },
@@ -1828,6 +1838,7 @@ const SCHOOL_COLUMNS = [
   { field: 'vetSchoolRank',   label: 'Vet\u00a0School', sortType: 'rank' },
   { field: 'avgGPA',          label: 'GPA',            sortType: 'numeric' },
   { field: 'testReq',         label: 'SAT/ACT',        sortType: 'text' },
+  { field: '_superscore',     label: 'Superscore',     sortType: 'text' },
   { field: 'acceptRate',      label: 'Accept\u00a0%',  sortType: 'percent' },
   { field: 'oosAcceptRate',   label: 'OOS\u00a0%',     sortType: 'percent' },
   { field: 'tuitionIn',       label: 'In-State\u00a0$',sortType: 'currency' },
@@ -1882,6 +1893,9 @@ function sortSchools(field, dir) {
     if (field === '_distance') {
       va = getDistanceFromAtlanta(a.location) ?? Infinity;
       vb = getDistanceFromAtlanta(b.location) ?? Infinity;
+    } else if (field === '_superscore') {
+      va = getSuperscoreStatus(a.name);
+      vb = getSuperscoreStatus(b.name);
     } else {
       va = parseSortValue(a[field] || (schoolDB[a.name] && schoolDB[a.name][field]) || '', col.sortType);
       vb = parseSortValue(b[field] || (schoolDB[b.name] && schoolDB[b.name][field]) || '', col.sortType);
@@ -1941,6 +1955,7 @@ function renderSchools() {
       <td class="compact"><span contenteditable="true" data-field="vetSchoolRank">${esc(s.vetSchoolRank || (dbEntry && dbEntry.vetSchoolRank) || '')}</span></td>
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span></td>
+      <td class="compact">${getSuperscoreStatus(s.name)}</td>
       <td class="compact"><span contenteditable="true" data-field="acceptRate">${esc(s.acceptRate)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="oosAcceptRate">${esc(s.oosAcceptRate)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="tuitionIn">${esc(s.tuitionIn)}</span></td>
@@ -3406,7 +3421,7 @@ function getSummaryCost(schoolName) {
     const budgetFit = fourYr <= 160000 ? 'FULLY FUNDED' : fourYr <= 200000 ? 'AFFORDABLE' : 'STRETCH';
     return { cost: '$' + Math.round(fourYr / 1000) + 'K', fourYr, budgetFit };
   }
-  // Fallback: parse tuition from schoolDB
+  // Fallback: parse tuition from schoolDB (sticker price — no merit data available)
   const db = schoolDB[schoolName];
   if (db) {
     const isInState = schoolName === 'University of Georgia';
@@ -3414,9 +3429,9 @@ function getSummaryCost(schoolName) {
     const annual = parseInt((tuitionStr || '').replace(/[$,]/g, '')) || 0;
     const fourYr = annual * 4;
     const budgetFit = fourYr <= 160000 ? 'FULLY FUNDED' : fourYr <= 200000 ? 'AFFORDABLE' : 'STRETCH';
-    return { cost: '$' + Math.round(fourYr / 1000) + 'K', fourYr, budgetFit };
+    return { cost: '$' + Math.round(fourYr / 1000) + 'K*', fourYr, budgetFit, noMerit: true };
   }
-  return { cost: 'N/A', fourYr: 0, budgetFit: 'MATCH' };
+  return { cost: 'N/A', fourYr: 0, budgetFit: 'MATCH', noMerit: true };
 }
 
 function renderSummary() {
@@ -3452,6 +3467,7 @@ function renderSummary() {
       vet,
       cost: costInfo.cost,
       budgetFit: costInfo.budgetFit,
+      noMerit: costInfo.noMerit || false,
       notes: rk.notes || '',
       visitNorm: Math.round(visitNorm * 10) / 10,
       visitScore,
@@ -3480,6 +3496,16 @@ function renderSummary() {
       <td style="font-size:0.82rem;max-width:260px">${esc(r.notes)}</td>
     </tr>`;
   }).join('');
+
+  // Show footnote if any school lacks merit data
+  let footnote = document.getElementById('summaryMeritFootnote');
+  if (!footnote) {
+    footnote = document.createElement('p');
+    footnote.id = 'summaryMeritFootnote';
+    footnote.style.cssText = 'font-size:0.78rem;color:var(--text-light);margin:6px 0 0 4px;';
+    tbody.closest('table').parentNode.appendChild(footnote);
+  }
+  footnote.textContent = rows.some(r => r.noMerit) ? '* Sticker price — no merit aid data available for this school.' : '';
 
   renderScenarios();
 }
@@ -3575,7 +3601,7 @@ function renderScenarios() {
   const noUGA = [...scored].filter(s => s.name !== 'University of Georgia').sort((a, b) => b.combined - a.combined);
   if (scored.some(s => s.name === 'University of Georgia') && noUGA.length) {
     const budgetPick = noUGA.filter(s => s.budgetFit === 'FULLY FUNDED').sort((a, b) => b.combined - a.combined)[0];
-    const prestigePick = noUGA.sort((a, b) => b.vetProgram - a.vetProgram || b.combined - a.combined)[0];
+    const prestigePick = [...noUGA].sort((a, b) => b.vetProgram - a.vetProgram || b.combined - a.combined)[0];
     const parts = [];
     if (budgetPick) parts.push(budgetPick.short + ' (save for vet school)');
     if (prestigePick && prestigePick.name !== (budgetPick || {}).name) parts.push(prestigePick.short + ' (best program)');
@@ -3950,7 +3976,7 @@ ${rows.map(r => `<Row>${r.map(c => xmlCell(c)).join('')}</Row>`).join('\n')}
 if (!localStorage.getItem('checklistV12')) {
   data.checklists = [];
   if (!data.honorsOptOut) data.honorsOptOut = {};
-  localStorage.setItem('checklistV10', 'true');
+  localStorage.setItem('checklistV12', 'true');
 }
 // ─── One-time migration: reset rankings to use detailed presets ───
 if (!localStorage.getItem('rankingsV2')) {
