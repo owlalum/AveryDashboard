@@ -1487,9 +1487,7 @@ function uid() { return Math.random().toString(36).slice(2, 10); }
 // ─── Pre-Vet School Database ───
 const schoolDB = {
   'Texas A&M University':           { domain:'tamu.edu', color:'#500000', location:'College Station, TX', notes:'Top-ranked College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program. Departmental Animal Science Honors Program — requires 28 ACT (min 27 each verbal/math) or top 10% of HS class; 18 hrs honors coursework', tuitionIn:'$12,856', tuitionOut:'$40,157', deadline:'December 1', earlyDecision:'N/A', testReq:'SAT 1160-1390 / ACT 25-31', acceptRate:'57%', oosAcceptRate:'49%', avgGPA:'3.78', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#5' },
-  'University of Georgia':          { domain:'uga.edu', color:'#BA0C2F', location:'Athens, GA', notes:'Excellent pre-vet program with research opportunities; accredited College of Veterinary Medicine on campus', tuitionIn:'$11,727', tuitionOut:'$33,227', deadline:'January 1', earlyDecision:'October 15', testReq:'SAT 1400-1510 / ACT 32-35', acceptRate:'33%', oosAcceptRate:'9%', avgGPA:'4.08', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#8' },
-  'Cornell University':             { domain:'cornell.edu', color:'#B31B1B', location:'Ithaca, NY', notes:'Ivy League with top-5 vet school; undergrad Animal Science major feeds directly into Cornell CVM; outstanding research. CALS Honors in Animal Science — independent research with faculty mentor, thesis, graduate with Distinction in Research', tuitionIn:'$71,266', tuitionOut:'$71,266', deadline:'January 2', earlyDecision:'November 1', testReq:'SAT 1510-1560 / ACT 33-35', acceptRate:'8%', oosAcceptRate:'8%', avgGPA:'3.9', usNewsOverall:'#12', usNewsPublic:'N/A', vetSchoolRank:'#2' },
-  'UC Davis':                       { domain:'ucdavis.edu', color:'#022851', location:'Davis, CA', notes:'#1 ranked vet school nationally; premier Animal Science & pre-vet advising; extensive hands-on animal facilities', tuitionIn:'$16,381', tuitionOut:'$49,420', deadline:'December 1', earlyDecision:'N/A', testReq:'Test-blind', acceptRate:'42%', oosAcceptRate:'63%', avgGPA:'4.13', usNewsOverall:'#32', usNewsPublic:'#9', vetSchoolRank:'#1' },
+  'University of Georgia':          { domain:'uga.edu', color:'#BA0C2F', location:'Athens, GA', notes:'★ 3+1 EARLY ASSURANCE DVM PATHWAY: Animal Health majors can apply after 3 years of undergrad for guaranteed CVM admission — saves a full year. Accredited CVM on campus; excellent pre-vet research opportunities; in-state tuition as GA resident', tuitionIn:'$11,727', tuitionOut:'$33,227', deadline:'January 1', earlyDecision:'October 15', testReq:'SAT 1400-1510 / ACT 32-35', acceptRate:'33%', oosAcceptRate:'9%', avgGPA:'4.08', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#8' },
   'Colorado State University':      { domain:'colostate.edu', color:'#1E4D2B', location:'Fort Collins, CO', notes:'Top-5 vet school; Animal Science pre-vet track with early clinical exposure; strong equine and large animal programs', tuitionIn:'$13,009', tuitionOut:'$33,765', deadline:'February 1', earlyDecision:'N/A', testReq:'SAT 1060-1280 / ACT 23-29', acceptRate:'89%', oosAcceptRate:'82%', avgGPA:'3.6', usNewsOverall:'#151', usNewsPublic:'#79', vetSchoolRank:'#3' },
   'University of Florida':          { domain:'ufl.edu', color:'#FA4616', location:'Gainesville, FL', notes:'Accredited CVM on campus; pre-vet specialization in Animal Sciences; UF early admission pathway to vet school. CALS Honors Scholar track in Animal Sciences — requires 3.75 upper-division GPA, 9 honors credits, undergraduate thesis', tuitionIn:'$6,381', tuitionOut:'$28,659', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1330-1470 / ACT 29-33', acceptRate:'23%', oosAcceptRate:'14%', avgGPA:'4.0', usNewsOverall:'#30', usNewsPublic:'#7', vetSchoolRank:'#5' },
   'Ohio State University':          { domain:'osu.edu', color:'#BB0000', location:'Columbus, OH', notes:'Top-10 vet school; strong pre-vet curriculum through Animal Sciences; veterinary teaching hospital on campus. Departmental Animal Sciences Honors Program — requires 3.4 GPA; honors/embedded courses + research project; accelerated BS/MS option', tuitionIn:'$12,485', tuitionOut:'$36,722', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1290-1440 / ACT 27-32', acceptRate:'51%', oosAcceptRate:'27%', avgGPA:'3.75', usNewsOverall:'#41', usNewsPublic:'#15', vetSchoolRank:'#4' },
@@ -1508,8 +1506,6 @@ const schoolDB = {
   'Mississippi State University':   { domain:'msstate.edu', color:'#660000', location:'Starkville, MS', notes:'Accredited CVM; pre-vet in Animal & Dairy Sciences; wildlife and aquatic medicine specialties', tuitionIn:'$10,604', tuitionOut:'$28,736', deadline:'January 5', earlyDecision:'October 1', testReq:'SAT 1110-1410 / ACT 21-29', acceptRate:'70%', oosAcceptRate:'63%', avgGPA:'3.53', usNewsOverall:'#208', usNewsPublic:'#115', vetSchoolRank:'#24' },
   'Louisiana State University':     { domain:'lsu.edu', color:'#461D7C', location:'Baton Rouge, LA', notes:'School of Veterinary Medicine on campus; pre-vet in Animal Sciences; unique aquatic and wildlife programs', tuitionIn:'$12,695', tuitionOut:'$30,404', deadline:'February 1', earlyDecision:'December 15', testReq:'SAT 1150-1330 / ACT 24-30', acceptRate:'73%', oosAcceptRate:'55%', avgGPA:'3.83', usNewsOverall:'#169', usNewsPublic:'#92', vetSchoolRank:'#22' },
   'University of Illinois':         { domain:'illinois.edu', color:'#E84A27', location:'Champaign, IL', notes:'Accredited CVM; pre-vet in Animal Sciences; strong companion animal and food animal medicine programs', tuitionIn:'$15,714', tuitionOut:'$33,686', deadline:'January 5', earlyDecision:'November 1', testReq:'SAT 1350-1510 / ACT 30-34', acceptRate:'44%', oosAcceptRate:'37%', avgGPA:'3.85', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#15' },
-  'Tufts University':               { domain:'tufts.edu', color:'#3E8EDE', location:'Medford, MA', notes:'Cummings School of Veterinary Medicine; pre-vet through Biology; wildlife clinic and unique international programs', tuitionIn:'$71,982', tuitionOut:'$71,982', deadline:'January 5', earlyDecision:'November 3', testReq:'SAT 1460-1550 / ACT 33-35', acceptRate:'10%', oosAcceptRate:'10%', avgGPA:'3.9', usNewsOverall:'#36', usNewsPublic:'N/A', vetSchoolRank:'#12' },
-  'University of Pennsylvania':     { domain:'upenn.edu', color:'#011F5B', location:'Philadelphia, PA', notes:'Penn Vet — Ivy League vet school; pre-vet through Biology; New Bolton Center large animal facility; top research', tuitionIn:'$71,236', tuitionOut:'$71,236', deadline:'January 5', earlyDecision:'November 1', testReq:'SAT 1510-1570 / ACT 34-36', acceptRate:'5%', oosAcceptRate:'5%', avgGPA:'3.95', usNewsOverall:'#7', usNewsPublic:'N/A', vetSchoolRank:'#5' },
   'Tuskegee University':            { domain:'tuskegee.edu', color:'#8B0000', location:'Tuskegee, AL', notes:'Only HBCU with a vet school; pre-vet in Animal & Veterinary Sciences; small class sizes; strong community', tuitionIn:'$21,802', tuitionOut:'$21,802', deadline:'July 1', earlyDecision:'N/A', testReq:'SAT 880-1098 / ACT 18-23', acceptRate:'31%', oosAcceptRate:'31%', avgGPA:'3.1', usNewsOverall:'Regional', usNewsPublic:'N/A', vetSchoolRank:'#27' },
   'University of Tennessee':        { domain:'utk.edu', color:'#FF8200', location:'Knoxville, TN', notes:'Accredited CVM; pre-vet in Animal Science; large teaching hospital; equine and farm animal strengths', tuitionIn:'$14,148', tuitionOut:'$34,589', deadline:'December 15', earlyDecision:'November 1', testReq:'SAT 1210-1360 / ACT 27-32', acceptRate:'39%', oosAcceptRate:'31%', avgGPA:'3.65', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20' },
   'University of Missouri':         { domain:'missouri.edu', color:'#F1B82D', location:'Columbia, MO', notes:'Accredited CVM; pre-vet in Animal Sciences; strong food animal and equine programs; guaranteed admission track', tuitionIn:'$11,981', tuitionOut:'$31,970', deadline:'Rolling', earlyDecision:'November 15', testReq:'SAT 1150-1330 / ACT 23-29', acceptRate:'77%', oosAcceptRate:'68%', avgGPA:'3.55', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20' },
@@ -1518,24 +1514,18 @@ const schoolDB = {
   'University of Vermont':          { domain:'uvm.edu', color:'#154734', location:'Burlington, VT', notes:'Pre-vet through Animal & Veterinary Sciences; Morgan Horse Farm; dairy and equine focus; small class sizes', tuitionIn:'$19,514', tuitionOut:'$47,554', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1300-1420 / ACT 30-32', acceptRate:'63%', oosAcceptRate:'50%', avgGPA:'3.6', usNewsOverall:'#132', usNewsPublic:'#68', vetSchoolRank:'N/A' },
   // ── Schools without vet schools but with strong pre-vet undergrad programs ──
   'University of Kentucky':         { domain:'uky.edu', color:'#0033A0', location:'Lexington, KY', notes:'No vet school but outstanding pre-vet advising through Animal & Food Sciences; nationally renowned equine science program leveraging Kentucky horse industry; students place well at Auburn, Tufts, and other DVMs', tuitionIn:'$13,212', tuitionOut:'$33,406', deadline:'February 15', earlyDecision:'December 1', testReq:'SAT 1070-1270 / ACT 21-28', acceptRate:'93%', oosAcceptRate:'88%', avgGPA:'3.59', usNewsOverall:'#143', usNewsPublic:'#74', vetSchoolRank:'N/A' },
-  'Rutgers University':             { domain:'rutgers.edu', color:'#CC0033', location:'New Brunswick, NJ', notes:'No vet school; strong pre-vet track in Animal Sciences; active pre-vet club; proximity to research hospitals and NJ equine industry', tuitionIn:'$18,824', tuitionOut:'$39,652', deadline:'December 1', earlyDecision:'November 1', testReq:'SAT 1270-1480 / ACT 28-33', acceptRate:'65%', oosAcceptRate:'49%', avgGPA:'3.7', usNewsOverall:'#42', usNewsPublic:'#16', vetSchoolRank:'N/A' },
   'University of Arizona':          { domain:'arizona.edu', color:'#CC0033', location:'Tucson, AZ', notes:'No vet school; pre-vet through Animal & Comparative Biomedical Sciences; unique desert/exotic animal exposure; partnership with local wildlife centers', tuitionIn:'$13,876', tuitionOut:'$41,054', deadline:'Rolling', earlyDecision:'November 1', testReq:'SAT 1130-1340 / ACT 21-30', acceptRate:'87%', oosAcceptRate:'80%', avgGPA:'3.48', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A' },
-  'University of Maryland':         { domain:'umd.edu', color:'#E03A3E', location:'College Park, MD', notes:'No vet school; pre-vet through Animal & Avian Sciences; proximity to USDA and NIH for research; strong science foundation', tuitionIn:'$12,121', tuitionOut:'$40,306', deadline:'January 20', earlyDecision:'November 1', testReq:'SAT 1380-1510 / ACT 32-35', acceptRate:'45%', oosAcceptRate:'35%', avgGPA:'3.9', usNewsOverall:'#42', usNewsPublic:'#16', vetSchoolRank:'N/A' },
   'Cal Poly San Luis Obispo':       { domain:'calpoly.edu', color:'#154734', location:'San Luis Obispo, CA', notes:'No vet school; learn-by-doing Animal Science program; campus ranch and farm units; exceptional hands-on experience from day one', tuitionIn:'$12,161', tuitionOut:'$33,230', deadline:'December 1', earlyDecision:'N/A', testReq:'Test-blind', acceptRate:'30%', oosAcceptRate:'25%', avgGPA:'3.85', usNewsOverall:'Regional #1 (West)', usNewsPublic:'N/A', vetSchoolRank:'N/A' },
-  'University of Connecticut':      { domain:'uconn.edu', color:'#000E2F', location:'Storrs, CT', notes:'No vet school; pre-vet through Animal Science; campus farms and equine facilities; strong placement at northeastern vet schools', tuitionIn:'$18,678', tuitionOut:'$41,346', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1210-1420 / ACT 29-33', acceptRate:'50%', oosAcceptRate:'38%', avgGPA:'3.76', usNewsOverall:'#69', usNewsPublic:'#32', vetSchoolRank:'N/A' },
   'University of Nebraska-Lincoln': { domain:'unl.edu', color:'#D00000', location:'Lincoln, NE', notes:'No vet school; pre-vet through Animal Science; strong livestock and production animal focus; affordable with good vet school placement', tuitionIn:'$10,771', tuitionOut:'$29,445', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1100-1310 / ACT 22-28', acceptRate:'87%', oosAcceptRate:'79%', avgGPA:'3.5', usNewsOverall:'#158', usNewsPublic:'#84', vetSchoolRank:'N/A' },
-  'Montana State University':       { domain:'montana.edu', color:'#003875', location:'Bozeman, MT', notes:'No vet school; pre-vet in Animal & Range Sciences; large animal and ranch experience; proximity to wildlife and outdoor labs', tuitionIn:'$8,855', tuitionOut:'$35,358', deadline:'Rolling', earlyDecision:'December 1', testReq:'SAT 1065-1285 / ACT 21-27', acceptRate:'82%', oosAcceptRate:'75%', avgGPA:'3.4', usNewsOverall:'#318', usNewsPublic:'#170', vetSchoolRank:'N/A' },
   'University of Delaware':         { domain:'udel.edu', color:'#00539F', location:'Newark, DE', notes:'No vet school; pre-vet through Animal & Food Sciences; small program with personalized advising; good placement at mid-Atlantic vet schools', tuitionIn:'$17,573', tuitionOut:'$43,151', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1200-1360 / ACT 27-31', acceptRate:'65%', oosAcceptRate:'50%', avgGPA:'3.98', usNewsOverall:'#88', usNewsPublic:'#43', vetSchoolRank:'N/A' },
-  'University of New Hampshire':    { domain:'unh.edu', color:'#003DA5', location:'Durham, NH', notes:'No vet school; pre-vet through Biomedical Science or Animal Science; campus dairy and equine facilities; organic dairy research farm', tuitionIn:'$19,292', tuitionOut:'$40,846', deadline:'February 1', earlyDecision:'November 15', testReq:'SAT 1120-1320 / ACT 26-31', acceptRate:'87%', oosAcceptRate:'72%', avgGPA:'3.58', usNewsOverall:'#117', usNewsPublic:'#57', vetSchoolRank:'N/A' },
   'Berry College':                  { domain:'berry.edu', color:'#002855', location:'Mount Berry, GA', notes:'No vet school; Animal Science with hands-on focus; 27,000-acre campus with working farms and wildlife; exceptional undergrad animal experience', tuitionIn:'$39,376', tuitionOut:'$39,376', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1115-1305 / ACT 22-28', acceptRate:'63%', oosAcceptRate:'63%', avgGPA:'3.84', usNewsOverall:'Regional #4 (South)', usNewsPublic:'N/A', vetSchoolRank:'N/A' },
-  'Delaware Valley University':     { domain:'delval.edu', color:'#006747', location:'Doylestown, PA', notes:'No vet school; dedicated pre-vet major — one of few schools offering it; small animal hospital on campus; A-Day hands-on tradition; strong DVM acceptance rate', tuitionIn:'$42,120', tuitionOut:'$42,120', deadline:'Rolling', earlyDecision:'N/A', testReq:'SAT 1070-1270 / ACT 24-27', acceptRate:'92%', oosAcceptRate:'92%', avgGPA:'3.32', usNewsOverall:'Regional #136 (North)', usNewsPublic:'N/A', vetSchoolRank:'N/A' },
-  'University of Wyoming':          { domain:'uwyo.edu', color:'#492F24', location:'Laramie, WY', notes:'No vet school; pre-vet in Animal & Veterinary Sciences; WWAMI partnership region; ranch and wildlife exposure; very affordable', tuitionIn:'$8,697', tuitionOut:'$25,732', deadline:'Rolling', earlyDecision:'N/A', testReq:'SAT 1040-1265 / ACT 20-27', acceptRate:'97%', oosAcceptRate:'93%', avgGPA:'3.55', usNewsOverall:'#222', usNewsPublic:'#122', vetSchoolRank:'N/A' },
+  'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', deadline:'December 1', earlyDecision:'N/A', testReq:'SAT 1290-1400 / ACT 29-32', acceptRate:'24%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A' },
+  'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,706', deadline:'December 1', earlyDecision:'October 15 (EA)', testReq:'SAT 1190-1350 / ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A' },
 };
 const schoolNames = Object.keys(schoolDB);
 // Aliases so common abbreviations also match
 const schoolAliases = {
   'North Carolina State University': ['nc state','ncsu'],
-  'UC Davis': ['university of california davis','california davis','ucd'],
   'Texas A&M University': ['tamu'],
   'University of Georgia': ['uga'],
   'University of Florida': ['uf','gators'],
@@ -1554,17 +1544,12 @@ const schoolAliases = {
   'Washington State University': ['wsu','wazzu'],
   'Mississippi State University': ['miss state'],
   'University of Kentucky': ['uk','wildcats'],
-  'Rutgers University': ['rutgers'],
   'University of Arizona': ['u of a','uarizona'],
-  'University of Maryland': ['umd','terps'],
   'Cal Poly San Luis Obispo': ['cal poly','cal poly slo','cpslo'],
-  'University of Connecticut': ['uconn','huskies'],
   'University of Nebraska-Lincoln': ['unl','huskers'],
-  'Montana State University': ['msu bozeman','montana state'],
   'University of Delaware': ['ud','udel'],
-  'University of New Hampshire': ['unh'],
-  'Delaware Valley University': ['del val','delval'],
-  'University of Wyoming': ['uwyo'],
+  'Florida State University': ['fsu','seminoles','noles'],
+  'University of South Carolina': ['usc','south carolina','gamecocks'],
 };
 
 // ─── Distance from Atlanta ───
@@ -1572,8 +1557,6 @@ const ATLANTA_COORDS = { lat: 33.749, lng: -84.388 };
 const cityCoords = {
   'College Station, TX': { lat: 30.628, lng: -96.334 },
   'Athens, GA': { lat: 33.951, lng: -83.357 },
-  'Ithaca, NY': { lat: 42.444, lng: -76.500 },
-  'Davis, CA': { lat: 38.545, lng: -121.741 },
   'Fort Collins, CO': { lat: 40.585, lng: -105.084 },
   'Gainesville, FL': { lat: 29.652, lng: -82.325 },
   'Columbus, OH': { lat: 39.961, lng: -82.999 },
@@ -1592,8 +1575,6 @@ const cityCoords = {
   'Starkville, MS': { lat: 33.451, lng: -88.818 },
   'Baton Rouge, LA': { lat: 30.451, lng: -91.187 },
   'Champaign, IL': { lat: 40.116, lng: -88.243 },
-  'Medford, MA': { lat: 42.419, lng: -71.106 },
-  'Philadelphia, PA': { lat: 39.953, lng: -75.164 },
   'Tuskegee, AL': { lat: 32.430, lng: -85.691 },
   'Knoxville, TN': { lat: 35.961, lng: -83.921 },
   'Columbia, MO': { lat: 38.952, lng: -92.334 },
@@ -1601,18 +1582,13 @@ const cityCoords = {
   'University Park, PA': { lat: 40.793, lng: -77.860 },
   'Burlington, VT': { lat: 44.476, lng: -73.213 },
   'Lexington, KY': { lat: 38.040, lng: -84.504 },
-  'New Brunswick, NJ': { lat: 40.486, lng: -74.445 },
   'Tucson, AZ': { lat: 32.222, lng: -110.975 },
-  'College Park, MD': { lat: 38.981, lng: -76.937 },
   'San Luis Obispo, CA': { lat: 35.283, lng: -120.660 },
-  'Storrs, CT': { lat: 41.808, lng: -72.250 },
   'Lincoln, NE': { lat: 40.813, lng: -96.703 },
-  'Bozeman, MT': { lat: 45.680, lng: -111.044 },
   'Newark, DE': { lat: 39.684, lng: -75.750 },
-  'Durham, NH': { lat: 43.134, lng: -70.926 },
   'Mount Berry, GA': { lat: 34.275, lng: -85.200 },
-  'Doylestown, PA': { lat: 40.310, lng: -75.130 },
-  'Laramie, WY': { lat: 41.312, lng: -105.587 },
+  'Tallahassee, FL': { lat: 30.438, lng: -84.281 },
+  'Columbia, SC': { lat: 34.000, lng: -81.035 },
 };
 
 function getDistanceFromAtlanta(location) {
@@ -2247,8 +2223,8 @@ function openModal(type) {
   const templates = {
     school: `
       <h3>Add New School</h3>
-      <div class="form-group"><label>School Name</label><input id="m_name" placeholder="e.g., Cornell University"></div>
-      <div class="form-group"><label>Location</label><input id="m_location" placeholder="e.g., Ithaca, NY"></div>
+      <div class="form-group"><label>School Name</label><input id="m_name" placeholder="e.g., Auburn University"></div>
+      <div class="form-group"><label>Location</label><input id="m_location" placeholder="e.g., Auburn, AL"></div>
       <div class="form-group"><label>Pre-Vet Program Notes</label><textarea id="m_notes" placeholder="What makes their program stand out?"></textarea></div>
       <div class="form-group"><label>Average GPA</label><input id="m_avgGPA" placeholder="e.g., 3.75"></div>
       <div class="form-group"><label>SAT/ACT Requirements</label><input id="m_testReq" placeholder="e.g., SAT 1200-1400 / ACT 25-31"></div>
@@ -2360,6 +2336,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: Apply to Honors Academy via portal (Aug 1 - Dec 15) — essays required, ACT 28+ recommended. Note: Dept. honors in Animal Science also available once enrolled (3.5+ GPA, no separate app needed)', cat: 'honors' },
   ],
   'University of Georgia': [
+    { text: '\u2605 3+1 EARLY ASSURANCE DVM PATHWAY: Animal Health majors can apply to UGA CVM after 3 years of undergrad for guaranteed admission \u2014 saves a full year of tuition. This is the single most important strategic advantage of choosing UGA.', cat: 'program' },
     { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
     { text: 'Submit application via Common App or UGA portal — $70 fee', cat: 'app' },
     { text: 'Request official high school transcript', cat: 'app' },
@@ -2371,31 +2348,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Research UGA pre-vet program & CVM research opportunities', cat: 'program' },
     { text: 'Explore CAES (College of Ag & Environmental Sciences) scholarships', cat: 'scholarship' },
     { text: 'HONORS: Apply EA by Oct 15 for auto Morehead Honors review (no extra essays). If not auto-admitted, complete supplemental honors app by Jan 15', cat: 'honors' },
-  ],
-  'Cornell University': [
-    { text: 'Apply by Nov 1 (Early Decision — binding) or Jan 2 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $85 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
-    { text: 'Write Cornell community essay (350 words) — how a community has shaped you', cat: 'app' },
-    { text: 'Write CALS-specific essay (500 words) — why your major, why Cornell CALS', cat: 'app' },
-    { text: 'TESTING: Test-required (target ACT 33-35). SUPERSCORES across all dates. Score Choice OK. Science: not required. No honors college.', cat: 'test' },
-    { text: '3 letters of recommendation REQUIRED — 1 counselor + 2 teachers', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (both required for Cornell financial aid)', cat: 'financial' },
-    { text: 'Apply to CALS Animal Science major (select your college at application time)', cat: 'program' },
-    { text: 'Research Cornell CVM DVM pipeline & undergraduate research opportunities', cat: 'program' },
-    { text: 'HONORS: No freshman honors college. Dept. honors (CALS Research Honors) available junior/senior year — thesis + oral defense, 3.0+ GPA. No action needed during application.', cat: 'honors' },
-  ],
-  'UC Davis': [
-    { text: 'File UC Application by November 30 (single deadline for all UC campuses)', cat: 'deadline' },
-    { text: 'Submit via UC Application — $80 fee per campus', cat: 'app' },
-    { text: 'Write 4 Personal Insight Questions (choose 4 of 8 prompts, 350 words each)', cat: 'app' },
-    { text: 'TESTING: Test-blind (UC system). No scores considered for admission, scholarships, or honors. May only be used for course placement after enrollment.', cat: 'test' },
-    { text: 'Letters of recommendation — not accepted for freshman review', cat: 'app' },
-    { text: 'Complete FAFSA (or CA Dream Act Application)', cat: 'financial' },
-    { text: 'Select Animal Science or related major at application time (admission is major-specific)', cat: 'program' },
-    { text: 'Research UC Davis #1-ranked veterinary program & pre-vet advising', cat: 'program' },
-    { text: 'HONORS: UC Davis UHP is invitation-only (~2.5% of admits). No separate app. Note: Dept. honors thesis also available once enrolled (3.2+ GPA, junior/senior year).', cat: 'honors' },
   ],
   'Colorado State University': [
     { text: 'Apply by Feb 1 (priority; rolling admissions)', cat: 'deadline' },
@@ -2613,31 +2565,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Research UIUC CVM pre-vet track in Animal Sciences', cat: 'program' },
     { text: 'Explore companion and food animal medicine programs', cat: 'program' },
   ],
-  'Tufts University': [
-    { text: 'Apply by Nov 1 (Early Decision I) or Jan 4 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App, Coalition App, or QuestBridge — $75 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
-    { text: 'Write "Why Tufts" supplemental essay (250 words)', cat: 'app' },
-    { text: 'Write 1 additional short essay (200-250 words) — choose from 3 prompts', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2027)', cat: 'test' },
-    { text: '2 letters of recommendation REQUIRED — 1 teacher + 1 counselor', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (both required for Tufts financial aid)', cat: 'financial' },
-    { text: 'Research Cummings School of Veterinary Medicine pre-vet path through Biology', cat: 'program' },
-    { text: 'Explore wildlife clinic and international veterinary programs', cat: 'program' },
-  ],
-  'University of Pennsylvania': [
-    { text: 'Apply by Nov 1 (Early Decision) or Jan 5 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App or Coalition App — $75 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
-    { text: 'Write 3 Penn supplemental short essays (150-200 words each): thank-you note, community at Penn, school-specific', cat: 'app' },
-    { text: 'SAT/ACT — REQUIRED', cat: 'test' },
-    { text: '3 letters of recommendation REQUIRED — 1 counselor + 2 teachers', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (both required; CSS requires info from all biological/adoptive parents)', cat: 'financial' },
-    { text: 'Research Penn Vet pre-vet track through Biology', cat: 'program' },
-    { text: 'Explore New Bolton Center large animal facility & research opportunities', cat: 'program' },
-  ],
   'Tuskegee University': [
     { text: 'Apply by Mar 15 (Regular Decision; rolling admissions)', cat: 'deadline' },
     { text: 'Submit application via Common App or Common Black College App — $40 fee', cat: 'app' },
@@ -2724,17 +2651,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Research UK pre-vet track & vet school pipeline options', cat: 'program' },
     { text: 'HONORS: Lewis Honors College by Dec 1. Two essays (300 + 500 words on "common good"). Test scores NOT reviewed — STRONG FIT.', cat: 'honors' },
   ],
-  'Rutgers University': [
-    { text: 'Apply by Dec 1 for honors/merit scholarship consideration; Feb 1 Regular Decision', cat: 'deadline' },
-    { text: 'Submit application via Common App or Rutgers Direct — $70 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (no additional supplemental essays)', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional with test-blind options available)', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED (2 encouraged but not formally used)', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (CSS REQUIRED for institutional need-based aid; priority: Feb 15)', cat: 'financial' },
-    { text: 'Research pre-vet track in Animal Sciences', cat: 'program' },
-    { text: 'Explore NJ equine industry connections & pre-vet club', cat: 'program' },
-  ],
   'University of Arizona': [
     { text: 'Apply by Nov 1 (Early Action — recommended) for best admission/merit/Honors consideration', cat: 'deadline' },
     { text: 'Submit application via Common App or UA portal — $80 fee', cat: 'app' },
@@ -2745,18 +2661,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research pre-vet through Animal & Comparative Biomedical Sciences', cat: 'program' },
     { text: 'Explore desert/exotic animal exposure & wildlife center partnerships', cat: 'program' },
-  ],
-  'University of Maryland': [
-    { text: 'Apply by Nov 1 (Early Action — strongly encouraged) or Jan 20 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $75 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
-    { text: 'Complete 6 required short-answer prompts (650 characters each) — travel, academic interests, research, diversity', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional through Fall 2027)', cat: 'test' },
-    { text: '2 letters of recommendation REQUIRED — 1 counselor + 1 teacher', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research pre-vet through Animal & Avian Sciences', cat: 'program' },
-    { text: 'Explore proximity to USDA and NIH for research opportunities', cat: 'program' },
   ],
   'Cal Poly San Luis Obispo': [
     { text: 'Apply Oct 1 through Nov 30 via Cal State Apply (only application window)', cat: 'deadline' },
@@ -2769,17 +2673,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Apply to Animal Science major for pre-vet (major selection is critical)', cat: 'program' },
     { text: 'Research learn-by-doing program & campus ranch/farm units', cat: 'program' },
   ],
-  'University of Connecticut': [
-    { text: 'Apply by Jan 15 (Regular Decision); apply Nov 1 = Fee Free Day (saves $80)', cat: 'deadline' },
-    { text: 'Submit application via Common App or Coalition App — $80 fee (FREE if submitted Nov 1)', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (no additional supplemental essays)', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional pilot program)', cat: 'test' },
-    { text: 'Letters of recommendation — OPTIONAL but recommended (2 preferred: junior-year teachers)', cat: 'app' },
-    { text: 'Complete FAFSA (priority deadline: Feb 15)', cat: 'financial' },
-    { text: 'Verify HS course requirements (4 English, 3 Math through Alg II, 2 lab science, 2 foreign language)', cat: 'app' },
-    { text: 'Research pre-vet through Animal Science; explore campus farms and equine facilities', cat: 'program' },
-  ],
   'University of Nebraska-Lincoln': [
     { text: 'Apply by Nov 1 (priority for best scholarship/aid packaging)', cat: 'deadline' },
     { text: 'Submit application via Common App or UNL Direct — $45 fee', cat: 'app' },
@@ -2790,17 +2683,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Complete FAFSA (priority: Feb 1)', cat: 'financial' },
     { text: 'Research pre-vet track through Animal Science', cat: 'program' },
     { text: 'Explore livestock and production animal focus', cat: 'program' },
-  ],
-  'Montana State University': [
-    { text: 'Apply early for scholarship consideration (rolling admissions; ~2-week turnaround)', cat: 'deadline' },
-    { text: 'Submit application via Common App or MSU Direct — $38 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'No personal essay or supplemental essays required', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (encouraged for scholarship placement)', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
-    { text: 'Complete FAFSA (priority: Dec 1)', cat: 'financial' },
-    { text: 'Research pre-vet in Animal & Range Sciences', cat: 'program' },
-    { text: 'Explore large animal/ranch experience & wildlife/outdoor lab opportunities', cat: 'program' },
   ],
   'University of Delaware': [
     { text: 'Apply by Dec 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
@@ -2814,17 +2696,6 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Research pre-vet through Animal & Food Sciences', cat: 'program' },
     { text: 'Explore personalized advising & mid-Atlantic vet school placement', cat: 'program' },
   ],
-  'University of New Hampshire': [
-    { text: 'Apply by Nov 15 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $65 fee', cat: 'app' },
-    { text: 'Self-report grades via STARS system (official transcript sent later)', cat: 'app' },
-    { text: 'Write Common App personal essay (no supplemental essays required)', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL', cat: 'test' },
-    { text: '1 letter of recommendation REQUIRED (counselor or core academic teacher; max 2 total)', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research pre-vet through Biomedical Science or Animal Science', cat: 'program' },
-    { text: 'Explore campus dairy, equine facilities & organic dairy research farm', cat: 'program' },
-  ],
   'Berry College': [
     { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
     { text: 'Submit application via Common App or Berry Direct — FREE (no application fee)', cat: 'app' },
@@ -2836,27 +2707,25 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Research Animal Science program with hands-on focus', cat: 'program' },
     { text: 'Explore 27,000-acre campus with working farms and wildlife', cat: 'program' },
   ],
-  'Delaware Valley University': [
-    { text: 'Apply anytime (rolling admissions — no fixed deadline; apply early for best aid)', cat: 'deadline' },
-    { text: 'Submit application via Common App or DelVal Direct — FREE (no application fee)', cat: 'app' },
+  'Florida State University': [
+    { text: 'Submit application via Common App or FSU portal', cat: 'app' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (no supplemental essays required)', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional applicants may be asked for on-campus interview)', cat: 'test' },
-    { text: '1 letter of recommendation REQUIRED', cat: 'app' },
-    { text: 'Complete FAFSA (file early for best aid packaging)', cat: 'financial' },
-    { text: 'Research dedicated pre-vet major (one of few schools offering it as standalone)', cat: 'program' },
-    { text: 'Explore small animal hospital on campus & Experience360 hands-on program', cat: 'program' },
-  ],
-  'University of Wyoming': [
-    { text: 'Apply early for scholarship consideration (rolling admissions; final deadline Jun 1)', cat: 'deadline' },
-    { text: 'Submit application via Common App or UW Direct — $40 fee', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'No personal essay or supplemental essays required (Honors College has separate essay)', cat: 'app' },
-    { text: 'SAT/ACT — EXPECTED for applicants under 21 (assured admission: 3.0 GPA + ACT 21+ / SAT 980+)', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED or considered', cat: 'app' },
+    { text: 'Write required personal essay', cat: 'app' },
+    { text: 'Check SAT/ACT testing requirements & submit scores if required', cat: 'test' },
     { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research pre-vet in Animal & Veterinary Sciences', cat: 'program' },
-    { text: 'Explore ranch and wildlife exposure opportunities', cat: 'program' },
+    { text: 'Research FSU scholarships & merit aid opportunities', cat: 'scholarship' },
+    { text: 'Research pre-vet advising & biological science programs at FSU', cat: 'program' },
+    { text: 'Explore undergraduate research opportunities in animal/biological sciences', cat: 'program' },
+  ],
+  'University of South Carolina': [
+    { text: 'Submit application via Common App or USC portal', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write required personal essay', cat: 'app' },
+    { text: 'Check SAT/ACT testing requirements & submit scores if required', cat: 'test' },
+    { text: 'Complete FAFSA', cat: 'financial' },
+    { text: 'Research USC scholarships & merit aid opportunities', cat: 'scholarship' },
+    { text: 'Research pre-vet advising & biological science programs at USC', cat: 'program' },
+    { text: 'Explore undergraduate research opportunities in animal/biological sciences', cat: 'program' },
   ],
 };
 
@@ -3242,7 +3111,7 @@ function getRankingForSchool(name) {
     // Pre-fill from spreadsheet data for known schools
     const presets = {
       // ── Top-13 schools from Executive Summary / Financial Analysis ──
-      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:5, notes:'In-state Zell Miller. 3+1 fast-track. Best value overall.' },
+      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:5, notes:'In-state Zell Miller. 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat). Best value overall.' },
       'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit.' },
       'Purdue University':               { vetProgram:5, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
       'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. Top-10 vet school.' },
@@ -3256,8 +3125,6 @@ function getRankingForSchool(name) {
       'University of Florida':           { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Excellent program but hardest admission, limited merit.' },
       'University of Wisconsin-Madison': { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Great vet school. Very limited OOS merit.' },
       // ── Other schools with vet schools ──
-      'Cornell University':              { vetProgram:5, costScore:1, planB:5, meritAid:2, notes:'Ivy League top-5 vet. Very expensive.' },
-      'UC Davis':                        { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'#1 ranked vet school. Limited OOS merit.' },
       'Colorado State University':       { vetProgram:5, costScore:3, planB:3, meritAid:3, notes:'Top-5 vet. Strong equine & large animal.' },
       'University of Minnesota':         { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Accredited CVM. Strong research.' },
       'Michigan State University':       { vetProgram:5, costScore:3, planB:4, meritAid:2, notes:'Top-ranked CVM. Large animal hospital.' },
@@ -3270,24 +3137,17 @@ function getRankingForSchool(name) {
       'University of Illinois':          { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Accredited CVM. Strong companion animal.' },
       'University of Missouri':          { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Guaranteed admission track.' },
       'Tuskegee University':             { vetProgram:3, costScore:3, planB:2, meritAid:3, notes:'Only HBCU with vet school. Small classes.' },
-      'Tufts University':                { vetProgram:5, costScore:1, planB:4, meritAid:1, notes:'Top vet school. Very expensive private.' },
-      'University of Pennsylvania':      { vetProgram:5, costScore:1, planB:5, meritAid:1, notes:'Penn Vet Ivy League. Very expensive.' },
       // ── Schools without vet schools ──
       'Penn State University':           { vetProgram:2, costScore:3, planB:5, meritAid:2, notes:'No vet school. Strong Animal Science advising.' },
       'University of Vermont':           { vetProgram:2, costScore:2, planB:3, meritAid:2, notes:'No vet school. Morgan Horse Farm. Small classes.' },
       'University of Massachusetts Amherst': { vetProgram:2, costScore:3, planB:3, meritAid:2, notes:'No vet school. Pre-vet track available.' },
-      'Rutgers University':              { vetProgram:2, costScore:3, planB:4, meritAid:2, notes:'No vet school. NJ equine industry proximity.' },
       'University of Arizona':           { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'No vet school. Desert/exotic animal exposure.' },
-      'University of Maryland':          { vetProgram:2, costScore:3, planB:4, meritAid:2, notes:'No vet school. Near USDA & NIH.' },
       'Cal Poly San Luis Obispo':        { vetProgram:2, costScore:4, planB:3, meritAid:2, notes:'No vet school. Exceptional hands-on learn-by-doing.' },
-      'University of Connecticut':       { vetProgram:2, costScore:2, planB:3, meritAid:2, notes:'No vet school. Campus farms & equine.' },
       'University of Nebraska-Lincoln':  { vetProgram:2, costScore:4, planB:3, meritAid:3, notes:'No vet school. Affordable. Good placement.' },
-      'Montana State University':        { vetProgram:2, costScore:4, planB:2, meritAid:3, notes:'No vet school. Ranch & wildlife. Very affordable.' },
       'University of Delaware':          { vetProgram:2, costScore:3, planB:3, meritAid:2, notes:'No vet school. Small personalized program.' },
-      'University of New Hampshire':     { vetProgram:2, costScore:2, planB:3, meritAid:2, notes:'No vet school. Campus dairy & equine.' },
       'Berry College':                   { vetProgram:2, costScore:2, planB:2, meritAid:3, notes:'No vet school. 27K-acre campus. Hands-on.' },
-      'Delaware Valley University':      { vetProgram:3, costScore:2, planB:2, meritAid:3, notes:'Dedicated pre-vet major. Small animal hospital.' },
-      'University of Wyoming':           { vetProgram:2, costScore:5, planB:2, meritAid:3, notes:'No vet school. Most affordable. Ranch & wildlife.' }
+      'Florida State University':         { vetProgram:2, costScore:3, planB:4, meritAid:3, notes:'No vet school. Strong bio program. Tallahassee near UF CVM.' },
+      'University of South Carolina':    { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'No vet school. Pre-vet advising available. SEC school.' }
     };
     data.rankings[name] = presets[name] || { vetProgram:3, costScore:3, planB:3, meritAid:3, notes:'' };
   }
@@ -3518,15 +3378,16 @@ const SCENARIO_SHORT_NAMES = {
   'Louisiana State University': 'LSU', 'Auburn University': 'Auburn', 'Purdue University': 'Purdue',
   'Clemson University': 'Clemson', 'University of Illinois': 'Illinois', 'University of Minnesota': 'Minnesota',
   'Michigan State University': 'Michigan State', 'Iowa State University': 'Iowa State', 'Colorado State University': 'Colorado State',
-  'Kansas State University': 'K-State', 'Cornell University': 'Cornell', 'UC Davis': 'UC Davis',
+  'Kansas State University': 'K-State',
   'Oklahoma State University': 'Oklahoma State', 'Oregon State University': 'Oregon State',
   'Washington State University': 'Washington State', 'Mississippi State University': 'Mississippi State',
-  'University of Missouri': 'Mizzou', 'Penn State University': 'Penn State', 'University of Pennsylvania': 'Penn',
-  'Tufts University': 'Tufts', 'Tuskegee University': 'Tuskegee', 'Cal Poly San Luis Obispo': 'Cal Poly',
-  'Berry College': 'Berry', 'Delaware Valley University': 'DelVal', 'University of Wyoming': 'Wyoming',
-  'Rutgers University': 'Rutgers', 'University of Arizona': 'Arizona', 'University of Maryland': 'Maryland',
-  'University of Connecticut': 'UConn', 'University of Nebraska-Lincoln': 'Nebraska', 'Montana State University': 'Montana State',
-  'University of Delaware': 'Delaware', 'University of New Hampshire': 'UNH', 'University of Vermont': 'Vermont'
+  'University of Missouri': 'Mizzou', 'Penn State University': 'Penn State',
+  'Tuskegee University': 'Tuskegee', 'Cal Poly San Luis Obispo': 'Cal Poly',
+  'Berry College': 'Berry',
+  'University of Arizona': 'Arizona',
+  'University of Nebraska-Lincoln': 'Nebraska',
+  'University of Delaware': 'Delaware', 'University of Vermont': 'Vermont',
+  'Florida State University': 'FSU', 'University of South Carolina': 'South Carolina'
 };
 
 function scenarioShortName(name) {
@@ -3861,8 +3722,6 @@ const STRATEGY_DATA = [
   { school:'Purdue University', type:'Direct to College & Major', overall:'~50%', advantage:'verified', advDetail:'Ag: 55.8% vs 50% overall', major:'Animal Sciences', track:'Pre-Vet Medicine Concentration', backup:'Biology or Biochemistry (2nd choice required)' },
   { school:'Texas A&M University', type:'University-Wide', overall:'~57%', advantage:'likely', advDetail:'Ag college data in ABPA dashboard (not public)', major:'Animal Science (Science Option)', track:'Pre-vet advising via CVM', backup:'Biology (required 2nd choice)' },
   { school:'University of Georgia', type:'University-Wide', overall:'~33%', advantage:'likely', advDetail:'CAES is less competitive than Terry Business / Engineering', major:'Animal Science or Animal Health', track:'Animal Health = 3+1 DVM pathway', backup:'Biological Science (co-major for Animal Health)' },
-  { school:'Cornell University', type:'Direct to College', overall:'~8%', advantage:'structural', advDetail:'CALS admits separately from Arts & Sciences; Ag is less competitive', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Cannot list second college' },
-  { school:'UC Davis', type:'Direct to Major', overall:'~42%', advantage:'structural', advDetail:'UC InfoCenter shows Ag discipline rates (data available by discipline)', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Biological Sciences (alternate encouraged)' },
   { school:'Colorado State University', type:'University-Wide', overall:'~89%', advantage:'minimal', advDetail:'Very high overall rate; Ag not meaningfully different', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Not required' },
   { school:'Virginia Tech', type:'Direct to Major', overall:'~55%', advantage:'structural', advDetail:'Direct-admit system; CALS majors less competitive than Engineering', major:'Animal and Poultry Sciences', track:'Pre-Vet Option (formal)', backup:'University Studies (recommended 2nd choice)' },
   { school:'University of Florida', type:'University-Wide', overall:'~23%', advantage:'likely', advDetail:'Highly competitive overall; CALS/IFAS historically less selective', major:'Animal Sciences', track:'Animal Biology specialization (pre-vet)', backup:'Not required' },
@@ -3878,7 +3737,9 @@ const STRATEGY_DATA = [
   { school:'Penn State University', type:'University-Wide + ETM', overall:'~57%', advantage:'likely', advDetail:'Ag Sciences less competitive than Engineering/Smeal; ETM required after admission', major:'Veterinary and Biomedical Sciences', track:'Dedicated pre-vet major (or Animal Sci, Science option)', backup:'Division of Undergraduate Studies' },
   { school:'University of Kentucky', type:'University-Wide', overall:'~93%', advantage:'minimal', advDetail:'Very high overall rate; essentially open admission', major:'Animal Sciences', track:'Pre-Professional focus + Pre-Vet Certificate', backup:'Not required' },
   { school:'University of Tennessee', type:'Direct to College & Major', overall:'~39%', advantage:'structural', advDetail:'Herbert College of Ag admits separately; less competitive than Tickle Engineering', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Not required' },
-  { school:'Louisiana State University', type:'Direct to College', overall:'~73%', advantage:'likely', advDetail:'College of Ag admits freshmen directly; less competitive than Flores Business', major:'Animal Sciences', track:'Pre-Vet Medicine concentration (3+1 to LSU SVM)', backup:'Not required' }
+  { school:'Louisiana State University', type:'Direct to College', overall:'~73%', advantage:'likely', advDetail:'College of Ag admits freshmen directly; less competitive than Flores Business', major:'Animal Sciences', track:'Pre-Vet Medicine concentration (3+1 to LSU SVM)', backup:'Not required' },
+  { school:'Florida State University', type:'University-Wide', overall:'~25%', advantage:'minimal', advDetail:'University-wide admission; no separate Ag college rate', major:'Biological Science', track:'Pre-vet advising pathway', backup:'Not required' },
+  { school:'University of South Carolina', type:'University-Wide', overall:'~63%', advantage:'minimal', advDetail:'University-wide admission; moderate acceptance rate', major:'Biology or Animal Sciences (pending)', track:'Pre-vet advising pathway', backup:'Not required' }
 ];
 
 function renderStrategy() {
@@ -3995,8 +3856,6 @@ if (!localStorage.getItem('essaysV2')) {
 const GREEK_LIFE_DATA = {
   'Texas A&M University': { pctWomen: '~10%', npc: 14, total: '20+', recruitment: 'Fall (Aug)', housing: '12 houses on Sorority Row; live-in optional soph/jr', cost: '$2,000\u2013$5,000', greekPct: '~11%', gpa: 'At or above campus avg', vibe: 'One of many social avenues; Aggie traditions dominate campus culture more than Greek life' },
   'University of Georgia': { pctWomen: '~35%', npc: 20, total: '30+', recruitment: 'Fall (early Aug)', housing: 'Mansion houses on Milledge Ave; live-in soph year', cost: '$2,200\u2013$8,700', greekPct: '~28%', gpa: '3.65 sorority vs campus avg (higher)', vibe: 'Central to social life; one of the most prominent Greek systems in the SEC' },
-  'Cornell University': { pctWomen: '~28%', npc: 11, total: '17', recruitment: 'Deferred \u2014 Spring (Jan)', housing: 'Most NPC chapters have houses; live-in soph', cost: '$700\u2013$1,000', greekPct: '~35%', gpa: '3.65 vs 3.44 campus', vibe: 'Most prominent Greek scene in the Ivy League; deferred rush gives freshmen a semester first' },
-  'UC Davis': { pctWomen: '~7%', npc: 10, total: '22', recruitment: 'Fall', housing: 'Most sororities lack houses; no Greek Row', cost: '$1,000\u2013$2,000', greekPct: '~10%', gpa: 'Not reported', vibe: 'Low-key; one of many social options; academically focused and service-oriented' },
   'Colorado State University': { pctWomen: '~12%', npc: 8, total: '20', recruitment: 'Fall (mid-Sept)', housing: 'All PHA chapters have houses; some require live-in', cost: '$400\u2013$2,400', greekPct: '~12%', gpa: '3.33 PHA vs ~3.16 campus', vibe: 'Present but not dominant; outdoor rec and brewery culture compete for social time' },
   'University of Florida': { pctWomen: '~24%', npc: 18, total: '30+', recruitment: 'Fall (mid-Aug)', housing: 'Sorority Row with ~15 houses; live-in soph+', cost: '$3,000\u2013$5,000', greekPct: '~15%', gpa: '3.50 vs 3.43 campus', vibe: 'Significant; Sorority Row is iconic; game-day culture and competitive recruitment' },
   'Ohio State University': { pctWomen: '~11%', npc: 19, total: '28', recruitment: 'Spring (Jan)', housing: 'Off-campus, privately owned; varies by chapter', cost: '$2,500+', greekPct: '~11%', gpa: 'Above campus avg 45 consecutive terms', vibe: 'Growing rapidly but not dominant at a 60K+ campus; spring rush gives freshmen a semester first' },
@@ -4015,8 +3874,6 @@ const GREEK_LIFE_DATA = {
   'Mississippi State University': { pctWomen: '~28%', npc: 9, total: '13+', recruitment: 'Fall (mid-Aug)', housing: '7 of 13 sororities have houses', cost: '$3,700\u2013$6,200', greekPct: '~22%', gpa: 'Not publicly aggregated', vibe: 'Significant SEC presence; intertwined with football and tailgating culture' },
   'Louisiana State University': { pctWomen: '~29%', npc: 13, total: '18+', recruitment: 'Fall (mid-Aug)', housing: 'Chapter houses on Greek Row; mandatory meal plans', cost: '$3,800\u2013$5,600', greekPct: '~22%', gpa: '3.17 Greek vs 2.95 campus', vibe: 'Very central; PHC alone has 4,000+ women; deeply tied to SEC football culture' },
   'University of Illinois': { pctWomen: '~24%', npc: 'Large', total: '36', recruitment: 'Fall', housing: 'Historic Greek Row houses; live-in soph year', cost: '$2,000\u2013$3,000', greekPct: '~24%', gpa: '3.53 Greek vs 3.53 campus', vibe: 'Major presence with one of oldest/largest Greek systems nationally; beautiful historic houses' },
-  'Tufts University': { pctWomen: '~12%', npc: 2, total: '5', recruitment: 'Deferred \u2014 Soph year+', housing: 'Very limited; Jr/Sr only', cost: '$500\u2013$1,500', greekPct: '~13%', gpa: 'Not reported', vibe: 'Low-key; only 2 NPC sororities; progressive campus does not revolve around Greek life' },
-  'University of Pennsylvania': { pctWomen: '~25%', npc: 7, total: '14', recruitment: 'Deferred \u2014 Spring (Jan)', housing: 'Some chapters have houses', cost: '$1,000\u2013$3,000', greekPct: '~25%', gpa: 'Not reported', vibe: 'Present and visible but not dominant; urban Philadelphia setting offers many alternatives' },
   'Tuskegee University': { pctWomen: '~5% (NPHC)', npc: 0, total: '4 NPHC', recruitment: 'NPHC intake (varies)', housing: 'No chapter houses', cost: '$300\u2013$800', greekPct: '~5%', gpa: 'Not reported', vibe: 'Completely different model \u2014 Divine Nine orgs only; service-focused, no traditional rush' },
   'University of Tennessee': { pctWomen: '~37%', npc: 14, total: '20+', recruitment: 'Fall (Aug)', housing: '30 fraternity/sorority houses on campus', cost: '$2,500\u2013$5,000', greekPct: '~30%', gpa: '3.0 min for bids', vibe: 'Very central; one of strongest SEC Greek communities; 3,000+ women register for rush' },
   'University of Missouri': { pctWomen: '~32%', npc: 14, total: '20', recruitment: 'Fall', housing: 'Greektown houses; move in second year', cost: '$2,000\u2013$4,000', greekPct: '~27%', gpa: 'Above campus avg', vibe: 'Central; Greektown is "where the action is"; SEC football culture amplifies Greek scene' },
@@ -4024,18 +3881,13 @@ const GREEK_LIFE_DATA = {
   'Penn State University': { pctWomen: '~20%', npc: 21, total: '25+', recruitment: 'Deferred \u2014 Spring', housing: 'Dorm floors in South Residence Halls', cost: '$900\u2013$1,400', greekPct: '~17%', gpa: '~3.2\u20133.3 new member avg', vibe: 'Well-established but not dominant at 40K+; THON is huge; broad social scene' },
   'University of Vermont': { pctWomen: '~7%', npc: 6, total: '6', recruitment: 'Fall (Sept)', housing: 'Some chapters have houses; varies', cost: '$500\u2013$1,500', greekPct: '~8%', gpa: 'Not reported', vibe: 'Very small and low-key; Burlington social scene dominates; inclusive and progressive' },
   'University of Kentucky': { pctWomen: '~27%', npc: 14, total: '14+', recruitment: 'Fall', housing: 'Greek Park chapter houses', cost: '$2,000\u2013$9,600', greekPct: '~23%', gpa: 'Higher + 3x retention rate', vibe: 'Moderately central; well-established SEC system; Greek Park is traditional' },
-  'Rutgers University': { pctWomen: '~10%', npc: 8, total: '30+', recruitment: 'Spring (Jan)', housing: 'Private off-campus houses; varies', cost: '$600\u2013$1,000', greekPct: '~10%', gpa: 'Above all-women avg', vibe: 'Modest presence; strong multicultural Greek community; social life is diverse' },
   'University of Arizona': { pctWomen: '~17%', npc: 12, total: '15+', recruitment: 'Fall (late Aug)', housing: 'Historic Greek Row (since 1900); mostly social space', cost: '$500\u2013$1,000', greekPct: '~13%', gpa: 'Meets or exceeds campus avg', vibe: 'Visible with historic Greek Row; warm-weather social culture; not dominant at 48K campus' },
-  'University of Maryland': { pctWomen: '~16%', npc: 16, total: '20+', recruitment: 'Spring (primary) + Fall informal', housing: 'Leased chapter houses on Fraternity Row', cost: '$400\u2013$900', greekPct: '~16%', gpa: '~3.32 sorority avg', vibe: 'Moderate; D.C. proximity provides vast non-Greek social/professional opportunities' },
   'Cal Poly San Luis Obispo': { pctWomen: '~20%', npc: 9, total: '12+', recruitment: 'Fall (quarter start)', housing: 'Some scattered houses; no Greek Row (proposed)', cost: '$1,200\u2013$2,500', greekPct: '~20%', gpa: 'Above all-women avg', vibe: 'Significant; SLO beach/outdoor lifestyle blends with Greek culture; quarter system' },
-  'University of Connecticut': { pctWomen: '~11%', npc: 9, total: '20', recruitment: 'Fall (primary)', housing: 'Husky Village (purpose-built; 301 beds)', cost: '$600\u2013$1,600', greekPct: '~10%', gpa: '56% earned 3.5+ GPA', vibe: 'Moderate; Husky athletics especially basketball are the bigger social draw' },
   'University of Nebraska-Lincoln': { pctWomen: '~20%', npc: 13, total: '16+', recruitment: 'Fall (mid-Aug)', housing: '12 sorority houses; well-established Greek Row', cost: '$2,000\u2013$13,000', greekPct: '~20%', gpa: '3.44 sorority vs 3.23 campus', vibe: 'Very central; one of largest Greek systems nationally; 1,100+ women rush' },
-  'Montana State University': { pctWomen: '~2%', npc: 5, total: '5', recruitment: 'Fall (late Aug)', housing: 'All 5 have houses; cheaper than dorms', cost: '$700\u2013$1,300', greekPct: '~3%', gpa: 'Not reported', vibe: 'Very small niche; outdoor recreation drives social life; laid-back option' },
   'University of Delaware': { pctWomen: '~27%', npc: 13, total: '22', recruitment: 'Spring (primary)', housing: 'Limited; 7 university-owned houses + some off-campus', cost: '~$1,700', greekPct: '~27%', gpa: '3.32 all-sorority avg', vibe: 'Moderately important; deferred spring rush; 117-year-old system' },
-  'University of New Hampshire': { pctWomen: '~10%', npc: 8, total: '8', recruitment: 'Fall (Sept)', housing: 'Some houses on Madbury Rd', cost: 'Not published', greekPct: '~18%', gpa: 'Tracked via chapter scorecards', vibe: 'Present but low-key; 63% say Greek life is average; diverse social scene' },
   'Berry College': { pctWomen: '0%', npc: 0, total: '0', recruitment: 'N/A', housing: 'N/A', cost: 'N/A', greekPct: '0%', gpa: 'N/A', vibe: 'No Greek life \u2014 intentional institutional choice; community built through residential living' },
-  'Delaware Valley University': { pctWomen: '~4%', npc: 2, total: '3', recruitment: 'Informal/continuous', housing: 'No chapter houses', cost: 'Modest', greekPct: '~3%', gpa: 'Not reported', vibe: 'Extremely small; 2 social sororities on a small ag-focused campus' },
-  'University of Wyoming': { pctWomen: '~5%', npc: 4, total: '6', recruitment: 'Fall (late Aug)', housing: 'Houses on Fraternity & Sorority Mall', cost: '$200\u2013$2,000', greekPct: '~6%', gpa: 'Not reported', vibe: 'Small but active; outdoor recreation and small-town Laramie vibe dominate social life' },
+  'Florida State University': { pctWomen: '~38%', npc: 18, total: '26+', recruitment: 'Fall (Aug)', housing: 'Chapter houses on Heritage Grove', cost: '$2,000–$4,500', greekPct: '~38%', gpa: 'Above campus avg', vibe: 'Very central; one of the largest Greek systems in the South; Heritage Grove is a social hub' },
+  'University of South Carolina': { pctWomen: '~30%', npc: 14, total: '20+', recruitment: 'Fall (Aug)', housing: 'Greek Village on campus', cost: '$2,000–$4,000', greekPct: '~30%', gpa: 'Above campus avg', vibe: 'Prominent SEC Greek scene; Greek Village is central to social life; game-day culture' },
 };
 
 function renderGreekLife() {
@@ -4072,18 +3924,6 @@ const SCHOOL_ESSAYS = {
   'University of Georgia': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
     { name: 'UGA Supplemental Essay', words: 300, prompt: 'Prompt changes yearly — check when released Aug 2026', required: true }
-  ],
-  'Cornell University': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
-    { name: 'CALS: Why This Major', words: 500, prompt: 'Why are you drawn to studying Animal Science at Cornell CALS?', required: true },
-    { name: 'CALS: Public Good', words: 100, prompt: 'How does your major connect to the public good?', required: false },
-    { name: 'CALS: Agriculture Interest', words: 100, prompt: 'Describe your interest in agriculture and life sciences', required: false }
-  ],
-  'UC Davis': [
-    { name: 'Personal Insight Question 1', words: 350, prompt: 'Choose from 8 UC PIQ prompts — highlight a different aspect in each', required: true },
-    { name: 'Personal Insight Question 2', words: 350, prompt: 'Choose from 8 UC PIQ prompts', required: true },
-    { name: 'Personal Insight Question 3', words: 350, prompt: 'Choose from 8 UC PIQ prompts', required: true },
-    { name: 'Personal Insight Question 4', words: 350, prompt: 'Choose from 8 UC PIQ prompts', required: true }
   ],
   'Colorado State University': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays — Common App essay only', required: true },
@@ -4156,17 +3996,6 @@ const SCHOOL_ESSAYS = {
     { name: 'Major Experience', words: 150, prompt: 'Experience related to your chosen major', required: true },
     { name: 'Career Goals', words: 150, prompt: 'Describe your career goals', required: true }
   ],
-  'Tufts University': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
-    { name: 'Why Tufts', words: 250, prompt: 'Why Tufts specifically?', required: true },
-    { name: 'Additional Short Essay', words: 250, prompt: 'Choose from 3 prompts', required: true }
-  ],
-  'University of Pennsylvania': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
-    { name: 'Penn Thank-You Note', words: 200, prompt: 'Write a thank-you note to someone who has helped you', required: true },
-    { name: 'Community at Penn', words: 200, prompt: 'How will you explore community at Penn?', required: true },
-    { name: 'School-Specific Essay', words: 150, prompt: 'Essay specific to your chosen school within Penn', required: true }
-  ],
   'Tuskegee University': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'Common App essay — note: AI detection is used', required: true }
   ],
@@ -4199,45 +4028,31 @@ const SCHOOL_ESSAYS = {
     { name: 'HONORS: Statement of Intent', words: 300, prompt: 'Rationale for applying to Lewis Honors College and how experience has prepared you. Due Dec 1. STRONG FIT — test scores NOT reviewed.', required: false },
     { name: 'HONORS: Common Good Essay', words: 500, prompt: 'The concept of "common good" and how you will contribute to your community. Due Dec 1.', required: false }
   ],
-  'Rutgers University': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'No additional supplemental essays', required: true }
-  ],
   'University of Arizona': [
     { name: 'Why Arizona', words: 500, prompt: 'Why Arizona and your academic area? (strongly encouraged)', required: false }
-  ],
-  'University of Maryland': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
-    { name: 'Short-Answer Prompts (6)', words: 650, prompt: '6 prompts at 650 characters each: travel, academics, research, diversity', required: true }
   ],
   'Cal Poly San Luis Obispo': [
     { name: 'No essays required', words: 0, prompt: 'Cal Poly does not accept essays', required: false }
   ],
-  'University of Connecticut': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'No additional supplemental essays', required: true }
-  ],
   'University of Nebraska-Lincoln': [
     { name: 'Optional Essay', words: 650, prompt: 'Optional — 1 essay available', required: false }
-  ],
-  'Montana State University': [
-    { name: 'No essays required', words: 0, prompt: 'Montana State does not require essays', required: false }
   ],
   'University of Delaware': [
     { name: 'Test-Optional Supplement 1', words: 250, prompt: 'Required if test-optional: demonstrate academic readiness', required: false },
     { name: 'Test-Optional Supplement 2', words: 250, prompt: 'Required if test-optional', required: false },
     { name: 'Test-Optional Supplement 3', words: 250, prompt: 'Required if test-optional', required: false }
   ],
-  'University of New Hampshire': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays required', required: true }
-  ],
   'Berry College': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'Common App essay', required: true },
     { name: 'Why Berry', words: 300, prompt: 'Optional — recommended to show interest', required: false }
   ],
-  'Delaware Valley University': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays required', required: true }
+  'Florida State University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'FSU Supplemental Essay', words: 250, prompt: 'Why are you interested in FSU? (prompt may vary by year)', required: false }
   ],
-  'University of Wyoming': [
-    { name: 'No essays required', words: 0, prompt: 'UWyo does not require essays (Honors College has separate essay)', required: false }
+  'University of South Carolina': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'UofSC Short Answer', words: 250, prompt: 'Optional short answer — describe your interest or goals', required: false }
   ]
 };
 
@@ -4268,8 +4083,7 @@ function getDeadlineEvents() {
     if (earlyDecision && earlyDecision !== 'N/A') {
       const d = parseDeadline(earlyDecision, 2026);
       if (d) {
-        const isED = name === 'Cornell University' || name === 'University of Pennsylvania' || name === 'Tufts University';
-        events.push({ date: d, school: name, type: isED ? 'ed' : 'ea', label: isED ? 'Early Decision' : 'Early Action', desc: earlyDecision });
+        events.push({ date: d, school: name, type: 'ea', label: 'Early Action', desc: earlyDecision });
       }
     }
 
@@ -4290,7 +4104,7 @@ function getDeadlineEvents() {
     events.push({ date: new Date(2026, 9, 1), school: name, type: 'fin', label: 'FAFSA Opens', desc: 'Complete ASAP after Oct 1' });
 
     // CSS Profile for schools that need it
-    if (name === 'Cornell University' || name === 'University of Wisconsin-Madison' || name === 'Tufts University' || name === 'University of Pennsylvania' || name === 'Rutgers University') {
+    if (name === 'University of Wisconsin-Madison') {
       events.push({ date: new Date(2026, 10, 1), school: name, type: 'fin', label: 'CSS Profile Due', desc: 'Required for need-based institutional aid' });
     }
   }
@@ -4383,7 +4197,7 @@ function syncEssays() {
   // Ensure shared Common App essay exists if any school uses Common App
   const hasCommonApp = data.schools.some(s => {
     const name = s.name;
-    return name !== 'UC Davis' && name !== 'Cal Poly San Luis Obispo';
+    return name !== 'Cal Poly San Luis Obispo';
   });
   if (hasCommonApp && !data.essays.find(e => e.school === 'Shared' && e.name === 'Common App Personal Statement')) {
     data.essays.unshift({
