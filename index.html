@@ -2026,7 +2026,7 @@ function collapseAllChecklists() {
 }
 
 // Regex helpers for essay item detection
-const REGULAR_ESSAY_RE = /\bwrite\b.*\bessay\b|\bessay\b.*\bwrite\b|\bpersonal (essay|statement)\b|\bsupplemental essay\b|\bshort.?answer\b|\bpiq\b|\bpersonal insight\b|\but prosim\b|\bwhy (purdue|tufts|berry|arizona)\b|\bwhy this major\b|\bwhy first.?choice\b|\bwhy second.?choice\b|\bmeaningful extracurricular\b|\bcommon app essay\b/i;
+const REGULAR_ESSAY_RE = /\bwrite\b.*\bessay\b|\bessay\b.*\bwrite\b|\bpersonal (essay|statement)\b|\bsupplemental essay\b|\bshort.?answer\b|\bpiq\b|\bpersonal insight\b|\but prosim\b|\bwhy purdue\b|\bwhy this major\b|\bwhy first.?choice\b|\bwhy second.?choice\b|\bmeaningful extracurricular\b|\bcommon app essay\b/i;
 const HONORS_ESSAY_RE = /\bhonors\b.*\bessay\b|\bhonors\b.*\bappl/i;
 
 function isRegularEssayItem(text) { return REGULAR_ESSAY_RE.test(text) && !HONORS_ESSAY_RE.test(text); }
@@ -2525,24 +2525,32 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: Lewis Honors College by Dec 1. Two essays (300 + 500 words on "common good"). Test scores NOT reviewed — STRONG FIT.', cat: 'honors' },
   ],
   'Florida State University': [
-    { text: 'Submit application via Common App or FSU portal', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write required personal essay', cat: 'app' },
-    { text: 'Check SAT/ACT testing requirements & submit scores if required', cat: 'test' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research FSU scholarships & merit aid opportunities', cat: 'scholarship' },
-    { text: 'Research pre-vet advising & biological science programs at FSU', cat: 'program' },
-    { text: 'Explore undergraduate research opportunities in animal/biological sciences', cat: 'program' },
+    { text: 'Apply by Oct 15 (Early Action — FL residents only) or Dec 1 (Regular Decision)', cat: 'deadline' },
+    { text: 'Submit application via Common App or FSU portal — $30 fee', cat: 'app' },
+    { text: 'Complete STARS (Self-Reported Transcript and Academic Record System) after submitting application', cat: 'app' },
+    { text: 'Write Common App personal essay (650 words max, 7 prompt choices) — no FSU-specific supplemental essay for general admission', cat: 'app' },
+    { text: 'TESTING: REQUIRED (FL Board of Governors mandate for all FL public universities). Also accepts CLT. SUPERSCORES English, Math, Reading across all dates — Science NOT used in composite. Send all scores. February test date is last accepted for admission.', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED and NOT used in the decision-making process', cat: 'app' },
+    { text: 'Complete FAFSA (FL state deadline: May 15; submit early — file by Jan recommended given Dec 1 admit timing)', cat: 'financial' },
+    { text: 'Research Biological Science major with pre-professional health track — FSU\'s pre-vet path', cat: 'program' },
+    { text: 'Connect with Health Professions Advising Office (College of Medicine) for vet school planning — they advise pre-vet students on prereqs, applications & VMCAS', cat: 'program' },
+    { text: 'Note proximity to UF College of Veterinary Medicine (~2.5 hrs) for shadowing and research opportunities', cat: 'program' },
+    { text: 'Merit scholarships are automatic with admission (no separate app). Apply by Dec 1 for best consideration. OOS: up to 100% tuition waiver.', cat: 'scholarship' },
+    { text: 'HONORS: Select "Yes" to Honors interest on FSU application, then complete supplemental Honors app by Dec 1 — includes 1 short essay (250-350 words: design an interdisciplinary Honors Signature Course). Holistic review, no published GPA/ACT minimums.', cat: 'honors' },
   ],
   'University of South Carolina': [
-    { text: 'Submit application via Common App or USC portal', cat: 'app' },
-    { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write required personal essay', cat: 'app' },
-    { text: 'Check SAT/ACT testing requirements & submit scores if required', cat: 'test' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research USC scholarships & merit aid opportunities', cat: 'scholarship' },
-    { text: 'Research pre-vet advising & biological science programs at USC', cat: 'program' },
-    { text: 'Explore undergraduate research opportunities in animal/biological sciences', cat: 'program' },
+    { text: 'Apply by Oct 15 (Early Action) or Dec 1 (Regular Decision). For Honors College + Top Scholars: apply by Nov 15 with credentials due Dec 1', cat: 'deadline' },
+    { text: 'Submit application via Common App or USC portal — $65 fee', cat: 'app' },
+    { text: 'Upload unofficial high school transcript (JPG or PDF, must include grades through junior year). Official transcript only required upon enrollment.', cat: 'app' },
+    { text: 'Write 1 essay — choose from prompts provided in application (approx. 200-500 words)', cat: 'app' },
+    { text: 'TESTING: Test-optional confirmed through Fall 2026; Fall 2027 policy NOT YET ANNOUNCED — plan to submit scores. Opt in/out on application. SUPERSCORES English, Math, Reading across all dates — Science NOT used. Honors College: scores NOT required for SCHC admission.', cat: 'test' },
+    { text: 'Letters of recommendation — NOT REQUIRED for general admission (only for Honors College)', cat: 'app' },
+    { text: 'Complete FAFSA (priority deadline: Apr 1; file by late Feb recommended). FAFSA not required for merit scholarships.', cat: 'financial' },
+    { text: 'Research Biology major + Office of Pre-Professional and Graduate Advising for vet school planning — advises pre-vet students on prereqs, VMCAS, and placement', cat: 'program' },
+    { text: 'Note: SC contracts with UGA, Mississippi State, and Tuskegee CVMs for SC residents. Proximity to Clemson CVM (opening Fall 2026) for clinical exposure.', cat: 'program' },
+    { text: 'Explore Pre-Vet Association student organization for networking and vet-related volunteering', cat: 'program' },
+    { text: 'OOS MERIT SCHOLARSHIPS: Automatic with Dec 1 application, no separate app. Tiers: McKissick (~$11K/yr, 33+ ACT / 4.0+ GPA), Excellence (~$9.5K/yr, 30+ ACT), Distinction (~$7K/yr, 28+ ACT), Leadership (~$5K/yr, 26+ ACT). All renewable with 3.0 GPA.', cat: 'scholarship' },
+    { text: 'HONORS: South Carolina Honors College (top-ranked public honors college). Apply by Nov 15 — select "Yes" on university app, then complete SCHC app within 48 hrs. Requires 2 additional essays + 1 letter of recommendation. Middle 50%: ACT 32-34. Stretch target but worth applying — scores are optional for SCHC.', cat: 'honors' },
   ],
 };
 
