@@ -1762,7 +1762,7 @@ let schoolSort = { field: null, dir: 'asc' };
 function getSuperscoreStatus(schoolName) {
   const items = SCHOOL_CHECKLISTS[schoolName];
   if (!items) return '\u2014';
-  const testItem = items.find(i => i.cat === 'test' && /superscore/i.test(i.text));
+  const testItem = items.find(i => i.cat === 'test' && /superscor/i.test(i.text));
   if (!testItem) return '\u2014';
   if (/does NOT superscore|not superscore/i.test(testItem.text)) return 'No';
   if (/SUPERSCORES?\b/i.test(testItem.text)) return 'Yes';
