@@ -577,6 +577,9 @@
   .profile-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.88rem; border-bottom: 1px solid #f5f7fa; }
   .profile-row:last-child { border-bottom: none; }
   .profile-row .label { color: var(--text-light); }
+  .act-edit { cursor:pointer; border-bottom:1px dashed var(--border); padding:0 2px; border-radius:2px; min-width:20px; display:inline-block; text-align:center; }
+  .act-edit:hover { background:var(--surface); border-bottom-color:var(--primary); }
+  .act-edit:focus { outline:none; background:#fff8e1; border-bottom:2px solid var(--primary); }
   .profile-row .value { font-weight: 600; }
   .insight-box { background: linear-gradient(135deg, #e8f4f8 0%, #eaf5ee 100%); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 22px; font-size: 0.9rem; }
   .insight-box strong { color: var(--primary-dark); }
@@ -757,15 +760,15 @@
   <div id="summary" class="sub-panel active">
     <div class="section-head"><h2>Executive Summary</h2></div>
     <div class="profile-grid">
-      <div class="profile-card">
-        <h3>Student Profile</h3>
+      <div class="profile-card" id="profileCard">
+        <h3>Student Profile <span style="font-size:0.75rem;font-weight:400;color:var(--text-light);">(click scores to edit)</span></h3>
         <div class="profile-row"><span class="label">Student</span><span class="value">Avery Denney</span></div>
-        <div class="profile-row"><span class="label">Targeted GPA</span><span class="value">3.85</span></div>
-        <div class="profile-row"><span class="label">ACT Composite</span><span class="value">27 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(87th %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">English</span><span class="value">23 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(73rd %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">Math</span><span class="value">28 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(90th %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">Reading</span><span class="value">30 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(90th %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">Science</span><span class="value">33 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(97th %ile)</span></span></div>
+        <div class="profile-row"><span class="label">Targeted GPA</span><span class="value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></span></div>
+        <div class="profile-row"><span class="label">ACT Composite</span><span class="value"><span class="act-edit" data-act="composite" contenteditable="true">27</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="composite-pct">(87th %ile)</span></span></div>
+        <div class="profile-row" style="padding-left:12px;"><span class="label">English</span><span class="value"><span class="act-edit" data-act="english" contenteditable="true">23</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="english-pct">(73rd %ile)</span></span></div>
+        <div class="profile-row" style="padding-left:12px;"><span class="label">Math</span><span class="value"><span class="act-edit" data-act="math" contenteditable="true">28</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="math-pct">(90th %ile)</span></span></div>
+        <div class="profile-row" style="padding-left:12px;"><span class="label">Reading</span><span class="value"><span class="act-edit" data-act="reading" contenteditable="true">30</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="reading-pct">(90th %ile)</span></span></div>
+        <div class="profile-row" style="padding-left:12px;"><span class="label">Science</span><span class="value"><span class="act-edit" data-act="science" contenteditable="true">33</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="science-pct">(97th %ile)</span></span></div>
         <div class="profile-row"><span class="label">Target ACT</span><span class="value">29 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(91st %ile)</span></span></div>
         <div class="profile-row"><span class="label">Intended Major</span><span class="value">Animal Science / Pre-Veterinary</span></div>
         <div class="profile-row"><span class="label">Goal</span><span class="value">Doctor of Veterinary Medicine (DVM)</span></div>
@@ -874,11 +877,10 @@
     <div style="margin-top:22px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;">
       <h3 style="font-size:1rem;color:var(--primary-dark);margin-bottom:10px;">Merit Aid Notes</h3>
       <ul style="font-size:0.88rem;line-height:1.7;color:var(--text);padding-left:18px;">
-        <li><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.85 GPA likely $16-20K/year.</li>
+        <li id="meritKentucky"><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.85 GPA likely $16-20K/year.</li>
         <li><strong>Auburn:</strong> Competitive Presidential and Academic scholarships. $8-16K realistic.</li>
         <li><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats. $8-12K likely.</li>
         <li><strong>UGA:</strong> Zell Miller (full tuition) or HOPE (partial) for Georgia residents meeting requirements.</li>
-        <li><strong>LSU:</strong> Generous automatic OOS merit. 3.85 GPA comfortably qualifies for $14-18K/year.</li>
         <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> Limited OOS merit. Don't bank on it.</li>
       </ul>
     </div>
@@ -919,13 +921,13 @@
     <div class="strat-explainer">
       <h3>Student Profile (Inputs)</h3>
       <p>All calculations use Avery's current stats as inputs:</p>
-      <table style="width:100%;margin-top:10px;font-size:0.88rem;">
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Targeted GPA</td><td>3.85</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite</td><td>27 (87th %ile)</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">English</td><td>23 (73rd %ile)</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Math</td><td>28 (90th %ile)</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Reading</td><td>30 (90th %ile)</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Science</td><td>33 (97th %ile)</td></tr>
+      <table id="profileInfoTable" style="width:100%;margin-top:10px;font-size:0.88rem;">
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Targeted GPA</td><td data-field="gpa">3.85</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite</td><td data-act="composite">27 (87th %ile)</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">English</td><td data-act="english">23 (73rd %ile)</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Math</td><td data-act="math">28 (90th %ile)</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Reading</td><td data-act="reading">30 (90th %ile)</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Science</td><td data-act="science">33 (97th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Target ACT</td><td>29 (91st %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Residency</td><td>Georgia (OOS everywhere except UGA)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Intended Major</td><td>Pre-Veterinary / Animal Science</td></tr>
@@ -1055,7 +1057,7 @@
         <tbody>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#16a34a;">SAFETY</td>
-            <td style="padding:8px 12px;">Acceptance rate &gt;70%, or Avery's 3.85 GPA and ACT 27 are well above the school's middle 50% range</td>
+            <td id="catSafetyDesc" style="padding:8px 12px;">Acceptance rate &gt;70%, or Avery's 3.85 GPA and ACT 27 are well above the school's middle 50% range</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">MATCH</td>
@@ -1063,7 +1065,7 @@
           </tr>
           <tr>
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">REACH</td>
-            <td style="padding:8px 12px;">Acceptance rate &lt;35%, or Avery's ACT 27 below the school's 25th percentile (e.g., UGA at 33%, UF at 24%)</td>
+            <td id="catReachDesc" style="padding:8px 12px;">Acceptance rate &lt;35%, or Avery's ACT 27 below the school's 25th percentile (e.g., UGA at 33%, UF at 24%)</td>
           </tr>
         </tbody>
       </table>
@@ -1669,6 +1671,8 @@ if (!data.rankings) data.rankings = {};
 if (!data.tripNotes) data.tripNotes = {};
 if (!data.tourChecklist) data.tourChecklist = null;
 if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
+if (!data.actScores) data.actScores = { composite: 27, english: 23, math: 28, reading: 30, science: 33 };
+if (!data.gpa) data.gpa = 3.85;
 
 // ─── Migrate: backfill new fields from schoolDB for existing saved schools ───
 (function migrate() {
@@ -1710,6 +1714,60 @@ if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
   if (changed) saveData();
   localStorage.setItem('rankingsDataV2', '1');
 })();
+
+// ─── ACT Score Helpers ───
+const ACT_PERCENTILES = {
+  36:99,35:99,34:99,33:98,32:97,31:96,30:94,29:91,28:88,27:85,
+  26:82,25:78,24:74,23:68,22:63,21:57,20:51,19:44,18:38,17:31,16:25
+};
+function actPercentile(score) { return ACT_PERCENTILES[score] || '—'; }
+function getStudentACT() { return data.actScores || { composite:27, english:23, math:28, reading:30, science:33 }; }
+function getStudentGPA() { return data.gpa || 3.85; }
+
+function renderProfile() {
+  const act = getStudentACT();
+  const gpa = getStudentGPA();
+  // Profile card
+  const pc = document.getElementById('profileCard');
+  if (pc) {
+    pc.querySelector('[data-act="composite"]').textContent = act.composite;
+    pc.querySelector('[data-act="composite-pct"]').textContent = '(' + actPercentile(act.composite) + getSuffix(actPercentile(act.composite)) + ' %ile)';
+    pc.querySelector('[data-act="english"]').textContent = act.english;
+    pc.querySelector('[data-act="english-pct"]').textContent = '(' + actPercentile(act.english) + getSuffix(actPercentile(act.english)) + ' %ile)';
+    pc.querySelector('[data-act="math"]').textContent = act.math;
+    pc.querySelector('[data-act="math-pct"]').textContent = '(' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)';
+    pc.querySelector('[data-act="reading"]').textContent = act.reading;
+    pc.querySelector('[data-act="reading-pct"]').textContent = '(' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)';
+    pc.querySelector('[data-act="science"]').textContent = act.science;
+    pc.querySelector('[data-act="science-pct"]').textContent = '(' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)';
+    pc.querySelector('[data-field="gpa"]').textContent = gpa;
+  }
+  // Info table
+  const it = document.getElementById('profileInfoTable');
+  if (it) {
+    it.querySelector('[data-act="composite"]').textContent = act.composite + ' (' + actPercentile(act.composite) + getSuffix(actPercentile(act.composite)) + ' %ile)';
+    it.querySelector('[data-act="english"]').textContent = act.english + ' (' + actPercentile(act.english) + getSuffix(actPercentile(act.english)) + ' %ile)';
+    it.querySelector('[data-act="math"]').textContent = act.math + ' (' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)';
+    it.querySelector('[data-act="reading"]').textContent = act.reading + ' (' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)';
+    it.querySelector('[data-act="science"]').textContent = act.science + ' (' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)';
+    it.querySelector('[data-field="gpa"]').textContent = gpa;
+  }
+  // Category descriptions
+  const safetyDesc = document.getElementById('catSafetyDesc');
+  const reachDesc = document.getElementById('catReachDesc');
+  if (safetyDesc) safetyDesc.textContent = 'Acceptance rate >70%, or Avery\u2019s ' + gpa + ' GPA and ACT ' + act.composite + ' are well above the school\u2019s middle 50% range';
+  if (reachDesc) reachDesc.textContent = 'Acceptance rate <35%, or Avery\u2019s ACT ' + act.composite + ' below the school\u2019s 25th percentile (e.g., UGA at 33%, UF at 24%)';
+  // Merit note
+  const kyMerit = document.getElementById('meritKentucky');
+  if (kyMerit) kyMerit.innerHTML = '<strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. ' + act.composite + ' ACT + ' + gpa + ' GPA likely $16-20K/year.';
+}
+
+function getSuffix(n) {
+  if (typeof n !== 'number') return '';
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return (s[(v-20)%10] || s[v] || s[0]);
+}
 
 // ─── Main Tabs ───
 document.querySelectorAll('.tab-btn[data-group]').forEach(btn => {
@@ -3253,7 +3311,8 @@ function renderScenarios() {
   if (byPrestige.length) scenarios.push({ label: 'If program prestige matters most', value: topN(byPrestige, 3) });
 
   // 3. If ACT reaches 29-30 — schools where that threshold shifts positioning
-  const actShifters = scored.filter(s => s.actLow !== null && s.actLow >= 27 && s.actLow <= 31);
+  const curACT = getStudentACT().composite;
+  const actShifters = scored.filter(s => s.actLow !== null && s.actLow >= curACT && s.actLow <= curACT + 4);
   if (actShifters.length) {
     // Show schools where 29-30 puts Avery at or above the 25th %ile
     const names = actShifters.sort((a, b) => b.combined - a.combined).map(s => {
@@ -4127,8 +4186,38 @@ function renderAll() {
   renderEssays();
   syncEssayStatusToChecklists();
   renderGreekLife();
+  renderProfile();
 }
 renderAll();
+
+// ─── ACT Score Editing ───
+document.getElementById('profileCard').addEventListener('blur', function(e) {
+  const el = e.target;
+  if (!el.classList.contains('act-edit')) return;
+  const field = el.dataset.act;
+  const gpaField = el.dataset.field;
+  if (field) {
+    const val = parseInt(el.textContent.trim());
+    if (isNaN(val) || val < 1 || val > 36) { renderProfile(); return; }
+    data.actScores[field] = val;
+    saveData();
+    renderProfile();
+    renderSummary(); // re-derive scenarios with new score
+  } else if (gpaField === 'gpa') {
+    const val = parseFloat(el.textContent.trim());
+    if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
+    data.gpa = val;
+    saveData();
+    renderProfile();
+    renderSummary();
+  }
+}, true);
+document.getElementById('profileCard').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.target.classList.contains('act-edit')) {
+    e.preventDefault();
+    e.target.blur();
+  }
+}, true);
 
 // ─── Firestore real-time sync ───
 docRef.onSnapshot(snap => {
