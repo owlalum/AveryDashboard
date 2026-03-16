@@ -4327,6 +4327,62 @@ docRef.onSnapshot(snap => {
 // ─── Changelog / What's New ───
 const CHANGELOG = [
   {
+    version: '4.3',
+    date: '2026-03-16',
+    title: 'Remove Unverified Ag Acceptance Rates',
+    items: [
+      'Removed Ag % and OOS Ag % columns from School Comparison — data was unverifiable for 20 of 21 schools',
+      'Cleaned up modal form, save logic, export, and auto-populate to match'
+    ]
+  },
+  {
+    version: '4.2',
+    date: '2026-03-16',
+    title: 'Departmental Honors & Tennessee CHP',
+    items: [
+      'Added University of Tennessee Chancellor\'s Honors Program (deadline Nov 19, three essays, 4.0 weighted GPA required)',
+      'Added departmental honors notes to 11 schools (Texas A&M, Cornell, UC Davis, UW-Madison, UF, Ohio State, LSU, Penn State, Clemson, Auburn, Virginia Tech)',
+      'Fixed UW-Madison: replaced incorrect L&S reference with CALS Honors in Research details',
+      'Added separate honors rec letter checklist items for Penn State (2 recs), Clemson (2 recs), Kansas State (1 rec)'
+    ]
+  },
+  {
+    version: '4.1',
+    date: '2026-03-16',
+    title: 'Application & Honors College Checklist Sections',
+    items: [
+      'Each school\'s checklist now has two sections: Application and Honors College',
+      'Honors section has "Applying / Not applying" toggle — grays out entire section when not applying',
+      'Opted-out honors items excluded from completion percentage',
+      'Essay Tracker respects honors opt-out: grays out honors essays and excludes from stats',
+      'Regular essay checklist items are now read-only (auto-synced with Essay Tracker)',
+      'Honors essay items remain fully manual'
+    ]
+  },
+  {
+    version: '4.0',
+    date: '2026-03-16',
+    title: 'Honest Ag Advantage & Strategy Redesign',
+    items: [
+      'Replaced estimated Ag admit rates with honest confidence tiers (Verified / Structural / Likely / Minimal)',
+      'Only Purdue has verified published college-level admit data (55.8%)',
+      'Added data transparency note explaining methodology',
+      'All school lists now filter to match School Comparison (Executive Summary, Financial Analysis, Strategy)',
+      'Fixed manual refresh and Update Now buttons (now clear SW cache before reload)'
+    ]
+  },
+  {
+    version: '3.5',
+    date: '2026-03-16',
+    title: 'Admission Strategy with Pre-Vet Details',
+    items: [
+      'Redesigned strategy table: 21 schools with exact major names, pre-vet tracks, and backup majors',
+      'Removed Engineering Rate column — replaced with Pre-Vet Track and Backup Major',
+      'Fixed school logos that were not displaying',
+      '15 of 21 schools have formal pre-vet concentrations; 10 require a second-choice major'
+    ]
+  },
+  {
     version: '3.4',
     date: '2026-03-16',
     title: 'Admission Strategy Redesign',
@@ -4468,13 +4524,18 @@ const CHANGELOG = [
 
 const CHANGELOG_SEEN_KEY = 'averyChangelogSeen';
 
+function versionToNum(v) {
+  const parts = String(v).split('.');
+  return (parseInt(parts[0]) || 0) * 1000 + (parseInt(parts[1]) || 0);
+}
+
 function getSeenVersion() {
   return localStorage.getItem(CHANGELOG_SEEN_KEY) || '0';
 }
 
 function getUnreadEntries() {
-  const seen = getSeenVersion();
-  return CHANGELOG.filter(e => e.version > seen);
+  const seenNum = versionToNum(getSeenVersion());
+  return CHANGELOG.filter(e => versionToNum(e.version) > seenNum);
 }
 
 function renderChangelog() {
@@ -4490,9 +4551,9 @@ function renderChangelog() {
     badge.style.display = 'none';
   }
 
-  const seen = getSeenVersion();
+  const seenNum = versionToNum(getSeenVersion());
   body.innerHTML = CHANGELOG.map(entry => {
-    const isNew = entry.version > seen;
+    const isNew = versionToNum(entry.version) > seenNum;
     return `
     <div class="changelog-entry">
       <div class="changelog-entry-header">
