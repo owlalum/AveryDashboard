@@ -1243,12 +1243,12 @@
     <div class="section-head"><h2>Admission Strategy</h2><p>Choosing the right major on your application</p></div>
     <div class="strat-explainer">
       <h3>The Animal Science Advantage</h3>
-      <p>Selecting the right major on the application gives Avery a <span class="strat-highlight">5&ndash;15+ percentage point</span> admission advantage at most schools.</p>
-      <p style="margin-top:10px;">At many universities, the College of Agriculture admits at a higher rate than the university overall. At "direct-admit" schools like Purdue, Virginia Tech, and NC State, students are admitted to a specific major &mdash; so major choice directly affects admission odds. Even at "university-wide" schools, indicating Animal Science signals clear intent and aligns Avery with a less competitive applicant pool. This strategy costs nothing and provides meaningful advantage.</p>
+      <p>At schools with "direct-admit" systems (Purdue, Virginia Tech, NC State, etc.), students are admitted to a specific college or major &mdash; and the College of Agriculture typically admits at a higher rate than Engineering, Business, or the university overall. Even at "university-wide" schools, selecting Animal Science signals clear intent and aligns Avery with a less competitive applicant pool. This strategy costs nothing.</p>
+      <p style="margin-top:10px;font-size:0.85rem;color:var(--text-light)"><strong>Data transparency:</strong> Very few schools publish college-level admission rates. Where a rate is published by the university, it is marked with a <span style="color:var(--accent);font-weight:700">&#10003;</span> below. All other advantage assessments are qualitative, based on admission structure (direct-to-major vs. university-wide) and publicly available overall rates.</p>
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>School</th><th>How Admission Works</th><th>Overall Rate</th><th>Ag Rate</th><th>Advantage</th><th>Primary Major</th><th>Pre-Vet Track</th><th>Backup Major</th></tr></thead>
+        <thead><tr><th>School</th><th>How Admission Works</th><th>Overall Rate</th><th>Ag Advantage</th><th>Primary Major</th><th>Pre-Vet Track</th><th>Backup Major</th></tr></thead>
         <tbody id="strategyBody"></tbody>
       </table>
     </div>
@@ -3537,28 +3537,30 @@ function deleteTourItem(section, itemId) {
 }
 
 // ─── Admission Strategy ───
+// Advantage levels: 'verified' = published official data, 'structural' = direct-admit system favors Ag,
+// 'likely' = university-wide but Ag is historically less competitive, 'minimal' = high overall rate, little difference
 const STRATEGY_DATA = [
-  { school:'Texas A&M University', type:'University-Wide', overall:'~57%', ag:'~65%', adv:'+8 pts', major:'Animal Science (Science Option)', track:'Pre-vet advising via CVM', backup:'Biology (required 2nd choice)' },
-  { school:'University of Georgia', type:'University-Wide', overall:'~33%', ag:'~45%', adv:'+12 pts', major:'Animal Science or Animal Health', track:'Animal Health = 3+1 DVM pathway', backup:'Biological Science (co-major for Animal Health)' },
-  { school:'Cornell University', type:'Direct to College', overall:'~8%', ag:'~11%', adv:'+3 pts', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Cannot list second college' },
-  { school:'UC Davis', type:'Direct to Major', overall:'~42%', ag:'~51%', adv:'+9 pts', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Biological Sciences (alternate encouraged)' },
-  { school:'Colorado State University', type:'University-Wide', overall:'~89%', ag:'~92%', adv:'+3 pts', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Not required' },
-  { school:'Virginia Tech', type:'Direct to Major', overall:'~55%', ag:'~63%', adv:'+8 pts', major:'Animal and Poultry Sciences', track:'Pre-Vet Option (formal)', backup:'University Studies (recommended 2nd choice)' },
-  { school:'Purdue University', type:'Direct to College & Major', overall:'~50%', ag:'~60%', adv:'+10 pts', major:'Animal Sciences', track:'Pre-Vet Medicine Concentration', backup:'Biology or Biochemistry (2nd choice required)' },
-  { school:'University of Florida', type:'University-Wide', overall:'~23%', ag:'~34%', adv:'+11 pts', major:'Animal Sciences', track:'Animal Biology specialization (pre-vet)', backup:'Not required' },
-  { school:'Ohio State University', type:'Direct to College', overall:'~51%', ag:'~58%', adv:'+7 pts', major:'Animal Sciences', track:'Animal Biosciences specialization', backup:'Not required' },
-  { school:'University of Minnesota', type:'College-Level', overall:'~75%', ag:'~80%', adv:'+5 pts', major:'Animal Science', track:'Pre-Vet Science emphasis (formal)', backup:'Alternate college encouraged on app' },
-  { school:'Michigan State University', type:'University-Wide', overall:'~84%', ag:'~88%', adv:'+4 pts', major:'Animal Science', track:'Animal Biology & Preveterinary concentration', backup:'Optional (Animal Sci is non-restricted)' },
-  { school:'Iowa State University', type:'Direct to College', overall:'~90%', ag:'~93%', adv:'+3 pts', major:'Animal Science', track:'Pre-Vet Medicine emphasis (formal)', backup:'Not required' },
-  { school:'North Carolina State University', type:'Direct to Major', overall:'~40%', ag:'~49%', adv:'+9 pts', major:'Animal Science', track:'Veterinary Bioscience Concentration', backup:'Biological Sciences (2nd choice required)' },
-  { school:'University of Wisconsin-Madison', type:'University-Wide', overall:'~43%', ag:'~52%', adv:'+9 pts', major:'Animal and Veterinary Biosciences', track:'Entire major IS the pre-vet pathway', backup:'2nd choice required on app' },
-  { school:'Auburn University', type:'University-Wide', overall:'~46%', ag:'~58%', adv:'+12 pts', major:'Animal Sciences', track:'Pre-Vet & Animal Biosciences Option', backup:'Not required' },
-  { school:'Kansas State University', type:'University-Wide', overall:'~82%', ag:'~86%', adv:'+4 pts', major:'Animal Sciences and Industry', track:'Science/Pre-Vet Option (formal)', backup:'Not required' },
-  { school:'Clemson University', type:'Direct to Major', overall:'~42%', ag:'~53%', adv:'+11 pts', major:'Animal and Veterinary Sciences', track:'Preveterinary and Science Concentration', backup:'Biological Sciences (encouraged)' },
-  { school:'Penn State University', type:'University-Wide + ETM', overall:'~57%', ag:'~67%', adv:'+10 pts', major:'Veterinary and Biomedical Sciences', track:'Dedicated pre-vet major (or Animal Sci, Science option)', backup:'Division of Undergraduate Studies' },
-  { school:'University of Kentucky', type:'University-Wide', overall:'~93%', ag:'~95%', adv:'+2 pts', major:'Animal Sciences', track:'Pre-Professional focus + Pre-Vet Certificate', backup:'Not required' },
-  { school:'University of Tennessee', type:'Direct to College & Major', overall:'~39%', ag:'~52%', adv:'+13 pts', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Not required' },
-  { school:'Louisiana State University', type:'Direct to College', overall:'~73%', ag:'~80%', adv:'+7 pts', major:'Animal Sciences', track:'Pre-Vet Medicine concentration (3+1 to LSU SVM)', backup:'Not required' }
+  { school:'Purdue University', type:'Direct to College & Major', overall:'~50%', advantage:'verified', advDetail:'Ag: 55.8% vs 50% overall', major:'Animal Sciences', track:'Pre-Vet Medicine Concentration', backup:'Biology or Biochemistry (2nd choice required)' },
+  { school:'Texas A&M University', type:'University-Wide', overall:'~57%', advantage:'likely', advDetail:'Ag college data in ABPA dashboard (not public)', major:'Animal Science (Science Option)', track:'Pre-vet advising via CVM', backup:'Biology (required 2nd choice)' },
+  { school:'University of Georgia', type:'University-Wide', overall:'~33%', advantage:'likely', advDetail:'CAES is less competitive than Terry Business / Engineering', major:'Animal Science or Animal Health', track:'Animal Health = 3+1 DVM pathway', backup:'Biological Science (co-major for Animal Health)' },
+  { school:'Cornell University', type:'Direct to College', overall:'~8%', advantage:'structural', advDetail:'CALS admits separately from Arts & Sciences; Ag is less competitive', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Cannot list second college' },
+  { school:'UC Davis', type:'Direct to Major', overall:'~42%', advantage:'structural', advDetail:'UC InfoCenter shows Ag discipline rates (data available by discipline)', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Biological Sciences (alternate encouraged)' },
+  { school:'Colorado State University', type:'University-Wide', overall:'~89%', advantage:'minimal', advDetail:'Very high overall rate; Ag not meaningfully different', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Not required' },
+  { school:'Virginia Tech', type:'Direct to Major', overall:'~55%', advantage:'structural', advDetail:'Direct-admit system; CALS majors less competitive than Engineering', major:'Animal and Poultry Sciences', track:'Pre-Vet Option (formal)', backup:'University Studies (recommended 2nd choice)' },
+  { school:'University of Florida', type:'University-Wide', overall:'~23%', advantage:'likely', advDetail:'Highly competitive overall; CALS/IFAS historically less selective', major:'Animal Sciences', track:'Animal Biology specialization (pre-vet)', backup:'Not required' },
+  { school:'Ohio State University', type:'Direct to College', overall:'~51%', advantage:'structural', advDetail:'CFAES admits separately; historically higher rate than Fisher/Engineering', major:'Animal Sciences', track:'Animal Biosciences specialization', backup:'Not required' },
+  { school:'University of Minnesota', type:'College-Level', overall:'~75%', advantage:'likely', advDetail:'CFANS is less competitive than Carlson Business / CSE', major:'Animal Science', track:'Pre-Vet Science emphasis (formal)', backup:'Alternate college encouraged on app' },
+  { school:'Michigan State University', type:'University-Wide', overall:'~84%', advantage:'minimal', advDetail:'High overall rate; Animal Science is non-restricted major', major:'Animal Science', track:'Animal Biology & Preveterinary concentration', backup:'Optional (Animal Sci is non-restricted)' },
+  { school:'Iowa State University', type:'Direct to College', overall:'~90%', advantage:'minimal', advDetail:'Very high overall rate; Ag not meaningfully different', major:'Animal Science', track:'Pre-Vet Medicine emphasis (formal)', backup:'Not required' },
+  { school:'North Carolina State University', type:'Direct to Major', overall:'~40%', advantage:'structural', advDetail:'Direct-admit; CALS majors less competitive than Engineering/CS', major:'Animal Science', track:'Veterinary Bioscience Concentration', backup:'Biological Sciences (2nd choice required)' },
+  { school:'University of Wisconsin-Madison', type:'University-Wide', overall:'~43%', advantage:'minimal', advDetail:'Admits to university, not college; CALS has no separate rate', major:'Animal and Veterinary Biosciences', track:'Entire major IS the pre-vet pathway', backup:'2nd choice required on app' },
+  { school:'Auburn University', type:'University-Wide', overall:'~46%', advantage:'likely', advDetail:'College of Ag historically less competitive than Engineering/Business', major:'Animal Sciences', track:'Pre-Vet & Animal Biosciences Option', backup:'Not required' },
+  { school:'Kansas State University', type:'University-Wide', overall:'~82%', advantage:'minimal', advDetail:'High overall rate; minimal difference by college', major:'Animal Sciences and Industry', track:'Science/Pre-Vet Option (formal)', backup:'Not required' },
+  { school:'Clemson University', type:'Direct to Major', overall:'~42%', advantage:'structural', advDetail:'Direct-admit; CAFLS data likely in factbook (not publicly confirmed)', major:'Animal and Veterinary Sciences', track:'Preveterinary and Science Concentration', backup:'Biological Sciences (encouraged)' },
+  { school:'Penn State University', type:'University-Wide + ETM', overall:'~57%', advantage:'likely', advDetail:'Ag Sciences less competitive than Engineering/Smeal; ETM required after admission', major:'Veterinary and Biomedical Sciences', track:'Dedicated pre-vet major (or Animal Sci, Science option)', backup:'Division of Undergraduate Studies' },
+  { school:'University of Kentucky', type:'University-Wide', overall:'~93%', advantage:'minimal', advDetail:'Very high overall rate; essentially open admission', major:'Animal Sciences', track:'Pre-Professional focus + Pre-Vet Certificate', backup:'Not required' },
+  { school:'University of Tennessee', type:'Direct to College & Major', overall:'~39%', advantage:'structural', advDetail:'Herbert College of Ag admits separately; less competitive than Tickle Engineering', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Not required' },
+  { school:'Louisiana State University', type:'Direct to College', overall:'~73%', advantage:'likely', advDetail:'College of Ag admits freshmen directly; less competitive than Flores Business', major:'Animal Sciences', track:'Pre-Vet Medicine concentration (3+1 to LSU SVM)', backup:'Not required' }
 ];
 
 function renderStrategy() {
@@ -3568,20 +3570,26 @@ function renderStrategy() {
   const activeStrategy = STRATEGY_DATA.filter(s => stratActiveNames.includes(s.school));
 
   if (activeStrategy.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see admission strategy.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see admission strategy.</td></tr>';
     return;
   }
 
+  const advBadge = (level) => {
+    switch(level) {
+      case 'verified':   return '<span title="Published by university" style="display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--accent)">&#10003; Verified</span>';
+      case 'structural': return '<span title="Direct-admit system structurally favors Ag" style="display:inline-flex;align-items:center;gap:4px;font-weight:600;color:var(--primary)">Structural</span>';
+      case 'likely':     return '<span title="Ag colleges are historically less competitive" style="display:inline-flex;align-items:center;gap:4px;font-weight:600;color:#9a7b1e">Likely</span>';
+      case 'minimal':    return '<span title="High overall rate or university-wide admits; little difference" style="display:inline-flex;align-items:center;gap:4px;color:var(--text-light)">Minimal</span>';
+      default:           return '';
+    }
+  };
+
   tbody.innerHTML = activeStrategy.map(s => {
-    // Parse advantage for color-coding
-    const advNum = parseInt((s.adv.match(/\d+/) || ['0'])[0]);
-    const advColor = advNum >= 10 ? 'var(--accent)' : advNum >= 5 ? 'var(--primary)' : 'var(--text-light)';
     return `<tr>
       <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.school, 22)} ${esc(s.school)}</span></td>
       <td class="compact" style="font-size:0.78rem">${esc(s.type)}</td>
       <td class="compact">${s.overall}</td>
-      <td class="compact" style="font-weight:600;color:var(--accent)">${s.ag}</td>
-      <td class="compact" style="font-weight:700;color:${advColor}">${s.adv}</td>
+      <td class="compact" style="font-size:0.78rem">${advBadge(s.advantage)}<div style="font-size:0.72rem;color:var(--text-light);margin-top:2px;max-width:200px">${esc(s.advDetail)}</div></td>
       <td style="font-size:0.82rem;font-weight:600">${esc(s.major)}</td>
       <td style="font-size:0.78rem">${esc(s.track)}</td>
       <td style="font-size:0.78rem;color:${s.backup === 'Not required' || s.backup === 'Cannot list second college' ? 'var(--text-light)' : 'var(--primary-dark)'}">${esc(s.backup)}</td>
