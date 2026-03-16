@@ -2026,6 +2026,13 @@ function collapseAllChecklists() {
   document.querySelectorAll('.checklist-school').forEach(el => el.classList.remove('open'));
 }
 
+// Regex helpers for essay item detection
+const REGULAR_ESSAY_RE = /\bwrite\b.*\bessay\b|\bessay\b.*\bwrite\b|\bpersonal (essay|statement)\b|\bsupplemental essay\b|\bshort.?answer\b|\bpiq\b|\bpersonal insight\b|\but prosim\b|\bwhy (purdue|tufts|berry|arizona)\b|\bwhy this major\b|\bwhy first.?choice\b|\bwhy second.?choice\b|\bmeaningful extracurricular\b|\bcommon app essay\b/i;
+const HONORS_ESSAY_RE = /\bhonors\b.*\bessay\b|\bhonors\b.*\bappl/i;
+
+function isRegularEssayItem(text) { return REGULAR_ESSAY_RE.test(text) && !HONORS_ESSAY_RE.test(text); }
+function isHonorsEssayItem(text) { return HONORS_ESSAY_RE.test(text); }
+
 function renderChecklists() {
   const container = document.getElementById('checklistContainer');
   const empty = document.getElementById('checklistEmpty');
@@ -2049,11 +2056,13 @@ function renderChecklists() {
       <div class="checklist-body">
         <div class="checklist-items">
           ${cl.items.map(item => {
-            const isEssayLinked = /\bwrite\b.*\bessay\b|\bessay\b.*\bwrite\b|\bpersonal (essay|statement)\b|\bsupplemental essay\b|\bshort.?answer\b|\bpiq\b|\bpersonal insight\b|\but prosim\b|\bwhy (purdue|tufts|berry|arizona)\b|\bwhy this major\b|\bwhy first.?choice\b|\bwhy second.?choice\b|\bmeaningful extracurricular\b|\bcommon app essay\b|\bhonors.*essay\b/i.test(item.text);
+            const isRegularEssay = isRegularEssayItem(item.text);
+            const isHonorsEssay = isHonorsEssayItem(item.text);
+            const isReadOnly = isRegularEssay && !isHonorsEssay;
             return `
             <div class="checklist-item" data-iid="${item.id}">
-              <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleCheckItem('${cl.id}','${item.id}',this.checked)"${isEssayLinked ? ' title="Synced with Essay Tracker"' : ''}>
-              <span class="item-text ${item.done ? 'done' : ''}" contenteditable="true" data-clid="${cl.id}" data-iid="${item.id}">${esc(item.text)}${isEssayLinked ? ' <span style="font-size:0.7rem;color:var(--primary);font-style:italic;pointer-events:none"> (synced with Essays tab)</span>' : ''}</span>
+              <input type="checkbox" ${item.done ? 'checked' : ''} ${isReadOnly ? 'disabled title="Auto-synced with Essay Tracker — complete essays in the Essays tab"' : `onchange="toggleCheckItem('${cl.id}','${item.id}',this.checked)"`}${isReadOnly ? ' style="opacity:0.6;cursor:not-allowed"' : ''}>
+              <span class="item-text ${item.done ? 'done' : ''}" contenteditable="true" data-clid="${cl.id}" data-iid="${item.id}">${esc(item.text)}${isReadOnly ? ' <span style="font-size:0.7rem;color:var(--primary);font-style:italic;pointer-events:none"> (auto-synced with Essays tab)</span>' : ''}</span>
               <span class="delete-item" onclick="deleteCheckItem('${cl.id}','${item.id}')">&times;</span>
             </div>`;
           }).join('')}
@@ -2085,7 +2094,13 @@ function toggleCheckItem(clId, itemId, checked) {
   const cl = data.checklists.find(c => c.id === clId);
   if (cl) {
     const item = cl.items.find(i => i.id === itemId);
-    if (item) { item.done = checked; saveData(); renderChecklists(); }
+    if (!item) return;
+    // Prevent manual toggle on auto-synced essay items
+    if (isRegularEssayItem(item.text) && !isHonorsEssayItem(item.text)) {
+      renderChecklists(); // re-render to reset checkbox state
+      return;
+    }
+    item.done = checked; saveData(); renderChecklists();
   }
 }
 
@@ -4193,28 +4208,18 @@ function syncEssayStatusToChecklists() {
   let changed = false;
 
   for (const cl of data.checklists) {
-    // Get all essays for this school (including shared Common App)
-    const schoolEssays = data.essays.filter(e => e.school === cl.school || e.school === 'Shared');
+    // Get all NON-honors essays for this school (including shared Common App)
+    const schoolEssays = data.essays.filter(e =>
+      (e.school === cl.school || e.school === 'Shared') && !/^HONORS:/i.test(e.name)
+    );
 
     for (const item of cl.items) {
-      const txt = item.text.toLowerCase();
+      // Only auto-sync REGULAR essay items (not honors — those stay manual)
+      if (!isRegularEssayItem(item.text)) continue;
 
-      // Match checklist items that are about essays/writing
-      const isEssayItem = /\bwrite\b.*\bessay\b|\bessay\b.*\bwrite\b|\bpersonal (essay|statement)\b|\bsupplemental essay\b|\bshort.?answer\b|\bpiq\b|\bpersonal insight\b|\but prosim\b|\bwhy (purdue|tufts|berry|arizona)\b|\bwhy this major\b|\bwhy first.?choice\b|\bwhy second.?choice\b|\bmeaningful extracurricular\b|\bcommon app essay\b|\bhonors.*essay\b/i.test(item.text);
+      if (schoolEssays.length === 0) continue;
 
-      if (!isEssayItem) continue;
-
-      // Check if ALL relevant essays for this school are finalized
-      const relevantEssays = schoolEssays.filter(e => {
-        // For honors items, only match honors essays
-        if (/\bhonors\b/i.test(item.text)) return /^HONORS:/i.test(e.name);
-        // For regular essay items, match non-honors essays
-        return !/^HONORS:/i.test(e.name);
-      });
-
-      if (relevantEssays.length === 0) continue;
-
-      const allFinal = relevantEssays.every(e => e.status === 'final');
+      const allFinal = schoolEssays.every(e => e.status === 'final');
       if (item.done !== allFinal) {
         item.done = allFinal;
         changed = true;
