@@ -1240,15 +1240,15 @@
 
   <!-- Admission Strategy sub-panel -->
   <div id="strategy" class="sub-panel">
-    <div class="section-head"><h2>Admission Strategy</h2><p>Why applying to Animal Science matters</p></div>
+    <div class="section-head"><h2>Admission Strategy</h2><p>Choosing the right major on your application</p></div>
     <div class="strat-explainer">
       <h3>The Animal Science Advantage</h3>
-      <p>Avery gains <span class="strat-highlight">15-25 percentage points</span> in admission probability by applying to Animal Science vs. Engineering/CS/Business.</p>
-      <p style="margin-top:10px;">At "direct-admit" schools like Purdue and Texas A&amp;M, students are admitted to specific colleges, not the university as a whole. The College of Agriculture typically admits at 50-60% while Engineering admits at 30-35%. With Avery's 3.85 GPA and 27 ACT, she's competitive for Agriculture admits at nearly every school and well below the median for Engineering. This strategy costs nothing and provides meaningful advantage.</p>
+      <p>Selecting the right major on the application gives Avery a <span class="strat-highlight">5&ndash;15+ percentage point</span> admission advantage at most schools.</p>
+      <p style="margin-top:10px;">At many universities, the College of Agriculture admits at a higher rate than the university overall. At "direct-admit" schools like Purdue, Virginia Tech, and NC State, students are admitted to a specific major &mdash; so major choice directly affects admission odds. Even at "university-wide" schools, indicating Animal Science signals clear intent and aligns Avery with a less competitive applicant pool. This strategy costs nothing and provides meaningful advantage.</p>
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>School</th><th>Admission Type</th><th>Overall Rate</th><th>Engineering Rate</th><th>Ag/Bio Rate</th><th>Advantage</th><th>Recommended Major</th><th>Confidence</th></tr></thead>
+        <thead><tr><th>School</th><th>How Admission Works</th><th>Overall Rate</th><th>Ag Rate</th><th>Advantage</th><th>Primary Major</th><th>Pre-Vet Track</th><th>Backup Major</th></tr></thead>
         <tbody id="strategyBody"></tbody>
       </table>
     </div>
@@ -3509,34 +3509,44 @@ function deleteTourItem(section, itemId) {
 
 // ─── Admission Strategy ───
 const STRATEGY_DATA = [
-  { school:'Purdue University', type:'Direct to Major', overall:'43%', eng:'30-35%', ag:'55-56%', adv:'+20-25 pts', major:'Animal Sciences (Pre-Vet)', conf:'HIGH' },
-  { school:'Texas A&M University', type:'College-Level', overall:'63%', eng:'10-15%', ag:'~65%', adv:'+45-50 pts', major:'Animal Science', conf:'HIGH' },
-  { school:'Virginia Tech', type:'College-Level', overall:'55%', eng:'35-40%', ag:'60-65%', adv:'+20-25 pts', major:'Animal & Poultry Sciences', conf:'MEDIUM' },
-  { school:'NC State', type:'University-Wide', overall:'47%', eng:'30-35%', ag:'55-60%', adv:'+20-25 pts', major:'Animal Science', conf:'MEDIUM' },
-  { school:'Ohio State', type:'College-Level', overall:'51%', eng:'35-40%', ag:'55-60%', adv:'+15-20 pts', major:'Animal Sciences', conf:'MEDIUM' },
-  { school:'UGA', type:'Holistic', overall:'43%', eng:'~30%', ag:'50-55%', adv:'+20-25 pts', major:'Animal Health / Animal & Dairy Science', conf:'MEDIUM' },
-  { school:'Auburn', type:'College-Level', overall:'44%', eng:'~35%', ag:'55-60%', adv:'+20 pts', major:'Animal Sciences', conf:'MEDIUM' },
-  { school:'Clemson', type:'College-Level', overall:'43%', eng:'~30%', ag:'~55%', adv:'+20-25 pts', major:'Animal & Veterinary Sciences', conf:'MEDIUM' },
-  { school:'Kentucky', type:'University-Wide', overall:'90%+', eng:'N/A', ag:'N/A', adv:'Minimal', major:'Animal Science', conf:'HIGH' },
-  { school:'Tennessee', type:'University-Wide', overall:'80%+', eng:'N/A', ag:'N/A', adv:'Minimal', major:'Animal Science', conf:'HIGH' },
-  { school:'LSU', type:'University-Wide', overall:'75%+', eng:'N/A', ag:'N/A', adv:'Minimal', major:'Animal Sciences', conf:'HIGH' },
-  { school:'Florida', type:'University-Wide', overall:'23%', eng:'15-18%', ag:'30-35%', adv:'+15 pts', major:'Animal Sciences', conf:'MEDIUM' },
-  { school:'Wisconsin', type:'University-Wide', overall:'49%', eng:'~35%', ag:'55-60%', adv:'+20 pts', major:'Animal Sciences', conf:'MEDIUM' }
+  { school:'Texas A&M University', type:'University-Wide', overall:'~57%', ag:'~65%', adv:'+8 pts', major:'Animal Science (Science Option)', track:'Pre-vet advising via CVM', backup:'Biology (required 2nd choice)' },
+  { school:'University of Georgia', type:'University-Wide', overall:'~33%', ag:'~45%', adv:'+12 pts', major:'Animal Science or Animal Health', track:'Animal Health = 3+1 DVM pathway', backup:'Biological Science (co-major for Animal Health)' },
+  { school:'Cornell University', type:'Direct to College', overall:'~8%', ag:'~11%', adv:'+3 pts', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Cannot list second college' },
+  { school:'UC Davis', type:'Direct to Major', overall:'~42%', ag:'~51%', adv:'+9 pts', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Biological Sciences (alternate encouraged)' },
+  { school:'Colorado State University', type:'University-Wide', overall:'~89%', ag:'~92%', adv:'+3 pts', major:'Animal Science', track:'Pre-vet advising pathway', backup:'Not required' },
+  { school:'Virginia Tech', type:'Direct to Major', overall:'~55%', ag:'~63%', adv:'+8 pts', major:'Animal and Poultry Sciences', track:'Pre-Vet Option (formal)', backup:'University Studies (recommended 2nd choice)' },
+  { school:'Purdue University', type:'Direct to College & Major', overall:'~50%', ag:'~60%', adv:'+10 pts', major:'Animal Sciences', track:'Pre-Vet Medicine Concentration', backup:'Biology or Biochemistry (2nd choice required)' },
+  { school:'University of Florida', type:'University-Wide', overall:'~23%', ag:'~34%', adv:'+11 pts', major:'Animal Sciences', track:'Animal Biology specialization (pre-vet)', backup:'Not required' },
+  { school:'Ohio State University', type:'Direct to College', overall:'~51%', ag:'~58%', adv:'+7 pts', major:'Animal Sciences', track:'Animal Biosciences specialization', backup:'Not required' },
+  { school:'University of Minnesota', type:'College-Level', overall:'~75%', ag:'~80%', adv:'+5 pts', major:'Animal Science', track:'Pre-Vet Science emphasis (formal)', backup:'Alternate college encouraged on app' },
+  { school:'Michigan State University', type:'University-Wide', overall:'~84%', ag:'~88%', adv:'+4 pts', major:'Animal Science', track:'Animal Biology & Preveterinary concentration', backup:'Optional (Animal Sci is non-restricted)' },
+  { school:'Iowa State University', type:'Direct to College', overall:'~90%', ag:'~93%', adv:'+3 pts', major:'Animal Science', track:'Pre-Vet Medicine emphasis (formal)', backup:'Not required' },
+  { school:'North Carolina State University', type:'Direct to Major', overall:'~40%', ag:'~49%', adv:'+9 pts', major:'Animal Science', track:'Veterinary Bioscience Concentration', backup:'Biological Sciences (2nd choice required)' },
+  { school:'University of Wisconsin-Madison', type:'University-Wide', overall:'~43%', ag:'~52%', adv:'+9 pts', major:'Animal and Veterinary Biosciences', track:'Entire major IS the pre-vet pathway', backup:'2nd choice required on app' },
+  { school:'Auburn University', type:'University-Wide', overall:'~46%', ag:'~58%', adv:'+12 pts', major:'Animal Sciences', track:'Pre-Vet & Animal Biosciences Option', backup:'Not required' },
+  { school:'Kansas State University', type:'University-Wide', overall:'~82%', ag:'~86%', adv:'+4 pts', major:'Animal Sciences and Industry', track:'Science/Pre-Vet Option (formal)', backup:'Not required' },
+  { school:'Clemson University', type:'Direct to Major', overall:'~42%', ag:'~53%', adv:'+11 pts', major:'Animal and Veterinary Sciences', track:'Preveterinary and Science Concentration', backup:'Biological Sciences (encouraged)' },
+  { school:'Penn State University', type:'University-Wide + ETM', overall:'~57%', ag:'~67%', adv:'+10 pts', major:'Veterinary and Biomedical Sciences', track:'Dedicated pre-vet major (or Animal Sci, Science option)', backup:'Division of Undergraduate Studies' },
+  { school:'University of Kentucky', type:'University-Wide', overall:'~93%', ag:'~95%', adv:'+2 pts', major:'Animal Sciences', track:'Pre-Professional focus + Pre-Vet Certificate', backup:'Not required' },
+  { school:'University of Tennessee', type:'Direct to College & Major', overall:'~39%', ag:'~52%', adv:'+13 pts', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Not required' },
+  { school:'Louisiana State University', type:'Direct to College', overall:'~73%', ag:'~80%', adv:'+7 pts', major:'Animal Sciences', track:'Pre-Vet Medicine concentration (3+1 to LSU SVM)', backup:'Not required' }
 ];
 
 function renderStrategy() {
   const tbody = document.getElementById('strategyBody');
   tbody.innerHTML = STRATEGY_DATA.map(s => {
-    const confColor = s.conf === 'HIGH' ? 'var(--accent)' : 'var(--warn)';
+    // Parse advantage for color-coding
+    const advNum = parseInt((s.adv.match(/\d+/) || ['0'])[0]);
+    const advColor = advNum >= 10 ? 'var(--accent)' : advNum >= 5 ? 'var(--primary)' : 'var(--text-light)';
     return `<tr>
       <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.school, 22)} ${esc(s.school)}</span></td>
-      <td class="compact">${esc(s.type)}</td>
+      <td class="compact" style="font-size:0.78rem">${esc(s.type)}</td>
       <td class="compact">${s.overall}</td>
-      <td class="compact">${s.eng}</td>
       <td class="compact" style="font-weight:600;color:var(--accent)">${s.ag}</td>
-      <td class="compact" style="font-weight:700;color:var(--primary)">${s.adv}</td>
-      <td style="font-size:0.82rem">${esc(s.major)}</td>
-      <td class="compact" style="color:${confColor};font-weight:600">${s.conf}</td>
+      <td class="compact" style="font-weight:700;color:${advColor}">${s.adv}</td>
+      <td style="font-size:0.82rem;font-weight:600">${esc(s.major)}</td>
+      <td style="font-size:0.78rem">${esc(s.track)}</td>
+      <td style="font-size:0.78rem;color:${s.backup === 'Not required' || s.backup === 'Cannot list second college' ? 'var(--text-light)' : 'var(--primary-dark)'}">${esc(s.backup)}</td>
     </tr>`;
   }).join('');
 }
