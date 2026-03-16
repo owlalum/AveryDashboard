@@ -3589,7 +3589,7 @@ function renderStrategy() {
       <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.school, 22)} ${esc(s.school)}</span></td>
       <td class="compact" style="font-size:0.78rem">${esc(s.type)}</td>
       <td class="compact">${s.overall}</td>
-      <td class="compact" style="font-size:0.78rem">${advBadge(s.advantage)}<div style="font-size:0.72rem;color:var(--text-light);margin-top:2px;max-width:200px">${esc(s.advDetail)}</div></td>
+      <td style="font-size:0.78rem;min-width:160px;max-width:220px">${advBadge(s.advantage)}<div style="font-size:0.72rem;color:var(--text-light);margin-top:2px;line-height:1.3">${esc(s.advDetail)}</div></td>
       <td style="font-size:0.82rem;font-weight:600">${esc(s.major)}</td>
       <td style="font-size:0.78rem">${esc(s.track)}</td>
       <td style="font-size:0.78rem;color:${s.backup === 'Not required' || s.backup === 'Cannot list second college' ? 'var(--text-light)' : 'var(--primary-dark)'}">${esc(s.backup)}</td>
