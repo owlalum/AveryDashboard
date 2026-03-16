@@ -3279,8 +3279,17 @@ function renderSummary() {
   const tbody = document.getElementById('summaryRankBody');
   const maxTotal = calcMaxWeightedTotal();
 
+  // Filter to only schools in the user's comparison list
+  const activeNames = data.schools.map(s => s.name);
+  const activeSummary = SUMMARY_SCHOOLS.filter(s => activeNames.includes(s.name));
+
+  if (activeSummary.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see the executive summary.</td></tr>';
+    return;
+  }
+
   // Build rows with live scores
-  const rows = SUMMARY_SCHOOLS.map(s => {
+  const rows = activeSummary.map(s => {
     const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
     const visitScore = calcWeightedTotal(ev);
@@ -3360,7 +3369,27 @@ function renderFinancials(totalOverride) {
   document.getElementById('finTotal').textContent = '$' + total.toLocaleString();
 
   const tbody = document.getElementById('finBody');
-  tbody.innerHTML = FIN_DATA.map(row => {
+  // Filter to only schools in the user's comparison list
+  const finActiveNames = data.schools.map(s => s.name);
+  const activeFin = FIN_DATA.filter(row => row.group || finActiveNames.includes(row.school));
+  // Remove group headers that have no schools after them
+  const cleanedFin = activeFin.filter((row, i) => {
+    if (!row.group) return true;
+    // Keep group header only if next non-group row exists
+    const nextSchool = activeFin.slice(i + 1).find(r => !r.group);
+    const nextGroup = activeFin.slice(i + 1).find(r => r.group);
+    // If next item is another group or end of list, skip this header
+    if (!nextSchool) return false;
+    if (nextGroup && activeFin.indexOf(nextGroup) < activeFin.indexOf(nextSchool)) return false;
+    return true;
+  });
+
+  if (cleanedFin.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see financial analysis.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = cleanedFin.map(row => {
     if (row.group) return `<tr class="fin-group-header"><td colspan="9">${row.group}</td></tr>`;
     const realistic = row.sticker - row.merit;
     const fourYrSticker = row.sticker * 4;
@@ -3534,7 +3563,16 @@ const STRATEGY_DATA = [
 
 function renderStrategy() {
   const tbody = document.getElementById('strategyBody');
-  tbody.innerHTML = STRATEGY_DATA.map(s => {
+  // Filter to only schools in the user's comparison list
+  const stratActiveNames = data.schools.map(s => s.name);
+  const activeStrategy = STRATEGY_DATA.filter(s => stratActiveNames.includes(s.school));
+
+  if (activeStrategy.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see admission strategy.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = activeStrategy.map(s => {
     // Parse advantage for color-coding
     const advNum = parseInt((s.adv.match(/\d+/) || ['0'])[0]);
     const advColor = advNum >= 10 ? 'var(--accent)' : advNum >= 5 ? 'var(--primary)' : 'var(--text-light)';
