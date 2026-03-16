@@ -4173,9 +4173,9 @@ function renderEssays() {
     <div class="essay-stat-card"><div class="essay-stat-num">${total - done}</div><div class="essay-stat-label">Remaining</div></div>
   `;
 
-  // Group essays: Shared first, then by school
+  // Group all essays (including opted-out honors): Shared first, then by school
   const groups = {};
-  for (const e of essays) {
+  for (const e of data.essays) {
     const key = e.school;
     if (!groups[key]) groups[key] = [];
     groups[key].push(e);
