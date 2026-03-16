@@ -22,11 +22,10 @@ jobs:
         with:
           fetch-depth: 0  # Full history for commit log
 
-      - name: Get commit details
-        id: commits
+      - name: Get commit details and update files
+        id: update
         run: |
           # Get commits from this push that modified index.html or sw.js
-          # Use the before SHA if available, otherwise use parent of current
           BEFORE="${{ github.event.before }}"
           if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
             BEFORE="HEAD~1"
@@ -42,77 +41,77 @@ jobs:
 
           echo "skip=false" >> "$GITHUB_OUTPUT"
 
-          # Store messages for the script
+          # Store messages for Python script
           echo "$MESSAGES" > /tmp/commit_messages.txt
 
-          # Get the date
-          echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          # Use Python for reliable multiline file manipulation
+          python3 << 'PYEOF'
+import re, datetime
 
-      - name: Update changelog in index.html
-        if: steps.commits.outputs.skip == 'false'
-        run: |
-          DATE="${{ steps.commits.outputs.date }}"
+# Read commit messages
+with open('/tmp/commit_messages.txt') as f:
+    messages = [line.strip() for line in f if line.strip() and not line.startswith('Co-Authored-By')]
 
-          # Read commit messages and build changelog items
-          ITEMS=""
-          while IFS= read -r msg; do
-            # Skip empty lines and Co-Authored-By lines
-            [ -z "$msg" ] && continue
-            [[ "$msg" == Co-Authored-By* ]] && continue
+if not messages:
+    print("No messages to process")
+    exit(0)
 
-            # Clean up the message: use the commit subject line as-is
-            CLEAN=$(echo "$msg" | sed "s/'/\\\\'/g" | sed 's/"/\\\\"/g')
-            ITEMS="${ITEMS}      '${CLEAN}',\n"
-          done < /tmp/commit_messages.txt
+# Read index.html
+with open('index.html') as f:
+    html = f.read()
 
-          if [ -z "$ITEMS" ]; then
-            echo "No items to add"
-            exit 0
-          fi
+# Find current max version
+versions = re.findall(r"version:\s*'(\d+\.\d+)'", html)
+if versions:
+    major, minor = versions[0].split('.')
+    next_version = f"{major}.{int(minor) + 1}"
+else:
+    next_version = "3.4"
 
-          # Calculate next version: find current max version and increment minor
-          CURRENT_VERSION=$(grep -oP "version: '[0-9]+\.[0-9]+'" index.html | head -1 | grep -oP '[0-9]+\.[0-9]+')
-          if [ -z "$CURRENT_VERSION" ]; then
-            NEXT_VERSION="3.4"
-          else
-            MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
-            MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
-            NEXT_MINOR=$((MINOR + 1))
-            NEXT_VERSION="${MAJOR}.${NEXT_MINOR}"
-          fi
+# Build the changelog entry
+date = datetime.date.today().isoformat()
+title = messages[0][:60]
+items_js = ',\n'.join(f"      '{msg.replace(chr(39), chr(92) + chr(39))}'" for msg in messages)
 
-          # Build the title from the first commit message (truncated)
-          TITLE=$(head -1 /tmp/commit_messages.txt | cut -c1-60)
+entry = f"""  {{
+    version: '{next_version}',
+    date: '{date}',
+    title: '{title.replace(chr(39), chr(92) + chr(39))}',
+    items: [
+{items_js}
+    ]
+  }},"""
 
-          # Create the new changelog entry
-          NEW_ENTRY="  {\n    version: '${NEXT_VERSION}',\n    date: '${DATE}',\n    title: '${TITLE}',\n    items: [\n${ITEMS}    ]\n  },"
+# Insert after "const CHANGELOG = ["
+marker = "const CHANGELOG = ["
+idx = html.find(marker)
+if idx == -1:
+    print("ERROR: Could not find CHANGELOG marker")
+    exit(1)
 
-          # Insert after "const CHANGELOG = [" line
-          # Use a temp file to handle the multiline insertion
-          awk -v entry="$NEW_ENTRY" '
-            /^const CHANGELOG = \[/ {
-              print $0
-              printf "%b\n", entry
-              next
-            }
-            { print }
-          ' index.html > index.html.tmp && mv index.html.tmp index.html
+insert_pos = idx + len(marker)
+html = html[:insert_pos] + "\n" + entry + html[insert_pos:]
 
-          echo "Added changelog entry v${NEXT_VERSION}"
+with open('index.html', 'w') as f:
+    f.write(html)
 
-      - name: Bump service worker cache version
-        if: steps.commits.outputs.skip == 'false'
-        run: |
-          # Increment the cache version number in sw.js
-          CURRENT_CACHE=$(grep -oP "avery-dashboard-v\K[0-9]+" sw.js)
-          if [ -n "$CURRENT_CACHE" ]; then
-            NEXT_CACHE=$((CURRENT_CACHE + 1))
-            sed -i "s/avery-dashboard-v${CURRENT_CACHE}/avery-dashboard-v${NEXT_CACHE}/" sw.js
-            echo "Bumped cache to v${NEXT_CACHE}"
-          fi
+print(f"Added changelog entry v{next_version}: {title}")
+
+# Bump service worker cache version
+with open('sw.js') as f:
+    sw = f.read()
+
+cache_match = re.search(r'avery-dashboard-v(\d+)', sw)
+if cache_match:
+    old_ver = int(cache_match.group(1))
+    sw = sw.replace(f'avery-dashboard-v{old_ver}', f'avery-dashboard-v{old_ver + 1}')
+    with open('sw.js', 'w') as f:
+        f.write(sw)
+    print(f"Bumped cache to v{old_ver + 1}")
+PYEOF
 
       - name: Commit and push
-        if: steps.commits.outputs.skip == 'false'
+        if: steps.update.outputs.skip == 'false'
         run: |
           git config user.name "changelog-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
