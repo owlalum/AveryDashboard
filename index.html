@@ -2614,6 +2614,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research UT CVM pre-vet track & large teaching hospital', cat: 'program' },
     { text: 'Explore equine and farm animal program strengths', cat: 'program' },
+    { text: 'HONORS: Chancellor\'s Honors Program (CHP). Deadline Nov 19. Three essays (300 + 300 + 400 words) on academic journey, community need, and leadership. Requires 4.0 weighted core GPA to be invited to apply — check if Avery qualifies. Note: Dept. honors (Pre-Vet Medicine Concentration) available once enrolled.', cat: 'honors' },
   ],
   'University of Missouri': [
     { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
@@ -3716,10 +3717,10 @@ ${rows.map(r => `<Row>${r.map(c => xmlCell(c)).join('')}</Row>`).join('\n')}
 }
 
 // ─── One-time migration: regenerate checklists with tailored items ───
-if (!localStorage.getItem('checklistV9')) {
+if (!localStorage.getItem('checklistV10')) {
   data.checklists = [];
   if (!data.honorsOptOut) data.honorsOptOut = {};
-  localStorage.setItem('checklistV9', 'true');
+  localStorage.setItem('checklistV10', 'true');
 }
 // ─── One-time migration: reset rankings to use detailed presets ───
 if (!localStorage.getItem('rankingsV2')) {
@@ -3915,7 +3916,10 @@ const SCHOOL_ESSAYS = {
   ],
   'University of Tennessee': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays for general admission', required: true },
-    { name: 'CASNR Scholarship Essay', words: 500, prompt: 'Optional — recommended if applying as Animal Science major', required: false }
+    { name: 'CASNR Scholarship Essay', words: 500, prompt: 'Optional — recommended if applying as Animal Science major', required: false },
+    { name: 'HONORS: CHP Academic Journey Essay', words: 300, prompt: 'Reflect on your academic journey and why you want to join CHP. Deadline Nov 19. Requires 4.0 weighted GPA to apply.', required: false },
+    { name: 'HONORS: CHP Community Need Essay', words: 300, prompt: 'Identify a local community need that holds importance to you and explain how it relates to you personally or academically', required: false },
+    { name: 'HONORS: CHP Leadership Essay', words: 400, prompt: 'Describe how you have shown up as a leader through extracurriculars, jobs, sports, church, etc.', required: false }
   ],
   'University of Missouri': [
     { name: 'Test-Optional Essay', words: 300, prompt: 'Required only if not submitting test scores', required: false }
