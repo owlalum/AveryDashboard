@@ -284,6 +284,58 @@
   }
   .card-actions { margin-top: 12px; text-align: right; }
 
+  /* ── Deadline Timeline ── */
+  .timeline-container { position: relative; padding: 12px 0 12px 32px; }
+  .timeline-container::before { content: ''; position: absolute; left: 14px; top: 0; bottom: 0; width: 3px; background: var(--border); border-radius: 2px; }
+  .tl-month-group { margin-bottom: 24px; }
+  .tl-month-label { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary-dark); background: var(--primary-light); display: inline-block; padding: 4px 14px; border-radius: 20px; margin-bottom: 10px; position: relative; }
+  .tl-month-label::before { content: ''; position: absolute; left: -22px; top: 50%; transform: translateY(-50%); width: 11px; height: 11px; background: var(--primary); border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px var(--primary); }
+  .tl-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; margin-bottom: 4px; border-radius: 8px; background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,0.04); position: relative; transition: background 0.15s; }
+  .tl-item:hover { background: #f0f6f8; }
+  .tl-item::before { content: ''; position: absolute; left: -22px; top: 14px; width: 7px; height: 7px; background: var(--border); border-radius: 50%; }
+  .tl-item.tl-urgent::before { background: var(--danger); }
+  .tl-item.tl-soon::before { background: var(--warn); }
+  .tl-item.tl-done::before { background: var(--accent); }
+  .tl-date { font-size: 0.78rem; font-weight: 700; color: var(--text-light); min-width: 56px; padding-top: 2px; }
+  .tl-school-logo { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+  .tl-details { flex: 1; }
+  .tl-school-name { font-weight: 700; font-size: 0.88rem; color: var(--primary-dark); }
+  .tl-desc { font-size: 0.82rem; color: var(--text-light); margin-top: 1px; }
+  .tl-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .tl-badge.tl-ea { background: #eef4ff; color: #3b6db5; }
+  .tl-badge.tl-ed { background: #fce8e8; color: var(--danger); }
+  .tl-badge.tl-rd { background: #f3eefa; color: #6a4fa0; }
+  .tl-badge.tl-fin { background: #fff8e6; color: #9a7b1e; }
+  .tl-badge.tl-test { background: var(--accent-light); color: #3a7a50; }
+  .tl-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+  .tl-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--text-light); }
+  .tl-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .tl-filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tl-filter-btn { padding: 5px 12px; border: 1px solid var(--border); border-radius: 16px; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: #fff; color: var(--text-light); transition: all 0.15s; }
+  .tl-filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .tl-filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* ── Essay Tracker ── */
+  .essay-group { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+  .essay-group-header { background: var(--primary-light); padding: 12px 18px; font-weight: 700; font-size: 0.92rem; color: var(--primary-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .essay-group-header .essay-progress { font-size: 0.78rem; font-weight: 600; color: var(--accent); }
+  .essay-table { width: 100%; border-collapse: collapse; }
+  .essay-table th { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; padding: 8px 12px; text-align: left; color: var(--text-light); border-bottom: 1px solid var(--border); }
+  .essay-table td { padding: 8px 12px; border-bottom: 1px solid #f0f3f5; font-size: 0.85rem; vertical-align: top; }
+  .essay-table tr:hover td { background: #fafcfd; }
+  .essay-status-sel { padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: #fff; }
+  .essay-status-sel.es-not-started { background: #f4f4f4; color: var(--text-light); }
+  .essay-status-sel.es-brainstorming { background: #eef4ff; color: #3b6db5; }
+  .essay-status-sel.es-drafting { background: #fff8e6; color: #9a7b1e; }
+  .essay-status-sel.es-reviewing { background: #f3eefa; color: #6a4fa0; }
+  .essay-status-sel.es-final { background: var(--accent-light); color: #3a7a50; }
+  .essay-word-limit { font-size: 0.78rem; color: var(--text-light); }
+  .essay-prompt { font-size: 0.78rem; color: var(--text-light); font-style: italic; max-width: 300px; }
+  .essay-stats { display: flex; gap: 20px; margin-bottom: 18px; flex-wrap: wrap; }
+  .essay-stat-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 24px; text-align: center; min-width: 140px; }
+  .essay-stat-num { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); }
+  .essay-stat-label { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+
   /* ── Checklist ── */
   .checklist-school {
     background: var(--surface);
@@ -1104,6 +1156,8 @@
   <div id="group-apps" class="tab-group">
   <nav class="subtab-bar">
     <button class="subtab-btn active" data-subtab="checklist">Checklist</button>
+    <button class="subtab-btn" data-subtab="timeline">Deadline Timeline</button>
+    <button class="subtab-btn" data-subtab="essays">Essays</button>
     <button class="subtab-btn" data-subtab="strategy">Strategy</button>
     <button class="subtab-btn" data-subtab="testprep">Test Prep</button>
   </nav>
@@ -1120,6 +1174,38 @@
     <div id="checklistContainer"></div>
     <div class="empty-state" id="checklistEmpty" style="display:none;">
       <p>No checklists yet. Add a school in the <strong>School Comparison</strong> tab to get started.</p>
+    </div>
+  </div>
+
+  <!-- Deadline Timeline sub-panel -->
+  <div id="timeline" class="sub-panel">
+    <div class="section-head">
+      <h2>Deadline Timeline</h2>
+      <p>All application deadlines in chronological order</p>
+    </div>
+    <div class="tl-legend">
+      <span class="tl-legend-item"><span class="tl-legend-dot" style="background:var(--danger)"></span> Urgent (&lt;30 days)</span>
+      <span class="tl-legend-item"><span class="tl-legend-dot" style="background:var(--warn)"></span> Soon (30-60 days)</span>
+      <span class="tl-legend-item"><span class="tl-legend-dot" style="background:var(--accent)"></span> Done</span>
+      <span class="tl-legend-item"><span class="tl-legend-dot" style="background:var(--border)"></span> Upcoming</span>
+    </div>
+    <div class="tl-filter-bar" id="tlFilterBar"></div>
+    <div class="timeline-container" id="timelineContainer"></div>
+    <div class="empty-state" id="timelineEmpty" style="display:none;">
+      <p>No schools added yet. Add schools in the <strong>School Comparison</strong> tab to see deadlines.</p>
+    </div>
+  </div>
+
+  <!-- Essay Tracker sub-panel -->
+  <div id="essays" class="sub-panel">
+    <div class="section-head">
+      <h2>Essay Tracker</h2>
+      <p>Track progress on all application essays across every school</p>
+    </div>
+    <div class="essay-stats" id="essayStats"></div>
+    <div id="essayContainer"></div>
+    <div class="empty-state" id="essayEmpty" style="display:none;">
+      <p>No schools added yet. Add schools in the <strong>School Comparison</strong> tab to see essays.</p>
     </div>
   </div>
 
@@ -1287,6 +1373,7 @@ function getDefaults() {
     evaluations: {},
     visitNotes: {},
     rankings: {},
+    essays: [],
     checklists: [
       {
         id: uid(),
@@ -3473,6 +3560,12 @@ if (!localStorage.getItem('rankingsV2')) {
   localStorage.setItem('rankingsV2', 'true');
   saveData();
 }
+// ─── One-time migration: initialize essays ───
+if (!localStorage.getItem('essaysV1')) {
+  data.essays = [];
+  localStorage.setItem('essaysV1', 'true');
+  saveData();
+}
 
 // ─── Greek Life Data ───
 const GREEK_LIFE_DATA = {
@@ -3546,6 +3639,428 @@ function renderGreekLife() {
   }).join('');
 }
 
+// ─── Essay Database (per-school essay requirements) ───
+const SCHOOL_ESSAYS = {
+  'Texas A&M University': [
+    { name: 'Tell Us Your Story', words: 750, prompt: 'Share your story — what makes you unique and what experiences have shaped who you are', required: true }
+  ],
+  'University of Georgia': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'UGA Supplemental Essay', words: 300, prompt: 'Prompt changes yearly — check when released Aug 2026', required: true }
+  ],
+  'Cornell University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'CALS: Why This Major', words: 500, prompt: 'Why are you drawn to studying Animal Science at Cornell CALS?', required: true },
+    { name: 'CALS: Public Good', words: 100, prompt: 'How does your major connect to the public good?', required: false },
+    { name: 'CALS: Agriculture Interest', words: 100, prompt: 'Describe your interest in agriculture and life sciences', required: false }
+  ],
+  'UC Davis': [
+    { name: 'Personal Insight Question 1', words: 350, prompt: 'Choose from 8 UC PIQ prompts — highlight a different aspect in each', required: true },
+    { name: 'Personal Insight Question 2', words: 350, prompt: 'Choose from 8 UC PIQ prompts', required: true },
+    { name: 'Personal Insight Question 3', words: 350, prompt: 'Choose from 8 UC PIQ prompts', required: true },
+    { name: 'Personal Insight Question 4', words: 350, prompt: 'Choose from 8 UC PIQ prompts', required: true }
+  ],
+  'Colorado State University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays — Common App essay only', required: true }
+  ],
+  'University of Florida': [
+    { name: 'Meaningful Extracurricular', words: 250, prompt: 'Describe your most meaningful extracurricular commitment', required: true },
+    { name: 'Honors Program Essay', words: 250, prompt: 'Optional — required if applying to UF Honors', required: false }
+  ],
+  'Virginia Tech': [
+    { name: 'Ut Prosim Short Answer 1', words: 120, prompt: 'Community service and the VT motto "That I May Serve"', required: true },
+    { name: 'Ut Prosim Short Answer 2', words: 120, prompt: 'Goals and aspirations', required: true },
+    { name: 'Ut Prosim Short Answer 3', words: 120, prompt: 'Inclusion and belonging', required: true },
+    { name: 'Ut Prosim Short Answer 4', words: 120, prompt: 'Leadership experience', required: true }
+  ],
+  'Purdue University': [
+    { name: 'Why Purdue', words: 250, prompt: 'How do Purdue opportunities support your interests?', required: true },
+    { name: 'Why This Major', words: 250, prompt: 'Reasons for choosing Animal Sciences and Purdue', required: true }
+  ],
+  'Ohio State University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No additional supplemental essays required', required: true }
+  ],
+  'University of Minnesota': [
+    { name: 'Academic Interests', words: 150, prompt: 'Describe your academic interests', required: true },
+    { name: 'Diversity Contribution', words: 150, prompt: 'How will you contribute to diversity?', required: true }
+  ],
+  'Michigan State University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Application essay (250-650 words)', required: true }
+  ],
+  'Iowa State University': [
+    { name: 'No essays required', words: 0, prompt: 'Iowa State does not require essays', required: false }
+  ],
+  'North Carolina State University': [
+    { name: 'Why First-Choice Major', words: 250, prompt: 'Why did you choose your first-choice major at NC State?', required: true },
+    { name: 'Why Second-Choice Major', words: 250, prompt: 'Why did you choose your second-choice major?', required: true }
+  ],
+  'University of Wisconsin-Madison': [
+    { name: 'Why UW-Madison', words: 650, prompt: 'Why UW-Madison and why your chosen major?', required: true }
+  ],
+  'Auburn University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays (Honors College has separate essays)', required: true }
+  ],
+  'Kansas State University': [
+    { name: 'No essays required', words: 0, prompt: 'K-State does not require essays', required: false }
+  ],
+  'Oklahoma State University': [
+    { name: 'Personal Essay', words: 650, prompt: 'Choose from 7 prompt options — recommended for scholarship consideration', required: false }
+  ],
+  'Oregon State University': [
+    { name: 'Activity Descriptions', words: 100, prompt: '3 activities (100 words each) + knowledge descriptions', required: true }
+  ],
+  'Washington State University': [
+    { name: 'Community Involvement', words: 150, prompt: 'Describe your team or community involvement', required: true }
+  ],
+  'Mississippi State University': [
+    { name: 'No essays required', words: 0, prompt: 'MSU does not require essays', required: false }
+  ],
+  'Louisiana State University': [
+    { name: 'Optional Essay', words: 650, prompt: 'Optional personal essay', required: false }
+  ],
+  'University of Illinois': [
+    { name: 'Major Experience', words: 150, prompt: 'Experience related to your chosen major', required: true },
+    { name: 'Career Goals', words: 150, prompt: 'Describe your career goals', required: true }
+  ],
+  'Tufts University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'Why Tufts', words: 250, prompt: 'Why Tufts specifically?', required: true },
+    { name: 'Additional Short Essay', words: 250, prompt: 'Choose from 3 prompts', required: true }
+  ],
+  'University of Pennsylvania': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'Penn Thank-You Note', words: 200, prompt: 'Write a thank-you note to someone who has helped you', required: true },
+    { name: 'Community at Penn', words: 200, prompt: 'How will you explore community at Penn?', required: true },
+    { name: 'School-Specific Essay', words: 150, prompt: 'Essay specific to your chosen school within Penn', required: true }
+  ],
+  'Tuskegee University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Common App essay — note: AI detection is used', required: true }
+  ],
+  'University of Tennessee': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays for general admission', required: true },
+    { name: 'CASNR Scholarship Essay', words: 500, prompt: 'Optional — recommended if applying as Animal Science major', required: false }
+  ],
+  'University of Missouri': [
+    { name: 'Test-Optional Essay', words: 300, prompt: 'Required only if not submitting test scores', required: false }
+  ],
+  'Clemson University': [
+    { name: 'Optional Personal Statement', words: 650, prompt: 'Optional — submitted via portal after application', required: false }
+  ],
+  'Penn State University': [
+    { name: 'Optional Personal Statement', words: 500, prompt: 'Optional — recommended to strengthen application', required: false }
+  ],
+  'University of Vermont': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'UVM Supplemental', words: 500, prompt: 'Optional — choose from 6 UVM-specific prompts', required: false }
+  ],
+  'University of Kentucky': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Common App essay', required: true },
+    { name: 'Lewis Honors College Essay', words: 500, prompt: '"Common good" prompt — due Dec 1 for priority', required: false }
+  ],
+  'Rutgers University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No additional supplemental essays', required: true }
+  ],
+  'University of Arizona': [
+    { name: 'Why Arizona', words: 500, prompt: 'Why Arizona and your academic area? (strongly encouraged)', required: false }
+  ],
+  'University of Maryland': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'Short-Answer Prompts (6)', words: 650, prompt: '6 prompts at 650 characters each: travel, academics, research, diversity', required: true }
+  ],
+  'Cal Poly San Luis Obispo': [
+    { name: 'No essays required', words: 0, prompt: 'Cal Poly does not accept essays', required: false }
+  ],
+  'University of Connecticut': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No additional supplemental essays', required: true }
+  ],
+  'University of Nebraska-Lincoln': [
+    { name: 'Optional Essay', words: 650, prompt: 'Optional — 1 essay available', required: false }
+  ],
+  'Montana State University': [
+    { name: 'No essays required', words: 0, prompt: 'Montana State does not require essays', required: false }
+  ],
+  'University of Delaware': [
+    { name: 'Test-Optional Supplement 1', words: 250, prompt: 'Required if test-optional: demonstrate academic readiness', required: false },
+    { name: 'Test-Optional Supplement 2', words: 250, prompt: 'Required if test-optional', required: false },
+    { name: 'Test-Optional Supplement 3', words: 250, prompt: 'Required if test-optional', required: false }
+  ],
+  'University of New Hampshire': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays required', required: true }
+  ],
+  'Berry College': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Common App essay', required: true },
+    { name: 'Why Berry', words: 300, prompt: 'Optional — recommended to show interest', required: false }
+  ],
+  'Delaware Valley University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays required', required: true }
+  ],
+  'University of Wyoming': [
+    { name: 'No essays required', words: 0, prompt: 'UWyo does not require essays (Honors College has separate essay)', required: false }
+  ]
+};
+
+// ─── Deadline Timeline ───
+let tlActiveFilter = 'all';
+
+function getDeadlineEvents() {
+  const events = [];
+  const today = new Date();
+  const currentYear = today.getFullYear();
+
+  for (const s of data.schools) {
+    const name = s.name;
+    const db = schoolDB[name] || {};
+    const deadline = s.deadline || db.deadline || '';
+    const earlyDecision = s.earlyDecision || db.earlyDecision || '';
+
+    // Parse deadline strings into dates
+    function parseDeadline(str, fallbackYear) {
+      if (!str || str === 'N/A' || str === 'Rolling') return null;
+      // Try common formats: "December 1", "Nov 30", "October 15"
+      const d = new Date(str + ', ' + fallbackYear);
+      if (!isNaN(d)) return d;
+      return null;
+    }
+
+    // EA/ED deadlines (Fall 2026)
+    if (earlyDecision && earlyDecision !== 'N/A') {
+      const d = parseDeadline(earlyDecision, 2026);
+      if (d) {
+        const isED = name === 'Cornell University' || name === 'University of Pennsylvania' || name === 'Tufts University';
+        events.push({ date: d, school: name, type: isED ? 'ed' : 'ea', label: isED ? 'Early Decision' : 'Early Action', desc: earlyDecision });
+      }
+    }
+
+    // Regular deadlines
+    if (deadline && deadline !== 'Rolling') {
+      // Deadlines in Jan/Feb are 2027, others are 2026
+      const month = deadline.match(/^(January|February|March|April|May)/i);
+      const yr = month ? 2027 : 2026;
+      const d = parseDeadline(deadline, yr);
+      if (d) {
+        events.push({ date: d, school: name, type: 'rd', label: 'Regular Decision', desc: deadline });
+      }
+    } else if (deadline === 'Rolling') {
+      events.push({ date: new Date(2026, 8, 1), school: name, type: 'rd', label: 'Rolling Admissions', desc: 'Apply early for best chances' });
+    }
+
+    // FAFSA
+    events.push({ date: new Date(2026, 9, 1), school: name, type: 'fin', label: 'FAFSA Opens', desc: 'Complete ASAP after Oct 1' });
+
+    // CSS Profile for schools that need it
+    if (name === 'Cornell University' || name === 'University of Wisconsin-Madison' || name === 'Tufts University' || name === 'University of Pennsylvania' || name === 'Rutgers University') {
+      events.push({ date: new Date(2026, 10, 1), school: name, type: 'fin', label: 'CSS Profile Due', desc: 'Required for need-based institutional aid' });
+    }
+  }
+
+  // Deduplicate FAFSA entries — keep just one
+  const seen = {};
+  const deduped = [];
+  for (const e of events) {
+    const key = e.type === 'fin' && e.label === 'FAFSA Opens' ? 'fafsa' : e.school + e.type + e.label;
+    if (!seen[key]) { seen[key] = true; deduped.push(e); }
+  }
+
+  // Add test dates
+  for (const tp of (data.testprep || [])) {
+    if (tp.type === 'test' && tp.date) {
+      deduped.push({ date: new Date(tp.date), school: 'All Schools', type: 'test', label: tp.title || 'Test Date', desc: tp.scoreGoal ? 'Target: ' + tp.scoreGoal : '' });
+    }
+  }
+
+  deduped.sort((a, b) => a.date - b.date);
+  return deduped;
+}
+
+function renderTimeline() {
+  const container = document.getElementById('timelineContainer');
+  const empty = document.getElementById('timelineEmpty');
+  const filterBar = document.getElementById('tlFilterBar');
+
+  if (data.schools.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; filterBar.innerHTML = ''; return; }
+  empty.style.display = 'none';
+
+  const events = getDeadlineEvents();
+
+  // Filters
+  const types = [
+    { key: 'all', label: 'All' },
+    { key: 'ea', label: 'Early Action' },
+    { key: 'ed', label: 'Early Decision' },
+    { key: 'rd', label: 'Regular Decision' },
+    { key: 'fin', label: 'Financial Aid' },
+    { key: 'test', label: 'Tests' }
+  ];
+  filterBar.innerHTML = types.map(t =>
+    `<button class="tl-filter-btn${tlActiveFilter === t.key ? ' active' : ''}" onclick="tlActiveFilter='${t.key}';renderTimeline()">${t.label}</button>`
+  ).join('');
+
+  const filtered = tlActiveFilter === 'all' ? events : events.filter(e => e.type === tlActiveFilter);
+
+  // Group by month
+  const months = {};
+  for (const e of filtered) {
+    const key = e.date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    if (!months[key]) months[key] = [];
+    months[key].push(e);
+  }
+
+  const today = new Date();
+  container.innerHTML = Object.entries(months).map(([month, items]) => `
+    <div class="tl-month-group">
+      <div class="tl-month-label">${month}</div>
+      ${items.map(e => {
+        const daysAway = Math.ceil((e.date - today) / 86400000);
+        const urgency = daysAway < 0 ? 'tl-done' : daysAway < 30 ? 'tl-urgent' : daysAway < 60 ? 'tl-soon' : '';
+        const badgeClass = e.type === 'ea' ? 'tl-ea' : e.type === 'ed' ? 'tl-ed' : e.type === 'fin' ? 'tl-fin' : e.type === 'test' ? 'tl-test' : 'tl-rd';
+        const dayStr = e.date.getDate();
+        const monthStr = e.date.toLocaleString('en-US', { month: 'short' });
+        return `
+        <div class="tl-item ${urgency}">
+          <span class="tl-date">${monthStr} ${dayStr}</span>
+          ${e.school !== 'All Schools' ? `<img class="tl-school-logo" src="https://logo.clearbit.com/${(schoolDB[e.school]||{}).domain||''}" alt="" onerror="this.style.display='none'">` : ''}
+          <div class="tl-details">
+            <span class="tl-school-name">${esc(e.school)}</span>
+            <div class="tl-desc">${esc(e.desc)}</div>
+          </div>
+          <span class="tl-badge ${badgeClass}">${e.label}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+// ─── Essay Tracker ───
+function syncEssays() {
+  if (!data.essays) data.essays = [];
+  const schoolNames = data.schools.map(s => s.name);
+
+  // Remove essays for schools no longer in list
+  data.essays = data.essays.filter(e => e.school === 'Shared' || schoolNames.includes(e.school));
+
+  // Ensure shared Common App essay exists if any school uses Common App
+  const hasCommonApp = data.schools.some(s => {
+    const name = s.name;
+    return name !== 'UC Davis' && name !== 'Cal Poly San Luis Obispo';
+  });
+  if (hasCommonApp && !data.essays.find(e => e.school === 'Shared' && e.name === 'Common App Personal Statement')) {
+    data.essays.unshift({
+      id: uid(), school: 'Shared', name: 'Common App Personal Statement',
+      words: 650, prompt: 'Choose from 7 prompts — focus on passion for veterinary medicine',
+      required: true, status: 'not-started', reviewer: '', notes: ''
+    });
+  }
+
+  // Add essays for each school
+  for (const s of data.schools) {
+    const essayDefs = SCHOOL_ESSAYS[s.name] || [];
+    for (const def of essayDefs) {
+      if (def.words === 0) continue; // skip "no essays required"
+      // Skip shared Common App entries
+      if (def.name === 'Common App Personal Statement') continue;
+      if (!data.essays.find(e => e.school === s.name && e.name === def.name)) {
+        data.essays.push({
+          id: uid(), school: s.name, name: def.name,
+          words: def.words, prompt: def.prompt,
+          required: def.required, status: 'not-started', reviewer: '', notes: ''
+        });
+      }
+    }
+  }
+
+  saveData();
+}
+
+function renderEssays() {
+  syncEssays();
+  const container = document.getElementById('essayContainer');
+  const empty = document.getElementById('essayEmpty');
+  const statsEl = document.getElementById('essayStats');
+
+  if (data.schools.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; statsEl.innerHTML = ''; return; }
+  empty.style.display = 'none';
+
+  const essays = data.essays;
+  const total = essays.length;
+  const done = essays.filter(e => e.status === 'final').length;
+  const drafting = essays.filter(e => e.status === 'drafting' || e.status === 'brainstorming').length;
+  const reviewing = essays.filter(e => e.status === 'reviewing').length;
+
+  statsEl.innerHTML = `
+    <div class="essay-stat-card"><div class="essay-stat-num">${total}</div><div class="essay-stat-label">Total Essays</div></div>
+    <div class="essay-stat-card"><div class="essay-stat-num">${done}</div><div class="essay-stat-label">Finalized</div></div>
+    <div class="essay-stat-card"><div class="essay-stat-num">${drafting}</div><div class="essay-stat-label">In Progress</div></div>
+    <div class="essay-stat-card"><div class="essay-stat-num">${reviewing}</div><div class="essay-stat-label">Under Review</div></div>
+    <div class="essay-stat-card"><div class="essay-stat-num">${total - done}</div><div class="essay-stat-label">Remaining</div></div>
+  `;
+
+  // Group essays: Shared first, then by school
+  const groups = {};
+  for (const e of essays) {
+    const key = e.school;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(e);
+  }
+
+  // Sort: Shared first, then alphabetical
+  const sortedKeys = Object.keys(groups).sort((a, b) => {
+    if (a === 'Shared') return -1;
+    if (b === 'Shared') return 1;
+    return a.localeCompare(b);
+  });
+
+  container.innerHTML = sortedKeys.map(school => {
+    const items = groups[school];
+    const groupDone = items.filter(i => i.status === 'final').length;
+    const schoolLabel = school === 'Shared' ? 'Shared (All Common App Schools)' : school;
+    return `
+    <div class="essay-group">
+      <div class="essay-group-header" style="${school !== 'Shared' && schoolDB[school] ? 'border-left: 4px solid ' + schoolDB[school].color : ''}">
+        <span>${school !== 'Shared' ? schoolLogoHTML(school, 20) + ' ' : ''}${esc(schoolLabel)}</span>
+        <span class="essay-progress">${groupDone}/${items.length} done</span>
+      </div>
+      <table class="essay-table">
+        <thead><tr><th>Essay</th><th>Words</th><th>Prompt</th><th>Status</th><th>Reviewer</th><th>Notes</th></tr></thead>
+        <tbody>
+          ${items.map(e => `
+          <tr>
+            <td style="font-weight:600">${esc(e.name)}${e.required ? '' : ' <span style="font-size:0.7rem;color:var(--text-light)">(optional)</span>'}</td>
+            <td class="essay-word-limit">${e.words > 0 ? e.words + ' words' : '—'}</td>
+            <td class="essay-prompt">${esc(e.prompt)}</td>
+            <td>
+              <select class="essay-status-sel es-${e.status}" onchange="updateEssay('${e.id}','status',this.value);this.className='essay-status-sel es-'+this.value">
+                <option value="not-started"${e.status==='not-started'?' selected':''}>Not Started</option>
+                <option value="brainstorming"${e.status==='brainstorming'?' selected':''}>Brainstorming</option>
+                <option value="drafting"${e.status==='drafting'?' selected':''}>Drafting</option>
+                <option value="reviewing"${e.status==='reviewing'?' selected':''}>Reviewing</option>
+                <option value="final"${e.status==='final'?' selected':''}>Final</option>
+              </select>
+            </td>
+            <td><span contenteditable="true" style="min-width:60px;font-size:0.82rem" data-eid="${e.id}" data-field="reviewer" class="essay-editable">${esc(e.reviewer || '')}</span></td>
+            <td><span contenteditable="true" style="min-width:80px;font-size:0.82rem" data-eid="${e.id}" data-field="notes" class="essay-editable">${esc(e.notes || '')}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  // Bind inline edits
+  container.querySelectorAll('.essay-editable').forEach(el => {
+    el.addEventListener('blur', () => {
+      const essay = data.essays.find(e => e.id === el.dataset.eid);
+      if (essay) { essay[el.dataset.field] = el.textContent.trim(); saveData(); }
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    });
+  });
+}
+
+function updateEssay(id, field, value) {
+  const essay = data.essays.find(e => e.id === id);
+  if (essay) { essay[field] = value; saveData(); renderEssays(); }
+}
+
 // ─── Initial render ───
 function renderAll() {
   renderSummary();
@@ -3558,6 +4073,8 @@ function renderAll() {
   renderStrategy();
   syncChecklists();
   renderTestPrep();
+  renderTimeline();
+  renderEssays();
   renderGreekLife();
 }
 renderAll();
