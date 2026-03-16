@@ -3106,8 +3106,16 @@ function setRankingField(school, field, val) {
 // ─── Ranking Formula: Visit 40% | Vet Program 25% | Cost 15% | Plan B 10% | Merit Aid 10% ───
 // Dynamically derives category, vet status, cost, and budget fit from live data
 
+// Manual overrides where OOS rate misrepresents Avery's actual odds
+// (e.g., Ag college admits at a higher rate than university OOS overall)
+const CATEGORY_OVERRIDES = {
+  'Ohio State University': 'MATCH',      // CFAES admits above 27% OOS university rate
+  'University of Florida': 'REACH',      // 14% OOS; highly selective even for Ag/CALS
+  'Florida State University': 'REACH',   // 19% OOS; no Ag advantage, university-wide
+};
+
 function getSummaryCategory(schoolName) {
-  // Derive SAFETY/MATCH/REACH from OOS acceptance rate (or overall for in-state schools)
+  if (CATEGORY_OVERRIDES[schoolName]) return CATEGORY_OVERRIDES[schoolName];
   const db = schoolDB[schoolName];
   if (!db) return 'MATCH';
   // UGA is in-state for Avery — use overall accept rate
@@ -3117,7 +3125,7 @@ function getSummaryCategory(schoolName) {
   const rate = parseInt(rateStr);
   if (isNaN(rate)) return 'MATCH';
   if (rate >= 70) return 'SAFETY';
-  if (rate < 30) return 'REACH';
+  if (rate < 25) return 'REACH';
   return 'MATCH';
 }
 
@@ -4252,6 +4260,19 @@ docRef.onSnapshot(snap => {
 
 // ─── Changelog / What's New ───
 const CHANGELOG = [
+  {
+    version: '4.4',
+    date: '2026-03-16',
+    title: 'Financial & Category Corrections',
+    items: [
+      'Corrected all Financial Analysis sticker prices to use full Cost of Attendance (tuition + room & board + fees) — previously showed tuition-only for 10 schools',
+      'Michigan State, Penn State, and South Carolina reclassified to STRETCH with accurate COA',
+      'FSU remains FULLY FUNDED even at full COA due to OOS tuition waiver program',
+      'Fixed Ohio State category: now shows MATCH (was incorrectly REACH due to 27% OOS rate — CFAES admits at a higher rate than university overall)',
+      'Added category override system for schools where OOS rate misrepresents actual admission odds',
+      'REACH threshold tightened from <30% to <25% OOS to better reflect Ag college advantage'
+    ]
+  },
   {
     version: '4.3',
     date: '2026-03-16',
