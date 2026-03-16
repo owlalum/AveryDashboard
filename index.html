@@ -781,6 +781,10 @@
         <div class="profile-row"><span class="label">4-Year Cash Flow</span><span class="value">$148,000</span></div>
         <div class="profile-row"><span class="label">Total Available</span><span class="value" style="color:var(--accent);font-size:1.05rem;">$323,000</span></div>
       </div>
+      <div class="profile-card" id="appStatusCard">
+        <h3>Application Status</h3>
+        <div id="appStatusBody" style="font-size:0.88rem;"></div>
+      </div>
     </div>
     <div class="insight-box"><strong>Key Insight:</strong> Applying to Animal Science (vs. Engineering/CS/Business) provides 15-25 percentage point admission advantage at most schools.</div>
     <div class="section-head"><h2>Comprehensive School Rankings</h2></div>
@@ -1774,6 +1778,39 @@ function getSuffix(n) {
   return (s[(v-20)%10] || s[v] || s[0]);
 }
 
+function renderAppStatus() {
+  const body = document.getElementById('appStatusBody');
+  if (!body) return;
+  const total = data.schools.length;
+  if (total === 0) { body.innerHTML = '<span style="color:var(--text-light);">No schools added yet.</span>'; return; }
+  const counts = { researching:0, applying:0, accepted:0, rejected:0, waitlisted:0 };
+  data.schools.forEach(s => { counts[s.status || 'researching']++; });
+  const heardBack = counts.accepted + counts.rejected + counts.waitlisted;
+  const applied = counts.applying + heardBack;
+  const colors = { researching:'var(--text-light)', applying:'var(--primary)', accepted:'#16a34a', rejected:'#dc2626', waitlisted:'#ca8a04' };
+  const icons = { researching:'\uD83D\uDD0D', applying:'\uD83D\uDCE8', accepted:'\u2705', rejected:'\u274C', waitlisted:'\u23F3' };
+  // Summary line
+  let html = '<div style="margin-bottom:10px;font-weight:600;">' + total + ' schools tracked';
+  if (applied > 0) html += ' &middot; ' + applied + ' applied &middot; ' + heardBack + ' decided';
+  html += '</div>';
+  // Status rows
+  const order = ['accepted','waitlisted','applying','researching','rejected'];
+  order.forEach(status => {
+    if (counts[status] === 0) return;
+    const names = data.schools.filter(s => (s.status || 'researching') === status).map(s => {
+      const short = s.name.replace(/^University of /, 'U ').replace(/ University$/, '');
+      return short;
+    });
+    const label = status.charAt(0).toUpperCase() + status.slice(1);
+    html += '<div style="display:flex;align-items:baseline;gap:8px;padding:3px 0;border-bottom:1px solid var(--border);">';
+    html += '<span style="min-width:90px;font-weight:600;color:' + colors[status] + ';">' + icons[status] + ' ' + label + '</span>';
+    html += '<span style="font-weight:700;min-width:18px;">' + counts[status] + '</span>';
+    html += '<span style="color:var(--text-light);font-size:0.82rem;">' + names.join(', ') + '</span>';
+    html += '</div>';
+  });
+  body.innerHTML = html;
+}
+
 // ─── Main Tabs ───
 document.querySelectorAll('.tab-btn[data-group]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -2003,6 +2040,7 @@ function updateSchoolStatus(id, sel) {
     school.status = sel.value;
     sel.className = 'status-sel s-' + sel.value;
     saveData();
+    renderAppStatus();
   }
 }
 
@@ -2015,6 +2053,7 @@ function deleteSchool(id) {
   renderEvaluation();
   renderRankings();
   renderGreekLife();
+  renderAppStatus();
 }
 
 // ─── Test Prep ───
@@ -2331,6 +2370,7 @@ function addSchool() {
   renderEvaluation();
   renderRankings();
   renderGreekLife();
+  renderAppStatus();
   closeModal();
 }
 
@@ -4210,6 +4250,7 @@ function renderAll() {
   syncEssayStatusToChecklists();
   renderGreekLife();
   renderProfile();
+  renderAppStatus();
 }
 renderAll();
 
