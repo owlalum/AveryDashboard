@@ -1765,8 +1765,8 @@ function getSuperscoreStatus(schoolName) {
   const testItem = items.find(i => i.cat === 'test' && /superscore/i.test(i.text));
   if (!testItem) return '\u2014';
   if (/does NOT superscore|not superscore/i.test(testItem.text)) return 'No';
-  if (/not confirmed/i.test(testItem.text)) return 'TBD';
   if (/SUPERSCORES?\b/i.test(testItem.text)) return 'Yes';
+  if (/superscore.*not confirmed|not confirmed.*superscore/i.test(testItem.text)) return 'TBD';
   return '\u2014';
 }
 
