@@ -380,6 +380,12 @@
   }
   .checklist-school.open .checklist-body { max-height: 2000px; }
   .checklist-items { padding: 8px 12px; }
+  .checklist-section-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--primary-dark); padding: 10px 12px 4px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .checklist-section-label:first-child { border-top: none; }
+  .honors-toggle { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--text-light); }
+  .honors-toggle select { font-size: 0.72rem; padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; font-weight: 600; cursor: pointer; }
+  .honors-section-disabled { opacity: 0.4; pointer-events: none; }
+  .honors-section-disabled .checklist-item input[type="checkbox"] { cursor: not-allowed; }
   .checklist-item {
     display: flex;
     align-items: center;
@@ -1403,6 +1409,7 @@ function getDefaults() {
     visitNotes: {},
     rankings: {},
     essays: [],
+    honorsOptOut: {},
     checklists: [
       {
         id: uid(),
@@ -2041,12 +2048,35 @@ function renderChecklists() {
   empty.style.display = 'none';
   if (toggleAll) toggleAll.style.display = '';
 
+  // Ensure honorsOptOut state exists
+  if (!data.honorsOptOut) data.honorsOptOut = {};
+
   container.innerHTML = data.checklists.map(cl => {
-    const doneCount = cl.items.filter(i => i.done).length;
-    const total = cl.items.length;
+    // Split items into application and honors sections
+    const appItems = cl.items.filter(i => i.cat !== 'honors');
+    const honorsItems = cl.items.filter(i => i.cat === 'honors');
+    const hasHonors = honorsItems.length > 0;
+    const honorsDisabled = data.honorsOptOut[cl.school] === true;
+
+    // Count done: exclude honors items if opted out
+    const countableItems = honorsDisabled ? appItems : cl.items;
+    const doneCount = countableItems.filter(i => i.done).length;
+    const total = countableItems.length;
     const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
     const isOpen = checklistOpenState[cl.id];
+
+    const renderItem = (item) => {
+      const isRegularEssay = isRegularEssayItem(item.text);
+      const isReadOnly = isRegularEssay && !isHonorsEssayItem(item.text);
+      return `
+      <div class="checklist-item" data-iid="${item.id}">
+        <input type="checkbox" ${item.done ? 'checked' : ''} ${isReadOnly ? 'disabled title="Auto-synced with Essay Tracker — complete essays in the Essays tab"' : `onchange="toggleCheckItem('${cl.id}','${item.id}',this.checked)"`}${isReadOnly ? ' style="opacity:0.6;cursor:not-allowed"' : ''}>
+        <span class="item-text ${item.done ? 'done' : ''}" contenteditable="true" data-clid="${cl.id}" data-iid="${item.id}">${esc(item.text)}${isReadOnly ? ' <span style="font-size:0.7rem;color:var(--primary);font-style:italic;pointer-events:none"> (auto-synced with Essays tab)</span>' : ''}</span>
+        <span class="delete-item" onclick="deleteCheckItem('${cl.id}','${item.id}')">&times;</span>
+      </div>`;
+    };
+
     return `
     <div class="checklist-school${isOpen ? ' open' : ''}" data-id="${cl.id}">
       <div class="checklist-header" onclick="toggleChecklist('${cl.id}')">
@@ -2054,19 +2084,24 @@ function renderChecklists() {
         <span class="progress">${doneCount}/${total} complete (${pct}%) <span class="chevron">&#9654;</span></span>
       </div>
       <div class="checklist-body">
+        <div class="checklist-section-label">Application</div>
         <div class="checklist-items">
-          ${cl.items.map(item => {
-            const isRegularEssay = isRegularEssayItem(item.text);
-            const isHonorsEssay = isHonorsEssayItem(item.text);
-            const isReadOnly = isRegularEssay && !isHonorsEssay;
-            return `
-            <div class="checklist-item" data-iid="${item.id}">
-              <input type="checkbox" ${item.done ? 'checked' : ''} ${isReadOnly ? 'disabled title="Auto-synced with Essay Tracker — complete essays in the Essays tab"' : `onchange="toggleCheckItem('${cl.id}','${item.id}',this.checked)"`}${isReadOnly ? ' style="opacity:0.6;cursor:not-allowed"' : ''}>
-              <span class="item-text ${item.done ? 'done' : ''}" contenteditable="true" data-clid="${cl.id}" data-iid="${item.id}">${esc(item.text)}${isReadOnly ? ' <span style="font-size:0.7rem;color:var(--primary);font-style:italic;pointer-events:none"> (auto-synced with Essays tab)</span>' : ''}</span>
-              <span class="delete-item" onclick="deleteCheckItem('${cl.id}','${item.id}')">&times;</span>
-            </div>`;
-          }).join('')}
+          ${appItems.map(renderItem).join('')}
         </div>
+        ${hasHonors ? `
+        <div class="checklist-section-label">
+          Honors College
+          <span class="honors-toggle">
+            <select onchange="toggleHonorsOptOut('${cl.school}', this.value === 'no')">
+              <option value="yes"${!honorsDisabled ? ' selected' : ''}>Applying</option>
+              <option value="no"${honorsDisabled ? ' selected' : ''}>Not applying</option>
+            </select>
+          </span>
+        </div>
+        <div class="checklist-items${honorsDisabled ? ' honors-section-disabled' : ''}">
+          ${honorsItems.map(renderItem).join('')}
+        </div>
+        ` : ''}
         <div class="add-item-row">
           <input type="text" placeholder="Add new item..." id="newItem_${cl.id}" onkeydown="if(event.key==='Enter')addCheckItem('${cl.id}')">
           <button class="btn btn-primary btn-sm" onclick="addCheckItem('${cl.id}')">Add</button>
@@ -2088,6 +2123,13 @@ function renderChecklists() {
       if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
     });
   });
+}
+
+function toggleHonorsOptOut(school, optOut) {
+  if (!data.honorsOptOut) data.honorsOptOut = {};
+  data.honorsOptOut[school] = optOut;
+  saveData();
+  renderChecklists();
 }
 
 function toggleCheckItem(clId, itemId, checked) {
@@ -2773,7 +2815,7 @@ function buildChecklistItems(school) {
   // Use verified school-specific checklist if available
   if (SCHOOL_CHECKLISTS[name]) {
     return SCHOOL_CHECKLISTS[name].map(item => ({
-      id: uid(), text: item.text, done: false
+      id: uid(), text: item.text, cat: item.cat || 'app', done: false
     }));
   }
 
@@ -3670,9 +3712,10 @@ ${rows.map(r => `<Row>${r.map(c => xmlCell(c)).join('')}</Row>`).join('\n')}
 }
 
 // ─── One-time migration: regenerate checklists with tailored items ───
-if (!localStorage.getItem('checklistV6')) {
+if (!localStorage.getItem('checklistV7')) {
   data.checklists = [];
-  localStorage.setItem('checklistV6', 'true');
+  if (!data.honorsOptOut) data.honorsOptOut = {};
+  localStorage.setItem('checklistV7', 'true');
 }
 // ─── One-time migration: reset rankings to use detailed presets ───
 if (!localStorage.getItem('rankingsV2')) {
@@ -4115,14 +4158,19 @@ function renderEssays() {
   if (data.schools.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; statsEl.innerHTML = ''; return; }
   empty.style.display = 'none';
 
-  const essays = data.essays;
-  const total = essays.length;
-  const done = essays.filter(e => e.status === 'final').length;
-  const drafting = essays.filter(e => e.status === 'drafting' || e.status === 'brainstorming').length;
-  const reviewing = essays.filter(e => e.status === 'reviewing').length;
+  if (!data.honorsOptOut) data.honorsOptOut = {};
+  // Filter out honors essays for schools where Avery isn't applying to honors
+  const activeEssays = data.essays.filter(e => {
+    if (!/^HONORS:/i.test(e.name)) return true;
+    return !data.honorsOptOut[e.school];
+  });
+  const total = activeEssays.length;
+  const done = activeEssays.filter(e => e.status === 'final').length;
+  const drafting = activeEssays.filter(e => e.status === 'drafting' || e.status === 'brainstorming').length;
+  const reviewing = activeEssays.filter(e => e.status === 'reviewing').length;
 
   statsEl.innerHTML = `
-    <div class="essay-stat-card"><div class="essay-stat-num">${total}</div><div class="essay-stat-label">Total Essays</div></div>
+    <div class="essay-stat-card"><div class="essay-stat-num">${total}</div><div class="essay-stat-label">Active Essays</div></div>
     <div class="essay-stat-card"><div class="essay-stat-num">${done}</div><div class="essay-stat-label">Finalized</div></div>
     <div class="essay-stat-card"><div class="essay-stat-num">${drafting}</div><div class="essay-stat-label">In Progress</div></div>
     <div class="essay-stat-card"><div class="essay-stat-num">${reviewing}</div><div class="essay-stat-label">Under Review</div></div>
@@ -4144,36 +4192,48 @@ function renderEssays() {
     return a.localeCompare(b);
   });
 
+  const renderEssayRow = (e, disabled) => `
+    <tr${disabled ? ' style="opacity:0.4"' : ''}>
+      <td style="font-weight:600">${esc(e.name)}${e.required ? '' : ' <span style="font-size:0.7rem;color:var(--text-light)">(optional)</span>'}</td>
+      <td class="essay-word-limit">${e.words > 0 ? e.words + ' words' : '—'}</td>
+      <td class="essay-prompt">${esc(e.prompt)}</td>
+      <td>
+        <select class="essay-status-sel es-${e.status}" ${disabled ? 'disabled' : ''}onchange="updateEssay('${e.id}','status',this.value);this.className='essay-status-sel es-'+this.value">
+          <option value="not-started"${e.status==='not-started'?' selected':''}>Not Started</option>
+          <option value="brainstorming"${e.status==='brainstorming'?' selected':''}>Brainstorming</option>
+          <option value="drafting"${e.status==='drafting'?' selected':''}>Drafting</option>
+          <option value="reviewing"${e.status==='reviewing'?' selected':''}>Reviewing</option>
+          <option value="final"${e.status==='final'?' selected':''}>Final</option>
+        </select>
+      </td>
+      <td><span ${disabled ? '' : 'contenteditable="true" '}style="min-width:60px;font-size:0.82rem" data-eid="${e.id}" data-field="reviewer" class="essay-editable">${esc(e.reviewer || '')}</span></td>
+      <td><span ${disabled ? '' : 'contenteditable="true" '}style="min-width:80px;font-size:0.82rem" data-eid="${e.id}" data-field="notes" class="essay-editable">${esc(e.notes || '')}</span></td>
+    </tr>`;
+
   container.innerHTML = sortedKeys.map(school => {
     const items = groups[school];
-    const groupDone = items.filter(i => i.status === 'final').length;
+    const regularItems = items.filter(e => !/^HONORS:/i.test(e.name));
+    const honorsItems = items.filter(e => /^HONORS:/i.test(e.name));
+    const honorsDisabled = data.honorsOptOut[school] === true;
+
+    const countItems = honorsDisabled ? regularItems : items;
+    const groupDone = countItems.filter(i => i.status === 'final').length;
     const schoolLabel = school === 'Shared' ? 'Shared (All Common App Schools)' : school;
     return `
     <div class="essay-group">
       <div class="essay-group-header" style="${school !== 'Shared' && schoolDB[school] ? 'border-left: 4px solid ' + schoolDB[school].color : ''}">
         <span>${school !== 'Shared' ? schoolLogoHTML(school, 20) + ' ' : ''}${esc(schoolLabel)}</span>
-        <span class="essay-progress">${groupDone}/${items.length} done</span>
+        <span class="essay-progress">${groupDone}/${countItems.length} done</span>
       </div>
       <table class="essay-table">
         <thead><tr><th>Essay</th><th>Words</th><th>Prompt</th><th>Status</th><th>Reviewer</th><th>Notes</th></tr></thead>
         <tbody>
-          ${items.map(e => `
-          <tr>
-            <td style="font-weight:600">${esc(e.name)}${e.required ? '' : ' <span style="font-size:0.7rem;color:var(--text-light)">(optional)</span>'}</td>
-            <td class="essay-word-limit">${e.words > 0 ? e.words + ' words' : '—'}</td>
-            <td class="essay-prompt">${esc(e.prompt)}</td>
-            <td>
-              <select class="essay-status-sel es-${e.status}" onchange="updateEssay('${e.id}','status',this.value);this.className='essay-status-sel es-'+this.value">
-                <option value="not-started"${e.status==='not-started'?' selected':''}>Not Started</option>
-                <option value="brainstorming"${e.status==='brainstorming'?' selected':''}>Brainstorming</option>
-                <option value="drafting"${e.status==='drafting'?' selected':''}>Drafting</option>
-                <option value="reviewing"${e.status==='reviewing'?' selected':''}>Reviewing</option>
-                <option value="final"${e.status==='final'?' selected':''}>Final</option>
-              </select>
-            </td>
-            <td><span contenteditable="true" style="min-width:60px;font-size:0.82rem" data-eid="${e.id}" data-field="reviewer" class="essay-editable">${esc(e.reviewer || '')}</span></td>
-            <td><span contenteditable="true" style="min-width:80px;font-size:0.82rem" data-eid="${e.id}" data-field="notes" class="essay-editable">${esc(e.notes || '')}</span></td>
-          </tr>`).join('')}
+          ${regularItems.map(e => renderEssayRow(e, false)).join('')}
+          ${honorsItems.length > 0 ? `
+          <tr><td colspan="6" style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--primary-dark);padding:10px 12px 4px;border-top:1px solid var(--border)">
+            Honors College Essays${honorsDisabled ? ' <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;color:var(--text-light)">— not applying (change in Checklist tab)</span>' : ''}
+          </td></tr>
+          ${honorsItems.map(e => renderEssayRow(e, honorsDisabled)).join('')}` : ''}
         </tbody>
       </table>
     </div>`;
