@@ -1,0 +1,122 @@
+name: Auto-update Changelog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'sw.js'
+      - 'manifest.json'
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    # Don't run on commits made by this action (prevent infinite loop)
+    if: "!contains(github.event.head_commit.message, '[changelog-bot]')"
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for commit log
+
+      - name: Get commit details
+        id: commits
+        run: |
+          # Get commits from this push that modified index.html or sw.js
+          # Use the before SHA if available, otherwise use parent of current
+          BEFORE="${{ github.event.before }}"
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="HEAD~1"
+          fi
+
+          # Get commit messages (skip any changelog-bot commits)
+          MESSAGES=$(git log --pretty=format:"%s" "$BEFORE..HEAD" -- index.html sw.js manifest.json | grep -v '\[changelog-bot\]' || true)
+
+          if [ -z "$MESSAGES" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+          # Store messages for the script
+          echo "$MESSAGES" > /tmp/commit_messages.txt
+
+          # Get the date
+          echo "date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Update changelog in index.html
+        if: steps.commits.outputs.skip == 'false'
+        run: |
+          DATE="${{ steps.commits.outputs.date }}"
+
+          # Read commit messages and build changelog items
+          ITEMS=""
+          while IFS= read -r msg; do
+            # Skip empty lines and Co-Authored-By lines
+            [ -z "$msg" ] && continue
+            [[ "$msg" == Co-Authored-By* ]] && continue
+
+            # Clean up the message: use the commit subject line as-is
+            CLEAN=$(echo "$msg" | sed "s/'/\\\\'/g" | sed 's/"/\\\\"/g')
+            ITEMS="${ITEMS}      '${CLEAN}',\n"
+          done < /tmp/commit_messages.txt
+
+          if [ -z "$ITEMS" ]; then
+            echo "No items to add"
+            exit 0
+          fi
+
+          # Calculate next version: find current max version and increment minor
+          CURRENT_VERSION=$(grep -oP "version: '[0-9]+\.[0-9]+'" index.html | head -1 | grep -oP '[0-9]+\.[0-9]+')
+          if [ -z "$CURRENT_VERSION" ]; then
+            NEXT_VERSION="3.4"
+          else
+            MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+            MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+            NEXT_MINOR=$((MINOR + 1))
+            NEXT_VERSION="${MAJOR}.${NEXT_MINOR}"
+          fi
+
+          # Build the title from the first commit message (truncated)
+          TITLE=$(head -1 /tmp/commit_messages.txt | cut -c1-60)
+
+          # Create the new changelog entry
+          NEW_ENTRY="  {\n    version: '${NEXT_VERSION}',\n    date: '${DATE}',\n    title: '${TITLE}',\n    items: [\n${ITEMS}    ]\n  },"
+
+          # Insert after "const CHANGELOG = [" line
+          # Use a temp file to handle the multiline insertion
+          awk -v entry="$NEW_ENTRY" '
+            /^const CHANGELOG = \[/ {
+              print $0
+              printf "%b\n", entry
+              next
+            }
+            { print }
+          ' index.html > index.html.tmp && mv index.html.tmp index.html
+
+          echo "Added changelog entry v${NEXT_VERSION}"
+
+      - name: Bump service worker cache version
+        if: steps.commits.outputs.skip == 'false'
+        run: |
+          # Increment the cache version number in sw.js
+          CURRENT_CACHE=$(grep -oP "avery-dashboard-v\K[0-9]+" sw.js)
+          if [ -n "$CURRENT_CACHE" ]; then
+            NEXT_CACHE=$((CURRENT_CACHE + 1))
+            sed -i "s/avery-dashboard-v${CURRENT_CACHE}/avery-dashboard-v${NEXT_CACHE}/" sw.js
+            echo "Bumped cache to v${NEXT_CACHE}"
+          fi
+
+      - name: Commit and push
+        if: steps.commits.outputs.skip == 'false'
+        run: |
+          git config user.name "changelog-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sw.js
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "[changelog-bot] Auto-update changelog and cache version"
+          git push
