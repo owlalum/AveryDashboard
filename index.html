@@ -826,6 +826,7 @@
       <button class="changelog-bell" onclick="toggleChangelog()" title="What's New" aria-label="What's New">
         &#128276;<span class="changelog-badge" id="changelogBadge" style="display:none">0</span>
       </button>
+      <button id="finalListBtn" onclick="setFinalListFilter(!finalListOnly)" title="Show Final List only" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Toggle Final List">&#11088;</button>
       <span id="syncIndicator" title="Saving..." style="background:rgba(255,255,255,.15);color:#ffd666;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;cursor:default">&#9203;</span>
       <button onclick="backupToJSON()" title="Backup data" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Backup data">&#128190;</button>
       <button onclick="document.getElementById('restoreInput').click()" title="Restore from backup" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Restore from backup">&#128194;</button>
@@ -850,6 +851,10 @@
     <button class="btn btn-primary btn-sm" onclick="backupToJSON();dismissBackupBanner()">Download Backup</button>
     <button class="btn btn-sm" onclick="dismissBackupBanner()">Remind me later</button>
   </div>
+</div>
+<div id="finalListBanner" style="display:none;padding:8px 24px;background:#fef9e7;border-bottom:1px solid #f0d86e;font-size:0.85rem;color:#7a6a1e;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+  <span class="flb-text"></span>
+  <button class="btn btn-sm" onclick="setFinalListFilter(false)" style="font-size:0.78rem;">Show All</button>
 </div>
 
 <main class="content">
@@ -1771,6 +1776,9 @@ function runMigrations() {
   if (!data.studentName) data.studentName = '';
   if (!data.lastModified) data.lastModified = Date.now();
 
+  // Ensure finalList field exists on all schools
+  data.schools.forEach(s => { if (s.finalList === undefined) s.finalList = false; });
+
   // Backfill new fields from schoolDB
   const newFields = ['domain','color','acceptRate','oosAcceptRate','avgGPA','usNewsOverall','usNewsPublic','vetSchoolRank'];
   data.schools.forEach(s => {
@@ -2007,10 +2015,11 @@ function onScoresChanged() {
 function renderAppStatus() {
   const body = document.getElementById('appStatusBody');
   if (!body) return;
-  const total = data.schools.length;
+  const visible = getVisibleSchools();
+  const total = visible.length;
   if (total === 0) { body.innerHTML = '<span style="color:var(--text-light);">No schools added yet.</span>'; return; }
   const counts = { researching:0, applying:0, accepted:0, rejected:0, waitlisted:0 };
-  data.schools.forEach(s => { counts[s.status || 'researching']++; });
+  visible.forEach(s => { counts[s.status || 'researching']++; });
   const heardBack = counts.accepted + counts.rejected + counts.waitlisted;
   const applied = counts.applying + heardBack;
   const colors = { researching:'var(--text-light)', applying:'var(--primary)', accepted:'#16a34a', rejected:'#dc2626', waitlisted:'#ca8a04' };
@@ -2082,6 +2091,44 @@ document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
   }
 })();
 
+// ─── Final List Filter ───
+let finalListOnly = sessionStorage.getItem('finalListOnly') === 'true';
+
+function getVisibleSchools() {
+  if (!finalListOnly) return data.schools;
+  return data.schools.filter(s => s.finalList);
+}
+
+function toggleFinalList(school) {
+  const s = data.schools.find(sc => sc.name === school || sc.id === school);
+  if (s) { s.finalList = !s.finalList; saveData(); renderSchools(); updateFinalListUI(); }
+}
+
+function setFinalListFilter(on) {
+  finalListOnly = on;
+  sessionStorage.setItem('finalListOnly', on ? 'true' : 'false');
+  updateFinalListUI();
+  renderAll();
+}
+
+function updateFinalListUI() {
+  const btn = document.getElementById('finalListBtn');
+  const banner = document.getElementById('finalListBanner');
+  const count = data.schools.filter(s => s.finalList).length;
+  if (btn) {
+    btn.style.background = finalListOnly ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,.15)';
+    btn.title = finalListOnly ? 'Showing Final List only' : 'Show Final List only';
+  }
+  if (banner) {
+    if (finalListOnly) {
+      banner.style.display = '';
+      banner.querySelector('.flb-text').textContent = 'Showing Final List only (' + count + ' school' + (count !== 1 ? 's' : '') + ')';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
 // ─── School Comparison ───
 let schoolSort = { field: null, dir: 'asc' };
 let compareSelected = []; // array of school names, max 4
@@ -2099,6 +2146,7 @@ function getSuperscoreStatus(schoolName) {
 
 const SCHOOL_COLUMNS = [
   { field: '_compare',        label: '',               sortType: null },
+  { field: '_finalList',      label: '',               sortType: null },
   { field: null,              label: '',               sortType: null },
   { field: 'name',            label: 'School',         sortType: 'text' },
   { field: 'location',        label: 'Location',       sortType: 'text' },
@@ -2296,7 +2344,7 @@ function renderSchools() {
   });
 
   const tbody = document.getElementById('schoolBody');
-  tbody.innerHTML = data.schools.map(s => {
+  tbody.innerHTML = getVisibleSchools().map(s => {
     const dbEntry = schoolDB[s.name];
     const schoolColor = s.color || (dbEntry && dbEntry.color) || '#4a7c8a';
     const initials = s.name.split(' ').map(w => w[0]).filter(c => c && c === c.toUpperCase()).slice(0,2).join('');
@@ -2305,6 +2353,7 @@ function renderSchools() {
     return `
     <tr data-id="${s.id}">
       <td class="compact" style="width:28px;"><input type="checkbox" class="compare-cb" data-school="${esc(s.name)}" ${compareSelected.includes(s.name) ? 'checked' : ''} onchange="toggleCompare(this)" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;" title="Select to compare"></td>
+      <td class="compact" style="width:28px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
       <td class="logo-cell">${schoolLogoHTML(s.name)}</td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="name">${esc(s.name)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
@@ -2463,7 +2512,8 @@ function renderChecklists() {
   // Ensure honorsOptOut state exists
   if (!data.honorsOptOut) data.honorsOptOut = {};
 
-  container.innerHTML = data.checklists.map(cl => {
+  const visibleNames = getVisibleSchools().map(s => s.name);
+  container.innerHTML = data.checklists.filter(cl => visibleNames.includes(cl.school)).map(cl => {
     // Split items into application and honors sections
     const appItems = cl.items.filter(i => i.cat !== 'honors');
     const honorsItems = cl.items.filter(i => i.cat === 'honors');
@@ -3174,7 +3224,7 @@ function calcMaxWeightedTotal() {
 function renderEvalSchoolPicker() {
   const sel = document.getElementById('evalSchoolSelect');
   const prev = sel.value;
-  sel.innerHTML = data.schools.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
+  sel.innerHTML = getVisibleSchools().map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
   if (prev && data.schools.find(s => s.name === prev)) sel.value = prev;
 }
 
@@ -3337,7 +3387,7 @@ function renderEvalSummary() {
   const tbody = document.getElementById('evalSummaryBody');
   if (data.schools.length === 0) { tbody.innerHTML = ''; return; }
 
-  const rows = data.schools.map(s => {
+  const rows = getVisibleSchools().map(s => {
     const ev = getEvalForSchool(s.name);
     return {
       name: s.name,
@@ -3412,7 +3462,7 @@ function renderRankings() {
 
   const maxTotal = calcMaxWeightedTotal();
 
-  const rows = data.schools.map(s => {
+  const rows = getVisibleSchools().map(s => {
     const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
     const visitScore = calcWeightedTotal(ev);
@@ -3558,7 +3608,7 @@ function renderSummary() {
   }
 
   // Build rows dynamically from live data
-  const rows = data.schools.map(s => {
+  const rows = getVisibleSchools().map(s => {
     const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
     const visitScore = calcWeightedTotal(ev);
@@ -3646,7 +3696,7 @@ function renderScenarios() {
 
   // Build scored rows for all active schools
   const maxTotal = calcMaxWeightedTotal();
-  const scored = data.schools.map(s => {
+  const scored = getVisibleSchools().map(s => {
     const rk = getRankingForSchool(s.name);
     const ev = getEvalForSchool(s.name);
     const visitScore = calcWeightedTotal(ev);
@@ -3784,7 +3834,7 @@ const FIN_DATA = [
 function renderFinancials() {
   const tbody = document.getElementById('finBody');
   // Filter to only schools in the user's comparison list
-  const finActiveNames = data.schools.map(s => s.name);
+  const finActiveNames = getVisibleSchools().map(s => s.name);
   const activeFin = FIN_DATA.filter(row => row.group || finActiveNames.includes(row.school));
   // Remove group headers that have no schools after them
   const cleanedFin = activeFin.filter((row, i) => {
@@ -3970,7 +4020,7 @@ const STRATEGY_DATA = [
 function renderStrategy() {
   const tbody = document.getElementById('strategyBody');
   // Filter to only schools in the user's comparison list
-  const stratActiveNames = data.schools.map(s => s.name);
+  const stratActiveNames = getVisibleSchools().map(s => s.name);
   const activeStrategy = STRATEGY_DATA.filter(s => stratActiveNames.includes(s.school));
 
   if (activeStrategy.length === 0) {
@@ -4270,7 +4320,7 @@ function renderGreekLife() {
   const tb = document.getElementById('greekBody');
   const empty = document.getElementById('greekEmpty');
   if (!tb) return;
-  const schools = data.schools;
+  const schools = getVisibleSchools();
   if (schools.length === 0) { empty.style.display = ''; tb.parentElement.style.display = 'none'; return; }
   empty.style.display = 'none'; tb.parentElement.style.display = '';
   tb.innerHTML = schools.map(s => {
@@ -4393,7 +4443,7 @@ function getDeadlineEvents() {
   const today = new Date();
   const currentYear = today.getFullYear();
 
-  for (const s of data.schools) {
+  for (const s of getVisibleSchools()) {
     const name = s.name;
     const db = schoolDB[name] || {};
     const deadline = s.deadline || db.deadline || '';
@@ -4563,8 +4613,10 @@ function renderEssays() {
   empty.style.display = 'none';
 
   if (!data.honorsOptOut) data.honorsOptOut = {};
-  // Filter out honors essays for schools where Avery isn't applying to honors
+  const visibleEssayNames = getVisibleSchools().map(s => s.name);
+  // Filter to visible schools and exclude opted-out honors essays
   const activeEssays = data.essays.filter(e => {
+    if (e.school !== 'Shared' && !visibleEssayNames.includes(e.school)) return false;
     if (!/^HONORS:/i.test(e.name)) return true;
     return !data.honorsOptOut[e.school];
   });
@@ -4770,6 +4822,7 @@ function renderAll() {
   renderProfile();
   renderAppStatus();
   renderNextUp();
+  updateFinalListUI();
 }
 renderAll();
 
