@@ -3209,7 +3209,8 @@ function renderEvaluation() {
         <div class="total-label">Weighted Total Score</div>
       </div>
       <div style="display:flex;align-items:center;gap:14px">
-        <button class="btn btn-sm" onclick="expandAllEvalSections()" style="font-size:0.78rem;padding:6px 12px;">Quick Score</button>
+        <button class="btn btn-sm" onclick="expandAllEvalSections()" style="font-size:0.78rem;padding:6px 12px;">Expand All</button>
+        <button class="btn btn-sm" onclick="collapseAllEvalSections()" style="font-size:0.78rem;padding:6px 12px;">Collapse All</button>
         <div class="eval-grade-picker">
           <label style="font-size:0.78rem;font-weight:600;color:var(--text-light);margin-right:6px;">Letter Grade:</label>
           <select onchange="setEvalField('${esc(schoolName)}','letterGrade',this.value)">
@@ -3297,6 +3298,10 @@ function toggleEvalSection(header) {
 
 function expandAllEvalSections() {
   document.querySelectorAll('.eval-section.eval-collapsed').forEach(s => s.classList.remove('eval-collapsed'));
+}
+
+function collapseAllEvalSections() {
+  document.querySelectorAll('.eval-section[data-evalcat]').forEach(s => s.classList.add('eval-collapsed'));
 }
 
 function setEvalRating(school, catKey, itemKey, val) {
