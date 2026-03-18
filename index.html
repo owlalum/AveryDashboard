@@ -631,9 +631,6 @@
   .badge-safety { background: #eaf5ee; color: #2d6e3f; }
   .badge-match { background: #e8f1f4; color: #3a6270; }
   .badge-reach { background: #fce8e8; color: #b04040; }
-  .badge-funded { background: #eaf5ee; color: #2d6e3f; }
-  .badge-affordable { background: #e8f1f4; color: #3a6270; }
-  .badge-stretch { background: #fff3e0; color: #b87a1e; }
   .badge-vet-yes { background: #e8f1f4; color: var(--primary-dark); }
   .badge-vet-no { background: #f5f5f5; color: #888; }
   .badge-booked { background: #eaf5ee; color: #2d6e3f; }
@@ -643,12 +640,6 @@
   .scenario-card .scenario-value { font-size: 0.92rem; font-weight: 600; color: var(--primary-dark); }
 
   /* ── Financial Analysis ── */
-  .fin-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
-  .fin-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; text-align: center; }
-  .fin-card .fin-amount { font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); }
-  .fin-card .fin-label { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; }
-  .fin-card input { border: none; text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--primary-dark); width: 100%; background: transparent; font-family: inherit; }
-  .fin-card input:focus { outline: none; background: var(--primary-light); border-radius: 6px; }
   .fin-group-header { background: var(--primary-light); color: var(--primary-dark); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
   .fin-group-header td { padding: 8px 10px !important; }
 
@@ -700,7 +691,6 @@
     .tab-btn { padding: 10px 14px; font-size: 0.82rem; min-height: 44px; }
     .card-grid { grid-template-columns: 1fr; }
     .profile-grid { grid-template-columns: 1fr; }
-    .fin-summary { grid-template-columns: 1fr 1fr; }
     .trip-day-body { grid-template-columns: 1fr; }
     .scenarios-grid { grid-template-columns: 1fr; }
     .subtab-bar { padding: 4px 12px 0; }
@@ -725,7 +715,6 @@
     .section-head h2 { font-size: 1.1rem; }
     .card { padding: 14px; }
     .card h3 { font-size: 0.95rem; }
-    .fin-summary { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 768px) {
@@ -824,13 +813,6 @@
         <div class="profile-row"><span class="label">Goal</span><span class="value">Doctor of Veterinary Medicine (DVM)</span></div>
         <div class="profile-row"><span class="label">Residency</span><span class="value">Georgia (In-State for UGA)</span></div>
       </div>
-      <div class="profile-card" id="finProfileCard">
-        <h3>Financial Resources</h3>
-        <div class="profile-row"><span class="label">529 Balance</span><span class="value" id="finProfile529">—</span></div>
-        <div class="profile-row"><span class="label">Annual Cash Flow</span><span class="value" id="finProfileCash">—</span></div>
-        <div class="profile-row"><span class="label">4-Year Cash Flow</span><span class="value" id="finProfile4yr">—</span></div>
-        <div class="profile-row"><span class="label">Total Available</span><span class="value" id="finProfileTotal" style="color:var(--accent);font-size:1.05rem;">—</span></div>
-      </div>
       <div class="profile-card" id="appStatusCard">
         <h3>Application Status</h3>
         <div id="appStatusBody" style="font-size:0.88rem;"></div>
@@ -840,7 +822,7 @@
     <div class="section-head"><h2>Comprehensive School Rankings</h2></div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>Rank</th><th>School</th><th>Category</th><th>Visit Score</th><th>Vet School</th><th>4-Yr Cost</th><th>Budget Fit</th><th>Score</th><th>Key Notes</th></tr></thead>
+        <thead><tr><th>Rank</th><th>School</th><th>Category</th><th>Visit Score</th><th>Vet School</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
         <tbody id="summaryRankBody"></tbody>
       </table>
     </div>
@@ -916,15 +898,9 @@
   <!-- Financial Analysis sub-panel -->
   <div id="financial" class="sub-panel">
     <div class="section-head"><h2>Financial Analysis</h2></div>
-    <div class="fin-summary">
-      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="fin529" value="0" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">529 Balance</div></div>
-      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="finCashflow" value="0" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">Annual Cash Flow</div></div>
-      <div class="fin-card"><div class="fin-amount" id="fin4yr">$148,000</div><div class="fin-label">4-Year Cash Flow</div></div>
-      <div class="fin-card"><div class="fin-amount" id="finTotal" style="color:var(--accent)">$0</div><div class="fin-label">Total Available</div></div>
-    </div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>School</th><th>Residency</th><th>Sticker COA/Yr</th><th>4-Yr Sticker</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th><th>Gap vs Total</th><th>Budget Fit</th></tr></thead>
+        <thead><tr><th>School</th><th>Residency</th><th>Sticker COA/Yr</th><th>4-Yr Sticker</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th></tr></thead>
         <tbody id="finBody"></tbody>
       </table>
     </div>
@@ -1065,42 +1041,6 @@
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Strong &mdash; well-regarded program with good job placement</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Good &mdash; solid program, regional reputation</td></tr>
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Fair &mdash; limited career options if vet school doesn't work out</td></tr>
-      </table>
-    </div>
-
-    <!-- Budget Fit Criteria -->
-    <div class="strat-explainer">
-      <h3>Budget Fit Criteria</h3>
-      <p>Based on the family's total 4-year education budget of <strong id="methBudgetTotal">—</strong>:</p>
-      <table style="width:100%;margin-top:8px;font-size:0.88rem;border-collapse:collapse;">
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">529 Plan Balance</td><td id="methBudget529">—</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Annual Cash Flow</td><td id="methBudgetCash">—</td></tr>
-        <tr style="border-top:2px solid var(--border);"><td style="padding:8px 12px 4px 0;font-weight:700;">Total Available</td><td id="methBudgetTotalRow" style="padding-top:8px;font-weight:700;">—</td></tr>
-      </table>
-      <p style="margin-top:14px;">Schools are labeled based on their estimated 4-year cost (after merit aid):</p>
-      <table style="width:100%;margin-top:8px;font-size:0.88rem;border-collapse:collapse;">
-        <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
-          <th style="padding:6px 12px 6px 0;">Label</th>
-          <th style="padding:6px 12px;">4-Year Cost</th>
-          <th style="padding:6px 12px;">Meaning</th>
-        </tr></thead>
-        <tbody>
-          <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;color:#16a34a;">FULLY FUNDED</td>
-            <td style="padding:8px 12px;">&le; $160,000</td>
-            <td style="padding:8px 12px;">529 + cash flow covers everything with money left for vet school savings</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">AFFORDABLE</td>
-            <td style="padding:8px 12px;">$160,000 &ndash; $200,000</td>
-            <td style="padding:8px 12px;">Within budget but uses most of the available funds</td>
-          </tr>
-          <tr>
-            <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">STRETCH</td>
-            <td style="padding:8px 12px;">&gt; $200,000</td>
-            <td style="padding:8px 12px;">Exceeds comfortable budget; may require loans or reduced vet school savings</td>
-          </tr>
-        </tbody>
       </table>
     </div>
 
@@ -1896,22 +1836,6 @@ function renderProfile() {
     it.querySelector('[data-act="science"]').textContent = act.science ? act.science + ' (' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '—';
     it.querySelector('[data-field="gpa"]').textContent = gpa || '—';
   }
-  // Financial profile card
-  const b529 = data.finConfig ? data.finConfig.b529 : 0;
-  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 0;
-  const fourYrCash = cashPerYr * 4;
-  const totalBudget = b529 + fourYrCash;
-  const fmt = n => n > 0 ? '$' + n.toLocaleString() : '—';
-  const el = id => document.getElementById(id);
-  if (el('finProfile529')) el('finProfile529').textContent = fmt(b529);
-  if (el('finProfileCash')) el('finProfileCash').textContent = cashPerYr > 0 ? '$' + cashPerYr.toLocaleString() + '/year' : '—';
-  if (el('finProfile4yr')) el('finProfile4yr').textContent = fmt(fourYrCash);
-  if (el('finProfileTotal')) el('finProfileTotal').textContent = fmt(totalBudget);
-  // Methodology budget section
-  if (el('methBudgetTotal')) el('methBudgetTotal').textContent = fmt(totalBudget);
-  if (el('methBudget529')) el('methBudget529').textContent = fmt(b529);
-  if (el('methBudgetCash')) el('methBudgetCash').textContent = cashPerYr > 0 ? '$' + cashPerYr.toLocaleString() + ' \u00d7 4 years = $' + fourYrCash.toLocaleString() : '—';
-  if (el('methBudgetTotalRow')) el('methBudgetTotalRow').textContent = fmt(totalBudget);
   // Category descriptions
   const safetyDesc = document.getElementById('catSafetyDesc');
   const reachDesc = document.getElementById('catReachDesc');
@@ -3421,15 +3345,12 @@ function getSummaryVetStatus(schoolName) {
 function getSummaryCost(schoolName) {
   // Use FIN_DATA if available, otherwise compute from schoolDB tuition
   const finEntry = FIN_DATA.find(r => r.school === schoolName);
-  const b529 = data.finConfig ? data.finConfig.b529 : 0;
-  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 0;
-  const totalBudget = b529 + cashPerYr * 4;
 
   if (finEntry) {
-    const realistic = finEntry.sticker - finEntry.merit;
+    const merit = schoolName === 'University of Kentucky' ? getKentuckyMerit() : finEntry.merit;
+    const realistic = finEntry.sticker - merit;
     const fourYr = realistic * 4;
-    const budgetFit = fourYr <= 160000 ? 'FULLY FUNDED' : fourYr <= 200000 ? 'AFFORDABLE' : 'STRETCH';
-    return { cost: '$' + Math.round(fourYr / 1000) + 'K', fourYr, budgetFit };
+    return { cost: '$' + Math.round(fourYr / 1000) + 'K', fourYr };
   }
   // Fallback: parse tuition from schoolDB (sticker price — no merit data available)
   const db = schoolDB[schoolName];
@@ -3438,10 +3359,9 @@ function getSummaryCost(schoolName) {
     const tuitionStr = isInState ? db.tuitionIn : (db.tuitionOut || db.tuitionIn);
     const annual = parseInt((tuitionStr || '').replace(/[$,]/g, '')) || 0;
     const fourYr = annual * 4;
-    const budgetFit = fourYr <= 160000 ? 'FULLY FUNDED' : fourYr <= 200000 ? 'AFFORDABLE' : 'STRETCH';
-    return { cost: '$' + Math.round(fourYr / 1000) + 'K*', fourYr, budgetFit, noMerit: true };
+    return { cost: '$' + Math.round(fourYr / 1000) + 'K*', fourYr, noMerit: true };
   }
-  return { cost: 'N/A', fourYr: 0, budgetFit: 'MATCH', noMerit: true };
+  return { cost: 'N/A', fourYr: 0, noMerit: true };
 }
 
 function renderSummary() {
@@ -3476,7 +3396,6 @@ function renderSummary() {
       cat,
       vet,
       cost: costInfo.cost,
-      budgetFit: costInfo.budgetFit,
       noMerit: costInfo.noMerit || false,
       notes: rk.notes || '',
       visitNorm: Math.round(visitNorm * 10) / 10,
@@ -3491,7 +3410,6 @@ function renderSummary() {
 
   tbody.innerHTML = rows.map(r => {
     const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
-    const budgetClass = r.budgetFit === 'FULLY FUNDED' ? 'badge-funded' : r.budgetFit === 'AFFORDABLE' ? 'badge-affordable' : 'badge-stretch';
     const vetClass = r.vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
     const visitDisplay = r.visitScore > 0 ? r.visitNorm.toFixed(1) : '\u2014';
     return `<tr>
@@ -3501,7 +3419,6 @@ function renderSummary() {
       <td class="compact" style="font-weight:600">${visitDisplay}</td>
       <td class="compact"><span class="badge ${vetClass}">${esc(r.vet)}</span></td>
       <td class="compact" style="font-weight:600">${r.cost}</td>
-      <td class="compact"><span class="badge ${budgetClass}">${r.budgetFit}</span></td>
       <td class="compact" style="font-weight:700">${r.combined.toFixed(2)}</td>
       <td style="font-size:0.82rem;max-width:260px">${esc(r.notes)}</td>
     </tr>`;
@@ -3561,7 +3478,6 @@ function renderScenarios() {
       planB: rk.planB || 3,
       meritAid: rk.meritAid || 3,
       fourYrCost: costInfo.fourYr,
-      budgetFit: costInfo.budgetFit,
       distance: dist || 0,
       hasHonors: /\bhonors\b/i.test(db.notes || ''),
       actLow: (() => { const m = (db.testReq || '').match(/ACT\s+(\d+)/); return m ? parseInt(m[1]) : null; })(),
@@ -3607,7 +3523,7 @@ function renderScenarios() {
   // 4. If UGA rejects — best alternatives sorted by combined score, excluding UGA
   const noUGA = [...scored].filter(s => s.name !== 'University of Georgia').sort((a, b) => b.combined - a.combined);
   if (scored.some(s => s.name === 'University of Georgia') && noUGA.length) {
-    const budgetPick = noUGA.filter(s => s.budgetFit === 'FULLY FUNDED').sort((a, b) => b.combined - a.combined)[0];
+    const budgetPick = [...noUGA].sort((a, b) => a.fourYrCost - b.fourYrCost)[0];
     const prestigePick = [...noUGA].sort((a, b) => b.vetProgram - a.vetProgram || b.combined - a.combined)[0];
     const parts = [];
     if (budgetPick) parts.push(budgetPick.short + ' (save for vet school)');
@@ -3680,28 +3596,7 @@ const FIN_DATA = [
   { school:'University of Florida', res:'OOS', sticker:45000, merit:0 }
 ];
 
-function recalcFinancials() {
-  const b529 = parseInt(document.getElementById('fin529').value.replace(/,/g, '')) || 0;
-  const cashPerYr = parseInt(document.getElementById('finCashflow').value.replace(/,/g, '')) || 0;
-  const fourYrCash = cashPerYr * 4;
-  const total = b529 + fourYrCash;
-  document.getElementById('fin4yr').textContent = '$' + fourYrCash.toLocaleString();
-  document.getElementById('finTotal').textContent = '$' + total.toLocaleString();
-  // Save to data
-  data.finConfig = { b529, cashPerYr };
-  saveData();
-  renderFinancials(total);
-}
-
-function renderFinancials(totalOverride) {
-  const b529 = data.finConfig ? data.finConfig.b529 : 0;
-  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 0;
-  const total = totalOverride || (b529 + cashPerYr * 4);
-  document.getElementById('fin529').value = b529.toLocaleString();
-  document.getElementById('finCashflow').value = cashPerYr.toLocaleString();
-  document.getElementById('fin4yr').textContent = '$' + (cashPerYr * 4).toLocaleString();
-  document.getElementById('finTotal').textContent = '$' + total.toLocaleString();
-
+function renderFinancials() {
   const tbody = document.getElementById('finBody');
   // Filter to only schools in the user's comparison list
   const finActiveNames = data.schools.map(s => s.name);
@@ -3709,29 +3604,24 @@ function renderFinancials(totalOverride) {
   // Remove group headers that have no schools after them
   const cleanedFin = activeFin.filter((row, i) => {
     if (!row.group) return true;
-    // Keep group header only if next non-group row exists
     const nextSchool = activeFin.slice(i + 1).find(r => !r.group);
     const nextGroup = activeFin.slice(i + 1).find(r => r.group);
-    // If next item is another group or end of list, skip this header
     if (!nextSchool) return false;
     if (nextGroup && activeFin.indexOf(nextGroup) < activeFin.indexOf(nextSchool)) return false;
     return true;
   });
 
   if (cleanedFin.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see financial analysis.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see financial analysis.</td></tr>';
     return;
   }
 
   tbody.innerHTML = cleanedFin.map(row => {
-    if (row.group) return `<tr class="fin-group-header"><td colspan="9">${row.group}</td></tr>`;
+    if (row.group) return `<tr class="fin-group-header"><td colspan="7">${row.group}</td></tr>`;
     const merit = row.school === 'University of Kentucky' ? getKentuckyMerit() : row.merit;
     const realistic = row.sticker - merit;
     const fourYrSticker = row.sticker * 4;
     const fourYrRealistic = realistic * 4;
-    const gap = total - fourYrRealistic;
-    const budgetFit = fourYrRealistic <= 160000 ? 'FULLY FUNDED' : fourYrRealistic <= 200000 ? 'AFFORDABLE' : 'STRETCH';
-    const verdictClass = budgetFit === 'FULLY FUNDED' ? 'badge-funded' : budgetFit === 'AFFORDABLE' ? 'badge-affordable' : 'badge-stretch';
     return `<tr>
       <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(row.school, 22)} ${esc(row.school)}</span></td>
       <td class="compact">${row.res}</td>
@@ -3740,8 +3630,6 @@ function renderFinancials(totalOverride) {
       <td class="compact">$${merit.toLocaleString()}</td>
       <td class="compact">$${realistic.toLocaleString()}</td>
       <td class="compact" style="font-weight:600">$${fourYrRealistic.toLocaleString()}</td>
-      <td class="compact" style="font-weight:600;color:${gap>=0?'var(--accent)':'var(--danger)'}">+$${gap.toLocaleString()} surplus</td>
-      <td class="compact"><span class="badge ${verdictClass}">${budgetFit}</span></td>
     </tr>`;
   }).join('');
 }
