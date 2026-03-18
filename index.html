@@ -738,6 +738,7 @@
       <button class="changelog-bell" onclick="toggleChangelog()" title="What's New" aria-label="What's New">
         &#128276;<span class="changelog-badge" id="changelogBadge" style="display:none">0</span>
       </button>
+      <span id="syncIndicator" title="Connecting to Firestore..." style="background:rgba(255,255,255,.15);color:#ffd666;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;cursor:default">&#9203;</span>
       <button onclick="backupToJSON()" title="Backup data" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Backup data">&#128190;</button>
       <button onclick="document.getElementById('restoreInput').click()" title="Restore from backup" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Restore from backup">&#128194;</button>
       <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreFromJSON(this)">
@@ -1310,6 +1311,9 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const docRef = db.collection('dashboards').doc('main');
 let firestoreSyncEnabled = false;
+let firestoreInitialized = false;
+let syncStatus = 'connecting';
+let saveDebounceTimer = null;
 
 // ─── Data store ───
 const STORAGE_KEY = 'averyCollegePlanning';
@@ -1321,10 +1325,35 @@ function loadData() {
 }
 
 function saveData() {
+  data.lastModified = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  if (firestoreSyncEnabled) {
-    docRef.set(JSON.parse(JSON.stringify(data))).catch(err => console.error('Firestore save:', err));
+  if (firestoreSyncEnabled && firestoreInitialized) {
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(() => {
+      docRef.set(JSON.parse(JSON.stringify(data))).then(() => {
+        updateSyncIndicator('synced');
+      }).catch(err => {
+        console.error('Firestore save:', err);
+        updateSyncIndicator('error');
+      });
+    }, 1500);
   }
+}
+
+function updateSyncIndicator(status) {
+  syncStatus = status;
+  const el = document.getElementById('syncIndicator');
+  if (!el) return;
+  const map = {
+    connecting: { icon: '\u23F3', title: 'Connecting to Firestore...',          color: '#ffd666' },
+    synced:     { icon: '\u2601',  title: 'Synced with Firestore',              color: '#73d13d' },
+    offline:    { icon: '\u26A0',  title: 'Firestore offline \u2013 using local data', color: '#ff7a45' },
+    error:      { icon: '\u26D4',  title: 'Firestore sync error',               color: '#ff4d4f' }
+  };
+  const s = map[status] || map.connecting;
+  el.textContent = s.icon;
+  el.title = s.title;
+  el.style.color = s.color;
 }
 
 // ─── Backup / Restore ───
@@ -1364,6 +1393,7 @@ function restoreFromJSON(input) {
         return;
       }
       data = restored;
+      data.lastModified = Date.now();
       saveData();
       renderAll();
       alert('Backup restored successfully! (' + schoolCount + ' schools loaded)');
@@ -1677,55 +1707,84 @@ function setupSchoolAutocomplete(inputId) {
 
 let data = loadData();
 
-// ─── Migrate: ensure new data structures exist ───
-if (!data.evaluations) data.evaluations = {};
-if (!data.visitNotes) data.visitNotes = {};
-if (!data.rankings) data.rankings = {};
-if (!data.tripNotes) data.tripNotes = {};
-if (!data.tourChecklist) data.tourChecklist = null;
-if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
-if (!data.actScores) data.actScores = { composite: 27, english: 23, math: 28, reading: 30, science: 33 };
-if (!data.gpa) data.gpa = 3.85;
+// ─── Run structural migrations (no Firestore writes) ───
+function runMigrations() {
+  if (!data.evaluations) data.evaluations = {};
+  if (!data.visitNotes) data.visitNotes = {};
+  if (!data.rankings) data.rankings = {};
+  if (!data.tripNotes) data.tripNotes = {};
+  if (!data.tourChecklist) data.tourChecklist = null;
+  if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
+  if (!data.actScores) data.actScores = { composite: 27, english: 23, math: 28, reading: 30, science: 33 };
+  if (!data.gpa) data.gpa = 3.85;
+  if (!data.lastModified) data.lastModified = Date.now();
 
-// ─── Migrate: backfill new fields from schoolDB for existing saved schools ───
-(function migrate() {
+  // Backfill new fields from schoolDB
   const newFields = ['domain','color','acceptRate','oosAcceptRate','avgGPA','usNewsOverall','usNewsPublic','vetSchoolRank'];
-  let changed = false;
   data.schools.forEach(s => {
-    const db = schoolDB[s.name];
-    if (!db) return;
-    newFields.forEach(f => {
-      if (!s[f] && db[f]) { s[f] = db[f]; changed = true; }
+    const dbEntry = schoolDB[s.name];
+    if (!dbEntry) return;
+    newFields.forEach(f => { if (!s[f] && dbEntry[f]) s[f] = dbEntry[f]; });
+  });
+
+  // Sync notes from schoolDB (honors program info)
+  if (!localStorage.getItem('notesV2')) {
+    data.schools.forEach(s => {
+      const dbEntry = schoolDB[s.name];
+      if (dbEntry && dbEntry.notes && dbEntry.notes !== s.notes) s.notes = dbEntry.notes;
     });
-  });
-  if (changed) saveData();
-})();
+    localStorage.setItem('notesV2', '1');
+  }
 
-// ─── Migrate: sync notes from schoolDB (honors program info) ───
-(function migrateNotes() {
-  if (localStorage.getItem('notesV2')) return;
-  let changed = false;
-  data.schools.forEach(s => {
-    const db = schoolDB[s.name];
-    if (db && db.notes && db.notes !== s.notes) { s.notes = db.notes; changed = true; }
-  });
-  if (changed) saveData();
-  localStorage.setItem('notesV2', '1');
-})();
+  // Backfill US News rankings
+  if (!localStorage.getItem('rankingsDataV2')) {
+    data.schools.forEach(s => {
+      const dbEntry = schoolDB[s.name];
+      if (!dbEntry) return;
+      if (!s.usNewsOverall && dbEntry.usNewsOverall) s.usNewsOverall = dbEntry.usNewsOverall;
+      if (!s.usNewsPublic && dbEntry.usNewsPublic) s.usNewsPublic = dbEntry.usNewsPublic;
+      if (!s.vetSchoolRank && dbEntry.vetSchoolRank) s.vetSchoolRank = dbEntry.vetSchoolRank;
+    });
+    localStorage.setItem('rankingsDataV2', '1');
+  }
 
-// ─── Migrate: backfill US News rankings and vet school rank from schoolDB ───
-(function migrateRankings() {
-  if (localStorage.getItem('rankingsDataV2')) return;
-  let changed = false;
-  data.schools.forEach(s => {
-    const db = schoolDB[s.name];
-    if (!db) return;
-    if (!s.usNewsOverall && db.usNewsOverall) { s.usNewsOverall = db.usNewsOverall; changed = true; }
-    if (!s.usNewsPublic && db.usNewsPublic) { s.usNewsPublic = db.usNewsPublic; changed = true; }
-    if (!s.vetSchoolRank && db.vetSchoolRank) { s.vetSchoolRank = db.vetSchoolRank; changed = true; }
-  });
-  if (changed) saveData();
-  localStorage.setItem('rankingsDataV2', '1');
+  // Save migrations to localStorage only (not Firestore)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ─── Firestore-first async initialization ───
+(async function initFromFirestore() {
+  // Run migrations on local data first for immediate render
+  runMigrations();
+
+  try {
+    const snap = await docRef.get();
+    if (snap.exists) {
+      const remote = snap.data();
+      const remoteTs = remote.lastModified || 0;
+      const localTs = data.lastModified || 0;
+      if (remoteTs >= localTs) {
+        // Firestore has newer or equal data — use it
+        data = remote;
+        runMigrations();
+        console.log('Initialized from Firestore (remote timestamp:', remoteTs, ')');
+      } else {
+        // Local is newer (e.g. offline edits) — push local to Firestore
+        console.log('Local data is newer, will sync to Firestore');
+      }
+    } else {
+      // Firestore doc doesn't exist — don't push defaults
+      console.log('Firestore empty, using local data');
+    }
+    firestoreSyncEnabled = true;
+    firestoreInitialized = true;
+    updateSyncIndicator('synced');
+  } catch (err) {
+    console.warn('Firestore init failed, using local data:', err);
+    firestoreInitialized = true;
+    updateSyncIndicator('offline');
+  }
+  renderAll();
 })();
 
 // ─── ACT Score Helpers ───
@@ -4451,20 +4510,30 @@ document.getElementById('profileCard').addEventListener('keydown', function(e) {
 }, true);
 
 // ─── Firestore real-time sync ───
-docRef.onSnapshot(snap => {
-  if (snap.metadata.hasPendingWrites) return;
-  if (snap.exists) {
-    const remote = snap.data();
-    if (JSON.stringify(remote) !== JSON.stringify(data)) {
-      data = remote;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      renderAll();
+docRef.onSnapshot(
+  snap => {
+    if (snap.metadata.hasPendingWrites) return;
+    if (!firestoreInitialized) return;
+
+    if (snap.exists) {
+      const remote = snap.data();
+      const remoteTs = remote.lastModified || 0;
+      const localTs = data.lastModified || 0;
+      if (remoteTs > localTs) {
+        data = remote;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        renderAll();
+      }
     }
-  } else if (!firestoreSyncEnabled) {
-    docRef.set(JSON.parse(JSON.stringify(data)));
+
+    firestoreSyncEnabled = true;
+    updateSyncIndicator('synced');
+  },
+  err => {
+    console.error('Firestore snapshot error:', err);
+    updateSyncIndicator('error');
   }
-  firestoreSyncEnabled = true;
-});
+);
 
 // ─── Changelog / What's New ───
 const CHANGELOG = [
