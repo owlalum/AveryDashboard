@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Avery's College Planning Dashboard</title>
+<title>College Planning Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Avery College">
+<meta name="apple-mobile-web-app-title" content="College Planner">
 <meta name="theme-color" content="#2c5364">
 <style>
   :root {
@@ -776,7 +776,7 @@
 <header>
   <div class="header-content">
     <div>
-      <h1>Avery's College Planning Dashboard</h1>
+      <h1 id="dashboardTitle">College Planning Dashboard</h1>
       <p>Pre-Veterinary Program Search &amp; Application Tracker</p>
       <span class="header-badge">Class of 2031 &bull; Animal Science &bull; DVM Track</span>
     </div>
@@ -812,7 +812,7 @@
     <div class="profile-grid">
       <div class="profile-card" id="profileCard">
         <h3>Student Profile <button onclick="openScoreEditor()" style="background:none;border:none;cursor:pointer;font-size:0.95rem;vertical-align:middle;padding:2px 6px;border-radius:4px;color:var(--primary);" title="Edit scores">&#9998;</button></h3>
-        <div class="profile-row"><span class="label">Student</span><span class="value">Avery Denney</span></div>
+        <div class="profile-row"><span class="label">Student</span><span class="value" id="profileStudentName">—</span></div>
         <div class="profile-row"><span class="label">Targeted GPA</span><span class="value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></span></div>
         <div class="profile-row"><span class="label">ACT Composite</span><span class="value"><span class="act-edit" data-act="composite" contenteditable="true">27</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="composite-pct">(87th %ile)</span></span></div>
         <div class="profile-row" style="padding-left:12px;"><span class="label">English</span><span class="value"><span class="act-edit" data-act="english" contenteditable="true">23</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="english-pct">(73rd %ile)</span></span></div>
@@ -824,12 +824,12 @@
         <div class="profile-row"><span class="label">Goal</span><span class="value">Doctor of Veterinary Medicine (DVM)</span></div>
         <div class="profile-row"><span class="label">Residency</span><span class="value">Georgia (In-State for UGA)</span></div>
       </div>
-      <div class="profile-card">
+      <div class="profile-card" id="finProfileCard">
         <h3>Financial Resources</h3>
-        <div class="profile-row"><span class="label">529 Balance</span><span class="value">$175,000</span></div>
-        <div class="profile-row"><span class="label">Annual Cash Flow</span><span class="value">$37,000/year</span></div>
-        <div class="profile-row"><span class="label">4-Year Cash Flow</span><span class="value">$148,000</span></div>
-        <div class="profile-row"><span class="label">Total Available</span><span class="value" style="color:var(--accent);font-size:1.05rem;">$323,000</span></div>
+        <div class="profile-row"><span class="label">529 Balance</span><span class="value" id="finProfile529">—</span></div>
+        <div class="profile-row"><span class="label">Annual Cash Flow</span><span class="value" id="finProfileCash">—</span></div>
+        <div class="profile-row"><span class="label">4-Year Cash Flow</span><span class="value" id="finProfile4yr">—</span></div>
+        <div class="profile-row"><span class="label">Total Available</span><span class="value" id="finProfileTotal" style="color:var(--accent);font-size:1.05rem;">—</span></div>
       </div>
       <div class="profile-card" id="appStatusCard">
         <h3>Application Status</h3>
@@ -917,10 +917,10 @@
   <div id="financial" class="sub-panel">
     <div class="section-head"><h2>Financial Analysis</h2></div>
     <div class="fin-summary">
-      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="fin529" value="175000" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">529 Balance</div></div>
-      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="finCashflow" value="37000" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">Annual Cash Flow</div></div>
+      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="fin529" value="0" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">529 Balance</div></div>
+      <div class="fin-card"><div class="fin-amount"><span style="font-size:1.4rem;font-weight:700;color:var(--primary-dark)">$</span><input id="finCashflow" value="0" onchange="recalcFinancials()" style="width:calc(100% - 16px);display:inline"></div><div class="fin-label">Annual Cash Flow</div></div>
       <div class="fin-card"><div class="fin-amount" id="fin4yr">$148,000</div><div class="fin-label">4-Year Cash Flow</div></div>
-      <div class="fin-card"><div class="fin-amount" id="finTotal" style="color:var(--accent)">$323,000</div><div class="fin-label">Total Available</div></div>
+      <div class="fin-card"><div class="fin-amount" id="finTotal" style="color:var(--accent)">$0</div><div class="fin-label">Total Available</div></div>
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table>
@@ -941,7 +941,7 @@
         <li><strong>Penn State / Illinois / Wisconsin:</strong> Expensive OOS with minimal merit at these stats. $50-60K/yr realistic net cost.</li>
         <li><strong>UF:</strong> Essentially no OOS merit. Admission itself is a reach at 14% OOS acceptance.</li>
       </ul>
-      <p style="font-size:0.8rem;color:var(--text-light);margin-top:10px;"><strong>Note:</strong> All sticker prices reflect full Cost of Attendance (tuition + room &amp; board + fees). Merit estimates are based on Avery's current 3.85 GPA / 27 ACT profile and will shift if scores change.</p>
+      <p style="font-size:0.8rem;color:var(--text-light);margin-top:10px;"><strong>Note:</strong> All sticker prices reflect full Cost of Attendance (tuition + room &amp; board + fees). Merit estimates are based on the student's current GPA/ACT profile and will shift if scores change.</p>
     </div>
   </div>
 
@@ -973,13 +973,13 @@
     <div class="section-head"><h2>Methodology</h2><p>How rankings, costs, and categories are calculated</p></div>
 
     <div class="insight-box">
-      <strong>Why this exists:</strong> Every number on this dashboard follows a documented formula. This page explains exactly how schools are ranked, what "Budget Fit" means, and where the data comes from &mdash; so Avery and Carey can evaluate whether the rankings match their own priorities.
+      <strong>Why this exists:</strong> Every number on this dashboard follows a documented formula. This page explains exactly how schools are ranked, what "Budget Fit" means, and where the data comes from &mdash; so you can evaluate whether the rankings match your own priorities.
     </div>
 
     <!-- Student Profile -->
     <div class="strat-explainer">
       <h3>Student Profile (Inputs)</h3>
-      <p>All calculations use Avery's current stats as inputs:</p>
+      <p>All calculations use the student's current stats as inputs:</p>
       <table id="profileInfoTable" style="width:100%;margin-top:10px;font-size:0.88rem;">
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Targeted GPA</td><td data-field="gpa">3.85</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite</td><td data-act="composite">27 (87th %ile)</td></tr>
@@ -1054,7 +1054,7 @@
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Admission Likelihood</h4>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>SAFETY &mdash; acceptance rate &gt;70% or Avery's GPA well above average</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>SAFETY &mdash; acceptance rate &gt;70% or student's GPA well above average</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>MATCH &mdash; acceptance rate 40&ndash;70% and GPA near average</td></tr>
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>REACH &mdash; acceptance rate &lt;30% or GPA below average</td></tr>
       </table>
@@ -1071,11 +1071,11 @@
     <!-- Budget Fit Criteria -->
     <div class="strat-explainer">
       <h3>Budget Fit Criteria</h3>
-      <p>Based on the family's total 4-year education budget of <strong>$323,000</strong>:</p>
+      <p>Based on the family's total 4-year education budget of <strong id="methBudgetTotal">—</strong>:</p>
       <table style="width:100%;margin-top:8px;font-size:0.88rem;border-collapse:collapse;">
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">529 Plan Balance</td><td>$175,000</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Annual Cash Flow</td><td>$37,000 &times; 4 years = $148,000</td></tr>
-        <tr style="border-top:2px solid var(--border);"><td style="padding:8px 12px 4px 0;font-weight:700;">Total Available</td><td style="padding-top:8px;font-weight:700;">$323,000</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">529 Plan Balance</td><td id="methBudget529">—</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Annual Cash Flow</td><td id="methBudgetCash">—</td></tr>
+        <tr style="border-top:2px solid var(--border);"><td style="padding:8px 12px 4px 0;font-weight:700;">Total Available</td><td id="methBudgetTotalRow" style="padding-top:8px;font-weight:700;">—</td></tr>
       </table>
       <p style="margin-top:14px;">Schools are labeled based on their estimated 4-year cost (after merit aid):</p>
       <table style="width:100%;margin-top:8px;font-size:0.88rem;border-collapse:collapse;">
@@ -1107,7 +1107,7 @@
     <!-- Admission Categories -->
     <div class="strat-explainer">
       <h3>Admission Categories</h3>
-      <p>Each school is classified as SAFETY, MATCH, or REACH based on how Avery's profile compares:</p>
+      <p>Each school is classified as SAFETY, MATCH, or REACH based on how the student's profile compares:</p>
       <table style="width:100%;margin-top:10px;font-size:0.88rem;border-collapse:collapse;">
         <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
           <th style="padding:6px 12px 6px 0;">Category</th>
@@ -1116,7 +1116,7 @@
         <tbody>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#16a34a;">SAFETY</td>
-            <td id="catSafetyDesc" style="padding:8px 12px;">Acceptance rate &gt;70%, or Avery's 3.85 GPA and ACT 27 are well above the school's middle 50% range</td>
+            <td id="catSafetyDesc" style="padding:8px 12px;">Acceptance rate &gt;70%, or student's GPA and ACT are well above the school's middle 50% range</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">MATCH</td>
@@ -1124,7 +1124,7 @@
           </tr>
           <tr>
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">REACH</td>
-            <td id="catReachDesc" style="padding:8px 12px;">Acceptance rate &lt;35%, or Avery's ACT 27 below the school's 25th percentile (e.g., UGA at 33%, UF at 24%)</td>
+            <td id="catReachDesc" style="padding:8px 12px;">Acceptance rate &lt;35%, or student's ACT below the school's 25th percentile (e.g., UGA at 33%, UF at 24%)</td>
           </tr>
         </tbody>
       </table>
@@ -1145,7 +1145,7 @@
         </tr>
         <tr style="border-bottom:1px solid var(--border);">
           <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Merit Aid</td>
-          <td style="padding:8px 12px;">Based on published automatic scholarship grids for Avery's GPA/ACT ranges; conservative estimates used when ranges are ambiguous</td>
+          <td style="padding:8px 12px;">Based on published automatic scholarship grids for the student's GPA/ACT ranges; conservative estimates used when ranges are ambiguous</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border);">
           <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Acceptance Rates</td>
@@ -1415,7 +1415,7 @@ function backupToJSON() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'avery-dashboard-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = ((data.studentName || 'student').split(' ')[0].toLowerCase()) + '-dashboard-backup-' + new Date().toISOString().slice(0, 10) + '.json';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1762,9 +1762,10 @@ function runMigrations() {
   if (!data.rankings) data.rankings = {};
   if (!data.tripNotes) data.tripNotes = {};
   if (!data.tourChecklist) data.tourChecklist = null;
-  if (!data.finConfig) data.finConfig = { b529: 175000, cashPerYr: 37000 };
-  if (!data.actScores) data.actScores = { composite: 27, english: 23, math: 28, reading: 30, science: 33 };
-  if (!data.gpa) data.gpa = 3.85;
+  if (!data.finConfig) data.finConfig = { b529: 0, cashPerYr: 0 };
+  if (!data.actScores) data.actScores = { composite: 0, english: 0, math: 0, reading: 0, science: 0 };
+  if (!data.gpa) data.gpa = 0;
+  if (!data.studentName) data.studentName = '';
   if (!data.lastModified) data.lastModified = Date.now();
 
   // Backfill new fields from schoolDB
@@ -1833,6 +1834,18 @@ function runMigrations() {
     updateSyncIndicator('offline');
   }
   renderAll();
+
+  // First-use welcome: prompt for student name if not set
+  if (!data.studentName) {
+    setTimeout(() => {
+      const name = prompt('Welcome! Enter the student\u2019s name to personalize the dashboard:');
+      if (name && name.trim()) {
+        data.studentName = name.trim();
+        saveData();
+        renderProfile();
+      }
+    }, 500);
+  }
 })();
 
 // ─── ACT Score Helpers ───
@@ -1841,42 +1854,69 @@ const ACT_PERCENTILES = {
   26:82,25:78,24:74,23:68,22:63,21:57,20:51,19:44,18:38,17:31,16:25
 };
 function actPercentile(score) { return ACT_PERCENTILES[score] || '—'; }
-function getStudentACT() { return data.actScores || { composite:27, english:23, math:28, reading:30, science:33 }; }
-function getStudentGPA() { return data.gpa || 3.85; }
+function getStudentACT() { return data.actScores || { composite:0, english:0, math:0, reading:0, science:0 }; }
+function getStudentGPA() { return data.gpa || 0; }
+function getStudentName() { return data.studentName || ''; }
 
 function renderProfile() {
   const act = getStudentACT();
   const gpa = getStudentGPA();
+  const name = getStudentName();
+  const firstName = name.split(' ')[0] || 'Student';
+
+  // Title & name
+  const titleEl = document.getElementById('dashboardTitle');
+  if (titleEl) titleEl.textContent = name ? name.split(' ')[0] + '\u2019s College Planning Dashboard' : 'College Planning Dashboard';
+  document.title = name ? name.split(' ')[0] + '\u2019s College Planning Dashboard' : 'College Planning Dashboard';
+  const nameEl = document.getElementById('profileStudentName');
+  if (nameEl) nameEl.textContent = name || 'Not set';
+
   // Profile card
   const pc = document.getElementById('profileCard');
   if (pc) {
-    pc.querySelector('[data-act="composite"]').textContent = act.composite;
-    pc.querySelector('[data-act="composite-pct"]').textContent = '(' + actPercentile(act.composite) + getSuffix(actPercentile(act.composite)) + ' %ile)';
-    pc.querySelector('[data-act="english"]').textContent = act.english;
-    pc.querySelector('[data-act="english-pct"]').textContent = '(' + actPercentile(act.english) + getSuffix(actPercentile(act.english)) + ' %ile)';
-    pc.querySelector('[data-act="math"]').textContent = act.math;
-    pc.querySelector('[data-act="math-pct"]').textContent = '(' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)';
-    pc.querySelector('[data-act="reading"]').textContent = act.reading;
-    pc.querySelector('[data-act="reading-pct"]').textContent = '(' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)';
-    pc.querySelector('[data-act="science"]').textContent = act.science;
-    pc.querySelector('[data-act="science-pct"]').textContent = '(' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)';
-    pc.querySelector('[data-field="gpa"]').textContent = gpa;
+    pc.querySelector('[data-act="composite"]').textContent = act.composite || '—';
+    pc.querySelector('[data-act="composite-pct"]').textContent = act.composite ? '(' + actPercentile(act.composite) + getSuffix(actPercentile(act.composite)) + ' %ile)' : '';
+    pc.querySelector('[data-act="english"]').textContent = act.english || '—';
+    pc.querySelector('[data-act="english-pct"]').textContent = act.english ? '(' + actPercentile(act.english) + getSuffix(actPercentile(act.english)) + ' %ile)' : '';
+    pc.querySelector('[data-act="math"]').textContent = act.math || '—';
+    pc.querySelector('[data-act="math-pct"]').textContent = act.math ? '(' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)' : '';
+    pc.querySelector('[data-act="reading"]').textContent = act.reading || '—';
+    pc.querySelector('[data-act="reading-pct"]').textContent = act.reading ? '(' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)' : '';
+    pc.querySelector('[data-act="science"]').textContent = act.science || '—';
+    pc.querySelector('[data-act="science-pct"]').textContent = act.science ? '(' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '';
+    pc.querySelector('[data-field="gpa"]').textContent = gpa || '—';
   }
   // Info table
   const it = document.getElementById('profileInfoTable');
   if (it) {
-    it.querySelector('[data-act="composite"]').textContent = act.composite + ' (' + actPercentile(act.composite) + getSuffix(actPercentile(act.composite)) + ' %ile)';
-    it.querySelector('[data-act="english"]').textContent = act.english + ' (' + actPercentile(act.english) + getSuffix(actPercentile(act.english)) + ' %ile)';
-    it.querySelector('[data-act="math"]').textContent = act.math + ' (' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)';
-    it.querySelector('[data-act="reading"]').textContent = act.reading + ' (' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)';
-    it.querySelector('[data-act="science"]').textContent = act.science + ' (' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)';
-    it.querySelector('[data-field="gpa"]').textContent = gpa;
+    it.querySelector('[data-act="composite"]').textContent = act.composite ? act.composite + ' (' + actPercentile(act.composite) + getSuffix(actPercentile(act.composite)) + ' %ile)' : '—';
+    it.querySelector('[data-act="english"]').textContent = act.english ? act.english + ' (' + actPercentile(act.english) + getSuffix(actPercentile(act.english)) + ' %ile)' : '—';
+    it.querySelector('[data-act="math"]').textContent = act.math ? act.math + ' (' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)' : '—';
+    it.querySelector('[data-act="reading"]').textContent = act.reading ? act.reading + ' (' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)' : '—';
+    it.querySelector('[data-act="science"]').textContent = act.science ? act.science + ' (' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '—';
+    it.querySelector('[data-field="gpa"]').textContent = gpa || '—';
   }
+  // Financial profile card
+  const b529 = data.finConfig ? data.finConfig.b529 : 0;
+  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 0;
+  const fourYrCash = cashPerYr * 4;
+  const totalBudget = b529 + fourYrCash;
+  const fmt = n => n > 0 ? '$' + n.toLocaleString() : '—';
+  const el = id => document.getElementById(id);
+  if (el('finProfile529')) el('finProfile529').textContent = fmt(b529);
+  if (el('finProfileCash')) el('finProfileCash').textContent = cashPerYr > 0 ? '$' + cashPerYr.toLocaleString() + '/year' : '—';
+  if (el('finProfile4yr')) el('finProfile4yr').textContent = fmt(fourYrCash);
+  if (el('finProfileTotal')) el('finProfileTotal').textContent = fmt(totalBudget);
+  // Methodology budget section
+  if (el('methBudgetTotal')) el('methBudgetTotal').textContent = fmt(totalBudget);
+  if (el('methBudget529')) el('methBudget529').textContent = fmt(b529);
+  if (el('methBudgetCash')) el('methBudgetCash').textContent = cashPerYr > 0 ? '$' + cashPerYr.toLocaleString() + ' \u00d7 4 years = $' + fourYrCash.toLocaleString() : '—';
+  if (el('methBudgetTotalRow')) el('methBudgetTotalRow').textContent = fmt(totalBudget);
   // Category descriptions
   const safetyDesc = document.getElementById('catSafetyDesc');
   const reachDesc = document.getElementById('catReachDesc');
-  if (safetyDesc) safetyDesc.textContent = 'Acceptance rate >70%, or Avery\u2019s ' + gpa + ' GPA and ACT ' + act.composite + ' are well above the school\u2019s middle 50% range';
-  if (reachDesc) reachDesc.textContent = 'Acceptance rate <35%, or Avery\u2019s ACT ' + act.composite + ' below the school\u2019s 25th percentile (e.g., UGA at 33%, UF at 24%)';
+  if (safetyDesc) safetyDesc.textContent = 'Acceptance rate >70%, or ' + firstName + '\u2019s ' + (gpa || '—') + ' GPA and ACT ' + (act.composite || '—') + ' are well above the school\u2019s middle 50% range';
+  if (reachDesc) reachDesc.textContent = 'Acceptance rate <35%, or ' + firstName + '\u2019s ACT ' + (act.composite || '—') + ' below the school\u2019s 25th percentile (e.g., UGA at 33%, UF at 24%)';
   // Merit note
   const kyMerit = document.getElementById('meritKentucky');
   if (kyMerit) kyMerit.innerHTML = getKentuckyMeritLabel();
@@ -3381,8 +3421,8 @@ function getSummaryVetStatus(schoolName) {
 function getSummaryCost(schoolName) {
   // Use FIN_DATA if available, otherwise compute from schoolDB tuition
   const finEntry = FIN_DATA.find(r => r.school === schoolName);
-  const b529 = data.finConfig ? data.finConfig.b529 : 175000;
-  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 37000;
+  const b529 = data.finConfig ? data.finConfig.b529 : 0;
+  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 0;
   const totalBudget = b529 + cashPerYr * 4;
 
   if (finEntry) {
@@ -3654,8 +3694,8 @@ function recalcFinancials() {
 }
 
 function renderFinancials(totalOverride) {
-  const b529 = data.finConfig ? data.finConfig.b529 : 175000;
-  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 37000;
+  const b529 = data.finConfig ? data.finConfig.b529 : 0;
+  const cashPerYr = data.finConfig ? data.finConfig.cashPerYr : 0;
   const total = totalOverride || (b529 + cashPerYr * 4);
   document.getElementById('fin529').value = b529.toLocaleString();
   document.getElementById('finCashflow').value = cashPerYr.toLocaleString();
@@ -4014,7 +4054,8 @@ function exportEvaluationsToExcel() {
   wsNotes['!cols'] = Object.keys(notesRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 20) }));
   XLSX.utils.book_append_sheet(wb, wsNotes, 'Notes & Intangibles');
 
-  XLSX.writeFile(wb, 'Avery_Visit_Evaluations.xlsx');
+  const evalName = (data.studentName || 'Student').split(' ')[0];
+  XLSX.writeFile(wb, evalName + '_Visit_Evaluations.xlsx');
 }
 
 // ─── Export to CSV ───
@@ -4060,7 +4101,7 @@ function exportToCSV(type) {
     });
     rows.sort((a, b) => b['Weighted Total'] - a['Weighted Total']);
     ws = XLSX.utils.json_to_sheet(rows);
-    filename = 'Avery_Visit_Evaluations.csv';
+    filename = (data.studentName || 'Student').split(' ')[0] + '_Visit_Evaluations.csv';
   }
   XLSX.writeFile(wb_from_ws(ws, 'Data'), filename, { bookType: 'csv' });
 }
@@ -4683,8 +4724,16 @@ function openScoreEditor() {
 
   overlay.innerHTML = `
     <div class="modal" style="max-width:380px;">
-      <h3>Edit Scores</h3>
+      <h3>Edit Profile</h3>
       <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.9rem;font-weight:600;">Student Name</label>
+          <input type="text" id="scoreEdit_name" value="${esc(getStudentName())}"
+            placeholder="First Last"
+            style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.95rem;font-family:inherit;">
+          <span style="min-width:64px;"></span>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:2px 0;">
         ${fields.map(f => `
           <div style="display:flex;align-items:center;gap:10px;${f.indent ? 'padding-left:16px;' : ''}">
             <label style="flex:1;font-size:0.9rem;font-weight:${f.indent ? '400' : '600'};">${f.label}</label>
@@ -4717,6 +4766,9 @@ function previewPercentile(key, val) {
 }
 
 function saveScoreEditor() {
+  const nameVal = (document.getElementById('scoreEdit_name').value || '').trim();
+  data.studentName = nameVal;
+
   const gpaVal = parseFloat(document.getElementById('scoreEdit_gpa').value);
   if (!isNaN(gpaVal) && gpaVal >= 0 && gpaVal <= 5) data.gpa = gpaVal;
 
