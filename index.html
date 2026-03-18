@@ -1831,7 +1831,7 @@ function renderProfile() {
   if (reachDesc) reachDesc.textContent = 'Acceptance rate <35%, or Avery\u2019s ACT ' + act.composite + ' below the school\u2019s 25th percentile (e.g., UGA at 33%, UF at 24%)';
   // Merit note
   const kyMerit = document.getElementById('meritKentucky');
-  if (kyMerit) kyMerit.innerHTML = '<strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. ' + act.composite + ' ACT + ' + gpa + ' GPA likely $16-20K/year.';
+  if (kyMerit) kyMerit.innerHTML = getKentuckyMeritLabel();
 }
 
 function getSuffix(n) {
@@ -1839,6 +1839,81 @@ function getSuffix(n) {
   const s = ['th','st','nd','rd'];
   const v = n % 100;
   return (s[(v-20)%10] || s[v] || s[0]);
+}
+
+// ─── Dynamic Kentucky Merit Aid Based on ACT/GPA ───
+function getKentuckyMerit() {
+  const act = (data.actScores || {}).composite || 27;
+  const gpa = data.gpa || 3.85;
+  // UK automatic merit tiers (OOS, approximate annual amounts)
+  if (act >= 33 && gpa >= 3.5) return 22000;
+  if (act >= 31 && gpa >= 3.5) return 20000;
+  if (act >= 29 && gpa >= 3.5) return 18000;
+  if (act >= 27 && gpa >= 3.5) return 16000;
+  if (act >= 25 && gpa >= 3.3) return 12000;
+  if (act >= 23 && gpa >= 3.0) return 8000;
+  return 4000;
+}
+
+function getKentuckyMeritLabel() {
+  const act = (data.actScores || {}).composite || 27;
+  const gpa = data.gpa || 3.85;
+  const merit = getKentuckyMerit();
+  return '<strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. ' + act + ' ACT + ' + gpa + ' GPA \u2192 ~$' + (merit / 1000) + 'K/year.';
+}
+
+// ─── Update Honors Eligibility Text in Checklists ───
+function updateHonorsEligibility() {
+  const act = (data.actScores || {}).composite || 27;
+  const gpa = data.gpa || 3.85;
+  let changed = false;
+
+  data.checklists.forEach(cl => {
+    cl.items.forEach(item => {
+      if (item.cat !== 'honors') return;
+      let newText = item.text;
+
+      if (cl.school === 'Auburn University' && /Requires 3\.85 GPA AND 29 ACT/i.test(item.text)) {
+        if (act >= 29 && gpa >= 3.85) {
+          newText = 'HONORS: Separate app by Nov 15. Requires 3.85 GPA AND 29 ACT minimum. ELIGIBLE with current ' + act + ' ACT. Note: Honors thesis (ANSC 4997) available through Auburn HC once enrolled.';
+        } else {
+          const missing = [];
+          if (act < 29) missing.push('ACT ' + act + ' < 29');
+          if (gpa < 3.85) missing.push('GPA ' + gpa + ' < 3.85');
+          newText = 'HONORS: Separate app by Nov 15. Requires 3.85 GPA AND 29 ACT minimum. NOT ELIGIBLE (' + missing.join(', ') + ') \u2014 only apply if ACT reaches 29+. Note: Honors thesis (ANSC 4997) available through Auburn HC once enrolled.';
+        }
+      }
+
+      if (cl.school === 'Texas A&M University' && /ACT 28\+/i.test(item.text) && item.cat === 'honors') {
+        if (act >= 28) {
+          newText = newText.replace(/Borderline:.*$/i, 'ELIGIBLE with current ' + act + ' ACT.');
+          newText = newText.replace(/needs ACT 28\+.*$/i, 'ELIGIBLE with current ' + act + ' ACT.');
+        } else {
+          newText = newText.replace(/ELIGIBLE.*$/i, 'Borderline: needs ACT 28+ (current: ' + act + ').');
+        }
+      }
+
+      if (newText !== item.text) {
+        item.text = newText;
+        changed = true;
+      }
+    });
+  });
+
+  if (changed) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+}
+
+// ─── Cascade score changes to all dependent views ───
+function onScoresChanged() {
+  renderProfile();
+  renderSummary();
+  renderSchools();
+  renderFinancials();
+  updateHonorsEligibility();
+  renderChecklists();
+  renderEssays();
 }
 
 function renderAppStatus() {
@@ -3562,7 +3637,8 @@ function renderFinancials(totalOverride) {
 
   tbody.innerHTML = cleanedFin.map(row => {
     if (row.group) return `<tr class="fin-group-header"><td colspan="9">${row.group}</td></tr>`;
-    const realistic = row.sticker - row.merit;
+    const merit = row.school === 'University of Kentucky' ? getKentuckyMerit() : row.merit;
+    const realistic = row.sticker - merit;
     const fourYrSticker = row.sticker * 4;
     const fourYrRealistic = realistic * 4;
     const gap = total - fourYrRealistic;
@@ -3573,7 +3649,7 @@ function renderFinancials(totalOverride) {
       <td class="compact">${row.res}</td>
       <td class="compact">$${row.sticker.toLocaleString()}</td>
       <td class="compact">$${fourYrSticker.toLocaleString()}</td>
-      <td class="compact">$${row.merit.toLocaleString()}</td>
+      <td class="compact">$${merit.toLocaleString()}</td>
       <td class="compact">$${realistic.toLocaleString()}</td>
       <td class="compact" style="font-weight:600">$${fourYrRealistic.toLocaleString()}</td>
       <td class="compact" style="font-weight:600;color:${gap>=0?'var(--accent)':'var(--danger)'}">+$${gap.toLocaleString()} surplus</td>
@@ -4547,8 +4623,7 @@ function saveScoreEditor() {
   });
 
   saveData();
-  renderProfile();
-  renderSummary();
+  onScoresChanged();
   document.getElementById('scoreEditorModal').classList.remove('open');
 }
 
@@ -4563,15 +4638,13 @@ document.getElementById('profileCard').addEventListener('blur', function(e) {
     if (isNaN(val) || val < 1 || val > 36) { renderProfile(); return; }
     data.actScores[field] = val;
     saveData();
-    renderProfile();
-    renderSummary(); // re-derive scenarios with new score
+    onScoresChanged();
   } else if (gpaField === 'gpa') {
     const val = parseFloat(el.textContent.trim());
     if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
     data.gpa = val;
     saveData();
-    renderProfile();
-    renderSummary();
+    onScoresChanged();
   }
 }, true);
 document.getElementById('profileCard').addEventListener('keydown', function(e) {
