@@ -763,7 +763,7 @@
     <div class="section-head"><h2>Executive Summary</h2></div>
     <div class="profile-grid">
       <div class="profile-card" id="profileCard">
-        <h3>Student Profile <span style="font-size:0.75rem;font-weight:400;color:var(--text-light);">(click scores to edit)</span></h3>
+        <h3>Student Profile <button onclick="openScoreEditor()" style="background:none;border:none;cursor:pointer;font-size:0.95rem;vertical-align:middle;padding:2px 6px;border-radius:4px;color:var(--primary);" title="Edit scores">&#9998;</button></h3>
         <div class="profile-row"><span class="label">Student</span><span class="value">Avery Denney</span></div>
         <div class="profile-row"><span class="label">Targeted GPA</span><span class="value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></span></div>
         <div class="profile-row"><span class="label">ACT Composite</span><span class="value"><span class="act-edit" data-act="composite" contenteditable="true">27</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="composite-pct">(87th %ile)</span></span></div>
@@ -4480,7 +4480,79 @@ function renderAll() {
 }
 renderAll();
 
-// ─── ACT Score Editing ───
+// ─── ACT Score Editor Modal ───
+function openScoreEditor() {
+  let overlay = document.getElementById('scoreEditorModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'scoreEditorModal';
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.body.appendChild(overlay);
+  }
+
+  const act = getStudentACT();
+  const gpa = getStudentGPA();
+  const fields = [
+    { key: 'gpa', label: 'GPA', value: gpa, min: 0, max: 5, step: 0.01, isGpa: true },
+    { key: 'composite', label: 'ACT Composite', value: act.composite, min: 1, max: 36, step: 1 },
+    { key: 'english', label: 'English', value: act.english, min: 1, max: 36, step: 1, indent: true },
+    { key: 'math', label: 'Math', value: act.math, min: 1, max: 36, step: 1, indent: true },
+    { key: 'reading', label: 'Reading', value: act.reading, min: 1, max: 36, step: 1, indent: true },
+    { key: 'science', label: 'Science', value: act.science, min: 1, max: 36, step: 1, indent: true }
+  ];
+
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:380px;">
+      <h3>Edit Scores</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
+        ${fields.map(f => `
+          <div style="display:flex;align-items:center;gap:10px;${f.indent ? 'padding-left:16px;' : ''}">
+            <label style="flex:1;font-size:0.9rem;font-weight:${f.indent ? '400' : '600'};">${f.label}</label>
+            <input type="number" id="scoreEdit_${f.key}" value="${f.value}"
+              min="${f.min}" max="${f.max}" step="${f.step}"
+              oninput="previewPercentile('${f.key}', this.value)"
+              style="width:64px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.95rem;text-align:center;font-family:inherit;">
+            <span id="scorePct_${f.key}" style="font-size:0.8rem;color:var(--text-light);min-width:64px;text-align:right;">
+              ${f.isGpa ? '' : actPercentile(f.value) + getSuffix(actPercentile(f.value)) + ' %ile'}
+            </span>
+          </div>`).join('')}
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="document.getElementById('scoreEditorModal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveScoreEditor()">Save All</button>
+      </div>
+    </div>`;
+
+  overlay.classList.add('open');
+  overlay.querySelector('#scoreEdit_gpa').focus();
+}
+
+function previewPercentile(key, val) {
+  const el = document.getElementById('scorePct_' + key);
+  if (!el || key === 'gpa') return;
+  const score = parseInt(val);
+  if (isNaN(score) || score < 1 || score > 36) { el.textContent = '—'; return; }
+  const pct = actPercentile(score);
+  el.textContent = pct + getSuffix(pct) + ' %ile';
+}
+
+function saveScoreEditor() {
+  const gpaVal = parseFloat(document.getElementById('scoreEdit_gpa').value);
+  if (!isNaN(gpaVal) && gpaVal >= 0 && gpaVal <= 5) data.gpa = gpaVal;
+
+  ['composite', 'english', 'math', 'reading', 'science'].forEach(key => {
+    const val = parseInt(document.getElementById('scoreEdit_' + key).value);
+    if (!isNaN(val) && val >= 1 && val <= 36) data.actScores[key] = val;
+  });
+
+  saveData();
+  renderProfile();
+  renderSummary();
+  document.getElementById('scoreEditorModal').classList.remove('open');
+}
+
+// ─── ACT Score Editing (inline) ───
 document.getElementById('profileCard').addEventListener('blur', function(e) {
   const el = e.target;
   if (!el.classList.contains('act-edit')) return;
