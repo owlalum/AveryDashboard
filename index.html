@@ -959,6 +959,7 @@
   <!-- Financial Analysis sub-panel -->
   <div id="financial" class="sub-panel">
     <div class="section-head"><h2>Financial Analysis</h2></div>
+    <div style="padding:8px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">Sticker prices reflect 2025-26 published rates. Update annually in August when schools release new figures.</div>
     <div class="table-wrap" style="max-height:none;">
       <table>
         <thead><tr><th>School</th><th>Residency</th><th>Sticker COA/Yr</th><th>4-Yr Sticker</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th></tr></thead>
@@ -3752,6 +3753,7 @@ function renderScenarios() {
 }
 
 // ─── Financial Analysis ───
+// UPDATE ANNUALLY — verify against school COA pages each August
 const FIN_DATA = [
   { group:'SAFETY SCHOOLS' },
   { school:'University of Kentucky', res:'OOS', sticker:52000, merit:18000 },
