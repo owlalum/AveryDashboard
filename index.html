@@ -723,6 +723,7 @@
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -815,6 +816,7 @@
       <div style="display:flex;gap:8px">
         <button class="btn btn-primary" onclick="openModal('school')">+ Add School</button>
         <button class="btn btn-export" onclick="exportToExcel()">Download Excel</button>
+        <button class="btn btn-export" onclick="exportToCSV('comparison')" style="background:#5a6a70;">Download CSV</button>
       </div>
     </div>
     <div class="table-wrap">
@@ -1171,7 +1173,11 @@
     </div>
 
     <div style="margin-top:32px">
-      <div class="section-head"><h2>Evaluation Summary</h2></div>
+      <div class="section-head">
+        <h2>Evaluation Summary</h2>
+        <button class="btn btn-export" onclick="exportEvaluationsToExcel()">Download Excel</button>
+        <button class="btn btn-export" onclick="exportToCSV('evaluations')" style="background:#5a6a70;">Download CSV</button>
+      </div>
       <div class="table-wrap" id="evalSummaryWrap" style="max-height:none;">
         <table class="summary-table">
           <thead>
@@ -3723,40 +3729,161 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
 
-// ─── Export to Excel ───
+// ─── Export to Excel (SheetJS) ───
 function exportToExcel() {
   const statusLabels = { researching:'Researching', applying:'Applying', accepted:'Accepted', rejected:'Rejected', waitlisted:'Waitlisted' };
-  const headers = ['School Name','Location','Distance (mi)','Pre-Vet Program Notes','US News Overall','US News Public','Vet School Rank','Avg GPA','SAT/ACT Requirements','Overall Accept %','Out-of-State Accept %','In-State Tuition','Out-of-State Tuition','Application Deadline','Early Decision Deadline','Status'];
-  const rows = data.schools.map(s => { const d = getDistanceFromAtlanta(s.location); const db = schoolDB[s.name]; return [s.name, s.location, d != null ? String(d) : '', s.notes, s.usNewsOverall || (db && db.usNewsOverall) || '', s.usNewsPublic || (db && db.usNewsPublic) || '', s.vetSchoolRank || (db && db.vetSchoolRank) || '', s.avgGPA, s.testReq, s.acceptRate, s.oosAcceptRate, s.tuitionIn, s.tuitionOut, s.deadline, s.earlyDecision, statusLabels[s.status] || s.status]; });
+  const rows = data.schools.map(s => {
+    const d = getDistanceFromAtlanta(s.location);
+    const db = schoolDB[s.name];
+    return {
+      'School Name': s.name,
+      'Location': s.location,
+      'Distance (mi)': d != null ? d : '',
+      'Pre-Vet Program Notes': s.notes,
+      'US News Overall': s.usNewsOverall || (db && db.usNewsOverall) || '',
+      'US News Public': s.usNewsPublic || (db && db.usNewsPublic) || '',
+      'Vet School Rank': s.vetSchoolRank || (db && db.vetSchoolRank) || '',
+      'Avg GPA': s.avgGPA,
+      'SAT/ACT Requirements': s.testReq,
+      'Overall Accept %': s.acceptRate,
+      'Out-of-State Accept %': s.oosAcceptRate,
+      'In-State Tuition': s.tuitionIn,
+      'Out-of-State Tuition': s.tuitionOut,
+      'Application Deadline': s.deadline,
+      'Early Decision Deadline': s.earlyDecision,
+      'Status': statusLabels[s.status] || s.status
+    };
+  });
 
-  function xmlCell(val) {
-    const v = (val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    return `<Cell><Data ss:Type="String">${v}</Data></Cell>`;
-  }
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-<Styles>
- <Style ss:ID="hdr"><Font ss:Bold="1" ss:Size="11"/><Interior ss:Color="#E8F1F4" ss:Pattern="Solid"/></Style>
-</Styles>
-<Worksheet ss:Name="School Comparison">
-<Table>
-<Row ss:StyleID="hdr">${headers.map(h => xmlCell(h)).join('')}</Row>
-${rows.map(r => `<Row>${r.map(c => xmlCell(c)).join('')}</Row>`).join('\n')}
-</Table>
-</Worksheet>
-</Workbook>`;
-
-  const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'School_Comparison.xls';
-  a.click();
-  URL.revokeObjectURL(url);
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  // Auto-size columns
+  ws['!cols'] = Object.keys(rows[0] || {}).map(k => ({ wch: Math.max(k.length, ...rows.map(r => String(r[k] || '').length), 10) }));
+  XLSX.utils.book_append_sheet(wb, ws, 'School Comparison');
+  XLSX.writeFile(wb, 'School_Comparison.xlsx');
 }
+
+// ─── Export Evaluations to Excel (SheetJS) ───
+function exportEvaluationsToExcel() {
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Evaluation Summary
+  const summaryRows = data.schools.map(s => {
+    const ev = getEvalForSchool(s.name);
+    const wt = calcWeightedTotal(ev);
+    return {
+      'School': s.name,
+      'Gut Check': calcCategorySubtotal(ev, 'gutCheck'),
+      'Campus & Facilities': calcCategorySubtotal(ev, 'campus'),
+      'Academic & Pre-Vet': calcCategorySubtotal(ev, 'academic'),
+      'Student Life & Vibe': calcCategorySubtotal(ev, 'studentLife'),
+      'Practical Factors': calcCategorySubtotal(ev, 'practical'),
+      'Weighted Total': wt,
+      'Letter Grade': ev.letterGrade || '',
+      'Visit Date': ev.visitDate || '',
+      'Weather': ev.weather || '',
+      'Tour Guide': ev.tourGuide || ''
+    };
+  });
+  summaryRows.sort((a, b) => b['Weighted Total'] - a['Weighted Total']);
+  summaryRows.forEach((r, i) => r['Rank'] = i + 1);
+  const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+  wsSummary['!cols'] = Object.keys(summaryRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 12) }));
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+  // Sheet 2: Detailed Ratings (every item for every school)
+  const detailRows = [];
+  data.schools.forEach(s => {
+    const ev = getEvalForSchool(s.name);
+    for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
+      cat.items.forEach(it => {
+        detailRows.push({
+          'School': s.name,
+          'Category': cat.label,
+          'Weight': cat.weight + 'x',
+          'Item': it.label,
+          'Rating (1-5)': ev[catKey] && ev[catKey][it.key] ? ev[catKey][it.key] : 0
+        });
+      });
+    }
+  });
+  const wsDetail = XLSX.utils.json_to_sheet(detailRows);
+  wsDetail['!cols'] = [{ wch: 30 }, { wch: 22 }, { wch: 8 }, { wch: 40 }, { wch: 12 }];
+  XLSX.utils.book_append_sheet(wb, wsDetail, 'Detailed Ratings');
+
+  // Sheet 3: Visit Notes & Intangibles
+  const notesRows = data.schools.map(s => {
+    const ev = getEvalForSchool(s.name);
+    const vn = data.visitNotes[s.name] || {};
+    const intang = ev.intangibles || {};
+    return {
+      'School': s.name,
+      'Best Thing': intang.bestThing || '',
+      'Biggest Concern': intang.biggestConcern || '',
+      'What Surprised You': intang.surprised || '',
+      'Vibe in 3 Words': intang.vibeWords || '',
+      'What I Loved': vn.loved || '',
+      'What Concerned Me': vn.concerned || '',
+      'Questions Answered': vn.answered || '',
+      'Questions Still Open': vn.openQuestions || '',
+      'Would I Be Happy Here?': vn.happyHere || ''
+    };
+  });
+  const wsNotes = XLSX.utils.json_to_sheet(notesRows);
+  wsNotes['!cols'] = Object.keys(notesRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 20) }));
+  XLSX.utils.book_append_sheet(wb, wsNotes, 'Notes & Intangibles');
+
+  XLSX.writeFile(wb, 'Avery_Visit_Evaluations.xlsx');
+}
+
+// ─── Export to CSV ───
+function exportToCSV(type) {
+  let ws, filename;
+  if (type === 'comparison') {
+    const statusLabels = { researching:'Researching', applying:'Applying', accepted:'Accepted', rejected:'Rejected', waitlisted:'Waitlisted' };
+    const rows = data.schools.map(s => {
+      const d = getDistanceFromAtlanta(s.location);
+      const db = schoolDB[s.name];
+      return {
+        'School Name': s.name, 'Location': s.location, 'Distance (mi)': d != null ? d : '',
+        'Pre-Vet Notes': s.notes, 'US News Overall': s.usNewsOverall || (db && db.usNewsOverall) || '',
+        'Vet School Rank': s.vetSchoolRank || (db && db.vetSchoolRank) || '',
+        'Avg GPA': s.avgGPA, 'SAT/ACT': s.testReq, 'Accept %': s.acceptRate,
+        'OOS Accept %': s.oosAcceptRate, 'In-State Tuition': s.tuitionIn,
+        'OOS Tuition': s.tuitionOut, 'Deadline': s.deadline, 'Status': statusLabels[s.status] || s.status
+      };
+    });
+    ws = XLSX.utils.json_to_sheet(rows);
+    filename = 'School_Comparison.csv';
+  } else {
+    const rows = data.schools.map(s => {
+      const ev = getEvalForSchool(s.name);
+      const vn = data.visitNotes[s.name] || {};
+      const intang = ev.intangibles || {};
+      return {
+        'School': s.name,
+        'Gut Check': calcCategorySubtotal(ev, 'gutCheck'),
+        'Campus': calcCategorySubtotal(ev, 'campus'),
+        'Academic': calcCategorySubtotal(ev, 'academic'),
+        'Student Life': calcCategorySubtotal(ev, 'studentLife'),
+        'Practical': calcCategorySubtotal(ev, 'practical'),
+        'Weighted Total': calcWeightedTotal(ev),
+        'Grade': ev.letterGrade || '',
+        'Visit Date': ev.visitDate || '',
+        'Best Thing': intang.bestThing || '',
+        'Biggest Concern': intang.biggestConcern || '',
+        'Vibe Words': intang.vibeWords || '',
+        'What I Loved': vn.loved || '',
+        'What Concerned Me': vn.concerned || ''
+      };
+    });
+    rows.sort((a, b) => b['Weighted Total'] - a['Weighted Total']);
+    ws = XLSX.utils.json_to_sheet(rows);
+    filename = 'Avery_Visit_Evaluations.csv';
+  }
+  XLSX.writeFile(wb_from_ws(ws, 'Data'), filename, { bookType: 'csv' });
+}
+function wb_from_ws(ws, name) { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, name); return wb; }
 
 // ─── One-time migration: regenerate checklists with tailored items ───
 if (!localStorage.getItem('checklistV12')) {

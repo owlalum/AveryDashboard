@@ -1,10 +1,11 @@
-const CACHE_NAME = 'avery-dashboard-v9';
+const CACHE_NAME = 'avery-dashboard-v10';
 const PRECACHE_URLS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js'
 ];
 
 // Install: precache app shell, activate immediately
