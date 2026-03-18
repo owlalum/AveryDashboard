@@ -147,6 +147,20 @@
     font-weight: 600;
   }
 
+  /* ── Backup Banner ── */
+  .backup-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 24px;
+    background: #fef9e7;
+    border-bottom: 1px solid #f0d86e;
+    font-size: 0.85rem;
+    color: #7a6a1e;
+    flex-wrap: wrap;
+  }
+
   /* ── Subtabs ── */
   .subtab-bar {
     display: flex;
@@ -791,6 +805,13 @@
 </nav>
 
 <div id="nextUpStrip" class="next-up-strip"></div>
+<div id="backupBanner" class="backup-banner" style="display:none;">
+  <span>It's been a while since your last backup — download one now to keep your data safe.</span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button class="btn btn-primary btn-sm" onclick="backupToJSON();dismissBackupBanner()">Download Backup</button>
+    <button class="btn btn-sm" onclick="dismissBackupBanner()">Remind me later</button>
+  </div>
+</div>
 
 <main class="content">
 
@@ -1358,6 +1379,7 @@ function backupToJSON() {
   a.download = ((data.studentName || 'student').split(' ')[0].toLowerCase()) + '-dashboard-backup-' + new Date().toISOString().slice(0, 10) + '.json';
   a.click();
   URL.revokeObjectURL(url);
+  localStorage.setItem('lastBackupDate', Date.now().toString());
 }
 
 function restoreFromJSON(input) {
@@ -1786,7 +1808,20 @@ function runMigrations() {
       }
     }, 500);
   }
+
+  // Backup reminder: show banner if >21 days since last backup
+  const lastBackup = parseInt(localStorage.getItem('lastBackupDate') || '0');
+  const daysSinceBackup = (Date.now() - lastBackup) / 86400000;
+  if (daysSinceBackup > 21) {
+    const banner = document.getElementById('backupBanner');
+    if (banner) banner.style.display = '';
+  }
 })();
+
+function dismissBackupBanner() {
+  const banner = document.getElementById('backupBanner');
+  if (banner) banner.style.display = 'none';
+}
 
 // ─── ACT Score Helpers ───
 const ACT_PERCENTILES = {
