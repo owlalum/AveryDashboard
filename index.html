@@ -103,6 +103,50 @@
     background: var(--primary-light);
   }
 
+  /* ── Next Up Strip ── */
+  .next-up-strip {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 8px 24px;
+    background: linear-gradient(135deg, #e6f2f0 0%, #eef6f4 100%);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text);
+    min-height: 36px;
+    flex-wrap: wrap;
+  }
+  .next-up-strip:empty { display: none; }
+  .next-up-label {
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .next-up-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 6px;
+    border: 1px solid rgba(74,124,138,0.15);
+    white-space: nowrap;
+  }
+  .next-up-item .nui-icon { font-size: 0.9rem; }
+  .next-up-item .nui-days {
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+  .next-up-item.on-track {
+    background: rgba(22,163,74,0.08);
+    border-color: rgba(22,163,74,0.2);
+    color: #16a34a;
+    font-weight: 600;
+  }
+
   /* ── Subtabs ── */
   .subtab-bar {
     display: flex;
@@ -661,6 +705,8 @@
     .scenarios-grid { grid-template-columns: 1fr; }
     .subtab-bar { padding: 4px 12px 0; }
     .subtab-btn { padding: 7px 10px; font-size: 0.76rem; min-height: 40px; }
+    .next-up-strip { padding: 6px 12px; gap: 8px; font-size: 0.76rem; }
+    .next-up-item { padding: 3px 8px; }
     .btn { min-height: 44px; }
     table { min-width: 800px; }
   }
@@ -754,6 +800,8 @@
   <button class="tab-btn" data-group="group-visits">Visits</button>
   <button class="tab-btn" data-group="group-apps">Applications</button>
 </nav>
+
+<div id="nextUpStrip" class="next-up-strip"></div>
 
 <main class="content">
 
@@ -4536,6 +4584,60 @@ function syncEssayStatusToChecklists() {
 }
 
 // ─── Initial render ───
+function renderNextUp() {
+  const strip = document.getElementById('nextUpStrip');
+  if (!strip) return;
+  if (data.schools.length === 0) { strip.innerHTML = ''; return; }
+
+  const items = [];
+
+  // 1. Next upcoming deadline
+  const today = new Date();
+  const events = getDeadlineEvents().filter(e => e.date > today);
+  if (events.length > 0) {
+    const next = events[0];
+    const days = Math.ceil((next.date - today) / 86400000);
+    const short = next.school.length > 20 ? next.school.split(' ').slice(0, 3).join(' ') : next.school;
+    items.push(`<span class="next-up-item"><span class="nui-icon">\uD83D\uDCC5</span>${esc(short)} \u2014 ${esc(next.label)} <span class="nui-days">${days}d</span></span>`);
+  }
+
+  // 2. School with lowest checklist completion
+  if (data.checklists.length > 0) {
+    let lowest = null;
+    let lowestPct = 101;
+    for (const cl of data.checklists) {
+      const honorsDisabled = (data.honorsOptOut || {})[cl.school] === true;
+      const countable = honorsDisabled ? cl.items.filter(i => i.cat !== 'honors') : cl.items;
+      if (countable.length === 0) continue;
+      const pct = Math.round((countable.filter(i => i.done).length / countable.length) * 100);
+      if (pct < lowestPct) { lowestPct = pct; lowest = cl.school; }
+    }
+    if (lowest !== null && lowestPct < 100) {
+      const short = lowest.length > 20 ? lowest.split(' ').slice(0, 3).join(' ') : lowest;
+      items.push(`<span class="next-up-item"><span class="nui-icon">\u2610</span>${esc(short)} checklist <span class="nui-days">${lowestPct}%</span></span>`);
+    } else {
+      items.push('<span class="next-up-item on-track"><span class="nui-icon">\u2705</span>All checklists complete</span>');
+    }
+  }
+
+  // 3. First not-started essay
+  const activeEssays = (data.essays || []).filter(e => {
+    if (!/^HONORS:/i.test(e.name)) return true;
+    return !(data.honorsOptOut || {})[e.school];
+  });
+  const notStarted = activeEssays.find(e => e.status === 'not-started');
+  if (notStarted) {
+    const essayLabel = notStarted.school === 'Shared' ? notStarted.name : notStarted.school.split(' ').slice(0, 3).join(' ');
+    items.push(`<span class="next-up-item"><span class="nui-icon">\u270F\uFE0F</span>${esc(essayLabel)} \u2014 ${esc(notStarted.name === essayLabel ? 'not started' : notStarted.name)}</span>`);
+  } else if (activeEssays.length > 0) {
+    items.push('<span class="next-up-item on-track"><span class="nui-icon">\u2705</span>All essays started</span>');
+  }
+
+  strip.innerHTML = items.length > 0
+    ? '<span class="next-up-label">Next Up</span>' + items.join('')
+    : '';
+}
+
 function renderAll() {
   renderSummary();
   renderSchools();
@@ -4553,6 +4655,7 @@ function renderAll() {
   renderGreekLife();
   renderProfile();
   renderAppStatus();
+  renderNextUp();
 }
 renderAll();
 
