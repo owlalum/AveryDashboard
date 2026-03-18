@@ -529,6 +529,17 @@
   .form-group textarea { resize: vertical; min-height: 60px; }
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
+  /* ── AI Analysis ── */
+  .btn-ai { background: var(--accent); color: #fff; }
+  .btn-ai:hover { background: #5e9a70; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(122,174,142,0.3); }
+  .ai-analysis-content p { margin-bottom: 14px; line-height: 1.65; font-size: 0.92rem; }
+  .ai-analysis-content p:last-child { margin-bottom: 0; }
+  .ai-loading { text-align: center; padding: 40px 20px; color: var(--text-light); }
+  .ai-loading .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: aispin 0.8s linear infinite; }
+  @keyframes aispin { to { transform: rotate(360deg); } }
+  .ai-error { background: #fce8e8; border: 1px solid #e8b3b3; border-radius: 8px; padding: 16px; color: var(--danger); font-size: 0.88rem; }
+  .ai-cached-badge { font-size: 0.75rem; color: var(--text-light); font-weight: 400; margin-left: 8px; }
+
   /* ── Compare Modal ── */
   .compare-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10002;
@@ -862,7 +873,7 @@
   <!-- ═══════════ GROUP: OVERVIEW ═══════════ -->
   <div id="group-overview" class="tab-group active">
   <div id="summary" class="sub-panel active">
-    <div class="section-head"><h2>Executive Summary</h2></div>
+    <div class="section-head"><h2>Executive Summary</h2><button class="btn btn-ai" onclick="openAIAnalysis()">&#x2728; AI Analysis</button></div>
     <div class="profile-grid">
       <div class="profile-card" id="profileCard">
         <h3>Student Profile <button onclick="openScoreEditor()" style="background:none;border:none;cursor:pointer;font-size:0.95rem;vertical-align:middle;padding:2px 6px;border-radius:4px;color:var(--primary);" title="Edit scores">&#9998;</button></h3>
@@ -1351,6 +1362,9 @@
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modalContent"></div>
 </div>
+<div class="modal-overlay" id="aiModalOverlay" onclick="if(event.target===this)closeAIModal()">
+  <div class="modal" id="aiModalContent" style="max-width:680px;"></div>
+</div>
 
 <script>
 // ─── Firebase ───
@@ -1369,6 +1383,10 @@ let firestoreSyncEnabled = false;
 let firestoreInitialized = false;
 let syncStatus = 'connecting';
 let saveDebounceTimer = null;
+
+// ─── AI Analysis ───
+// Set this to your deployed Cloudflare Worker URL
+const AI_WORKER_URL = 'https://avery-ai-proxy.owlalum.workers.dev/api/analyze';
 
 // ─── Data store ───
 const STORAGE_KEY = 'averyCollegePlanning';
@@ -4747,6 +4765,143 @@ function syncEssayStatusToChecklists() {
     saveData();
     renderChecklists();
   }
+}
+
+// ─── AI Analysis ───
+function gatherAIData() {
+  const act = getStudentACT();
+  const gpa = getStudentGPA();
+  const name = getStudentName();
+  const maxTotal = calcMaxWeightedTotal();
+
+  const rows = getVisibleSchools().map(s => {
+    const ev = getEvalForSchool(s.name);
+    const rk = getRankingForSchool(s.name);
+    const visitScore = calcWeightedTotal(ev);
+    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    const combined = Math.round((
+      visitNorm * RANK_WEIGHTS.visit +
+      (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
+      (rk.costScore || 3) * RANK_WEIGHTS.costScore +
+      (rk.planB || 3) * RANK_WEIGHTS.planB +
+      (rk.meritAid || 3) * RANK_WEIGHTS.meritAid
+    ) * 100) / 100;
+    const costInfo = getSummaryCost(s.name);
+    return {
+      name: s.name,
+      category: getSummaryCategory(s.name),
+      vetStatus: getSummaryVetStatus(s.name),
+      cost4yr: costInfo.cost,
+      vetProgram: rk.vetProgram || 3,
+      costScore: rk.costScore || 3,
+      meritAid: rk.meritAid || 3,
+      visitScore: Math.round(visitNorm * 10) / 10,
+      combined,
+      notes: rk.notes || ''
+    };
+  });
+
+  rows.sort((a, b) => b.combined - a.combined);
+  return {
+    studentName: name,
+    gpa,
+    act,
+    intendedMajor: 'Animal Science / Pre-Veterinary',
+    goal: 'Doctor of Veterinary Medicine (DVM)',
+    residency: 'Georgia',
+    top5: rows.slice(0, 5)
+  };
+}
+
+function buildAIPrompt(aiData) {
+  const schoolList = aiData.top5.map((s, i) =>
+    (i + 1) + '. ' + s.name + ' (' + s.category + ') \u2014 Visit: ' + s.visitScore + '/5, Vet Program: ' + s.vetProgram + '/5, Cost: ' + s.costScore + '/5, Merit Aid: ' + s.meritAid + '/5, 4yr Cost: ' + s.cost4yr + ', Combined: ' + s.combined + (s.notes ? ', Notes: ' + s.notes : '')
+  ).join('\n');
+
+  return {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1024,
+    system: 'You are an experienced college admissions counselor specializing in pre-veterinary programs. You give specific, actionable advice grounded in the data provided. Be direct and confident. Do not use bullet points or headers \u2014 write in flowing paragraphs.',
+    messages: [{
+      role: 'user',
+      content: 'Analyze this student\'s college application strategy for Fall 2027 enrollment.\n\nStudent: ' + aiData.studentName + '\nGPA: ' + aiData.gpa + '\nACT: Composite ' + aiData.act.composite + ' (E:' + aiData.act.english + ' M:' + aiData.act.math + ' R:' + aiData.act.reading + ' S:' + aiData.act.science + ')\nIntended Major: ' + aiData.intendedMajor + '\nGoal: ' + aiData.goal + '\nResidency: ' + aiData.residency + '\n\nTop 5 schools by combined ranking score:\n' + schoolList + '\n\nPlease provide exactly 3 paragraphs:\n1. BEST FIT ANALYSIS: Which of these schools is the strongest overall fit and why, considering vet program quality, visit impressions, and admission likelihood.\n2. FINANCIAL STRATEGY: How to optimize the financial outcome across this list \u2014 where merit aid is realistic, where costs are concerning, and what the smart financial play is.\n3. FALL APPLICATION WATCHPOINTS: What to prioritize in the next 6 months \u2014 deadlines to hit, scores to improve, and any strategic moves that could strengthen the application portfolio.'
+    }]
+  };
+}
+
+async function openAIAnalysis(forceRegenerate) {
+  const overlay = document.getElementById('aiModalOverlay');
+  const content = document.getElementById('aiModalContent');
+  overlay.classList.add('open');
+
+  // Check cache first
+  if (!forceRegenerate) {
+    const cached = localStorage.getItem('aiAnalysisCache');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        const ageHours = (Date.now() - parsed.timestamp) / (1000 * 60 * 60);
+        if (ageHours < 24) {
+          showAIResult(content, parsed.text, parsed.timestamp);
+          return;
+        }
+      } catch (e) { /* ignore bad cache */ }
+    }
+  }
+
+  // Loading state
+  content.innerHTML = '<h3>AI Analysis</h3><div class="ai-loading"><div class="spinner"></div><p style="margin-top:14px">Analyzing your college list...</p></div>';
+
+  try {
+    const aiData = gatherAIData();
+    const payload = buildAIPrompt(aiData);
+    const resp = await fetch(AI_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error('API returned ' + resp.status + ': ' + errText);
+    }
+
+    const result = await resp.json();
+    const text = (result.content && result.content[0] && result.content[0].text) || 'No analysis returned.';
+
+    const cacheEntry = { text: text, timestamp: Date.now() };
+    localStorage.setItem('aiAnalysisCache', JSON.stringify(cacheEntry));
+
+    showAIResult(content, text, cacheEntry.timestamp);
+  } catch (err) {
+    const isNetwork = err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('fetch');
+    content.innerHTML = '<h3>AI Analysis</h3>' +
+      '<div class="ai-error"><strong>Unable to generate analysis.</strong><br>' +
+      (isNetwork
+        ? 'The AI proxy is not reachable. Deploy the Cloudflare Worker (<code>wrangler deploy</code>) and set the <code>ANTHROPIC_API_KEY</code> secret.'
+        : esc(err.message)) +
+      '</div>' +
+      '<div class="modal-actions">' +
+      '<button class="btn" onclick="closeAIModal()">Close</button>' +
+      '<button class="btn btn-primary" onclick="openAIAnalysis(true)">Retry</button>' +
+      '</div>';
+  }
+}
+
+function showAIResult(container, text, timestamp) {
+  const ageHours = Math.round((Date.now() - timestamp) / (1000 * 60 * 60) * 10) / 10;
+  const ageLabel = ageHours < 0.1 ? 'Just generated' : ageHours < 1 ? Math.round(ageHours * 60) + 'm ago' : Math.round(ageHours) + 'h ago';
+  const paragraphs = text.split('\n\n').filter(function(p) { return p.trim(); }).map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
+  container.innerHTML = '<h3>AI Analysis <span class="ai-cached-badge">' + ageLabel + '</span></h3>' +
+    '<div class="ai-analysis-content">' + paragraphs + '</div>' +
+    '<div class="modal-actions">' +
+    '<button class="btn" onclick="closeAIModal()">Close</button>' +
+    '<button class="btn btn-ai" onclick="openAIAnalysis(true)">&#x1f504; Regenerate</button>' +
+    '</div>';
+}
+
+function closeAIModal() {
+  document.getElementById('aiModalOverlay').classList.remove('open');
 }
 
 // ─── Initial render ───
