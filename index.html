@@ -815,8 +815,7 @@
       <h2>School Comparison</h2>
       <div style="display:flex;gap:8px">
         <button class="btn btn-primary" onclick="openModal('school')">+ Add School</button>
-        <button class="btn btn-export" onclick="exportToExcel()">Download Excel</button>
-        <button class="btn btn-export" onclick="exportToCSV('comparison')" style="background:#5a6a70;">Download CSV</button>
+        <button class="btn btn-export" onclick="promptExport('comparison')">Download</button>
       </div>
     </div>
     <div class="table-wrap">
@@ -1175,8 +1174,7 @@
     <div style="margin-top:32px">
       <div class="section-head">
         <h2>Evaluation Summary</h2>
-        <button class="btn btn-export" onclick="exportEvaluationsToExcel()">Download Excel</button>
-        <button class="btn btn-export" onclick="exportToCSV('evaluations')" style="background:#5a6a70;">Download CSV</button>
+        <button class="btn btn-export" onclick="promptExport('evaluations')">Download</button>
       </div>
       <div class="table-wrap" id="evalSummaryWrap" style="max-height:none;">
         <table class="summary-table">
@@ -3884,6 +3882,20 @@ function exportToCSV(type) {
   XLSX.writeFile(wb_from_ws(ws, 'Data'), filename, { bookType: 'csv' });
 }
 function wb_from_ws(ws, name) { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, name); return wb; }
+
+function promptExport(type) {
+  const choice = prompt('Download as Excel or CSV?\n\nType "excel" or "csv":', 'excel');
+  if (!choice) return;
+  const fmt = choice.trim().toLowerCase();
+  if (fmt === 'csv') {
+    exportToCSV(type);
+  } else if (fmt === 'excel' || fmt === 'xlsx' || fmt === 'xls') {
+    if (type === 'comparison') exportToExcel();
+    else exportEvaluationsToExcel();
+  } else {
+    alert('Please enter "excel" or "csv".');
+  }
+}
 
 // ─── One-time migration: regenerate checklists with tailored items ───
 if (!localStorage.getItem('checklistV12')) {
