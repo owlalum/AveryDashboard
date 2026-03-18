@@ -4892,6 +4892,8 @@ function previewPercentile(key, val) {
 }
 
 function saveScoreEditor() {
+  const oldComposite = (data.actScores || {}).composite || 0;
+
   const nameVal = (document.getElementById('scoreEdit_name').value || '').trim();
   data.studentName = nameVal;
 
@@ -4903,9 +4905,116 @@ function saveScoreEditor() {
     if (!isNaN(val) && val >= 1 && val <= 36) data.actScores[key] = val;
   });
 
+  const newComposite = data.actScores.composite;
   saveData();
   onScoresChanged();
   document.getElementById('scoreEditorModal').classList.remove('open');
+
+  if (newComposite > oldComposite && oldComposite > 0) {
+    showScoreImpactModal(oldComposite, newComposite);
+  }
+}
+
+function showScoreImpactModal(oldACT, newACT) {
+  const gpa = data.gpa || 0;
+  const impacts = [];
+
+  // 1. Honors eligibility changes
+  const honorsThresholds = [
+    { school: 'Auburn University', min: 29, label: 'Auburn Honors' },
+    { school: 'Texas A&M University', min: 28, label: 'Texas A&M Honors Academy' },
+  ];
+  honorsThresholds.forEach(h => {
+    if (!data.schools.find(s => s.name === h.school)) return;
+    if (oldACT < h.min && newACT >= h.min) {
+      impacts.push({ icon: '\u2705', text: h.label + ' \u2014 now eligible with ACT ' + newACT + '+', type: 'honors' });
+    }
+  });
+
+  // 2. Kentucky merit tier changes
+  if (data.schools.find(s => s.name === 'University of Kentucky')) {
+    const oldMerit = getKentuckyMeritForACT(oldACT, gpa);
+    const newMerit = getKentuckyMeritForACT(newACT, gpa);
+    if (newMerit > oldMerit) {
+      impacts.push({ icon: '\uD83D\uDCB0', text: 'Kentucky merit aid \u2014 $' + (oldMerit/1000) + 'K \u2192 $' + (newMerit/1000) + 'K/year (+$' + ((newMerit - oldMerit)/1000) + 'K)', type: 'merit' });
+    }
+  }
+
+  // 3. Schools where positioning strengthened (ACT crosses into their middle 50% range)
+  data.schools.forEach(s => {
+    const db = schoolDB[s.name];
+    if (!db || !db.testReq) return;
+    const m = db.testReq.match(/ACT\s+(\d+)-(\d+)/);
+    if (!m) return;
+    const low = parseInt(m[1]);
+    const high = parseInt(m[2]);
+    if (oldACT < low && newACT >= low) {
+      impacts.push({ icon: '\uD83D\uDCC8', text: esc(s.name) + ' \u2014 now at or above 25th percentile (ACT ' + low + '+)', type: 'positioning' });
+    } else if (oldACT < high && newACT >= high) {
+      impacts.push({ icon: '\u2B50', text: esc(s.name) + ' \u2014 now at 75th percentile (ACT ' + high + '+)', type: 'positioning' });
+    }
+  });
+
+  // 4. Check SCHOOL_CHECKLISTS test items for superscore/threshold mentions
+  data.schools.forEach(s => {
+    const items = SCHOOL_CHECKLISTS[s.name];
+    if (!items) return;
+    items.forEach(item => {
+      if (item.cat !== 'test' && item.cat !== 'honors') return;
+      // Look for specific ACT thresholds mentioned in checklist text
+      const thresholdMatches = item.text.match(/ACT\s+(\d+)\+/g);
+      if (!thresholdMatches) return;
+      thresholdMatches.forEach(match => {
+        const threshold = parseInt(match.match(/\d+/)[0]);
+        if (oldACT < threshold && newACT >= threshold) {
+          // Don't duplicate honors items already caught above
+          if (honorsThresholds.some(h => h.school === s.name && h.min === threshold)) return;
+          const shortName = s.name.length > 25 ? s.name.split(' ').slice(0, 3).join(' ') : s.name;
+          impacts.push({ icon: '\u2705', text: shortName + ' \u2014 now meets ACT ' + threshold + '+ threshold', type: 'threshold' });
+        }
+      });
+    });
+  });
+
+  if (impacts.length === 0) return;
+
+  let overlay = document.getElementById('scoreImpactModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'scoreImpactModal';
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.body.appendChild(overlay);
+  }
+
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:480px;">
+      <h3>Score Update Impact</h3>
+      <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:14px;">ACT Composite: ${oldACT} \u2192 ${newACT} (+${newACT - oldACT})</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${impacts.map(i => `
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:0.88rem;">
+            <span style="font-size:1.1rem;flex-shrink:0;">${i.icon}</span>
+            <span>${i.text}</span>
+          </div>`).join('')}
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('scoreImpactModal').classList.remove('open')">Got it</button>
+      </div>
+    </div>`;
+
+  overlay.classList.add('open');
+}
+
+// Kentucky merit helper that accepts arbitrary ACT/GPA (for comparison)
+function getKentuckyMeritForACT(act, gpa) {
+  if (act >= 33 && gpa >= 3.5) return 22000;
+  if (act >= 31 && gpa >= 3.5) return 20000;
+  if (act >= 29 && gpa >= 3.5) return 18000;
+  if (act >= 27 && gpa >= 3.5) return 16000;
+  if (act >= 25 && gpa >= 3.3) return 12000;
+  if (act >= 23 && gpa >= 3.0) return 8000;
+  return 4000;
 }
 
 // ─── ACT Score Editing (inline) ───
@@ -4915,11 +5024,15 @@ document.getElementById('profileCard').addEventListener('blur', function(e) {
   const field = el.dataset.act;
   const gpaField = el.dataset.field;
   if (field) {
+    const oldComposite = data.actScores.composite || 0;
     const val = parseInt(el.textContent.trim());
     if (isNaN(val) || val < 1 || val > 36) { renderProfile(); return; }
     data.actScores[field] = val;
     saveData();
     onScoresChanged();
+    if (field === 'composite' && val > oldComposite && oldComposite > 0) {
+      showScoreImpactModal(oldComposite, val);
+    }
   } else if (gpaField === 'gpa') {
     const val = parseFloat(el.textContent.trim());
     if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
