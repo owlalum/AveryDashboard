@@ -3884,17 +3884,45 @@ function exportToCSV(type) {
 function wb_from_ws(ws, name) { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, name); return wb; }
 
 function promptExport(type) {
-  const choice = prompt('Download as Excel or CSV?\n\nType "excel" or "csv":', 'excel');
-  if (!choice) return;
-  const fmt = choice.trim().toLowerCase();
-  if (fmt === 'csv') {
-    exportToCSV(type);
-  } else if (fmt === 'excel' || fmt === 'xlsx' || fmt === 'xls') {
-    if (type === 'comparison') exportToExcel();
-    else exportEvaluationsToExcel();
-  } else {
-    alert('Please enter "excel" or "csv".');
+  let overlay = document.getElementById('exportModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'exportModal';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal" style="max-width:340px;">
+        <h3>Download Format</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;margin:16px 0;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem;">
+            <input type="radio" name="exportFmt" value="excel" checked style="width:18px;height:18px;accent-color:var(--primary);">
+            <span><strong>Excel</strong> (.xlsx) — multiple sheets, full detail</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.95rem;">
+            <input type="radio" name="exportFmt" value="csv" style="width:18px;height:18px;accent-color:var(--primary);">
+            <span><strong>CSV</strong> (.csv) — single sheet, easy to paste</span>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" onclick="document.getElementById('exportModal').classList.remove('open')">Cancel</button>
+          <button class="btn btn-export" id="exportConfirmBtn">Download</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
   }
+  overlay.classList.add('open');
+  overlay.querySelector('input[value="excel"]').checked = true;
+  const btn = document.getElementById('exportConfirmBtn');
+  btn.onclick = function() {
+    const fmt = overlay.querySelector('input[name="exportFmt"]:checked').value;
+    overlay.classList.remove('open');
+    if (fmt === 'csv') {
+      exportToCSV(type);
+    } else {
+      if (type === 'comparison') exportToExcel();
+      else exportEvaluationsToExcel();
+    }
+  };
 }
 
 // ─── One-time migration: regenerate checklists with tailored items ───
