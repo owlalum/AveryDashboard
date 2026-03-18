@@ -4761,6 +4761,26 @@ docRef.onSnapshot(
 // ─── Changelog / What's New ───
 const CHANGELOG = [
   {
+    version: '5.0',
+    date: '2026-03-18',
+    title: 'Export, Sync & Dashboard Overhaul',
+    items: [
+      'Excel/CSV export on School Comparison and Evaluation Summary tabs (powered by SheetJS)',
+      'Evaluation export includes 3 sheets: Summary, Detailed Ratings, and Notes & Intangibles',
+      'Fixed 5 Firestore sync bugs: startup race condition, timestamp-based conflict resolution, error handling, and sync status indicator in header',
+      'Debounced Firestore writes (1.5s) to prevent rapid-fire saves',
+      'Score editor modal: edit student name, GPA, and all ACT scores in one place with live percentile previews',
+      'ACT/GPA changes now cascade to all dependent views: profile, summary, school comparison, financial analysis, honors eligibility, and essays',
+      'Kentucky merit aid now dynamically calculated from ACT/GPA tiers',
+      'Auburn and Texas A&M honors eligibility text updates automatically when ACT scores change',
+      'Persistent "Next Up" strip shows next deadline, lowest checklist, and first unstarted essay',
+      'Configurable student name with first-use prompt — replaces all hardcoded name references',
+      'Removed hardcoded financial defaults from source code (529/cash flow values live only in saved data)',
+      'Removed Budget Fit system (FULLY FUNDED/AFFORDABLE/STRETCH badges, criteria section, and financial input cards)',
+      'Auto-backup reminder banner appears after 21 days without a JSON backup'
+    ]
+  },
+  {
     version: '4.4',
     date: '2026-03-16',
     title: 'Financial & Category Corrections',
