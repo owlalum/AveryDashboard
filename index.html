@@ -614,7 +614,11 @@
   .eval-school-picker { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
   .eval-school-picker select { padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.92rem; font-family: inherit; min-width: 240px; }
   .eval-section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
-  .eval-section-header { background: var(--primary-light); padding: 12px 18px; font-weight: 700; font-size: 0.95rem; color: var(--primary-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .eval-section-header { background: var(--primary-light); padding: 12px 18px; font-weight: 700; font-size: 0.95rem; color: var(--primary-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; gap: 8px; }
+  .eval-section-header .eval-chevron { font-size: 0.7rem; transition: transform 0.2s; color: var(--text-light); }
+  .eval-section.eval-collapsed .eval-section-body { display: none; }
+  .eval-section.eval-collapsed .eval-chevron { transform: rotate(0deg); }
+  .eval-section:not(.eval-collapsed) .eval-chevron { transform: rotate(90deg); }
   .eval-section-header .weight-badge { font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 20px; background: var(--primary); color: #fff; }
   .eval-section-header .subtotal { font-size: 0.85rem; font-weight: 600; color: var(--accent); }
   .eval-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; border-bottom: 1px solid #f0f3f5; }
@@ -3205,6 +3209,7 @@ function renderEvaluation() {
         <div class="total-label">Weighted Total Score</div>
       </div>
       <div style="display:flex;align-items:center;gap:14px">
+        <button class="btn btn-sm" onclick="expandAllEvalSections()" style="font-size:0.78rem;padding:6px 12px;">Quick Score</button>
         <div class="eval-grade-picker">
           <label style="font-size:0.78rem;font-weight:600;color:var(--text-light);margin-right:6px;">Letter Grade:</label>
           <select onchange="setEvalField('${esc(schoolName)}','letterGrade',this.value)">
@@ -3233,24 +3238,27 @@ function renderEvaluation() {
       </div>
     </div>`;
 
-  // Rating categories
+  // Rating categories (collapsible — gutCheck expanded by default)
   for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
     const subtotal = calcCategorySubtotal(ev, catKey);
     const maxSub = cat.items.length * 5;
+    const collapsed = catKey !== 'gutCheck' ? ' eval-collapsed' : '';
     html += `
-    <div class="eval-section">
-      <div class="eval-section-header">
-        <span>${cat.label} ${cat.weight > 0 ? `<span class="weight-badge">${cat.weight}x weight</span>` : ''}</span>
+    <div class="eval-section${collapsed}" data-evalcat="${catKey}">
+      <div class="eval-section-header" onclick="toggleEvalSection(this)">
+        <span><span class="eval-chevron">&#9654;</span> ${cat.label} ${cat.weight > 0 ? `<span class="weight-badge">${cat.weight}x weight</span>` : ''}</span>
         <span class="subtotal">${subtotal} / ${maxSub}</span>
       </div>
-      ${cat.note ? `<div style="padding:8px 18px;font-size:0.8rem;color:var(--text-light);font-style:italic;">${cat.note}</div>` : ''}
-      ${cat.items.map(it => `
-      <div class="eval-row">
-        <label>${it.label}</label>
-        <div class="eval-stars">
-          ${[1,2,3,4,5].map(n => `<button class="${(ev[catKey][it.key]||0)>=n?'active':''}" onclick="setEvalRating('${esc(schoolName)}','${catKey}','${it.key}',${n})">${n}</button>`).join('')}
-        </div>
-      </div>`).join('')}
+      <div class="eval-section-body">
+        ${cat.note ? `<div style="padding:8px 18px;font-size:0.8rem;color:var(--text-light);font-style:italic;">${cat.note}</div>` : ''}
+        ${cat.items.map(it => `
+        <div class="eval-row">
+          <label>${it.label}</label>
+          <div class="eval-stars">
+            ${[1,2,3,4,5].map(n => `<button class="${(ev[catKey][it.key]||0)>=n?'active':''}" onclick="setEvalRating('${esc(schoolName)}','${catKey}','${it.key}',${n})">${n}</button>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
     </div>`;
   }
 
@@ -3281,6 +3289,14 @@ function renderEvaluation() {
 
   // Summary table
   renderEvalSummary();
+}
+
+function toggleEvalSection(header) {
+  header.closest('.eval-section').classList.toggle('eval-collapsed');
+}
+
+function expandAllEvalSections() {
+  document.querySelectorAll('.eval-section.eval-collapsed').forEach(s => s.classList.remove('eval-collapsed'));
 }
 
 function setEvalRating(school, catKey, itemKey, val) {
