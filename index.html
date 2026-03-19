@@ -736,6 +736,39 @@
   .tour-add-row { display: flex; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--border); }
   .tour-add-row input { flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.88rem; font-family: inherit; }
 
+  /* ── Scholarships ── */
+  .schol-summary { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+  .schol-stat { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 20px; flex: 1; min-width: 140px; }
+  .schol-stat .schol-stat-val { font-size: 1.4rem; font-weight: 800; color: var(--primary-dark); }
+  .schol-stat .schol-stat-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.3px; margin-top: 2px; }
+  .schol-section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+  .schol-section-header { padding: 14px 20px; font-weight: 700; font-size: 0.95rem; color: var(--primary-dark); background: var(--primary-light); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .schol-section-header .schol-chevron { transition: transform 0.2s; font-size: 0.8rem; }
+  .schol-section.collapsed .schol-section-body { display: none; }
+  .schol-section.collapsed .schol-chevron { transform: rotate(0deg); }
+  .schol-section:not(.collapsed) .schol-chevron { transform: rotate(90deg); }
+  .schol-row { display: grid; grid-template-columns: 2fr 1.2fr 0.8fr 0.8fr 1fr 0.6fr; gap: 8px; padding: 10px 20px; border-bottom: 1px solid #f0f3f5; align-items: center; font-size: 0.85rem; }
+  .schol-row:last-child { border-bottom: none; }
+  .schol-row-header { font-weight: 700; font-size: 0.75rem; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.3px; background: #fafbfc; border-bottom: 2px solid var(--border); }
+  .schol-row-header span { padding: 4px 0; }
+  .schol-name { font-weight: 600; }
+  .schol-status { font-size: 0.78rem; font-weight: 600; padding: 3px 8px; border-radius: 12px; text-align: center; white-space: nowrap; }
+  .schol-s-not-started { background: #f3f4f6; color: #6b7280; }
+  .schol-s-in-progress { background: #dbeafe; color: #1d4ed8; }
+  .schol-s-applied { background: #fef3c7; color: #92400e; }
+  .schol-s-awarded { background: #d1fae5; color: #065f46; }
+  .schol-s-declined { background: #fde8e8; color: #991b1b; }
+  .schol-s-not-applying { background: #f3f4f6; color: #9ca3af; text-decoration: line-through; }
+  .schol-add-row { display: flex; gap: 8px; padding: 10px 20px; border-top: 1px solid var(--border); }
+  .schol-add-row input { flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; font-family: inherit; }
+  .schol-notes { font-size: 0.78rem; color: var(--text-light); font-style: italic; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .schol-merit-row { opacity: 0.75; }
+  .schol-merit-row .schol-status { background: #e8f5ee; color: #2d6e3f; }
+  @media (max-width: 900px) {
+    .schol-row { grid-template-columns: 1fr 1fr; font-size: 0.82rem; }
+    .schol-row-header { display: none; }
+  }
+
   /* ── Admission Strategy ── */
   .strat-explainer { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px; margin-bottom: 22px; font-size: 0.9rem; line-height: 1.65; }
   .strat-explainer h3 { font-size: 1.05rem; color: var(--primary-dark); margin-bottom: 10px; }
@@ -1273,6 +1306,7 @@
   <div id="group-apps" class="tab-group">
   <nav class="subtab-bar">
     <button class="subtab-btn active" data-subtab="checklist">Checklist</button>
+    <button class="subtab-btn" data-subtab="scholarships">Scholarships</button>
     <button class="subtab-btn" data-subtab="timeline">Deadline Timeline</button>
     <button class="subtab-btn" data-subtab="essays">Essays</button>
     <button class="subtab-btn" data-subtab="strategy">Strategy</button>
@@ -1291,6 +1325,22 @@
     <div id="checklistContainer"></div>
     <div class="empty-state" id="checklistEmpty" style="display:none;">
       <p>No checklists yet. Add a school in the <strong>School Comparison</strong> tab to get started.</p>
+    </div>
+  </div>
+
+  <!-- Scholarships sub-panel -->
+  <div id="scholarships" class="sub-panel">
+    <div class="section-head" style="display:flex;justify-content:space-between;align-items:center">
+      <h2>Scholarships</h2>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-primary" onclick="openAddScholarshipModal()">+ Add Scholarship</button>
+        <button class="btn btn-export" onclick="exportScholarships()">Download Excel / CSV</button>
+      </div>
+    </div>
+    <div class="schol-summary" id="scholSummary"></div>
+    <div id="scholContainer"></div>
+    <div class="empty-state" id="scholEmpty" style="display:none;">
+      <p>No scholarships tracked yet. Click <strong>+ Add Scholarship</strong> to get started.</p>
     </div>
   </div>
 
@@ -1798,6 +1848,7 @@ function runMigrations() {
   if (!data.gpa) data.gpa = 0;
   if (!data.studentName) data.studentName = '';
   if (!data.lastModified) data.lastModified = Date.now();
+  if (!data.scholarships) data.scholarships = initDefaultScholarships();
 
   // Ensure finalList field exists on all schools
   data.schools.forEach(s => { if (s.finalList === undefined) s.finalList = false; });
@@ -4973,6 +5024,323 @@ function renderNextUp() {
     : '';
 }
 
+// ─── Scholarships ───
+const SCHOL_STATUSES = ['Not Started','In Progress','Applied','Awarded','Declined','Not Applying'];
+const SCHOL_SECTIONS = [
+  { key: 'competitive', label: 'Competitive School-Based' },
+  { key: 'prevet', label: 'Pre-Vet & Animal Science' },
+  { key: 'external', label: 'External & National' },
+  { key: 'merit', label: 'Automatic Merit Aid (Reference Only)' }
+];
+const scholSectionOpen = { competitive: true, prevet: true, external: true, merit: false };
+
+function initDefaultScholarships() {
+  return [
+    // Competitive School-Based
+    { id: uid(), section:'competitive', name:'Scholarship Short-Answer Essays (5)', school:'Texas A&M University', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Strongly recommended for merit aid' },
+    { id: uid(), section:'competitive', name:'CVM Scholarships', school:'Texas A&M University', amount:'Varies ($2.9M pool)', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'$2.9M+ awarded annually' },
+    { id: uid(), section:'competitive', name:'CAES Scholarships', school:'University of Georgia', amount:'Varies', deadline:'2027-01-01', essayReq:false, separateApp:false, status:'Not Started', notes:'College of Ag & Environmental Sciences' },
+    { id: uid(), section:'competitive', name:'Morehead Honors Scholarship Review', school:'University of Georgia', amount:'Varies', deadline:'2026-10-15', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic with EA by Oct 15' },
+    { id: uid(), section:'competitive', name:'ScholarshipUniverse Profile Matching', school:'Ohio State University', amount:'Varies', deadline:'2027-02-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete profile for scholarship matching' },
+    { id: uid(), section:'competitive', name:'Alumni Distinguished Scholarship', school:'Michigan State University', amount:'Full ride', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Full-ride; invited applicants only' },
+    { id: uid(), section:'competitive', name:'Park Scholarship', school:'North Carolina State University', amount:'Full ride', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'Separate essays, recs, interviews required' },
+    { id: uid(), section:'competitive', name:'CASNR Scholarship Essay', school:'University of Tennessee', amount:'Varies', deadline:'2026-11-15', essayReq:true, separateApp:false, status:'Not Started', notes:'Optional for Animal Science majors; recommended' },
+    { id: uid(), section:'competitive', name:'Presidential/Singletary Awards', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Complete competitive scholarship section of application' },
+    { id: uid(), section:'competitive', name:'Lewis Honors College Essay', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'500 words, "common good" prompt' },
+    { id: uid(), section:'competitive', name:'Schreyer Honors College Scholarship', school:'Penn State University', amount:'$4,500/year', deadline:'2026-12-01', essayReq:true, separateApp:true, status:'Not Started', notes:'800-word essay + short answers; test scores NOT used' },
+    { id: uid(), section:'competitive', name:'Calhoun Honors College Scholarships', school:'Clemson University', amount:'Varies', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic with Dec 1 application' },
+    { id: uid(), section:'competitive', name:'OOS Tuition Waiver Program', school:'Florida State University', amount:'Up to 100% OOS tuition', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Very competitive; automatic with admission' },
+    { id: uid(), section:'competitive', name:'McKissick/Excellence/Distinction Awards', school:'University of South Carolina', amount:'$5K-$11K/year', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Tiered by ACT: 33+ McKissick ~$11K, 30+ Excellence ~$9.5K, 28+ Distinction ~$7K' },
+    // Pre-Vet & Animal Science
+    { id: uid(), section:'prevet', name:'AVMA/AAVMC Scholarships', school:'National', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'American Veterinary Medical Association' },
+    { id: uid(), section:'prevet', name:'Local Veterinary Association Scholarships', school:'State VMA', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'Contact state veterinary medical association' },
+    { id: uid(), section:'prevet', name:'School-Specific Animal Science Scholarships', school:'Various', amount:'Varies', deadline:'Varies', essayReq:false, separateApp:true, status:'Not Started', notes:'Research each school\'s College of Agriculture scholarships' },
+    // External & National
+    { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools' },
+    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'Partial tuition', deadline:'N/A', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with GPA 3.0+' },
+    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition', deadline:'N/A', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires 3.7+ GPA. Applies to UGA.' },
+  ];
+}
+
+function getMeritScholarships() {
+  const visibleNames = getVisibleSchools().map(s => s.name);
+  return FIN_DATA.filter(f => f.school && f.merit > 0 && visibleNames.includes(f.school)).map(f => {
+    const amt = f.school === 'University of Kentucky' ? getKentuckyMerit() : f.merit;
+    return {
+      id: 'merit_' + f.school.replace(/\s/g, '_'),
+      section: 'merit',
+      name: 'Automatic Merit Aid',
+      school: f.school,
+      amount: '$' + (amt / 1000) + 'K/year',
+      amountNum: amt,
+      deadline: 'With admission',
+      essayReq: false,
+      separateApp: false,
+      status: 'Awarded',
+      notes: f.school === 'University of Kentucky' ? 'Dynamic tiers based on ACT/GPA' : 'Automatic with admission',
+      readOnly: true
+    };
+  });
+}
+
+function renderScholarships() {
+  const container = document.getElementById('scholContainer');
+  const empty = document.getElementById('scholEmpty');
+  const summaryEl = document.getElementById('scholSummary');
+  if (!data.scholarships) data.scholarships = initDefaultScholarships();
+
+  const visibleNames = getVisibleSchools().map(s => s.name);
+  const userSchols = data.scholarships;
+  const meritSchols = getMeritScholarships();
+  const allSchols = [...userSchols, ...meritSchols];
+
+  // Filter competitive/prevet by visible schools (but keep items with non-school sources)
+  const schoolSpecificSections = ['competitive'];
+  const filterByVisible = (s) => {
+    if (!schoolSpecificSections.includes(s.section)) return true;
+    if (!s.school || s.school === 'Various' || s.school === 'National') return true;
+    return visibleNames.includes(s.school);
+  };
+  const visibleSchols = allSchols.filter(filterByVisible);
+
+  // Summary stats
+  const tracked = visibleSchols.length;
+  const applied = visibleSchols.filter(s => s.status === 'Applied' || s.status === 'Awarded').length;
+  const potentialAmount = visibleSchols
+    .filter(s => s.status === 'Applied' || s.status === 'Awarded')
+    .reduce((sum, s) => {
+      const num = s.amountNum || parseAmount(s.amount);
+      return sum + (num || 0);
+    }, 0);
+
+  summaryEl.innerHTML = `
+    <div class="schol-stat"><div class="schol-stat-val">${tracked}</div><div class="schol-stat-label">Total Tracked</div></div>
+    <div class="schol-stat"><div class="schol-stat-val">${applied}</div><div class="schol-stat-label">Applied / Awarded</div></div>
+    <div class="schol-stat"><div class="schol-stat-val">${potentialAmount > 0 ? '$' + Math.round(potentialAmount / 1000) + 'K/yr' : '$0'}</div><div class="schol-stat-label">Applied/Awarded Amount (Annual)</div></div>
+  `;
+
+  if (visibleSchols.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  container.innerHTML = SCHOL_SECTIONS.map(sec => {
+    const items = visibleSchols.filter(s => s.section === sec.key);
+    if (items.length === 0 && sec.key !== 'merit') return '';
+    const collapsed = !scholSectionOpen[sec.key] ? ' collapsed' : '';
+    const isMerit = sec.key === 'merit';
+
+    return `
+    <div class="schol-section${collapsed}" data-scholsec="${sec.key}">
+      <div class="schol-section-header" onclick="toggleScholSection('${sec.key}')">
+        <span>${esc(sec.label)} <span style="font-weight:400;font-size:0.82rem;color:var(--text-light);">(${items.length})</span></span>
+        <span class="schol-chevron">&#9654;</span>
+      </div>
+      <div class="schol-section-body">
+        <div class="schol-row schol-row-header">
+          <span>Name / School</span><span>Amount</span><span>Deadline</span><span>Essay</span><span>Status</span><span></span>
+        </div>
+        ${items.map(s => {
+          const statusSlug = s.status.toLowerCase().replace(/\s+/g, '-');
+          const schoolInfo = s.school ? schoolDB[s.school] : null;
+          return `
+          <div class="schol-row${isMerit ? ' schol-merit-row' : ''}" data-scholid="${s.id}">
+            <div>
+              <div class="schol-name">${schoolInfo ? schoolLogoHTML(s.school, 16) + ' ' : ''}${esc(s.name)}</div>
+              <div style="font-size:0.78rem;color:var(--text-light)">${esc(s.school || '')}</div>
+              ${s.notes ? '<div class="schol-notes" title="' + esc(s.notes) + '">' + esc(s.notes) + '</div>' : ''}
+            </div>
+            <div style="font-weight:600">${esc(s.amount || 'Varies')}</div>
+            <div>${formatScholDeadline(s.deadline)}</div>
+            <div>${s.essayReq ? '<span style="color:var(--primary);font-weight:600">Yes</span>' : 'No'}${s.separateApp ? ' <span style="font-size:0.72rem;color:var(--text-light)">(sep. app)</span>' : ''}</div>
+            <div><span class="schol-status schol-s-${statusSlug}">${esc(s.status)}</span></div>
+            <div>${s.readOnly ? '' : '<span class="delete-item" onclick="editScholarship(\'' + s.id + '\')" style="cursor:pointer;color:var(--primary);font-size:0.82rem;margin-right:6px" title="Edit">&#9998;</span><span class="delete-item" onclick="deleteScholarship(\'' + s.id + '\')" style="cursor:pointer;color:var(--text-light)" title="Remove">&times;</span>'}</div>
+          </div>`;
+        }).join('')}
+        ${!isMerit ? `<div class="schol-add-row">
+          <input type="text" placeholder="Quick add scholarship name..." id="scholAdd_${sec.key}" onkeydown="if(event.key==='Enter')quickAddScholarship('${sec.key}')">
+          <button class="btn btn-primary btn-sm" onclick="quickAddScholarship('${sec.key}')">Add</button>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function parseAmount(str) {
+  if (!str) return 0;
+  const m = str.match(/\$?([\d,.]+)\s*[Kk]/);
+  if (m) return parseFloat(m[1].replace(/,/g, '')) * 1000;
+  const m2 = str.match(/\$?([\d,]+)/);
+  if (m2) return parseFloat(m2[1].replace(/,/g, ''));
+  return 0;
+}
+
+function formatScholDeadline(d) {
+  if (!d || d === 'Varies' || d === 'N/A' || d === 'With admission') return esc(d || '—');
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return esc(d);
+  return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function toggleScholSection(key) {
+  scholSectionOpen[key] = !scholSectionOpen[key];
+  const el = document.querySelector(`.schol-section[data-scholsec="${key}"]`);
+  if (el) el.classList.toggle('collapsed');
+}
+
+function quickAddScholarship(section) {
+  const input = document.getElementById('scholAdd_' + section);
+  if (!input || !input.value.trim()) return;
+  data.scholarships.push({
+    id: uid(), section, name: input.value.trim(), school: '', amount: 'Varies',
+    deadline: '', essayReq: false, separateApp: false, status: 'Not Started', notes: ''
+  });
+  input.value = '';
+  saveData();
+  renderScholarships();
+}
+
+function deleteScholarship(id) {
+  if (!confirm('Remove this scholarship?')) return;
+  data.scholarships = data.scholarships.filter(s => s.id !== id);
+  saveData();
+  renderScholarships();
+}
+
+function editScholarship(id) {
+  const s = data.scholarships.find(x => x.id === id);
+  if (!s) return;
+  let overlay = document.getElementById('scholEditModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'scholEditModal';
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.body.appendChild(overlay);
+  }
+  const sectionOpts = SCHOL_SECTIONS.filter(x => x.key !== 'merit').map(x =>
+    `<option value="${x.key}"${s.section === x.key ? ' selected' : ''}>${esc(x.label)}</option>`
+  ).join('');
+  const statusOpts = SCHOL_STATUSES.map(st =>
+    `<option value="${st}"${s.status === st ? ' selected' : ''}>${st}</option>`
+  ).join('');
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:480px;">
+      <h3>Edit Scholarship</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;margin:16px 0;font-size:0.9rem;">
+        <label>Name<input id="se_name" value="${esc(s.name)}" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit"></label>
+        <label>School or Source<input id="se_school" value="${esc(s.school || '')}" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit"></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <label>Amount<input id="se_amount" value="${esc(s.amount || '')}" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit"></label>
+          <label>Deadline<input id="se_deadline" type="date" value="${s.deadline && s.deadline.match(/^\d{4}-\d{2}-\d{2}$/) ? s.deadline : ''}" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit"></label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <label>Section<select id="se_section" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit">${sectionOpts}</select></label>
+          <label>Status<select id="se_status" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit">${statusOpts}</select></label>
+        </div>
+        <div style="display:flex;gap:20px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="se_essay" ${s.essayReq ? 'checked' : ''} style="width:16px;height:16px"> Essay required</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="se_sepapp" ${s.separateApp ? 'checked' : ''} style="width:16px;height:16px"> Separate application</label>
+        </div>
+        <label>Notes<textarea id="se_notes" rows="2" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;resize:vertical">${esc(s.notes || '')}</textarea></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="document.getElementById('scholEditModal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveScholarshipEdit('${s.id}')">Save</button>
+      </div>
+    </div>`;
+  overlay.classList.add('open');
+}
+
+function saveScholarshipEdit(id) {
+  const s = data.scholarships.find(x => x.id === id);
+  if (!s) return;
+  s.name = document.getElementById('se_name').value.trim() || s.name;
+  s.school = document.getElementById('se_school').value.trim();
+  s.amount = document.getElementById('se_amount').value.trim() || 'Varies';
+  s.deadline = document.getElementById('se_deadline').value || s.deadline;
+  s.section = document.getElementById('se_section').value;
+  s.status = document.getElementById('se_status').value;
+  s.essayReq = document.getElementById('se_essay').checked;
+  s.separateApp = document.getElementById('se_sepapp').checked;
+  s.notes = document.getElementById('se_notes').value.trim();
+  saveData();
+  renderScholarships();
+  document.getElementById('scholEditModal').classList.remove('open');
+}
+
+function openAddScholarshipModal() {
+  // Reuse edit modal with blank values
+  const blank = {
+    id: '_new_', section: 'competitive', name: '', school: '', amount: '',
+    deadline: '', essayReq: false, separateApp: false, status: 'Not Started', notes: ''
+  };
+  // Temporarily push, edit, then handle in save
+  data.scholarships.push(blank);
+  editScholarship('_new_');
+  // Override save to assign real id
+  const overlay = document.getElementById('scholEditModal');
+  const saveBtn = overlay.querySelector('.btn-primary');
+  saveBtn.onclick = function() {
+    const s = data.scholarships.find(x => x.id === '_new_');
+    if (s) {
+      const name = document.getElementById('se_name').value.trim();
+      if (!name) {
+        data.scholarships = data.scholarships.filter(x => x.id !== '_new_');
+        overlay.classList.remove('open');
+        return;
+      }
+      s.id = uid();
+      s.name = name;
+      s.school = document.getElementById('se_school').value.trim();
+      s.amount = document.getElementById('se_amount').value.trim() || 'Varies';
+      s.deadline = document.getElementById('se_deadline').value || '';
+      s.section = document.getElementById('se_section').value;
+      s.status = document.getElementById('se_status').value;
+      s.essayReq = document.getElementById('se_essay').checked;
+      s.separateApp = document.getElementById('se_sepapp').checked;
+      s.notes = document.getElementById('se_notes').value.trim();
+    }
+    saveData();
+    renderScholarships();
+    overlay.classList.remove('open');
+  };
+  // Handle cancel — remove the blank
+  const cancelBtn = overlay.querySelector('.btn:not(.btn-primary)');
+  const origCancel = cancelBtn.onclick;
+  cancelBtn.onclick = function() {
+    data.scholarships = data.scholarships.filter(x => x.id !== '_new_');
+    overlay.classList.remove('open');
+  };
+}
+
+function exportScholarships() {
+  const visibleNames = getVisibleSchools().map(s => s.name);
+  const meritSchols = getMeritScholarships();
+  const all = [...data.scholarships, ...meritSchols];
+
+  const rows = all.map(s => ({
+    'Section': (SCHOL_SECTIONS.find(x => x.key === s.section) || {}).label || s.section,
+    'Name': s.name,
+    'School / Source': s.school || '',
+    'Amount': s.amount || 'Varies',
+    'Deadline': s.deadline || '',
+    'Essay Required': s.essayReq ? 'Yes' : 'No',
+    'Separate App': s.separateApp ? 'Yes' : 'No',
+    'Status': s.status,
+    'Notes': s.notes || ''
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = Object.keys(rows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 14) }));
+  XLSX.utils.book_append_sheet(wb, ws, 'Scholarships');
+  const firstName = (data.studentName || 'Student').split(' ')[0];
+  XLSX.writeFile(wb, firstName + '_Scholarships.xlsx');
+}
+
 function renderAll() {
   renderSummary();
   renderSchools();
@@ -4987,6 +5355,7 @@ function renderAll() {
   renderTimeline();
   renderEssays();
   syncEssayStatusToChecklists();
+  renderScholarships();
   renderGreekLife();
   renderProfile();
   renderAppStatus();
@@ -5245,6 +5614,20 @@ docRef.onSnapshot(
 
 // ─── Changelog / What's New ───
 const CHANGELOG = [
+  {
+    version: '5.2',
+    date: '2026-03-18',
+    title: 'Scholarship Tracker',
+    items: [
+      'New Scholarships subtab in Applications — track competitive, pre-vet, external, and merit aid all in one place',
+      'Four collapsible sections: Competitive School-Based, Pre-Vet & Animal Science, External & National, and Automatic Merit Aid',
+      'Pre-populated with 20+ scholarships from the college roadmap including Park, Schreyer, Lewis Honors, AVMA, FAFSA, and more',
+      'Automatic Merit Aid section is read-only, sourced live from financial data (Kentucky merit updates dynamically with ACT)',
+      'Summary bar shows total tracked, applied count, and potential award amount',
+      'Full CRUD: add, edit, delete scholarships with status tracking (Not Started through Awarded)',
+      'Download Excel export for all scholarship data',
+    ]
+  },
   {
     version: '5.1',
     date: '2026-03-18',
