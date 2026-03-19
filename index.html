@@ -1092,8 +1092,8 @@
       <h4 style="margin-top:14px;margin-bottom:6px;color:var(--primary);">Vet School Quality &amp; Access</h4>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Guaranteed or early admission to own CVM (e.g., UGA, Clemson guarantee programs)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Top-ranked CVM with guaranteed interview or strong pipeline (e.g., Cornell, Purdue)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Has an accredited CVM on campus (e.g., Auburn, Kentucky, Tennessee)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Top-ranked CVM with guaranteed interview or strong pipeline (e.g., NC State, Purdue)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Has an accredited CVM on campus (e.g., Auburn, Tennessee, Missouri)</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>No CVM but strong pre-vet advising or regional pipeline to nearby CVM</td></tr>
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>No CVM, limited pre-vet infrastructure</td></tr>
       </table>
@@ -1109,9 +1109,9 @@
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Admission Likelihood</h4>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>SAFETY &mdash; acceptance rate &gt;70% or student's GPA well above average</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>MATCH &mdash; acceptance rate 40&ndash;70% and GPA near average</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>REACH &mdash; acceptance rate &lt;30% or GPA below average</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>SAFETY &mdash; acceptance rate &gt;70%, or student's ACT/GPA well above the school's middle 50% range</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>MATCH &mdash; acceptance rate 25&ndash;70% and ACT/GPA within the school's middle 50% range</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>REACH &mdash; acceptance rate &lt;25%, or student's ACT well below the school's 25th percentile</td></tr>
       </table>
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Plan B Strength</h4>
@@ -1139,15 +1139,15 @@
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">MATCH</td>
-            <td style="padding:8px 12px;">Acceptance rate 40&ndash;70%, GPA and ACT near or within the school's middle 50%</td>
+            <td style="padding:8px 12px;">Acceptance rate 25&ndash;70%, GPA and ACT near or within the school's middle 50%</td>
           </tr>
           <tr>
             <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">REACH</td>
-            <td id="catReachDesc" style="padding:8px 12px;">Acceptance rate &lt;35%, or student's ACT below the school's 25th percentile (e.g., UGA at 33%, UF at 24%)</td>
+            <td id="catReachDesc" style="padding:8px 12px;">Acceptance rate &lt;25%, or student's ACT well below the school's 25th percentile (e.g., UGA ACT 32+, UF at 14% OOS)</td>
           </tr>
         </tbody>
       </table>
-      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Note:</strong> Applying to Animal Science (vs. Engineering/CS/Business) provides a 15&ndash;25 percentage point admission advantage at most schools, which is factored into these classifications.</p>
+      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Note:</strong> At schools with direct-admit or college-level admission (e.g., Purdue, Virginia Tech, NC State), applying to Animal Science rather than Engineering/CS/Business can provide a meaningful advantage. The degree of benefit varies by school &mdash; see the <strong>Admission Strategy</strong> tab for per-school details.</p>
     </div>
 
     <!-- Data Sources & Assumptions -->
@@ -1156,7 +1156,7 @@
       <table style="width:100%;font-size:0.88rem;border-collapse:collapse;">
         <tr style="border-bottom:1px solid var(--border);">
           <td style="padding:8px 12px 8px 0;font-weight:600;width:180px;vertical-align:top;">Tuition &amp; Fees</td>
-          <td style="padding:8px 12px;">Published 2025&ndash;26 rates from each university's official website</td>
+          <td style="padding:8px 12px;">Published 2025&ndash;26 rates from each university's official website. Will need updating to 2026&ndash;27 rates when published (typically June&ndash;August 2026).</td>
         </tr>
         <tr style="border-bottom:1px solid var(--border);">
           <td style="padding:8px 12px 8px 0;font-weight:600;vertical-align:top;">Room &amp; Board</td>
@@ -1947,7 +1947,7 @@ function renderProfile() {
   const safetyDesc = document.getElementById('catSafetyDesc');
   const reachDesc = document.getElementById('catReachDesc');
   if (safetyDesc) safetyDesc.textContent = 'Acceptance rate >70%, or ' + firstName + '\u2019s ' + (gpa || '—') + ' GPA and ACT ' + (act.composite || '—') + ' are well above the school\u2019s middle 50% range';
-  if (reachDesc) reachDesc.textContent = 'Acceptance rate <35%, or ' + firstName + '\u2019s ACT ' + (act.composite || '—') + ' below the school\u2019s 25th percentile (e.g., UGA at 33%, UF at 24%)';
+  if (reachDesc) reachDesc.textContent = 'Acceptance rate <25%, or ' + firstName + '\u2019s ACT ' + (act.composite || '—') + ' well below the school\u2019s 25th percentile (e.g., UGA ACT 32+, UF at 14% OOS)';
   // Merit note
   const kyMerit = document.getElementById('meritKentucky');
   if (kyMerit) kyMerit.innerHTML = getKentuckyMeritLabel();
@@ -3562,8 +3562,12 @@ function setRankingField(school, field, val) {
 // (e.g., Ag college admits at a higher rate than university OOS overall)
 const CATEGORY_OVERRIDES = {
   'Ohio State University': 'MATCH',      // CFAES admits above 27% OOS university rate
+  'University of Georgia': 'REACH',      // 33% in-state, but ACT 32-35 range — Avery's 27 is well below 25th %ile
   'University of Florida': 'REACH',      // 14% OOS; highly selective even for Ag/CALS
   'Florida State University': 'REACH',   // 19% OOS; no Ag advantage, university-wide
+  'Oklahoma State University': 'SAFETY', // 67% OOS but Avery's ACT at 75th %ile of their range
+  'Mississippi State University': 'SAFETY', // 63% OOS; Avery's ACT mid-range; accessible school
+  'University of Missouri': 'SAFETY',    // 68% OOS; Avery's ACT mid-range; near-open admission
 };
 
 function getSummaryCategory(schoolName) {
@@ -3840,8 +3844,8 @@ const FIN_DATA = [
   { school:'Mississippi State University', res:'OOS', sticker:44000, merit:11000 },
   { school:'Michigan State University', res:'OOS', sticker:65000, merit:8000 },
   { school:'University of Missouri', res:'OOS', sticker:47000, merit:5000 },
-  { school:'University of South Carolina', res:'OOS', sticker:54000, merit:7000 },
   { group:'MATCH SCHOOLS' },
+  { school:'University of South Carolina', res:'OOS', sticker:54000, merit:7000 },
   { school:'Auburn University', res:'OOS', sticker:52000, merit:12000 },
   { school:'University of Tennessee', res:'OOS', sticker:50000, merit:12000 },
   { school:'Texas A&M University', res:'OOS', sticker:58000, merit:2000 },
@@ -3853,8 +3857,8 @@ const FIN_DATA = [
   { school:'University of Wisconsin-Madison', res:'OOS', sticker:58000, merit:2000 },
   { school:'University of Illinois', res:'OOS', sticker:51000, merit:1000 },
   { school:'Penn State University', res:'OOS', sticker:61000, merit:1500 },
-  { school:'Florida State University', res:'OOS', sticker:37000, merit:2000 },
   { group:'REACH SCHOOLS' },
+  { school:'Florida State University', res:'OOS', sticker:37000, merit:2000 },
   { school:'University of Georgia', res:'In-State', sticker:30000, merit:5000, notes:'Zell Miller' },
   { school:'University of Florida', res:'OOS', sticker:45000, merit:0 }
 ];
