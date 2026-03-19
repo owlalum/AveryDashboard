@@ -1849,6 +1849,16 @@ function runMigrations() {
   if (!data.studentName) data.studentName = '';
   if (!data.lastModified) data.lastModified = Date.now();
   if (!data.scholarships) data.scholarships = initDefaultScholarships();
+  // Backfill url field on existing scholarship entries
+  if (data.scholarships.length > 0 && data.scholarships[0].url === undefined) {
+    const defaults = initDefaultScholarships();
+    data.scholarships.forEach(s => {
+      if (s.url === undefined) {
+        const match = defaults.find(d => d.name === s.name && d.school === s.school);
+        s.url = match ? match.url : '';
+      }
+    });
+  }
 
   // Ensure finalList field exists on all schools
   data.schools.forEach(s => { if (s.finalList === undefined) s.finalList = false; });
@@ -5036,29 +5046,48 @@ const scholSectionOpen = { competitive: true, prevet: true, external: true, meri
 
 function initDefaultScholarships() {
   return [
-    // Competitive School-Based
-    { id: uid(), section:'competitive', name:'Scholarship Short-Answer Essays (5)', school:'Texas A&M University', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Strongly recommended for merit aid' },
-    { id: uid(), section:'competitive', name:'CVM Scholarships', school:'Texas A&M University', amount:'Varies ($2.9M pool)', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'$2.9M+ awarded annually' },
-    { id: uid(), section:'competitive', name:'CAES Scholarships', school:'University of Georgia', amount:'Varies', deadline:'2027-01-01', essayReq:false, separateApp:false, status:'Not Started', notes:'College of Ag & Environmental Sciences' },
-    { id: uid(), section:'competitive', name:'Morehead Honors Scholarship Review', school:'University of Georgia', amount:'Varies', deadline:'2026-10-15', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic with EA by Oct 15' },
-    { id: uid(), section:'competitive', name:'ScholarshipUniverse Profile Matching', school:'Ohio State University', amount:'Varies', deadline:'2027-02-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete profile for scholarship matching' },
-    { id: uid(), section:'competitive', name:'Alumni Distinguished Scholarship', school:'Michigan State University', amount:'Full ride', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Full-ride; invited applicants only' },
-    { id: uid(), section:'competitive', name:'Park Scholarship', school:'North Carolina State University', amount:'Full ride', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'Separate essays, recs, interviews required' },
-    { id: uid(), section:'competitive', name:'CASNR Scholarship Essay', school:'University of Tennessee', amount:'Varies', deadline:'2026-11-15', essayReq:true, separateApp:false, status:'Not Started', notes:'Optional for Animal Science majors; recommended' },
-    { id: uid(), section:'competitive', name:'Presidential/Singletary Awards', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Complete competitive scholarship section of application' },
-    { id: uid(), section:'competitive', name:'Lewis Honors College Essay', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'500 words, "common good" prompt' },
-    { id: uid(), section:'competitive', name:'Schreyer Honors College Scholarship', school:'Penn State University', amount:'$4,500/year', deadline:'2026-12-01', essayReq:true, separateApp:true, status:'Not Started', notes:'800-word essay + short answers; test scores NOT used' },
-    { id: uid(), section:'competitive', name:'Calhoun Honors College Scholarships', school:'Clemson University', amount:'Varies', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic with Dec 1 application' },
-    { id: uid(), section:'competitive', name:'OOS Tuition Waiver Program', school:'Florida State University', amount:'Up to 100% OOS tuition', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Very competitive; automatic with admission' },
-    { id: uid(), section:'competitive', name:'McKissick/Excellence/Distinction Awards', school:'University of South Carolina', amount:'$5K-$11K/year', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Tiered by ACT: 33+ McKissick ~$11K, 30+ Excellence ~$9.5K, 28+ Distinction ~$7K' },
-    // Pre-Vet & Animal Science
-    { id: uid(), section:'prevet', name:'AVMA/AAVMC Scholarships', school:'National', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'American Veterinary Medical Association' },
-    { id: uid(), section:'prevet', name:'Local Veterinary Association Scholarships', school:'State VMA', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'Contact state veterinary medical association' },
-    { id: uid(), section:'prevet', name:'School-Specific Animal Science Scholarships', school:'Various', amount:'Varies', deadline:'Varies', essayReq:false, separateApp:true, status:'Not Started', notes:'Research each school\'s College of Agriculture scholarships' },
-    // External & National
-    { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools' },
-    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'Partial tuition', deadline:'N/A', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with GPA 3.0+' },
-    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition', deadline:'N/A', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires 3.7+ GPA. Applies to UGA.' },
+    // ── Competitive School-Based ──
+    { id: uid(), section:'competitive', name:'Scholarship Short-Answer Essays (5)', school:'Texas A&M University', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Strongly recommended for merit aid', url:'https://admissions.tamu.edu/apply' },
+    { id: uid(), section:'competitive', name:'Animal Science Dept. Scholarships', school:'Texas A&M University', amount:'Varies ($2.9M pool)', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'CVM and Dept of Animal Science awards; $2.9M+ annually', url:'https://animalscience.tamu.edu/scholarships-and-financial-aid/' },
+    { id: uid(), section:'competitive', name:'Foundation Fellowship', school:'University of Georgia', amount:'Full ride + stipend', deadline:'2026-10-15', essayReq:true, separateApp:false, status:'Not Started', notes:'UGA\'s most prestigious scholarship; automatic review with EA', url:'https://honors.uga.edu/scholarships/prospective-students/foundation-fellowship/' },
+    { id: uid(), section:'competitive', name:'CAES Scholarships', school:'University of Georgia', amount:'Varies', deadline:'2027-01-01', essayReq:false, separateApp:false, status:'Not Started', notes:'College of Ag & Environmental Sciences', url:'https://www.caes.uga.edu/students/scholarships.html' },
+    { id: uid(), section:'competitive', name:'Green & Gold Scholarship (Non-Resident)', school:'Colorado State University', amount:'Up to $16,000/year', deadline:'2027-02-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic for OOS with 3.2+ GPA; no separate app', url:'https://admissions.colostate.edu/cost-financial-aid/financial-aid-scholarships/green-gold-scholarships-nonresidents/' },
+    { id: uid(), section:'competitive', name:'ScholarshipUniverse Profile Matching', school:'Ohio State University', amount:'Varies', deadline:'2027-02-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete profile for scholarship matching', url:'https://sfa.osu.edu/incoming-freshmen/about-aid/ScholarshipU' },
+    { id: uid(), section:'competitive', name:'Animal Sciences Dept. Scholarships', school:'Ohio State University', amount:'Varies', deadline:'2027-02-01', essayReq:false, separateApp:true, status:'Not Started', notes:'CFAES departmental awards', url:'https://ansci.osu.edu/undergraduate/scholarships' },
+    { id: uid(), section:'competitive', name:'Alumni Distinguished Scholarship', school:'Michigan State University', amount:'Full ride', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Full-ride; invited applicants only by Nov 1', url:'https://admissions.msu.edu/cost-aid/scholarships' },
+    { id: uid(), section:'competitive', name:'Park Scholarship', school:'North Carolina State University', amount:'Full ride', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'Separate essays, recs, interviews required', url:'https://park.ncsu.edu/apply/' },
+    { id: uid(), section:'competitive', name:'Goodnight Scholars Program', school:'North Carolina State University', amount:'Full ride (NC residents) / partial (OOS)', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'STEM focus; includes mentoring and enrichment', url:'https://goodnight.ncsu.edu/' },
+    { id: uid(), section:'competitive', name:'CASNR Scholarship Essay', school:'University of Tennessee', amount:'Varies', deadline:'2026-11-15', essayReq:true, separateApp:false, status:'Not Started', notes:'Optional for Animal Science majors; recommended', url:'https://ag.tennessee.edu/casnr/Pages/Scholarships.aspx' },
+    { id: uid(), section:'competitive', name:'Presidential/Singletary Awards', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Complete competitive scholarship section of application', url:'https://www.uky.edu/financialaid/scholarships' },
+    { id: uid(), section:'competitive', name:'Lewis Honors College Essay', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'500 words, "common good" prompt', url:'https://www.uky.edu/honors/' },
+    { id: uid(), section:'competitive', name:'Animal Sciences Dept. Scholarships', school:'Purdue University', amount:'Varies', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic review with EA application', url:'https://ag.purdue.edu/department/ansc/scholarships.html' },
+    { id: uid(), section:'competitive', name:'Competitive Merit Scholarships', school:'Auburn University', amount:'$8K-$16K/year', deadline:'2026-11-15', essayReq:false, separateApp:false, status:'Not Started', notes:'Presidential and Academic; apply EA I by Nov 15', url:'https://www.auburn.edu/scholarship/undergraduate/competitive-merit.php' },
+    { id: uid(), section:'competitive', name:'VT Scholarships (Presidential, Provost)', school:'Virginia Tech', amount:'Varies', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic consideration with EA application', url:'https://finaid.vt.edu/university-scholarships-and-financial-aid-home-page-Virginia-Tech-Scholarships.html' },
+    { id: uid(), section:'competitive', name:'Schreyer Honors College Scholarship', school:'Penn State University', amount:'$4,500/year', deadline:'2026-12-01', essayReq:true, separateApp:true, status:'Not Started', notes:'800-word essay + short answers; test scores NOT used', url:'https://www.shc.psu.edu/admissions/' },
+    { id: uid(), section:'competitive', name:'Calhoun Honors / CAFLS Scholarships', school:'Clemson University', amount:'Varies', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic with Dec 1 application; CAFLS departmental awards', url:'https://www.clemson.edu/cafls/academics/scholarships/' },
+    { id: uid(), section:'competitive', name:'OOS Tuition Waiver Program', school:'Florida State University', amount:'Up to 100% OOS tuition', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Very competitive; automatic with admission', url:'https://admissions.fsu.edu/first-year/finances/' },
+    { id: uid(), section:'competitive', name:'McKissick/Excellence/Distinction Awards', school:'University of South Carolina', amount:'$5K-$11K/year', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Tiered by ACT: 33+ McKissick ~$11K, 30+ Excellence ~$9.5K, 28+ Distinction ~$7K', url:'https://sc.edu/about/offices_and_divisions/financial_aid/scholarships/freshmen_scholarships/index.php' },
+    { id: uid(), section:'competitive', name:'Animal Science Dept. Scholarships', school:'University of Wisconsin-Madison', amount:'Varies', deadline:'2027-01-15', essayReq:false, separateApp:false, status:'Not Started', notes:'CALS departmental awards', url:'https://cals.wisc.edu/academics/scholarships/' },
+    { id: uid(), section:'competitive', name:'Animal Science Dept. Scholarships', school:'University of Missouri', amount:'Varies', deadline:'2026-11-15', essayReq:false, separateApp:false, status:'Not Started', notes:'CAFNR departmental awards', url:'https://cafnr.missouri.edu/scholarships/' },
+    // ── Pre-Vet & Animal Science ──
+    { id: uid(), section:'prevet', name:'AVMA/AAVMC Scholarships', school:'National', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'For enrolled vet students; research pre-vet eligibility', url:'https://www.avmf.org/grants-and-scholarships/scholarships/' },
+    { id: uid(), section:'prevet', name:'APVMA Community Service Scholarship', school:'National', amount:'$1,000', deadline:'Varies (summer)', essayReq:true, separateApp:true, status:'Not Started', notes:'American Pre-Veterinary Medical Association; join campus APVMA chapter', url:'http://apvma.org/current-scholarships.html' },
+    { id: uid(), section:'prevet', name:'APVMA Resiliency Scholarship', school:'National', amount:'$500', deadline:'Varies (summer)', essayReq:true, separateApp:true, status:'Not Started', notes:'For APVMA members demonstrating resilience', url:'http://apvma.org/current-scholarships.html' },
+    { id: uid(), section:'prevet', name:'National Dairy Shrine Pre-Vet Scholarship (Zoetis)', school:'National', amount:'$2,500', deadline:'2027-04-15', essayReq:true, separateApp:true, status:'Not Started', notes:'For students pursuing veterinary medicine with dairy interest', url:'https://dairyshrine.org/youth/' },
+    { id: uid(), section:'prevet', name:'National Dairy Shrine Freshman Scholarship', school:'National', amount:'$1,500', deadline:'2027-04-15', essayReq:true, separateApp:true, status:'Not Started', notes:'Maurice E. Core scholarship for incoming freshmen in ag/dairy', url:'https://dairyshrine.org/youth/' },
+    { id: uid(), section:'prevet', name:'AKC Humane Fund Scholarship', school:'National', amount:'$2,000', deadline:'2027-07-01', essayReq:true, separateApp:true, status:'Not Started', notes:'5 awards annually; for students pursuing animal welfare careers', url:'https://akchumanefund.org/programs/' },
+    { id: uid(), section:'prevet', name:'AQHA Scholarships (50+ awards)', school:'National', amount:'$2,250-$10,000', deadline:'2027-01-15', essayReq:true, separateApp:true, status:'Not Started', notes:'American Quarter Horse Foundation; 50+ awards for members', url:'https://www.aqha.com/scholarships' },
+    { id: uid(), section:'prevet', name:'EQUUS Foundation Scholarship', school:'National', amount:'$1,000-$2,500', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'For students with equine interest/experience', url:'https://equusfoundation.org/scholarships/een-scholarships.php' },
+    { id: uid(), section:'prevet', name:'Vince\'s Pre-Vet Student Scholarship', school:'National', amount:'$500', deadline:'2026-10-01', essayReq:true, separateApp:true, status:'Not Started', notes:'Unique requirement: write a poem about pre-vet journey', url:'https://vincekotchian.com/blog/scholarship' },
+    { id: uid(), section:'prevet', name:'Georgia VMA Foundation Scholarships', school:'Georgia', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'Contact GVMA directly; may be for enrolled vet students only', url:'https://www.gvma.net/' },
+    // ── External & National ──
+    { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools', url:'https://studentaid.gov/h/apply-for-aid/fafsa' },
+    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; 3.7+ GPA + 26+ ACT — Avery qualifies! Applies to UGA.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
+    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'Partial tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with GPA 3.0+. Fallback if Zell Miller not maintained.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
+    { id: uid(), section:'external', name:'Coca-Cola Scholars Program', school:'National', amount:'$20,000 (150 awards)', deadline:'2026-09-30', essayReq:true, separateApp:true, status:'Not Started', notes:'Highly competitive national award; apply Aug-Sep of senior year', url:'https://www.coca-colascholarsfoundation.org/apply/' },
+    { id: uid(), section:'external', name:'Elks Most Valuable Student', school:'National', amount:'$4,000-$30,000 over 4 years', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'500 awards nationwide; leadership and financial need', url:'https://www.elks.org/scholars/scholarships/mvs.cfm' },
+    { id: uid(), section:'external', name:'National FFA Scholarship Program', school:'National', amount:'Up to $10,000', deadline:'2027-01-15', essayReq:true, separateApp:true, status:'Not Started', notes:'For FFA members; 100+ sponsors; ag/animal science focus', url:'https://www.ffa.org/participate/grants-and-scholarships/scholarships/' },
+    { id: uid(), section:'external', name:'Horatio Alger National Scholarship', school:'National', amount:'$10,000-$25,000', deadline:'2027-03-01', essayReq:true, separateApp:true, status:'Not Started', notes:'For students who have overcome adversity; financial need required', url:'https://scholars.horatioalger.org/scholarships/' },
   ];
 }
 
@@ -5078,7 +5107,8 @@ function getMeritScholarships() {
       separateApp: false,
       status: 'Awarded',
       notes: f.school === 'University of Kentucky' ? 'Dynamic tiers based on ACT/GPA' : 'Automatic with admission',
-      readOnly: true
+      readOnly: true,
+      url: schoolDB[f.school] ? 'https://' + schoolDB[f.school].domain + '/admissions' : ''
     };
   });
 }
@@ -5148,7 +5178,7 @@ function renderScholarships() {
           return `
           <div class="schol-row${isMerit ? ' schol-merit-row' : ''}" data-scholid="${s.id}">
             <div>
-              <div class="schol-name">${schoolInfo ? schoolLogoHTML(s.school, 16) + ' ' : ''}${esc(s.name)}</div>
+              <div class="schol-name">${schoolInfo ? schoolLogoHTML(s.school, 16) + ' ' : ''}${s.url ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed var(--primary)" title="Open scholarship page">' + esc(s.name) + ' <span style="font-size:0.7rem;color:var(--primary)">&#8599;</span></a>' : esc(s.name)}</div>
               <div style="font-size:0.78rem;color:var(--text-light)">${esc(s.school || '')}</div>
               ${s.notes ? '<div class="schol-notes" title="' + esc(s.notes) + '">' + esc(s.notes) + '</div>' : ''}
             </div>
@@ -5245,6 +5275,7 @@ function editScholarship(id) {
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="se_sepapp" ${s.separateApp ? 'checked' : ''} style="width:16px;height:16px"> Separate application</label>
         </div>
         <label>Notes<textarea id="se_notes" rows="2" style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;resize:vertical">${esc(s.notes || '')}</textarea></label>
+        <label>Link URL<input id="se_url" type="url" value="${esc(s.url || '')}" placeholder="https://..." style="width:100%;margin-top:4px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:inherit"></label>
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="document.getElementById('scholEditModal').classList.remove('open')">Cancel</button>
@@ -5266,6 +5297,7 @@ function saveScholarshipEdit(id) {
   s.essayReq = document.getElementById('se_essay').checked;
   s.separateApp = document.getElementById('se_sepapp').checked;
   s.notes = document.getElementById('se_notes').value.trim();
+  s.url = document.getElementById('se_url').value.trim();
   saveData();
   renderScholarships();
   document.getElementById('scholEditModal').classList.remove('open');
@@ -5302,6 +5334,7 @@ function openAddScholarshipModal() {
       s.essayReq = document.getElementById('se_essay').checked;
       s.separateApp = document.getElementById('se_sepapp').checked;
       s.notes = document.getElementById('se_notes').value.trim();
+      s.url = document.getElementById('se_url').value.trim();
     }
     saveData();
     renderScholarships();
@@ -5330,7 +5363,8 @@ function exportScholarships() {
     'Essay Required': s.essayReq ? 'Yes' : 'No',
     'Separate App': s.separateApp ? 'Yes' : 'No',
     'Status': s.status,
-    'Notes': s.notes || ''
+    'Notes': s.notes || '',
+    'Link': s.url || ''
   }));
 
   const wb = XLSX.utils.book_new();
@@ -5621,11 +5655,12 @@ const CHANGELOG = [
     items: [
       'New Scholarships subtab in Applications — track competitive, pre-vet, external, and merit aid all in one place',
       'Four collapsible sections: Competitive School-Based, Pre-Vet & Animal Science, External & National, and Automatic Merit Aid',
-      'Pre-populated with 20+ scholarships from the college roadmap including Park, Schreyer, Lewis Honors, AVMA, FAFSA, and more',
+      'Pre-populated with 38+ scholarships: school-specific (CAES, Park, Schreyer, Goodnight, Green & Gold, etc.), pre-vet (APVMA, Dairy Shrine, AKC, AQHA, EQUUS), and national (Coca-Cola, Elks, FFA, Horatio Alger)',
+      'Every scholarship has a clickable link to the application/info page — click any name to open it',
       'Automatic Merit Aid section is read-only, sourced live from financial data (Kentucky merit updates dynamically with ACT)',
       'Summary bar shows total tracked, applied count, and potential award amount',
-      'Full CRUD: add, edit, delete scholarships with status tracking (Not Started through Awarded)',
-      'Download Excel export for all scholarship data',
+      'Full CRUD: add, edit, delete scholarships with status tracking and URL field',
+      'Download Excel export includes all fields plus links',
     ]
   },
   {
