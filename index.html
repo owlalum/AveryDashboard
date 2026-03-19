@@ -915,7 +915,7 @@
     <button class="subtab-btn" data-subtab="rankings">Rankings</button>
     <button class="subtab-btn" data-subtab="financial">Financial Analysis</button>
     <button class="subtab-btn" data-subtab="greeklife">Greek Life</button>
-    <button class="subtab-btn" data-subtab="methodology">Methodology</button>
+    <button class="subtab-btn" data-subtab="methodology">How Rankings Work</button>
   </nav>
   <div id="schools" class="sub-panel active">
     <div class="section-head">
@@ -923,7 +923,7 @@
       <div style="display:flex;gap:8px;align-items:center;">
         <button id="compareBtn" class="btn btn-primary" onclick="openCompareModal()" style="display:none;">Compare Selected</button>
         <button class="btn btn-primary" onclick="openModal('school')">+ Add School</button>
-        <button class="btn btn-export" onclick="promptExport('comparison')">Download</button>
+        <button class="btn btn-export" onclick="promptExport('comparison')">Download Excel / CSV</button>
       </div>
     </div>
     <div class="table-wrap">
@@ -1002,6 +1002,7 @@
   <!-- Greek Life sub-panel -->
   <div id="greeklife" class="sub-panel">
     <div class="section-head"><h2>Greek Life</h2><p>Sorority overview for schools in your comparison list</p></div>
+    <div style="background:var(--bg-card);border-left:3px solid var(--primary);padding:10px 14px;margin-bottom:16px;border-radius:6px;font-size:0.88rem;color:var(--text-light);">For reference when Avery is enrolled &mdash; not a factor in the current decision.</div>
     <div id="greekEmpty" class="empty-state" style="display:none;">Add schools in the School Comparison tab to see Greek life data.</div>
     <div class="table-wrap" style="max-height:none;">
       <table>
@@ -1024,7 +1025,7 @@
 
   <!-- Methodology sub-panel -->
   <div id="methodology" class="sub-panel">
-    <div class="section-head"><h2>Methodology</h2><p>How rankings, costs, and categories are calculated</p></div>
+    <div class="section-head"><h2>How Rankings Work</h2><p>How rankings, costs, and categories are calculated</p></div>
 
     <div class="insight-box">
       <strong>Why this exists:</strong> Every number on this dashboard follows a documented formula. This page explains exactly how schools are ranked, what "Budget Fit" means, and where the data comes from &mdash; so you can evaluate whether the rankings match your own priorities.
@@ -1217,6 +1218,10 @@
 
   <!-- Tour Checklist sub-panel -->
   <div id="tourchk" class="sub-panel active">
+    <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:1px solid #a5d6a7;padding:12px 18px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-weight:600;color:#2e7d32;font-size:0.92rem;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Trip completed March 6, 2026
+    </div>
     <div class="section-head"><h2>Campus Visit Checklist</h2></div>
     <div id="tourChecklistContainer"></div>
   </div>
@@ -1241,7 +1246,7 @@
     <div style="margin-top:32px">
       <div class="section-head">
         <h2>Evaluation Summary</h2>
-        <button class="btn btn-export" onclick="promptExport('evaluations')">Download</button>
+        <button class="btn btn-export" onclick="promptExport('evaluations')">Download Excel / CSV</button>
       </div>
       <div class="table-wrap" id="evalSummaryWrap" style="max-height:none;">
         <table class="summary-table">
@@ -2495,6 +2500,7 @@ function deleteTestPrep(id) {
 
 // ─── Application Checklist ───
 const checklistOpenState = {};
+let checklistFirstRenderDone = false;
 
 function toggleChecklist(clId) {
   checklistOpenState[clId] = !checklistOpenState[clId];
@@ -2544,6 +2550,9 @@ function renderChecklists() {
     const total = countableItems.length;
     const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
 
+    if (!checklistFirstRenderDone && checklistOpenState[cl.id] === undefined) {
+      checklistOpenState[cl.id] = false;
+    }
     const isOpen = checklistOpenState[cl.id];
 
     const renderItem = (item) => {
@@ -2603,6 +2612,7 @@ function renderChecklists() {
       if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
     });
   });
+  checklistFirstRenderDone = true;
 }
 
 function toggleHonorsOptOut(school, optOut) {
@@ -5231,6 +5241,18 @@ docRef.onSnapshot(
 
 // ─── Changelog / What's New ───
 const CHANGELOG = [
+  {
+    version: '5.1',
+    date: '2026-03-18',
+    title: 'UI Polish & Label Updates',
+    items: [
+      'Renamed "Methodology" subtab to "How Rankings Work" for clarity',
+      'Added context note on Greek Life tab: for future reference, not a decision factor',
+      'Tour Checklist now shows "Trip completed March 6, 2026" banner',
+      'Application checklists default to collapsed on first load',
+      'Export buttons now labeled "Download Excel / CSV" for clarity',
+    ]
+  },
   {
     version: '5.0',
     date: '2026-03-18',
