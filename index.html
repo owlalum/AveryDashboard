@@ -2522,6 +2522,38 @@ function openCompareModal() {
     </div>`;
 
   document.body.appendChild(overlay);
+
+  // ── Best-in-category highlighting ──
+  const bestHighlight = 'rgba(122,174,142,0.12)';
+  const highlightFields = [
+    { label: 'Visit Score', lower: false },
+    { label: '4-Year Cost', lower: true },
+    { label: 'Vet Program', lower: false },
+    { label: 'Merit Aid', lower: false },
+  ];
+  const cardEls = overlay.querySelectorAll('.compare-card');
+  highlightFields.forEach(({ label, lower }) => {
+    const cells = [];
+    cardEls.forEach(card => {
+      card.querySelectorAll('.compare-row').forEach(row => {
+        const lbl = row.querySelector('.cr-label');
+        if (lbl && lbl.textContent.trim() === label) cells.push(row);
+      });
+    });
+    if (cells.length < 2) return;
+    const nums = cells.map(c => {
+      const txt = c.querySelector('.cr-value').textContent.trim();
+      const n = parseFloat(txt.replace(/[$K,%\/\s]/g, ''));
+      return isNaN(n) ? null : n;
+    });
+    const valid = nums.filter(n => n !== null);
+    if (valid.length < 2) return;
+    if (valid.every(v => v === valid[0])) return;
+    const best = lower ? Math.min(...valid) : Math.max(...valid);
+    cells.forEach((cell, i) => {
+      if (nums[i] === best) cell.style.background = bestHighlight;
+    });
+  });
 }
 
 function renderSchools() {
