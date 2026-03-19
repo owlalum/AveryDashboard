@@ -648,6 +648,17 @@
   .eval-total-bar .total-label { font-size: 0.85rem; color: var(--text-light); }
   .eval-grade-picker select { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.92rem; font-weight: 600; font-family: inherit; }
 
+  /* ── Sticky school-name columns ── */
+  .table-wrap table th.sticky-col,
+  .table-wrap table td.sticky-col {
+    position: sticky;
+    z-index: 2;
+    background: var(--surface);
+  }
+  .table-wrap table th.sticky-col { background: var(--primary-light); z-index: 3; }
+  .table-wrap table tr:hover td.sticky-col { background: #fafcfd; }
+  .sticky-col-last { border-right: 2px solid var(--border) !important; }
+
   /* ── Summary comparison table ── */
   .summary-table { width: 100%; border-collapse: collapse; }
   .summary-table th { background: var(--primary-light); color: var(--primary-dark); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 10px 12px; text-align: center; }
@@ -2418,12 +2429,17 @@ function openCompareModal() {
 
 function renderSchools() {
   // Build dynamic thead
+  const stickyCount = 4; // checkbox, star, logo, school name
   const thead = document.getElementById('schoolHead');
-  thead.innerHTML = '<tr>' + SCHOOL_COLUMNS.map(col => {
+  thead.innerHTML = '<tr>' + SCHOOL_COLUMNS.map((col, i) => {
+    const lastSticky = i === stickyCount - 1 ? ' sticky-col-last' : '';
+    const sticky = i < stickyCount ? ` class="sticky-col${lastSticky}${col.sortType ? ' sortable' : ''}"` : '';
+    if (!col.sortType && i < stickyCount) return `<th${sticky}>${col.label}</th>`;
     if (!col.sortType) return `<th>${col.label}</th>`;
     const isActive = schoolSort.field === col.field;
     const arrow = isActive ? (schoolSort.dir === 'asc' ? ' ▲' : ' ▼') : '';
     const hint = !isActive ? ' <span class="sort-hint">▲▼</span>' : '';
+    if (i < stickyCount) return `<th${sticky} data-field="${col.field}">${col.label}${arrow}${hint}</th>`;
     return `<th class="sortable" data-field="${col.field}">${col.label}${arrow}${hint}</th>`;
   }).join('') + '</tr>';
 
@@ -2449,10 +2465,10 @@ function renderSchools() {
     const distDisplay = dist != null ? dist + ' mi' : '\u2014';
     return `
     <tr data-id="${s.id}">
-      <td class="compact" style="width:28px;"><input type="checkbox" class="compare-cb" data-school="${esc(s.name)}" ${compareSelected.includes(s.name) ? 'checked' : ''} onchange="toggleCompare(this)" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;" title="Select to compare"></td>
-      <td class="compact" style="width:28px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
-      <td class="logo-cell">${schoolLogoHTML(s.name)}</td>
-      <td style="white-space:nowrap"><span contenteditable="true" data-field="name">${esc(s.name)}</span></td>
+      <td class="compact sticky-col" style="width:28px;"><input type="checkbox" class="compare-cb" data-school="${esc(s.name)}" ${compareSelected.includes(s.name) ? 'checked' : ''} onchange="toggleCompare(this)" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;" title="Select to compare"></td>
+      <td class="compact sticky-col" style="width:28px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
+      <td class="logo-cell sticky-col">${schoolLogoHTML(s.name)}</td>
+      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span contenteditable="true" data-field="name">${esc(s.name)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
       <td class="compact">${distDisplay}</td>
       <td class="notes-cell"><span contenteditable="true" data-field="notes">${esc(s.notes)}</span></td>
@@ -2495,6 +2511,20 @@ function renderSchools() {
       if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
     });
   });
+
+  // Compute sticky column left offsets from actual rendered widths
+  const headerRow = thead.querySelector('tr');
+  if (headerRow) {
+    const ths = headerRow.children;
+    let left = 0;
+    for (let i = 0; i < stickyCount && i < ths.length; i++) {
+      ths[i].style.left = left + 'px';
+      const w = ths[i].offsetWidth;
+      // Apply same offset to all body rows
+      tbody.querySelectorAll('tr').forEach(tr => { tr.children[i].style.left = left + 'px'; });
+      left += w;
+    }
+  }
 }
 
 function updateSchoolStatus(id, sel) {
