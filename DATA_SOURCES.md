@@ -141,13 +141,4 @@ Essay prompts, word counts, and requirements per school.
 
 ---
 
-## Annual Maintenance Calendar
-
-| When | Action |
-|------|--------|
-| **June** | Check for new tuition/COA postings; watch for Common App prompt updates |
-| **July** | Verify sticker prices, merit aid amounts, and scholarship criteria for all 21 schools |
-| **August** | Verify all deadlines (regular, EA/ED, scholarship, honors); confirm essay prompts are current; update test score ranges from new CDS releases |
-| **September** | Update US News rankings (overall, public, vet school) after annual publication |
-| **October** | Final pre-application audit: spot-check all active school data against live admissions pages |
-| **Post-cycle (April+)** | Update accept rates and GPA ranges from newly published CDS data |
+For the annual maintenance calendar and review process, see [ANNUAL_REVIEW.md](ANNUAL_REVIEW.md).
