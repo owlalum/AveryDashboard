@@ -942,7 +942,7 @@
     <div class="section-head"><h2>Comprehensive School Rankings</h2></div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>Rank</th><th>School</th><th>Category</th><th>Visit Score</th><th>Vet School</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
+        <thead id="summaryHead"><tr><th>Rank</th><th>School</th><th>Category</th><th>Visit Score</th><th>Vet School</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
         <tbody id="summaryRankBody"></tbody>
       </table>
     </div>
@@ -994,7 +994,7 @@
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table class="rank-table">
-        <thead>
+        <thead id="rankingsHead">
           <tr>
             <th>Rank</th>
             <th>School</th>
@@ -1022,7 +1022,7 @@
     <div style="padding:8px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">Sticker prices reflect 2025-26 published rates. Update annually in August when schools release new figures.</div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr><th>School</th><th>Residency</th><th>Sticker COA/Yr</th><th>4-Yr Sticker</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th></tr></thead>
+        <thead id="finHead"><tr><th>School</th><th>Residency</th><th>Sticker COA/Yr</th><th>4-Yr Sticker</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th></tr></thead>
         <tbody id="finBody"></tbody>
       </table>
     </div>
@@ -1050,7 +1050,7 @@
     <div id="greekEmpty" class="empty-state" style="display:none;">Add schools in the School Comparison tab to see Greek life data.</div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead><tr>
+        <thead id="greekHead"><tr>
           <th>School</th>
           <th>% Women in Sororities</th>
           <th>NPC Sororities</th>
@@ -2337,6 +2337,103 @@ function sortSchools(field, dir) {
   });
   saveData();
   renderSchools();
+}
+
+// ─── Generic Table Sort Helper ───
+const rankingsSort = { field: null, dir: 'asc' };
+const financialSort = { field: null, dir: 'asc' };
+const greekSort = { field: null, dir: 'asc' };
+const summarySort = { field: null, dir: 'asc' };
+
+const RANKING_COLUMNS = [
+  { field: 'finalRank', label: 'Rank', sortType: 'numeric' },
+  { field: 'name', label: 'School', sortType: 'text' },
+  { field: 'visitScore', label: 'Visit Score', sortType: 'numeric' },
+  { field: 'visitRank', label: 'Visit Rank', sortType: 'numeric' },
+  { field: 'vetProgram', label: 'Vet Program', sortType: 'numeric' },
+  { field: 'costScore', label: 'Cost Score', sortType: 'numeric' },
+  { field: 'planB', label: 'Plan B', sortType: 'numeric' },
+  { field: 'meritAid', label: 'Merit Aid', sortType: 'numeric' },
+  { field: 'combined', label: 'Combined', sortType: 'numeric' },
+  { field: 'notes', label: 'Notes', sortType: null },
+];
+
+const FINANCIAL_COLUMNS = [
+  { field: 'school', label: 'School', sortType: 'text' },
+  { field: 'res', label: 'Residency', sortType: 'text' },
+  { field: 'sticker', label: 'Sticker\u00a0COA/Yr', sortType: 'numeric' },
+  { field: 'fourYrSticker', label: '4-Yr\u00a0Sticker', sortType: 'numeric' },
+  { field: 'merit', label: 'Merit/Yr', sortType: 'numeric' },
+  { field: 'realistic', label: 'Realistic/Yr', sortType: 'numeric' },
+  { field: 'fourYrRealistic', label: '4-Yr\u00a0Realistic', sortType: 'numeric' },
+];
+
+const GREEK_COLUMNS = [
+  { field: 'name', label: 'School', sortType: 'text' },
+  { field: 'pctWomen', label: '%\u00a0Women in Sororities', sortType: 'percent' },
+  { field: 'npc', label: 'NPC\u00a0Sororities', sortType: 'numeric' },
+  { field: 'total', label: 'Total\u00a0Sororities', sortType: 'numeric' },
+  { field: 'recruitment', label: 'Recruitment', sortType: 'text' },
+  { field: 'housing', label: 'Housing', sortType: 'text' },
+  { field: 'cost', label: 'Est.\u00a0Annual Cost', sortType: 'currency' },
+  { field: 'greekPct', label: 'Overall\u00a0Greek %', sortType: 'percent' },
+  { field: 'gpa', label: 'Greek vs Campus GPA', sortType: 'text' },
+  { field: 'vibe', label: 'Vibe', sortType: null },
+];
+
+const SUMMARY_COLUMNS = [
+  { field: 'rank', label: 'Rank', sortType: 'numeric' },
+  { field: 'name', label: 'School', sortType: 'text' },
+  { field: 'cat', label: 'Category', sortType: 'text' },
+  { field: 'visitNorm', label: 'Visit Score', sortType: 'numeric' },
+  { field: 'vet', label: 'Vet School', sortType: 'text' },
+  { field: 'cost', label: '4-Yr Cost', sortType: 'currency' },
+  { field: 'combined', label: 'Score', sortType: 'numeric' },
+  { field: 'notes', label: 'Key Notes', sortType: null },
+];
+
+function setupSortableHeaders(theadId, columns, sortState, renderFn) {
+  const thead = document.getElementById(theadId);
+  if (!thead) return;
+  const tr = thead.querySelector('tr');
+  if (!tr) return;
+  tr.innerHTML = columns.map(col => {
+    if (!col.sortType) return `<th>${col.label}</th>`;
+    const isActive = sortState.field === col.field;
+    const arrow = isActive ? (sortState.dir === 'asc' ? ' \u25B2' : ' \u25BC') : '';
+    const hint = !isActive ? ' <span class="sort-hint">\u25B2\u25BC</span>' : '';
+    return `<th class="sortable" data-field="${col.field}">${col.label}${arrow}${hint}</th>`;
+  }).join('');
+  tr.querySelectorAll('.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const field = th.dataset.field;
+      if (sortState.field === field) {
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortState.field = field;
+        sortState.dir = 'asc';
+      }
+      renderFn();
+    });
+  });
+}
+
+function sortRows(rows, sortState, columns) {
+  if (!sortState.field) return rows;
+  const col = columns.find(c => c.field === sortState.field);
+  if (!col) return rows;
+  return [...rows].sort((a, b) => {
+    let va = a[sortState.field], vb = b[sortState.field];
+    va = parseSortValue(va, col.sortType);
+    vb = parseSortValue(vb, col.sortType);
+    let cmp;
+    if (typeof va === 'string' && typeof vb === 'string') {
+      cmp = va.localeCompare(vb);
+    } else {
+      cmp = (va < vb ? -1 : va > vb ? 1 : 0);
+    }
+    return sortState.dir === 'desc' ? -cmp : cmp;
+  });
 }
 
 function toggleCompare(cb) {
@@ -3630,13 +3727,15 @@ function renderRankings() {
   rows.sort((a, b) => b.combined - a.combined);
   rows.forEach((r, i) => r.finalRank = i + 1);
 
+  const sortedRows = rankingsSort.field ? sortRows(rows, rankingsSort, RANKING_COLUMNS) : rows;
+
   function ratingSelect(school, field, val) {
     return `<select onchange="setRankingField('${esc(school)}','${field}',parseInt(this.value))">
       ${[1,2,3,4,5].map(n => `<option value="${n}" ${val===n?'selected':''}>${n}</option>`).join('')}
     </select>`;
   }
 
-  tbody.innerHTML = rows.map(r => `
+  tbody.innerHTML = sortedRows.map(r => `
     <tr>
       <td>${r.finalRank}</td>
       <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
@@ -3649,6 +3748,8 @@ function renderRankings() {
       <td style="font-weight:700">${r.combined}</td>
       <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(r.name)}','notes',this.value)"></td>
     </tr>`).join('');
+
+  setupSortableHeaders('rankingsHead', RANKING_COLUMNS, rankingsSort, renderRankings);
 }
 
 function setRankingField(school, field, val) {
@@ -3778,7 +3879,9 @@ function renderSummary() {
   rows.sort((a, b) => b.combined - a.combined);
   rows.forEach((r, i) => r.rank = i + 1);
 
-  tbody.innerHTML = rows.map(r => {
+  const summaryRows = summarySort.field ? sortRows(rows, summarySort, SUMMARY_COLUMNS) : rows;
+
+  tbody.innerHTML = summaryRows.map(r => {
     const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
     const vetClass = r.vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
     const visitDisplay = r.visitScore > 0 ? r.visitNorm.toFixed(1) : '\u2014';
@@ -3804,6 +3907,7 @@ function renderSummary() {
   }
   footnote.textContent = rows.some(r => r.noMerit) ? '* Sticker price — no merit aid data available for this school.' : '';
 
+  setupSortableHeaders('summaryHead', SUMMARY_COLUMNS, summarySort, renderSummary);
   renderScenarios();
 }
 
@@ -3987,22 +4091,31 @@ function renderFinancials() {
     return;
   }
 
-  tbody.innerHTML = cleanedFin.map(row => {
-    if (row.group) return `<tr class="fin-group-header"><td colspan="7">${row.group}</td></tr>`;
+  // Build enriched rows for sorting
+  const finRows = cleanedFin.filter(r => !r.group).map(row => {
     const merit = row.school === 'University of Kentucky' ? getKentuckyMerit() : row.merit;
     const realistic = row.sticker - merit;
-    const fourYrSticker = row.sticker * 4;
-    const fourYrRealistic = realistic * 4;
+    return { ...row, merit, realistic, fourYrSticker: row.sticker * 4, fourYrRealistic: realistic * 4 };
+  });
+
+  const displayRows = financialSort.field ? sortRows(finRows, financialSort, FINANCIAL_COLUMNS) : null;
+  const rowsToRender = displayRows || cleanedFin;
+
+  tbody.innerHTML = rowsToRender.map(row => {
+    if (row.group) return `<tr class="fin-group-header"><td colspan="7">${row.group}</td></tr>`;
+    const r = displayRows ? row : finRows.find(f => f.school === row.school) || row;
     return `<tr>
-      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(row.school, 22)} ${esc(row.school)}</span></td>
-      <td class="compact">${row.res}</td>
-      <td class="compact">$${row.sticker.toLocaleString()}</td>
-      <td class="compact">$${fourYrSticker.toLocaleString()}</td>
-      <td class="compact">$${merit.toLocaleString()}</td>
-      <td class="compact">$${realistic.toLocaleString()}</td>
-      <td class="compact" style="font-weight:600">$${fourYrRealistic.toLocaleString()}</td>
+      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.school, 22)} ${esc(r.school)}</span></td>
+      <td class="compact">${r.res}</td>
+      <td class="compact">$${r.sticker.toLocaleString()}</td>
+      <td class="compact">$${r.fourYrSticker.toLocaleString()}</td>
+      <td class="compact">$${r.merit.toLocaleString()}</td>
+      <td class="compact">$${r.realistic.toLocaleString()}</td>
+      <td class="compact" style="font-weight:600">$${r.fourYrRealistic.toLocaleString()}</td>
     </tr>`;
   }).join('');
+
+  setupSortableHeaders('finHead', FINANCIAL_COLUMNS, financialSort, renderFinancials);
 }
 
 // ─── Road Trip ───
@@ -4459,22 +4572,31 @@ function renderGreekLife() {
   const schools = getVisibleSchools();
   if (schools.length === 0) { empty.style.display = ''; tb.parentElement.style.display = 'none'; return; }
   empty.style.display = 'none'; tb.parentElement.style.display = '';
-  tb.innerHTML = schools.map(s => {
+
+  // Build sortable row data
+  let greekRows = schools.map(s => {
     const g = GREEK_LIFE_DATA[s.name];
-    if (!g) return `<tr><td>${esc(s.name)}</td><td colspan="9" style="color:#999;">No Greek life data available</td></tr>`;
+    return { name: s.name, ...(g || {}), hasData: !!g };
+  });
+  if (greekSort.field) greekRows = sortRows(greekRows, greekSort, GREEK_COLUMNS);
+
+  tb.innerHTML = greekRows.map(r => {
+    if (!r.hasData) return `<tr><td>${esc(r.name)}</td><td colspan="9" style="color:#999;">No Greek life data available</td></tr>`;
     return `<tr>
-      <td><strong>${esc(s.name)}</strong></td>
-      <td>${esc(g.pctWomen)}</td>
-      <td>${g.npc}</td>
-      <td>${esc(String(g.total))}</td>
-      <td>${esc(g.recruitment)}</td>
-      <td style="font-size:0.82em;">${esc(g.housing)}</td>
-      <td>${esc(g.cost)}</td>
-      <td>${esc(g.greekPct)}</td>
-      <td style="font-size:0.82em;">${esc(g.gpa)}</td>
-      <td style="font-size:0.82em;max-width:220px;">${esc(g.vibe)}</td>
+      <td><strong>${esc(r.name)}</strong></td>
+      <td>${esc(r.pctWomen)}</td>
+      <td>${r.npc}</td>
+      <td>${esc(String(r.total))}</td>
+      <td>${esc(r.recruitment)}</td>
+      <td style="font-size:0.82em;">${esc(r.housing)}</td>
+      <td>${esc(r.cost)}</td>
+      <td>${esc(r.greekPct)}</td>
+      <td style="font-size:0.82em;">${esc(r.gpa)}</td>
+      <td style="font-size:0.82em;max-width:220px;">${esc(r.vibe)}</td>
     </tr>`;
   }).join('');
+
+  setupSortableHeaders('greekHead', GREEK_COLUMNS, greekSort, renderGreekLife);
 }
 
 // ─── Essay Database (per-school essay requirements) ───
