@@ -1547,7 +1547,7 @@ function getDefaults() {
         tuitionOut: '$40,526',
         deadline: 'December 1',
         earlyDecision: 'October 15',
-        testReq: 'SAT 1210-1410 / ACT 26-32',
+        testReq: 'ACT 26-32',
         acceptRate: '63%',
         oosAcceptRate: '47%',
         avgGPA: '3.68',
@@ -1566,7 +1566,7 @@ function getDefaults() {
         tuitionOut: '$31,120',
         deadline: 'January 1',
         earlyDecision: 'October 15',
-        testReq: 'SAT 1250-1430 / ACT 28-33',
+        testReq: 'ACT 28-33',
         acceptRate: '43%',
         oosAcceptRate: '18%',
         avgGPA: '4.0',
@@ -1595,7 +1595,7 @@ function getDefaults() {
     testprep: [
       {
         id: uid(),
-        title: 'Start SAT Prep',
+        title: 'Start ACT Prep',
         date: '2026-03-01',
         type: 'milestone',
         description: 'Begin consistent study routine — 1 hour daily focused practice',
@@ -1606,16 +1606,16 @@ function getDefaults() {
         title: 'Practice Test #1',
         date: '2026-04-15',
         type: 'practice',
-        description: 'Full-length timed practice SAT to set baseline score',
-        scoreGoal: '1200+'
+        description: 'Full-length timed practice ACT to set baseline score',
+        scoreGoal: '25+'
       },
       {
         id: uid(),
-        title: 'SAT Test Date',
-        date: '2026-06-06',
+        title: 'ACT Test Date',
+        date: '2026-06-14',
         type: 'test',
-        description: 'First official SAT sitting',
-        scoreGoal: '1300+'
+        description: 'First official ACT sitting',
+        scoreGoal: '28+'
       }
     ],
     evaluations: {},
@@ -1633,7 +1633,7 @@ function getDefaults() {
           { id: uid(), text: 'Supplemental essay (Why Texas A&M)', done: false },
           { id: uid(), text: 'Letter of recommendation — Science teacher', done: false },
           { id: uid(), text: 'Letter of recommendation — Counselor', done: false },
-          { id: uid(), text: 'Submit SAT/ACT scores', done: false },
+          { id: uid(), text: 'Submit ACT scores', done: false },
           { id: uid(), text: 'Complete FAFSA', done: false },
           { id: uid(), text: 'Scholarship applications', done: false }
         ]
@@ -1647,7 +1647,7 @@ function getDefaults() {
           { id: uid(), text: 'Supplemental essay (Why UGA)', done: false },
           { id: uid(), text: 'Letter of recommendation — Science teacher', done: false },
           { id: uid(), text: 'Letter of recommendation — Counselor', done: false },
-          { id: uid(), text: 'Submit SAT/ACT scores', done: false },
+          { id: uid(), text: 'Submit ACT scores', done: false },
           { id: uid(), text: 'Complete FAFSA', done: false },
           { id: uid(), text: 'Scholarship applications', done: false }
         ]
@@ -1660,28 +1660,28 @@ function uid() { return Math.random().toString(36).slice(2, 10); }
 
 // ─── Pre-Vet School Database ───
 const schoolDB = {
-  'Texas A&M University':           { domain:'tamu.edu', color:'#500000', location:'College Station, TX', notes:'Top-ranked College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program. Departmental Animal Science Honors Program — requires 28 ACT (min 27 each verbal/math) or top 10% of HS class; 18 hrs honors coursework', tuitionIn:'$12,856', tuitionOut:'$40,157', deadline:'December 1', earlyDecision:'N/A', testReq:'SAT 1160-1390 / ACT 25-31', acceptRate:'57%', oosAcceptRate:'49%', avgGPA:'3.78', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
-  'University of Georgia':          { domain:'uga.edu', color:'#BA0C2F', location:'Athens, GA', notes:'★ 3+1 EARLY ASSURANCE DVM PATHWAY: Animal Health majors can apply after 3 years of undergrad for guaranteed CVM admission — saves a full year. Accredited CVM on campus; excellent pre-vet research opportunities; in-state tuition as GA resident', tuitionIn:'$11,727', tuitionOut:'$33,227', deadline:'January 1', earlyDecision:'October 15', testReq:'SAT 1400-1510 / ACT 32-35', acceptRate:'33%', oosAcceptRate:'9%', avgGPA:'4.08', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#8', lastVerified:'2026-03-06' },
-  'Colorado State University':      { domain:'colostate.edu', color:'#1E4D2B', location:'Fort Collins, CO', notes:'Top-5 vet school; Animal Science pre-vet track with early clinical exposure; strong equine and large animal programs', tuitionIn:'$13,009', tuitionOut:'$33,765', deadline:'February 1', earlyDecision:'N/A', testReq:'SAT 1060-1280 / ACT 23-29', acceptRate:'89%', oosAcceptRate:'82%', avgGPA:'3.6', usNewsOverall:'#151', usNewsPublic:'#79', vetSchoolRank:'#3', lastVerified:'2026-03-06' },
-  'University of Florida':          { domain:'ufl.edu', color:'#FA4616', location:'Gainesville, FL', notes:'Accredited CVM on campus; pre-vet specialization in Animal Sciences; UF early admission pathway to vet school. CALS Honors Scholar track in Animal Sciences — requires 3.75 upper-division GPA, 9 honors credits, undergraduate thesis', tuitionIn:'$6,381', tuitionOut:'$28,659', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1330-1470 / ACT 29-33', acceptRate:'23%', oosAcceptRate:'14%', avgGPA:'4.0', usNewsOverall:'#30', usNewsPublic:'#7', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
-  'Ohio State University':          { domain:'osu.edu', color:'#BB0000', location:'Columbus, OH', notes:'Top-10 vet school; strong pre-vet curriculum through Animal Sciences; veterinary teaching hospital on campus. Departmental Animal Sciences Honors Program — requires 3.4 GPA; honors/embedded courses + research project; accelerated BS/MS option', tuitionIn:'$12,485', tuitionOut:'$36,722', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1290-1440 / ACT 27-32', acceptRate:'51%', oosAcceptRate:'27%', avgGPA:'3.75', usNewsOverall:'#41', usNewsPublic:'#15', vetSchoolRank:'#4', lastVerified:'2026-03-06' },
-  'Purdue University':              { domain:'purdue.edu', color:'#000000', location:'West Lafayette, IN', notes:'Accredited vet school; pre-vet students in Animal Sciences get priority advising; PVM early admission program available', tuitionIn:'$9,992', tuitionOut:'$28,794', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1210-1470 / ACT 27-34', acceptRate:'50%', oosAcceptRate:'39%', avgGPA:'3.81', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#13', lastVerified:'2026-03-06' },
-  'Michigan State University':      { domain:'msu.edu', color:'#18453B', location:'East Lansing, MI', notes:'Top-ranked CVM; pre-vet concentration in Animal Science; large animal hospital and clinical rotations for undergrads', tuitionIn:'$18,926', tuitionOut:'$45,675', deadline:'February 1', earlyDecision:'November 1', testReq:'SAT 1100-1310 / ACT 24-30', acceptRate:'84%', oosAcceptRate:'80%', avgGPA:'3.74', usNewsOverall:'#64', usNewsPublic:'#29', vetSchoolRank:'#15', lastVerified:'2026-03-06' },
-  'Virginia Tech':                  { domain:'vt.edu', color:'#861F41', location:'Blacksburg, VA', notes:'Virginia-Maryland CVM on campus; strong Animal & Poultry Sciences pre-vet path; rural setting with farm animal access', tuitionIn:'$16,526', tuitionOut:'$38,977', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1280-1450 / ACT 28-32', acceptRate:'55%', oosAcceptRate:'40%', avgGPA:'4.11', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#19', lastVerified:'2026-03-06' },
-  'North Carolina State University':{ domain:'ncsu.edu', color:'#CC0000', location:'Raleigh, NC', notes:'Top CVM; pre-vet students in Animal Science; teaching animal units on campus; guaranteed interview program', tuitionIn:'$8,799', tuitionOut:'$32,847', deadline:'January 15', earlyDecision:'October 15', testReq:'SAT 1300-1460 / ACT 28-32', acceptRate:'40%', oosAcceptRate:'35%', avgGPA:'3.83', usNewsOverall:'#64', usNewsPublic:'#29', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
-  'University of Wisconsin-Madison':{ domain:'wisc.edu', color:'#C5050C', location:'Madison, WI', notes:'School of Veterinary Medicine on campus; pre-vet through Animal & Dairy Sciences; strong research opportunities', tuitionIn:'$12,200', tuitionOut:'$44,000', deadline:'January 15', earlyDecision:'November 1', testReq:'SAT 1360-1510 / ACT 29-33', acceptRate:'43%', oosAcceptRate:'40%', avgGPA:'3.9', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
-  'Auburn University':              { domain:'auburn.edu', color:'#DD550C', location:'Auburn, AL', notes:'Accredited CVM; pre-vet in Animal Sciences; teaching hospital and farm; strong small animal and equine programs. Honors College members can take ANSC Honors Special Problems & Honors Thesis for departmental honors credit', tuitionIn:'$13,318', tuitionOut:'$36,022', deadline:'February 1', earlyDecision:'November 15', testReq:'SAT 1260-1380 / ACT 26-31', acceptRate:'46%', oosAcceptRate:'35%', avgGPA:'4.09', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#11', lastVerified:'2026-03-06' },
-  'Oklahoma State University':      { domain:'okstate.edu', color:'#FF6600', location:'Stillwater, OK', notes:'Center for Veterinary Health Sciences; pre-vet track in Animal Science; hands-on from freshman year. Animal Science honors supplemental courses + Undergraduate Research Scholars Program for faculty-mentored research', tuitionIn:'$10,360', tuitionOut:'$25,879', deadline:'Rolling', earlyDecision:'November 1', testReq:'SAT 1040-1140 / ACT 20-27', acceptRate:'75%', oosAcceptRate:'67%', avgGPA:'3.59', usNewsOverall:'#198', usNewsPublic:'#109', vetSchoolRank:'#23', lastVerified:'2026-03-06' },
-  'Mississippi State University':   { domain:'msstate.edu', color:'#660000', location:'Starkville, MS', notes:'Accredited CVM; pre-vet in Animal & Dairy Sciences; wildlife and aquatic medicine specialties', tuitionIn:'$10,604', tuitionOut:'$28,736', deadline:'January 5', earlyDecision:'October 1', testReq:'SAT 1110-1410 / ACT 21-29', acceptRate:'70%', oosAcceptRate:'63%', avgGPA:'3.53', usNewsOverall:'#208', usNewsPublic:'#115', vetSchoolRank:'#24', lastVerified:'2026-03-06' },
-  'University of Illinois':         { domain:'illinois.edu', color:'#E84A27', location:'Champaign, IL', notes:'Accredited CVM; pre-vet in Animal Sciences; strong companion animal and food animal medicine programs', tuitionIn:'$15,714', tuitionOut:'$33,686', deadline:'January 5', earlyDecision:'November 1', testReq:'SAT 1350-1510 / ACT 30-34', acceptRate:'44%', oosAcceptRate:'37%', avgGPA:'3.85', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#15', lastVerified:'2026-03-06' },
-  'University of Tennessee':        { domain:'utk.edu', color:'#FF8200', location:'Knoxville, TN', notes:'Accredited CVM; pre-vet in Animal Science; large teaching hospital; equine and farm animal strengths', tuitionIn:'$14,148', tuitionOut:'$34,589', deadline:'December 15', earlyDecision:'November 1', testReq:'SAT 1210-1360 / ACT 27-32', acceptRate:'39%', oosAcceptRate:'31%', avgGPA:'3.65', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20', lastVerified:'2026-03-06' },
-  'University of Missouri':         { domain:'missouri.edu', color:'#F1B82D', location:'Columbia, MO', notes:'Accredited CVM; pre-vet in Animal Sciences; strong food animal and equine programs; guaranteed admission track', tuitionIn:'$11,981', tuitionOut:'$31,970', deadline:'Rolling', earlyDecision:'November 15', testReq:'SAT 1150-1330 / ACT 23-29', acceptRate:'77%', oosAcceptRate:'68%', avgGPA:'3.55', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20', lastVerified:'2026-03-06' },
-  'Clemson University':             { domain:'clemson.edu', color:'#F56600', location:'Clemson, SC', notes:'New $230M College of Veterinary Medicine opening Fall 2026 — SC\'s first vet school; pre-vet through Animal & Veterinary Sciences; ground-floor research and faculty access', tuitionIn:'$14,038', tuitionOut:'$40,562', deadline:'January 1', earlyDecision:'October 15', testReq:'SAT 1250-1400 / ACT 28-32', acceptRate:'42%', oosAcceptRate:'30%', avgGPA:'3.75', usNewsOverall:'#75', usNewsPublic:'#36', vetSchoolRank:'Not yet ranked', lastVerified:'2026-03-06' },
-  'Penn State University':          { domain:'psu.edu', color:'#041E42', location:'University Park, PA', notes:'Pre-vet through Animal Science; veterinary and biomedical sciences emphasis; strong advising for vet school apps', tuitionIn:'$20,468', tuitionOut:'$42,860', deadline:'December 1', earlyDecision:'November 1', testReq:'SAT 1320-1450 / ACT 29-33', acceptRate:'57%', oosAcceptRate:'42%', avgGPA:'3.8', usNewsOverall:'#59', usNewsPublic:'#26', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
+  'Texas A&M University':           { domain:'tamu.edu', color:'#500000', location:'College Station, TX', notes:'Top-ranked College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program. Departmental Animal Science Honors Program — requires 28 ACT (min 27 each verbal/math) or top 10% of HS class; 18 hrs honors coursework', tuitionIn:'$12,856', tuitionOut:'$40,157', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 25-31', acceptRate:'57%', oosAcceptRate:'49%', avgGPA:'3.78', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
+  'University of Georgia':          { domain:'uga.edu', color:'#BA0C2F', location:'Athens, GA', notes:'★ 3+1 EARLY ASSURANCE DVM PATHWAY: Animal Health majors can apply after 3 years of undergrad for guaranteed CVM admission — saves a full year. Accredited CVM on campus; excellent pre-vet research opportunities; in-state tuition as GA resident', tuitionIn:'$11,727', tuitionOut:'$33,227', deadline:'January 1', earlyDecision:'October 15', testReq:'ACT 32-35', acceptRate:'33%', oosAcceptRate:'9%', avgGPA:'4.08', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#8', lastVerified:'2026-03-06' },
+  'Colorado State University':      { domain:'colostate.edu', color:'#1E4D2B', location:'Fort Collins, CO', notes:'Top-5 vet school; Animal Science pre-vet track with early clinical exposure; strong equine and large animal programs', tuitionIn:'$13,009', tuitionOut:'$33,765', deadline:'February 1', earlyDecision:'N/A', testReq:'ACT 23-29', acceptRate:'89%', oosAcceptRate:'82%', avgGPA:'3.6', usNewsOverall:'#151', usNewsPublic:'#79', vetSchoolRank:'#3', lastVerified:'2026-03-06' },
+  'University of Florida':          { domain:'ufl.edu', color:'#FA4616', location:'Gainesville, FL', notes:'Accredited CVM on campus; pre-vet specialization in Animal Sciences; UF early admission pathway to vet school. CALS Honors Scholar track in Animal Sciences — requires 3.75 upper-division GPA, 9 honors credits, undergraduate thesis', tuitionIn:'$6,381', tuitionOut:'$28,659', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'23%', oosAcceptRate:'14%', avgGPA:'4.0', usNewsOverall:'#30', usNewsPublic:'#7', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
+  'Ohio State University':          { domain:'osu.edu', color:'#BB0000', location:'Columbus, OH', notes:'Top-10 vet school; strong pre-vet curriculum through Animal Sciences; veterinary teaching hospital on campus. Departmental Animal Sciences Honors Program — requires 3.4 GPA; honors/embedded courses + research project; accelerated BS/MS option', tuitionIn:'$12,485', tuitionOut:'$36,722', deadline:'February 1', earlyDecision:'November 1', testReq:'ACT 27-32', acceptRate:'51%', oosAcceptRate:'27%', avgGPA:'3.75', usNewsOverall:'#41', usNewsPublic:'#15', vetSchoolRank:'#4', lastVerified:'2026-03-06' },
+  'Purdue University':              { domain:'purdue.edu', color:'#000000', location:'West Lafayette, IN', notes:'Accredited vet school; pre-vet students in Animal Sciences get priority advising; PVM early admission program available', tuitionIn:'$9,992', tuitionOut:'$28,794', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 27-34', acceptRate:'50%', oosAcceptRate:'39%', avgGPA:'3.81', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#13', lastVerified:'2026-03-06' },
+  'Michigan State University':      { domain:'msu.edu', color:'#18453B', location:'East Lansing, MI', notes:'Top-ranked CVM; pre-vet concentration in Animal Science; large animal hospital and clinical rotations for undergrads', tuitionIn:'$18,926', tuitionOut:'$45,675', deadline:'February 1', earlyDecision:'November 1', testReq:'ACT 24-30', acceptRate:'84%', oosAcceptRate:'80%', avgGPA:'3.74', usNewsOverall:'#64', usNewsPublic:'#29', vetSchoolRank:'#15', lastVerified:'2026-03-06' },
+  'Virginia Tech':                  { domain:'vt.edu', color:'#861F41', location:'Blacksburg, VA', notes:'Virginia-Maryland CVM on campus; strong Animal & Poultry Sciences pre-vet path; rural setting with farm animal access', tuitionIn:'$16,526', tuitionOut:'$38,977', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 28-32', acceptRate:'55%', oosAcceptRate:'40%', avgGPA:'4.11', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#19', lastVerified:'2026-03-06' },
+  'North Carolina State University':{ domain:'ncsu.edu', color:'#CC0000', location:'Raleigh, NC', notes:'Top CVM; pre-vet students in Animal Science; teaching animal units on campus; guaranteed interview program', tuitionIn:'$8,799', tuitionOut:'$32,847', deadline:'January 15', earlyDecision:'October 15', testReq:'ACT 28-32', acceptRate:'40%', oosAcceptRate:'35%', avgGPA:'3.83', usNewsOverall:'#64', usNewsPublic:'#29', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
+  'University of Wisconsin-Madison':{ domain:'wisc.edu', color:'#C5050C', location:'Madison, WI', notes:'School of Veterinary Medicine on campus; pre-vet through Animal & Dairy Sciences; strong research opportunities', tuitionIn:'$12,200', tuitionOut:'$44,000', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'43%', oosAcceptRate:'40%', avgGPA:'3.9', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#5', lastVerified:'2026-03-06' },
+  'Auburn University':              { domain:'auburn.edu', color:'#DD550C', location:'Auburn, AL', notes:'Accredited CVM; pre-vet in Animal Sciences; teaching hospital and farm; strong small animal and equine programs. Honors College members can take ANSC Honors Special Problems & Honors Thesis for departmental honors credit', tuitionIn:'$13,318', tuitionOut:'$36,022', deadline:'February 1', earlyDecision:'November 15', testReq:'ACT 26-31', acceptRate:'46%', oosAcceptRate:'35%', avgGPA:'4.09', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#11', lastVerified:'2026-03-06' },
+  'Oklahoma State University':      { domain:'okstate.edu', color:'#FF6600', location:'Stillwater, OK', notes:'Center for Veterinary Health Sciences; pre-vet track in Animal Science; hands-on from freshman year. Animal Science honors supplemental courses + Undergraduate Research Scholars Program for faculty-mentored research', tuitionIn:'$10,360', tuitionOut:'$25,879', deadline:'Rolling', earlyDecision:'November 1', testReq:'ACT 20-27', acceptRate:'75%', oosAcceptRate:'67%', avgGPA:'3.59', usNewsOverall:'#198', usNewsPublic:'#109', vetSchoolRank:'#23', lastVerified:'2026-03-06' },
+  'Mississippi State University':   { domain:'msstate.edu', color:'#660000', location:'Starkville, MS', notes:'Accredited CVM; pre-vet in Animal & Dairy Sciences; wildlife and aquatic medicine specialties', tuitionIn:'$10,604', tuitionOut:'$28,736', deadline:'January 5', earlyDecision:'October 1', testReq:'ACT 21-29', acceptRate:'70%', oosAcceptRate:'63%', avgGPA:'3.53', usNewsOverall:'#208', usNewsPublic:'#115', vetSchoolRank:'#24', lastVerified:'2026-03-06' },
+  'University of Illinois':         { domain:'illinois.edu', color:'#E84A27', location:'Champaign, IL', notes:'Accredited CVM; pre-vet in Animal Sciences; strong companion animal and food animal medicine programs', tuitionIn:'$15,714', tuitionOut:'$33,686', deadline:'January 5', earlyDecision:'November 1', testReq:'ACT 30-34', acceptRate:'44%', oosAcceptRate:'37%', avgGPA:'3.85', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#15', lastVerified:'2026-03-06' },
+  'University of Tennessee':        { domain:'utk.edu', color:'#FF8200', location:'Knoxville, TN', notes:'Accredited CVM; pre-vet in Animal Science; large teaching hospital; equine and farm animal strengths', tuitionIn:'$14,148', tuitionOut:'$34,589', deadline:'December 15', earlyDecision:'November 1', testReq:'ACT 27-32', acceptRate:'39%', oosAcceptRate:'31%', avgGPA:'3.65', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20', lastVerified:'2026-03-06' },
+  'University of Missouri':         { domain:'missouri.edu', color:'#F1B82D', location:'Columbia, MO', notes:'Accredited CVM; pre-vet in Animal Sciences; strong food animal and equine programs; guaranteed admission track', tuitionIn:'$11,981', tuitionOut:'$31,970', deadline:'Rolling', earlyDecision:'November 15', testReq:'ACT 23-29', acceptRate:'77%', oosAcceptRate:'68%', avgGPA:'3.55', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20', lastVerified:'2026-03-06' },
+  'Clemson University':             { domain:'clemson.edu', color:'#F56600', location:'Clemson, SC', notes:'New $230M College of Veterinary Medicine opening Fall 2026 — SC\'s first vet school; pre-vet through Animal & Veterinary Sciences; ground-floor research and faculty access', tuitionIn:'$14,038', tuitionOut:'$40,562', deadline:'January 1', earlyDecision:'October 15', testReq:'ACT 28-32', acceptRate:'42%', oosAcceptRate:'30%', avgGPA:'3.75', usNewsOverall:'#75', usNewsPublic:'#36', vetSchoolRank:'Not yet ranked', lastVerified:'2026-03-06' },
+  'Penn State University':          { domain:'psu.edu', color:'#041E42', location:'University Park, PA', notes:'Pre-vet through Animal Science; veterinary and biomedical sciences emphasis; strong advising for vet school apps', tuitionIn:'$20,468', tuitionOut:'$42,860', deadline:'December 1', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'57%', oosAcceptRate:'42%', avgGPA:'3.8', usNewsOverall:'#59', usNewsPublic:'#26', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
   // ── Schools without vet schools but with strong pre-vet undergrad programs ──
-  'University of Kentucky':         { domain:'uky.edu', color:'#0033A0', location:'Lexington, KY', notes:'No vet school but outstanding pre-vet advising through Animal & Food Sciences; nationally renowned equine science program leveraging Kentucky horse industry; students place well at Auburn, Tufts, and other DVMs', tuitionIn:'$13,212', tuitionOut:'$33,406', deadline:'February 15', earlyDecision:'December 1', testReq:'SAT 1070-1270 / ACT 21-28', acceptRate:'93%', oosAcceptRate:'88%', avgGPA:'3.59', usNewsOverall:'#143', usNewsPublic:'#74', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
-  'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', deadline:'December 1', earlyDecision:'N/A', testReq:'SAT 1290-1400 / ACT 29-32', acceptRate:'24%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
-  'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,706', deadline:'December 1', earlyDecision:'October 15 (EA)', testReq:'SAT 1190-1350 / ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
+  'University of Kentucky':         { domain:'uky.edu', color:'#0033A0', location:'Lexington, KY', notes:'No vet school but outstanding pre-vet advising through Animal & Food Sciences; nationally renowned equine science program leveraging Kentucky horse industry; students place well at Auburn, Tufts, and other DVMs', tuitionIn:'$13,212', tuitionOut:'$33,406', deadline:'February 15', earlyDecision:'December 1', testReq:'ACT 21-28', acceptRate:'93%', oosAcceptRate:'88%', avgGPA:'3.59', usNewsOverall:'#143', usNewsPublic:'#74', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
+  'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 29-32', acceptRate:'24%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
+  'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,706', deadline:'December 1', earlyDecision:'October 15 (EA)', testReq:'ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-03-06' },
 };
 const schoolNames = Object.keys(schoolDB);
 // Aliases so common abbreviations also match
@@ -2240,7 +2240,7 @@ const SCHOOL_COLUMNS = [
   { field: 'usNewsPublic',    label: 'Public\u00a0Rank', sortType: 'rank' },
   { field: 'vetSchoolRank',   label: 'Vet\u00a0School', sortType: 'rank' },
   { field: 'avgGPA',          label: 'GPA',            sortType: 'numeric' },
-  { field: 'testReq',         label: 'SAT/ACT',        sortType: 'text' },
+  { field: 'testReq',         label: 'ACT',             sortType: 'text' },
   { field: '_superscore',     label: 'Superscore',     sortType: 'text' },
   { field: 'acceptRate',      label: 'Accept\u00a0%',  sortType: 'percent' },
   { field: 'oosAcceptRate',   label: 'OOS\u00a0%',     sortType: 'percent' },
@@ -2752,7 +2752,7 @@ function openModal(type) {
       <div class="form-group"><label>Location</label><input id="m_location" placeholder="e.g., Auburn, AL"></div>
       <div class="form-group"><label>Pre-Vet Program Notes</label><textarea id="m_notes" placeholder="What makes their program stand out?"></textarea></div>
       <div class="form-group"><label>Average GPA</label><input id="m_avgGPA" placeholder="e.g., 3.75"></div>
-      <div class="form-group"><label>SAT/ACT Requirements</label><input id="m_testReq" placeholder="e.g., SAT 1200-1400 / ACT 25-31"></div>
+      <div class="form-group"><label>ACT Requirements</label><input id="m_testReq" placeholder="e.g., ACT 25-31"></div>
       <div class="form-group"><label>Overall Acceptance Rate</label><input id="m_acceptRate" placeholder="e.g., 53%"></div>
       <div class="form-group"><label>Out-of-State Acceptance Rate</label><input id="m_oosAcceptRate" placeholder="e.g., 40%"></div>
       <div class="form-group"><label>In-State Tuition</label><input id="m_tuitionIn" placeholder="e.g., $15,000"></div>
@@ -2766,7 +2766,7 @@ function openModal(type) {
 
     testprep: `
       <h3>Add Test Prep Milestone</h3>
-      <div class="form-group"><label>Title</label><input id="m_ttitle" placeholder="e.g., SAT Practice Test #2"></div>
+      <div class="form-group"><label>Title</label><input id="m_ttitle" placeholder="e.g., ACT Practice Test #2"></div>
       <div class="form-group"><label>Date</label><input type="date" id="m_tdate"></div>
       <div class="form-group">
         <label>Type</label>
@@ -2992,7 +2992,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Request official high school transcript', cat: 'app' },
     { text: 'Write 1 essay (250-650 words, 7 prompt choices) — recommended for scholarship consideration', cat: 'app' },
     { text: 'Submit leadership/involvement resume via OSU portal for full scholarship review', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional with 3.0+ GPA)', cat: 'test' },
+    { text: 'ACT — OPTIONAL (test-optional with 3.0+ GPA)', cat: 'test' },
     { text: 'Letters of recommendation — OPTIONAL (considered if submitted)', cat: 'app' },
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research Center for Veterinary Health Sciences pre-vet track', cat: 'program' },
@@ -3003,7 +3003,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Submit application via Common App or MSU portal — $50 fee', cat: 'app' },
     { text: 'Request official high school transcript', cat: 'app' },
     { text: 'No supplemental essays required', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL but encouraged for scholarship consideration', cat: 'test' },
+    { text: 'ACT — OPTIONAL but encouraged for scholarship consideration', cat: 'test' },
     { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research MSU CVM pre-vet track in Animal & Dairy Sciences', cat: 'program' },
@@ -3014,7 +3014,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Submit application via Common App — $75 fee', cat: 'app' },
     { text: 'Request official high school transcript', cat: 'app' },
     { text: 'Write 2 major-specific short essays (~150 words each): experience related to major + career goals', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL', cat: 'test' },
+    { text: 'ACT — OPTIONAL', cat: 'test' },
     { text: 'Letters of recommendation — NOT REQUIRED and not considered (essays carry extra weight)', cat: 'app' },
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research UIUC CVM pre-vet track in Animal Sciences', cat: 'program' },
@@ -3026,7 +3026,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Request official high school transcript', cat: 'app' },
     { text: 'No supplemental essays required for general admission', cat: 'app' },
     { text: 'Write optional CASNR scholarship essay if applying as Animal Science major (recommended)', cat: 'scholarship' },
-    { text: 'TESTING: Test-required (self-report by Jan 15). SUPERSCORES across all dates. Science: optional — included if it helps, ignored if not. Does not mix ACT/SAT. Honors (CHP): same superscore, auto-considered.', cat: 'test' },
+    { text: 'TESTING: Test-required (self-report by Jan 15). SUPERSCORES across all dates. Science: optional — included if it helps, ignored if not. Honors (CHP): same superscore, auto-considered.', cat: 'test' },
     { text: 'Letters of recommendation — OPTIONAL', cat: 'app' },
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research UT CVM pre-vet track & large teaching hospital', cat: 'program' },
@@ -3038,7 +3038,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Submit application via Common App or Mizzou portal — $55 fee', cat: 'app' },
     { text: 'Request official high school transcript', cat: 'app' },
     { text: 'If test-optional: 1 required short essay; if submitting scores: no supplemental essays', cat: 'app' },
-    { text: 'SAT/ACT — OPTIONAL (test-optional applicants must write additional short essay)', cat: 'test' },
+    { text: 'ACT — OPTIONAL (test-optional applicants must write additional short essay)', cat: 'test' },
     { text: 'Letters of recommendation — NOT REQUIRED (may be needed for competitive scholarships)', cat: 'app' },
     { text: 'Complete FAFSA', cat: 'financial' },
     { text: 'Research Mizzou CVM guaranteed admission track for pre-vet students', cat: 'program' },
@@ -3154,9 +3154,9 @@ function buildChecklistItems(school) {
 
   // ── Test scores (generic — needs per-school verification) ──
   if (testReq) {
-    items.push({ id: uid(), text: 'Check test score policy & submit SAT/ACT if required (target: ' + testReq + ')', done: false });
+    items.push({ id: uid(), text: 'Check test score policy & submit ACT if required (target: ' + testReq + ')', done: false });
   } else {
-    items.push({ id: uid(), text: 'Check SAT/ACT score requirements & submit if required', done: false });
+    items.push({ id: uid(), text: 'Check ACT score requirements & submit if required', done: false });
   }
 
   // ── Pre-vet & program-specific ──
@@ -4181,7 +4181,7 @@ function exportToExcel() {
       'US News Public': s.usNewsPublic || (db && db.usNewsPublic) || '',
       'Vet School Rank': s.vetSchoolRank || (db && db.vetSchoolRank) || '',
       'Avg GPA': s.avgGPA,
-      'SAT/ACT Requirements': s.testReq,
+      'ACT Requirements': s.testReq,
       'Overall Accept %': s.acceptRate,
       'Out-of-State Accept %': s.oosAcceptRate,
       'In-State Tuition': s.tuitionIn,
@@ -4286,7 +4286,7 @@ function exportToCSV(type) {
         'School Name': s.name, 'Location': s.location, 'Distance (mi)': d != null ? d : '',
         'Pre-Vet Notes': s.notes, 'US News Overall': s.usNewsOverall || (db && db.usNewsOverall) || '',
         'Vet School Rank': s.vetSchoolRank || (db && db.vetSchoolRank) || '',
-        'Avg GPA': s.avgGPA, 'SAT/ACT': s.testReq, 'Accept %': s.acceptRate,
+        'Avg GPA': s.avgGPA, 'ACT': s.testReq, 'Accept %': s.acceptRate,
         'OOS Accept %': s.oosAcceptRate, 'In-State Tuition': s.tuitionIn,
         'OOS Tuition': s.tuitionOut, 'Deadline': s.deadline, 'Status': statusLabels[s.status] || s.status
       };
@@ -5819,7 +5819,7 @@ const CHANGELOG = [
       'Created essay-tracker.csv — all 17+ essays with word limits and prompts',
       'Updated application-checklist.csv with UC Application, ApplyTexas, school-specific deadlines, and score-send plan',
       'Added 6 missing campus visits (Cornell, UC Davis, CSU, VT, Purdue, UF)',
-      'Updated test prep with target scores (1350+ SAT / 30+ ACT; 1400+/33+ for Cornell)',
+      'Updated test prep with target ACT scores (30+; 33+ for Cornell)',
       'Updated scholarship tracker with CSS Profile for Cornell and merit scholarship deadlines tied to EA dates'
     ]
   },
