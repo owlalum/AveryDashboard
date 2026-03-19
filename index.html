@@ -1892,6 +1892,19 @@ function runMigrations() {
     localStorage.setItem('rankingsDataV2', '1');
   }
 
+  // One-time migration: remove SAT from testReq, keep ACT only
+  if (!localStorage.getItem('actOnlyV1')) {
+    data.schools.forEach(s => {
+      if (s.testReq && /SAT/.test(s.testReq)) {
+        const m = s.testReq.match(/ACT\s+[\d\-]+/);
+        s.testReq = m ? m[0] : s.testReq.replace(/SAT\s*[\d\-]+\s*\/?\s*/, '').trim();
+      }
+      const dbEntry = schoolDB[s.name];
+      if (dbEntry) s.testReq = dbEntry.testReq;
+    });
+    localStorage.setItem('actOnlyV1', '1');
+  }
+
   // Save migrations to localStorage only (not Firestore)
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
