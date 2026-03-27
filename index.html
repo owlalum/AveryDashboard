@@ -1859,7 +1859,7 @@ function runMigrations() {
   if (!data.finConfig) data.finConfig = { b529: 0, cashPerYr: 0 };
   if (!data.actScores) data.actScores = { composite: 0, english: 0, math: 0, reading: 0, science: 0 };
   if (!data.gpa) data.gpa = 0;
-  if (data.hopeGPA === undefined) data.hopeGPA = 0;
+  if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
   if (!data.studentName) data.studentName = '';
   if (!data.lastModified) data.lastModified = Date.now();
   if (!data.scholarships) data.scholarships = initDefaultScholarships();
@@ -1917,6 +1917,12 @@ function runMigrations() {
       if (dbEntry) s.testReq = dbEntry.testReq;
     });
     localStorage.setItem('actOnlyV1', '1');
+  }
+
+  // One-time: set HOPE GPA default if not yet set by user
+  if (!localStorage.getItem('hopeGPAv1')) {
+    if (!data.hopeGPA || data.hopeGPA === 0) data.hopeGPA = 3.609;
+    localStorage.setItem('hopeGPAv1', '1');
   }
 
   // Save migrations to localStorage only (not Firestore)
