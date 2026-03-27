@@ -923,6 +923,7 @@
         <h3>Student Profile <button onclick="openScoreEditor()" style="background:none;border:none;cursor:pointer;font-size:0.95rem;vertical-align:middle;padding:2px 6px;border-radius:4px;color:var(--primary);" title="Edit scores">&#9998;</button></h3>
         <div class="profile-row"><span class="label">Student</span><span class="value" id="profileStudentName">—</span></div>
         <div class="profile-row"><span class="label">Targeted GPA</span><span class="value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></span></div>
+        <div class="profile-row"><span class="label">HOPE GPA</span><span class="value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.609</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-field="hopeGPA-status"></span></span></div>
         <div class="profile-row"><span class="label">ACT Composite</span><span class="value"><span class="act-edit" data-act="composite" contenteditable="true">27</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="composite-pct">(87th %ile)</span></span></div>
         <div class="profile-row" style="padding-left:12px;"><span class="label">English</span><span class="value"><span class="act-edit" data-act="english" contenteditable="true">23</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="english-pct">(73rd %ile)</span></span></div>
         <div class="profile-row" style="padding-left:12px;"><span class="label">Math</span><span class="value"><span class="act-edit" data-act="math" contenteditable="true">28</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="math-pct">(90th %ile)</span></span></div>
@@ -1032,7 +1033,7 @@
         <li id="meritKentucky"><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.85 GPA likely $16-20K/year.</li>
         <li><strong>Auburn:</strong> Competitive Presidential and Academic scholarships. $8-16K realistic.</li>
         <li><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats. $8-12K likely.</li>
-        <li><strong>UGA:</strong> Zell Miller (full tuition) or HOPE (partial) for Georgia residents meeting requirements.</li>
+        <li id="meritUGA"><strong>UGA:</strong> Zell Miller (full tuition) or HOPE (partial) for Georgia residents meeting requirements.</li>
         <li><strong>Oklahoma State / Mississippi State:</strong> Generous automatic OOS merit ($9-11K/yr). Best value safeties after Kentucky.</li>
         <li><strong>FSU:</strong> Looks cheap at $37K sticker because FL has low base tuition. The $2K Vires scholarship is small, but total COA is already the lowest OOS option on the list. Larger OOS tuition waivers exist but are very competitive.</li>
         <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> Limited OOS merit. Don't bank on it.</li>
@@ -1081,6 +1082,7 @@
       <p>All calculations use the student's current stats as inputs:</p>
       <table id="profileInfoTable" style="width:100%;margin-top:10px;font-size:0.88rem;">
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Targeted GPA</td><td data-field="gpa">3.85</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">HOPE GPA</td><td data-field="hopeGPA-info">3.609</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite</td><td data-act="composite">27 (87th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">English</td><td data-act="english">23 (73rd %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Math</td><td data-act="math">28 (90th %ile)</td></tr>
@@ -1857,6 +1859,7 @@ function runMigrations() {
   if (!data.finConfig) data.finConfig = { b529: 0, cashPerYr: 0 };
   if (!data.actScores) data.actScores = { composite: 0, english: 0, math: 0, reading: 0, science: 0 };
   if (!data.gpa) data.gpa = 0;
+  if (data.hopeGPA === undefined) data.hopeGPA = 0;
   if (!data.studentName) data.studentName = '';
   if (!data.lastModified) data.lastModified = Date.now();
   if (!data.scholarships) data.scholarships = initDefaultScholarships();
@@ -2017,6 +2020,16 @@ function renderProfile() {
     pc.querySelector('[data-act="science"]').textContent = act.science || '—';
     pc.querySelector('[data-act="science-pct"]').textContent = act.science ? '(' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '';
     pc.querySelector('[data-field="gpa"]').textContent = gpa || '—';
+    const hopeEl = pc.querySelector('[data-field="hopeGPA"]');
+    if (hopeEl) hopeEl.textContent = data.hopeGPA || '—';
+    const hopeStatusEl = pc.querySelector('[data-field="hopeGPA-status"]');
+    if (hopeStatusEl) {
+      const hg = data.hopeGPA || 0;
+      const act = (data.actScores || {}).composite || 0;
+      if (hg >= 3.70 && act >= 26) hopeStatusEl.textContent = '(Zell Miller eligible)';
+      else if (hg >= 3.0) hopeStatusEl.textContent = '(HOPE eligible)';
+      else hopeStatusEl.textContent = '';
+    }
   }
   // Info table
   const it = document.getElementById('profileInfoTable');
@@ -2027,6 +2040,15 @@ function renderProfile() {
     it.querySelector('[data-act="reading"]').textContent = act.reading ? act.reading + ' (' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)' : '—';
     it.querySelector('[data-act="science"]').textContent = act.science ? act.science + ' (' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '—';
     it.querySelector('[data-field="gpa"]').textContent = gpa || '—';
+    const hopeInfoEl = it.querySelector('[data-field="hopeGPA-info"]');
+    if (hopeInfoEl) {
+      const hg = data.hopeGPA || 0;
+      const act = (data.actScores || {}).composite || 0;
+      let label = hg ? hg.toFixed(3) : '—';
+      if (hg >= 3.70 && act >= 26) label += ' (Zell Miller eligible)';
+      else if (hg >= 3.0) label += ' (HOPE eligible — needs 3.70 for Zell Miller)';
+      hopeInfoEl.textContent = label;
+    }
   }
   // Category descriptions
   const safetyDesc = document.getElementById('catSafetyDesc');
@@ -2036,6 +2058,8 @@ function renderProfile() {
   // Merit note
   const kyMerit = document.getElementById('meritKentucky');
   if (kyMerit) kyMerit.innerHTML = getKentuckyMeritLabel();
+  const ugaMerit = document.getElementById('meritUGA');
+  if (ugaMerit) ugaMerit.innerHTML = getUGAMeritLabel();
 }
 
 function getSuffix(n) {
@@ -2064,6 +2088,32 @@ function getKentuckyMeritLabel() {
   const gpa = data.gpa || 3.85;
   const merit = getKentuckyMerit();
   return '<strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. ' + act + ' ACT + ' + gpa + ' GPA \u2192 ~$' + (merit / 1000) + 'K/year.';
+}
+
+// ─── Dynamic UGA Merit Aid Based on HOPE GPA + ACT ───
+// Zell Miller: HOPE GPA >= 3.70 AND ACT >= 26 → full tuition ($11,450 in-state 2025-26)
+// HOPE: HOPE GPA >= 3.0 → partial tuition (~$5,500/year at UGA)
+// If neither, return 0
+function getUGAMerit() {
+  const hopeGPA = data.hopeGPA || 0;
+  const act = (data.actScores || {}).composite || 0;
+  if (hopeGPA >= 3.70 && act >= 26) return 11450; // Zell Miller — full in-state tuition
+  if (hopeGPA >= 3.0) return 5500; // HOPE — partial tuition
+  return 0;
+}
+
+function getUGAMeritLabel() {
+  const hopeGPA = data.hopeGPA || 0;
+  const act = (data.actScores || {}).composite || 0;
+  const merit = getUGAMerit();
+  if (hopeGPA >= 3.70 && act >= 26) {
+    return '<strong>UGA:</strong> Zell Miller Scholarship (full tuition). HOPE GPA ' + hopeGPA.toFixed(3) + ' + ACT ' + act + ' both meet thresholds (3.70 GPA, 26 ACT). ~$' + (merit / 1000).toFixed(1) + 'K/year.';
+  }
+  if (hopeGPA >= 3.0) {
+    const gap = (3.70 - hopeGPA).toFixed(3);
+    return '<strong>UGA:</strong> HOPE Scholarship (partial tuition). HOPE GPA ' + hopeGPA.toFixed(3) + ' qualifies for HOPE (~$' + (merit / 1000).toFixed(1) + 'K/year) but is ' + gap + ' below the 3.70 Zell Miller threshold.' + (act < 26 ? ' Also needs ACT 26+ for Zell Miller.' : '');
+  }
+  return '<strong>UGA:</strong> Neither HOPE nor Zell Miller eligible. HOPE GPA ' + hopeGPA.toFixed(3) + ' is below the 3.0 minimum.';
 }
 
 // ─── Update Honors Eligibility Text in Checklists ───
@@ -3693,7 +3743,7 @@ function getRankingForSchool(name) {
     // Pre-fill from spreadsheet data for known schools
     const presets = {
       // ── Top-13 schools from Executive Summary / Financial Analysis ──
-      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:5, notes:'In-state Zell Miller. 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat). Best value overall.' },
+      'University of Georgia':           { vetProgram:5, costScore:4, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$5.5K/yr). Zell Miller requires 3.70 HOPE GPA (currently 3.609). 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat).' },
       'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit.' },
       'Purdue University':               { vetProgram:5, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
       'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. Top-10 vet school.' },
@@ -3858,7 +3908,7 @@ function getSummaryCost(schoolName) {
   const finEntry = FIN_DATA.find(r => r.school === schoolName);
 
   if (finEntry) {
-    const merit = schoolName === 'University of Kentucky' ? getKentuckyMerit() : finEntry.merit;
+    const merit = schoolName === 'University of Kentucky' ? getKentuckyMerit() : schoolName === 'University of Georgia' ? getUGAMerit() : finEntry.merit;
     const sticker = finEntry.sticker || ((finEntry.tuition||0) + (finEntry.rb||0) + (finEntry.books||0));
     const realistic = sticker - merit;
     const fourYr = realistic * 4;
@@ -4135,7 +4185,7 @@ function renderFinancials() {
 
   // Build enriched rows for sorting
   const finRows = cleanedFin.filter(r => !r.group).map(row => {
-    const merit = row.school === 'University of Kentucky' ? getKentuckyMerit() : row.merit;
+    const merit = row.school === 'University of Kentucky' ? getKentuckyMerit() : row.school === 'University of Georgia' ? getUGAMerit() : row.merit;
     const sticker = (row.tuition || 0) + (row.rb || 0) + (row.books || 0);
     const realistic = sticker - merit;
     return { ...row, sticker, merit, realistic, fourYrSticker: sticker * 4, fourYrRealistic: realistic * 4 };
@@ -5292,8 +5342,8 @@ function initDefaultScholarships() {
     { id: uid(), section:'prevet', name:'Georgia VMA Foundation Scholarships', school:'Georgia', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'Contact GVMA directly; may be for enrolled vet students only', url:'https://www.gvma.net/' },
     // ── External & National ──
     { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools', url:'https://studentaid.gov/h/apply-for-aid/fafsa' },
-    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; 3.7+ GPA + 26+ ACT — Avery qualifies! Applies to UGA.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
-    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'Partial tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with GPA 3.0+. Fallback if Zell Miller not maintained.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
+    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 26+. Avery\'s HOPE GPA (3.609) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
+    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'Partial tuition at GA publics (~$5,500/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.609 HOPE GPA.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
     { id: uid(), section:'external', name:'Coca-Cola Scholars Program', school:'National', amount:'$20,000 (150 awards)', deadline:'2026-09-30', essayReq:true, separateApp:true, status:'Not Started', notes:'Highly competitive national award; apply Aug-Sep of senior year', url:'https://www.coca-colascholarsfoundation.org/apply/' },
     { id: uid(), section:'external', name:'Elks Most Valuable Student', school:'National', amount:'$4,000-$30,000 over 4 years', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'500 awards nationwide; leadership and financial need', url:'https://www.elks.org/scholars/scholarships/mvs.cfm' },
     { id: uid(), section:'external', name:'National FFA Scholarship Program', school:'National', amount:'Up to $10,000', deadline:'2027-01-15', essayReq:true, separateApp:true, status:'Not Started', notes:'For FFA members; 100+ sponsors; ag/animal science focus', url:'https://www.ffa.org/participate/grants-and-scholarships/scholarships/' },
@@ -5304,7 +5354,7 @@ function initDefaultScholarships() {
 function getMeritScholarships() {
   const visibleNames = getVisibleSchools().map(s => s.name);
   return FIN_DATA.filter(f => f.school && f.merit > 0 && visibleNames.includes(f.school)).map(f => {
-    const amt = f.school === 'University of Kentucky' ? getKentuckyMerit() : f.merit;
+    const amt = f.school === 'University of Kentucky' ? getKentuckyMerit() : f.school === 'University of Georgia' ? getUGAMerit() : f.merit;
     return {
       id: 'merit_' + f.school.replace(/\s/g, '_'),
       section: 'merit',
@@ -5623,6 +5673,7 @@ function openScoreEditor() {
   const gpa = getStudentGPA();
   const fields = [
     { key: 'gpa', label: 'GPA', value: gpa, min: 0, max: 5, step: 0.01, isGpa: true },
+    { key: 'hopeGPA', label: 'HOPE GPA', value: data.hopeGPA || 0, min: 0, max: 5, step: 0.001, isGpa: true },
     { key: 'composite', label: 'ACT Composite', value: act.composite, min: 1, max: 36, step: 1 },
     { key: 'english', label: 'English', value: act.english, min: 1, max: 36, step: 1, indent: true },
     { key: 'math', label: 'Math', value: act.math, min: 1, max: 36, step: 1, indent: true },
@@ -5681,6 +5732,8 @@ function saveScoreEditor() {
 
   const gpaVal = parseFloat(document.getElementById('scoreEdit_gpa').value);
   if (!isNaN(gpaVal) && gpaVal >= 0 && gpaVal <= 5) data.gpa = gpaVal;
+  const hopeGPAVal = parseFloat(document.getElementById('scoreEdit_hopeGPA').value);
+  if (!isNaN(hopeGPAVal) && hopeGPAVal >= 0 && hopeGPAVal <= 5) data.hopeGPA = hopeGPAVal;
 
   ['composite', 'english', 'math', 'reading', 'science'].forEach(key => {
     const val = parseInt(document.getElementById('scoreEdit_' + key).value);
@@ -5713,7 +5766,17 @@ function showScoreImpactModal(oldACT, newACT) {
     }
   });
 
-  // 2. Kentucky merit tier changes
+  // 2. UGA HOPE/Zell Miller changes
+  if (data.schools.find(s => s.name === 'University of Georgia')) {
+    const hopeGPA = data.hopeGPA || 0;
+    const oldEligible = hopeGPA >= 3.70 && oldACT >= 26;
+    const newEligible = hopeGPA >= 3.70 && newACT >= 26;
+    if (!oldEligible && newEligible) {
+      impacts.push({ icon: '\uD83C\uDF1F', text: 'UGA Zell Miller \u2014 now eligible! ACT ' + newACT + ' + HOPE GPA ' + hopeGPA.toFixed(3) + ' meet both thresholds. Full tuition covered.', type: 'merit' });
+    }
+  }
+
+  // 3. Kentucky merit tier changes
   if (data.schools.find(s => s.name === 'University of Kentucky')) {
     const oldMerit = getKentuckyMeritForACT(oldACT, gpa);
     const newMerit = getKentuckyMeritForACT(newACT, gpa);
@@ -5819,6 +5882,12 @@ document.getElementById('profileCard').addEventListener('blur', function(e) {
     const val = parseFloat(el.textContent.trim());
     if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
     data.gpa = val;
+    saveData();
+    onScoresChanged();
+  } else if (gpaField === 'hopeGPA') {
+    const val = parseFloat(el.textContent.trim());
+    if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
+    data.hopeGPA = val;
     saveData();
     onScoresChanged();
   }
