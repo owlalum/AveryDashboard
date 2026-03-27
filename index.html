@@ -1030,14 +1030,17 @@
     <div style="margin-top:22px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;">
       <h3 style="font-size:1rem;color:var(--primary-dark);margin-bottom:10px;">Merit Aid Notes</h3>
       <ul style="font-size:0.88rem;line-height:1.7;color:var(--text);padding-left:18px;">
-        <li id="meritKentucky"><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. 27 ACT + 3.85 GPA likely $16-20K/year.</li>
-        <li><strong>Auburn:</strong> Competitive Presidential and Academic scholarships. $8-16K realistic.</li>
-        <li><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats. $8-12K likely.</li>
-        <li id="meritUGA"><strong>UGA:</strong> Zell Miller (full tuition) or HOPE (partial) for Georgia residents meeting requirements.</li>
-        <li><strong>Oklahoma State / Mississippi State:</strong> Generous automatic OOS merit ($9-11K/yr). Best value safeties after Kentucky.</li>
-        <li><strong>FSU:</strong> Looks cheap at $37K sticker because FL has low base tuition. The $2K Vires scholarship is small, but total COA is already the lowest OOS option on the list. Larger OOS tuition waivers exist but are very competitive.</li>
-        <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> Limited OOS merit. Don't bank on it.</li>
-        <li><strong>Penn State / Illinois / Wisconsin:</strong> Expensive OOS with minimal merit at these stats. $50-60K/yr realistic net cost.</li>
+        <li id="meritKentucky"><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT.</li>
+        <li id="meritTennessee"><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats.</li>
+        <li id="meritCSU"><strong>Colorado State:</strong> Green &amp; Gold Scholarship, GPA-driven.</li>
+        <li id="meritOKState"><strong>Oklahoma State:</strong> Automatic OOS merit grid.</li>
+        <li id="meritMissState"><strong>Mississippi State:</strong> Automatic OOS merit.</li>
+        <li id="meritSC"><strong>South Carolina:</strong> Automatic OOS merit grid.</li>
+        <li id="meritUGA"><strong>UGA:</strong> HOPE/Zell Miller for Georgia residents.</li>
+        <li><strong>Auburn:</strong> Competitive (no published grid). Awards range $0-$6K/yr at this profile. Not predictable.</li>
+        <li><strong>FSU:</strong> Lowest OOS sticker price. Limited competitive OOS merit beyond that.</li>
+        <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> No published OOS merit grids. Don't bank on it.</li>
+        <li><strong>Penn State / Illinois / Wisconsin:</strong> Expensive OOS with minimal merit at these stats.</li>
         <li><strong>UF:</strong> Essentially no OOS merit. Admission itself is a reach at 14% OOS acceptance.</li>
       </ul>
       <p style="font-size:0.8rem;color:var(--text-light);margin-top:10px;"><strong>Note:</strong> Sticker COA = Tuition &amp; Fees + Room &amp; Board + Books/Supplies, sourced from each school's official 2025-26 Cost of Attendance page. Merit estimates are based on the student's current GPA/ACT profile and will shift if scores change.</p>
@@ -2066,6 +2069,18 @@ function renderProfile() {
   if (kyMerit) kyMerit.innerHTML = getKentuckyMeritLabel();
   const ugaMerit = document.getElementById('meritUGA');
   if (ugaMerit) ugaMerit.innerHTML = getUGAMeritLabel();
+  // Dynamic labels for other schools with published grids
+  const autoMeritSchools = [
+    { id: 'meritTennessee', school: 'University of Tennessee' },
+    { id: 'meritCSU', school: 'Colorado State University' },
+    { id: 'meritOKState', school: 'Oklahoma State University' },
+    { id: 'meritMissState', school: 'Mississippi State University' },
+    { id: 'meritSC', school: 'University of South Carolina' },
+  ];
+  autoMeritSchools.forEach(({ id, school }) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = getAutoMeritLabel(school) || el.innerHTML;
+  });
 }
 
 function getSuffix(n) {
@@ -2094,6 +2109,141 @@ function getKentuckyMeritLabel() {
   const gpa = data.gpa || 3.85;
   const merit = getKentuckyMerit();
   return '<strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. ' + act + ' ACT + ' + gpa + ' GPA \u2192 ~$' + (merit / 1000) + 'K/year.';
+}
+
+// ─── Dynamic Tennessee Volunteer Scholarship Based on ACT/GPA (OOS) ───
+// Grid starts at ACT 28. Below 28 = $0.
+function getTennesseeMerit() {
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
+  if (act < 28) return 0;
+  if (gpa >= 4.0) {
+    if (act >= 34) return 20000;
+    if (act >= 32) return 17000;
+    if (act >= 30) return 14000;
+    if (act >= 28) return 11000;
+  } else if (gpa >= 3.8) {
+    if (act >= 34) return 17000;
+    if (act >= 32) return 14000;
+    if (act >= 30) return 11000;
+    if (act >= 28) return 8000;
+  } else if (gpa >= 3.6) {
+    if (act >= 34) return 14000;
+    if (act >= 32) return 11000;
+    if (act >= 30) return 8000;
+    if (act >= 28) return 5000;
+  }
+  return 0;
+}
+
+// ─── Dynamic Colorado State Green & Gold Scholarship (Non-Resident, GPA-driven) ───
+function getCSUMerit() {
+  const gpa = data.gpa || 0;
+  if (gpa >= 4.0) return 10000;
+  if (gpa >= 3.75) return 8000;
+  if (gpa >= 3.5) return 6000;
+  if (gpa >= 3.25) return 4000;
+  if (gpa >= 3.0) return 2000;
+  return 0;
+}
+
+// ─── Dynamic Oklahoma State Automatic Merit (Non-Resident, GPA × ACT) ───
+function getOKStateMerit() {
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
+  if (act >= 32) {
+    if (gpa >= 4.0) return 22000; // full NR waiver
+    if (gpa >= 3.75) return 18000;
+    if (gpa >= 3.5) return 16000;
+    if (gpa >= 3.0) return 14000;
+  } else if (act >= 30) {
+    if (gpa >= 4.0) return 18000;
+    if (gpa >= 3.75) return 16000;
+    if (gpa >= 3.5) return 14000;
+    if (gpa >= 3.0) return 12000;
+  } else if (act >= 28) {
+    if (gpa >= 4.0) return 14000;
+    if (gpa >= 3.75) return 12000;
+    if (gpa >= 3.5) return 10000;
+    if (gpa >= 3.0) return 8000;
+  } else if (act >= 26) {
+    if (gpa >= 4.0) return 12000;
+    if (gpa >= 3.75) return 10000;
+    if (gpa >= 3.5) return 8000;
+    if (gpa >= 3.0) return 6000;
+  } else if (act >= 24) {
+    if (gpa >= 4.0) return 10000;
+    if (gpa >= 3.75) return 8000;
+    if (gpa >= 3.5) return 6000;
+    if (gpa >= 3.0) return 4000;
+  }
+  return 0;
+}
+
+// ─── Dynamic Mississippi State Automatic Merit (Non-Resident) ───
+function getMissStateMerit() {
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
+  if (act >= 32 && gpa >= 3.5) return 18000;
+  if (act >= 30 && gpa >= 3.5) return 14000;
+  if (act >= 28 && gpa >= 3.5) return 10000;
+  if (act >= 26 && gpa >= 3.0) return 7000;
+  if (act >= 24 && gpa >= 3.0) return 5000;
+  return 0;
+}
+
+// ─── Dynamic South Carolina Automatic Merit (OOS, uses weighted GPA — approximate with UW) ───
+function getSCMerit() {
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
+  if (act >= 33) {
+    if (gpa >= 4.0) return 22000;
+    if (gpa >= 3.5) return 14000;
+  } else if (act >= 31) {
+    if (gpa >= 4.0) return 18000;
+    if (gpa >= 3.5) return 10000;
+  } else if (act >= 29) {
+    if (gpa >= 4.0) return 14000;
+    if (gpa >= 3.5) return 7000;
+  } else if (act >= 27) {
+    if (gpa >= 4.0) return 7000;
+    if (gpa >= 3.5) return 5000;
+  } else if (act >= 25) {
+    if (gpa >= 4.0) return 5000;
+    if (gpa >= 3.5) return 3000;
+  }
+  return 0;
+}
+
+// ─── Automatic Merit Labels ───
+function getAutoMeritLabel(school) {
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
+  const fns = {
+    'University of Tennessee': { fn: getTennesseeMerit, note: act < 28 ? 'ACT 28 minimum not met — ACT ' + act + '.' : '' },
+    'Colorado State University': { fn: getCSUMerit, note: 'GPA-driven.' },
+    'Oklahoma State University': { fn: getOKStateMerit, note: '' },
+    'Mississippi State University': { fn: getMissStateMerit, note: '' },
+    'University of South Carolina': { fn: getSCMerit, note: 'Uses weighted GPA (UW approximated).' },
+  };
+  const entry = fns[school];
+  if (!entry) return null;
+  const merit = entry.fn();
+  return '<strong>' + school.replace('University of ', 'U. ') + ':</strong> ' + (merit > 0 ? '~$' + (merit/1000) + 'K/year' : '$0') + ' automatic merit (' + gpa + ' GPA / ACT ' + act + '). ' + entry.note;
+}
+
+// ─── Central merit dispatch — returns dynamic merit or falls back to hardcoded ───
+function getAutoMeritForSchool(school, fallback) {
+  const fns = {
+    'University of Kentucky': getKentuckyMerit,
+    'University of Georgia': getUGAMerit,
+    'University of Tennessee': getTennesseeMerit,
+    'Colorado State University': getCSUMerit,
+    'Oklahoma State University': getOKStateMerit,
+    'Mississippi State University': getMissStateMerit,
+    'University of South Carolina': getSCMerit,
+  };
+  return fns[school] ? fns[school]() : fallback;
 }
 
 // ─── Dynamic UGA Merit Aid Based on HOPE GPA + ACT ───
@@ -3916,7 +4066,7 @@ function getSummaryCost(schoolName) {
   const finEntry = FIN_DATA.find(r => r.school === schoolName);
 
   if (finEntry) {
-    const merit = schoolName === 'University of Kentucky' ? getKentuckyMerit() : schoolName === 'University of Georgia' ? getUGAMerit() : finEntry.merit;
+    const merit = getAutoMeritForSchool(schoolName, finEntry.merit);
     const sticker = finEntry.sticker || ((finEntry.tuition||0) + (finEntry.rb||0) + (finEntry.books||0));
     const realistic = sticker - merit;
     const fourYr = realistic * 4;
@@ -4154,7 +4304,7 @@ const FIN_DATA = [
   { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000 },
   { group:'MATCH SCHOOLS' },
   { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000 },
-  { school:'Auburn University', res:'OOS', tuition:36022, rb:17210, books:1260, merit:12000 },
+  { school:'Auburn University', res:'OOS', tuition:36022, rb:17210, books:1260, merit:4000 },
   { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000 },
   { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000 },
   { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000 },
@@ -4193,7 +4343,7 @@ function renderFinancials() {
 
   // Build enriched rows for sorting
   const finRows = cleanedFin.filter(r => !r.group).map(row => {
-    const merit = row.school === 'University of Kentucky' ? getKentuckyMerit() : row.school === 'University of Georgia' ? getUGAMerit() : row.merit;
+    const merit = getAutoMeritForSchool(row.school, row.merit);
     const sticker = (row.tuition || 0) + (row.rb || 0) + (row.books || 0);
     const realistic = sticker - merit;
     return { ...row, sticker, merit, realistic, fourYrSticker: sticker * 4, fourYrRealistic: realistic * 4 };
@@ -5362,7 +5512,7 @@ function initDefaultScholarships() {
 function getMeritScholarships() {
   const visibleNames = getVisibleSchools().map(s => s.name);
   return FIN_DATA.filter(f => f.school && f.merit > 0 && visibleNames.includes(f.school)).map(f => {
-    const amt = f.school === 'University of Kentucky' ? getKentuckyMerit() : f.school === 'University of Georgia' ? getUGAMerit() : f.merit;
+    const amt = getAutoMeritForSchool(f.school, f.merit);
     return {
       id: 'merit_' + f.school.replace(/\s/g, '_'),
       section: 'merit',
@@ -5793,7 +5943,30 @@ function showScoreImpactModal(oldACT, newACT) {
     }
   }
 
-  // 3. Schools where positioning strengthened (ACT crosses into their middle 50% range)
+  // 4. Auto-merit schools — check if ACT change moves to a higher tier
+  const autoMeritFns = {
+    'University of Tennessee': getTennesseeMerit,
+    'Colorado State University': getCSUMerit,
+    'Oklahoma State University': getOKStateMerit,
+    'Mississippi State University': getMissStateMerit,
+    'University of South Carolina': getSCMerit,
+  };
+  Object.entries(autoMeritFns).forEach(([school, fn]) => {
+    if (!data.schools.find(s => s.name === school)) return;
+    // Temporarily swap composite to calculate old vs new merit
+    const saved = data.actScores.composite;
+    data.actScores.composite = oldACT;
+    const oldM = fn();
+    data.actScores.composite = newACT;
+    const newM = fn();
+    data.actScores.composite = saved;
+    if (newM > oldM) {
+      const shortName = school.replace('University of ', '');
+      impacts.push({ icon: '\uD83D\uDCB0', text: shortName + ' merit \u2014 $' + (oldM/1000) + 'K \u2192 $' + (newM/1000) + 'K/year (+$' + ((newM - oldM)/1000) + 'K)', type: 'merit' });
+    }
+  });
+
+  // 5. Schools where positioning strengthened (ACT crosses into their middle 50% range)
   data.schools.forEach(s => {
     const db = schoolDB[s.name];
     if (!db || !db.testReq) return;
