@@ -2098,13 +2098,13 @@ function getKentuckyMeritLabel() {
 
 // ─── Dynamic UGA Merit Aid Based on HOPE GPA + ACT ───
 // Zell Miller: HOPE GPA >= 3.70 AND ACT >= 26 → full tuition ($11,450 in-state 2025-26)
-// HOPE: HOPE GPA >= 3.0 → partial tuition (~$5,500/year at UGA)
+// HOPE: HOPE GPA >= 3.0 → ~90% of tuition ($276/credit hr × 30 hrs = $8,280/yr at UGA, 2024-25 rate)
 // If neither, return 0
 function getUGAMerit() {
   const hopeGPA = data.hopeGPA || 0;
   const act = (data.actScores || {}).composite || 0;
   if (hopeGPA >= 3.70 && act >= 26) return 11450; // Zell Miller — full in-state tuition
-  if (hopeGPA >= 3.0) return 5500; // HOPE — partial tuition
+  if (hopeGPA >= 3.0) return 8280; // HOPE — ~90% of tuition ($276/cr hr × 30 hrs)
   return 0;
 }
 
@@ -2117,7 +2117,7 @@ function getUGAMeritLabel() {
   }
   if (hopeGPA >= 3.0) {
     const gap = (3.70 - hopeGPA).toFixed(3);
-    return '<strong>UGA:</strong> HOPE Scholarship (partial tuition). HOPE GPA ' + hopeGPA.toFixed(3) + ' qualifies for HOPE (~$' + (merit / 1000).toFixed(1) + 'K/year) but is ' + gap + ' below the 3.70 Zell Miller threshold.' + (act < 26 ? ' Also needs ACT 26+ for Zell Miller.' : '');
+    return '<strong>UGA:</strong> HOPE Scholarship (~90% of tuition). HOPE GPA ' + hopeGPA.toFixed(3) + ' qualifies for HOPE (~$' + (merit / 1000).toFixed(1) + 'K/year) but is ' + gap + ' below the 3.70 Zell Miller threshold.' + (act < 26 ? ' Also needs ACT 26+ for Zell Miller.' : '');
   }
   return '<strong>UGA:</strong> Neither HOPE nor Zell Miller eligible. HOPE GPA ' + hopeGPA.toFixed(3) + ' is below the 3.0 minimum.';
 }
@@ -3749,7 +3749,7 @@ function getRankingForSchool(name) {
     // Pre-fill from spreadsheet data for known schools
     const presets = {
       // ── Top-13 schools from Executive Summary / Financial Analysis ──
-      'University of Georgia':           { vetProgram:5, costScore:4, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$5.5K/yr). Zell Miller requires 3.70 HOPE GPA (currently 3.609). 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat).' },
+      'University of Georgia':           { vetProgram:5, costScore:4, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$8.3K/yr, ~90% of tuition). Zell Miller requires 3.70 HOPE GPA (currently 3.609). 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat).' },
       'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit.' },
       'Purdue University':               { vetProgram:5, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
       'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. Top-10 vet school.' },
@@ -5349,7 +5349,7 @@ function initDefaultScholarships() {
     // ── External & National ──
     { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools', url:'https://studentaid.gov/h/apply-for-aid/fafsa' },
     { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 26+. Avery\'s HOPE GPA (3.609) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
-    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'Partial tuition at GA publics (~$5,500/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.609 HOPE GPA.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
+    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'~90% of tuition at GA publics (~$8,280/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.609 HOPE GPA. Covers $276/credit hour (2024-25 rate).', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
     { id: uid(), section:'external', name:'Coca-Cola Scholars Program', school:'National', amount:'$20,000 (150 awards)', deadline:'2026-09-30', essayReq:true, separateApp:true, status:'Not Started', notes:'Highly competitive national award; apply Aug-Sep of senior year', url:'https://www.coca-colascholarsfoundation.org/apply/' },
     { id: uid(), section:'external', name:'Elks Most Valuable Student', school:'National', amount:'$4,000-$30,000 over 4 years', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'500 awards nationwide; leadership and financial need', url:'https://www.elks.org/scholars/scholarships/mvs.cfm' },
     { id: uid(), section:'external', name:'National FFA Scholarship Program', school:'National', amount:'Up to $10,000', deadline:'2027-01-15', essayReq:true, separateApp:true, status:'Not Started', notes:'For FFA members; 100+ sponsors; ag/animal science focus', url:'https://www.ffa.org/participate/grants-and-scholarships/scholarships/' },
