@@ -1,0 +1,623 @@
+{
+  "researchDate": "2026-03-18",
+  "purpose": "Scholarship research for Avery - Pre-vet/Animal Science track, Georgia resident, 3.85 GPA, 27 ACT, Class of 2027",
+  "notes": "Deadlines listed are typical cycle dates. For the 2026-2027 application cycle (Fall 2027 enrollment), confirm exact dates on each organization's website as they may shift slightly year to year.",
+
+  "categories": {
+    "preVetAndAnimalScience": {
+      "label": "Pre-Vet & Animal Science Specific Scholarships",
+      "scholarships": [
+        {
+          "name": "APVMA Community Service Scholarship",
+          "sponsor": "American Pre-Veterinary Medical Association (APVMA)",
+          "amount": "$1,000",
+          "deadlineMonth": "Varies (check website — summer cycle typical)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Pre-veterinary students who demonstrate commitment to animal welfare, animal care, or public health through volunteer work, internships, or service",
+          "url": "http://apvma.org/current-scholarships.html",
+          "notes": "Must be an APVMA member. Summer 2026 scholarships now open — deadline July 1, 2026."
+        },
+        {
+          "name": "APVMA Resiliency Scholarship",
+          "sponsor": "American Pre-Veterinary Medical Association (APVMA)",
+          "amount": "$500",
+          "deadlineMonth": "Varies (check website)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Pre-vet students or APVMA club members who have demonstrated resilience and need financial assistance",
+          "url": "http://apvma.org/current-scholarships.html",
+          "notes": "Requires APVMA membership"
+        },
+        {
+          "name": "APVMA One Health Scholarship",
+          "sponsor": "American Pre-Veterinary Medical Association (APVMA)",
+          "amount": "$500",
+          "deadlineMonth": "Varies (check website)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Pre-vet students committed to interconnected health of people, animals, and the environment; must demonstrate leadership",
+          "url": "http://apvma.org/current-scholarships.html",
+          "notes": "Requires APVMA membership"
+        },
+        {
+          "name": "Vince's Pre-Veterinary Student Scholarship",
+          "sponsor": "Vince Kotchian Test Prep",
+          "amount": "$500 (2 awards)",
+          "deadlineMonth": "October",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Undergraduate students enrolled in pre-veterinary or animal science program in the U.S. with minimum 3.33 GPA. Must write a poem (max 500 words) about animals.",
+          "url": "https://scholarships360.org/scholarships/search/vinces-pre-veterinary-student-scholarship/",
+          "notes": "Avery qualifies with 3.85 GPA. Apply once enrolled as a freshman."
+        },
+        {
+          "name": "National Dairy Shrine / Maurice E. Core Freshman Scholarship",
+          "sponsor": "National Dairy Shrine",
+          "amount": "$1,500",
+          "deadlineMonth": "April (April 15 for 2026 cycle)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "College freshmen majoring in dairy/animal industry related field with interest in dairy industry. Based on leadership, volunteerism, activities, and future plans.",
+          "url": "https://dairyshrine.org/youth/",
+          "notes": "Apply once enrolled as a college freshman. Applications open March 1."
+        },
+        {
+          "name": "National Dairy Shrine Pre-Vet Scholarship (Zoetis-sponsored)",
+          "sponsor": "National Dairy Shrine / Zoetis",
+          "amount": "$2,500",
+          "deadlineMonth": "April (April 15)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Student enrolled in a pre-vet program in their 3rd or 4th year of undergraduate study",
+          "url": "https://dairyshrine.org/youth/",
+          "notes": "For later in college career, not freshman year. Worth bookmarking for junior/senior year."
+        },
+        {
+          "name": "Charles Shelton Veterinary Scholarship",
+          "sponsor": "Charles Shelton Foundation",
+          "amount": "$2,000 (2 awards)",
+          "deadlineMonth": "March",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Black/African-American high school seniors and college students pursuing veterinary careers. Minimum 3.0 GPA.",
+          "url": "https://scholarships360.org/scholarships/search/charles-shelton-veterinary-scholarship/",
+          "notes": "Only applicable if Avery meets the demographic eligibility requirement."
+        },
+        {
+          "name": "AKC Humane Fund Sir John D. Spurling Scholarship",
+          "sponsor": "American Kennel Club Humane Fund",
+          "amount": "$2,000 (5 awards)",
+          "deadlineMonth": "July (July 1 postmark deadline)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Full-time students enrolled in degree or certification program at accredited U.S. institution focusing on care of pets. Requires 2 letters of recommendation and transcript.",
+          "url": "https://akchumanefund.org/programs/",
+          "notes": "Apply once enrolled in college. Good fit for pre-vet students."
+        },
+        {
+          "name": "AKC Companion Events Scholarship",
+          "sponsor": "American Kennel Club",
+          "amount": "Up to $10,000 (scholarship fund shared among recipients)",
+          "deadlineMonth": "Check AKC website",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Students active in AKC Companion Events attending institution of higher education",
+          "url": "https://www.akc.org/sports/juniors/junior-resources/companion-events-scholarship/",
+          "notes": "Only applicable if Avery participates in AKC events (dog showing, obedience, etc.)"
+        },
+        {
+          "name": "EQUUS Foundation Scholarship",
+          "sponsor": "EQUUS Foundation",
+          "amount": "$1,000-$2,500 (minimum $60,000 awarded total in 2026)",
+          "deadlineMonth": "Check website for 2026-2027 cycle",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Junior and senior level undergraduate students enrolled in equine studies programs. Closely related majors (Animal Science with equine emphasis, Pre-Vet with equine focus) accepted.",
+          "url": "https://equusfoundation.org/scholarships/een-scholarships.php",
+          "notes": "For college juniors/seniors, not incoming freshmen. Bookmark for later."
+        },
+        {
+          "name": "AQHA (American Quarter Horse Foundation) Scholarships",
+          "sponsor": "American Quarter Horse Foundation",
+          "amount": "$2,250-$10,000 depending on specific scholarship (50+ scholarships awarded annually)",
+          "deadlineMonth": "January (January 15)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Based on academic achievement, financial need, and Quarter Horse involvement. GPA minimums range from 2.5-3.0 depending on specific scholarship. Must demonstrate involvement with the equine industry.",
+          "url": "https://www.aqha.com/scholarships",
+          "notes": "Only applicable if Avery has Quarter Horse / equine involvement. Multiple scholarships available under one application."
+        }
+      ]
+    },
+
+    "nationalFFA4H": {
+      "label": "FFA, 4-H & Agriculture Organization Scholarships",
+      "scholarships": [
+        {
+          "name": "National FFA Scholarship Program",
+          "sponsor": "National FFA Organization",
+          "amount": "Up to $10,000 (nearly $2.5 million total awarded)",
+          "deadlineMonth": "January (January 15)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Active FFA member, high school senior or current college student. Must plan to attend or be enrolled in accredited post-secondary program.",
+          "url": "https://www.ffa.org/participate/grants-and-scholarships/scholarships/",
+          "notes": "Only if Avery is an FFA member. One of the largest agriculture scholarship programs in the country."
+        },
+        {
+          "name": "Farm Credit Foundation for Agricultural Advancement Scholarship",
+          "sponsor": "Farm Credit Foundation for Agricultural Advancement",
+          "amount": "Up to $10,000 ($350,000+ awarded total)",
+          "deadlineMonth": "January (January 2 for 2026 cycle)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "High school seniors or current college students pursuing agriculture career. Must reside in Horizon Farm Credit's territory (DE, MD, PA, VA, WV, DC).",
+          "url": "https://fcfoundationforag.org/",
+          "notes": "GEOGRAPHIC LIMITATION: Only for students in DE, MD, PA, VA, WV, DC. Avery as a Georgia resident would NOT qualify for this one."
+        },
+        {
+          "name": "Georgia 4-H Scholarships",
+          "sponsor": "Georgia 4-H / UGA Extension",
+          "amount": "Varies ($500-$2,500 typical)",
+          "deadlineMonth": "Varies by specific scholarship (check Georgia 4-H website)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Must be a Georgia 4-H member. Various scholarships available for different interests including animal science and agriculture.",
+          "url": "https://georgia4h.org/",
+          "notes": "Only if Avery is a 4-H member. Contact Georgia 4-H county extension for current opportunities."
+        }
+      ]
+    },
+
+    "externalNational": {
+      "label": "External & National Scholarships (STEM, Leadership, Merit)",
+      "scholarships": [
+        {
+          "name": "Georgia HOPE Scholarship",
+          "sponsor": "Georgia Student Finance Commission",
+          "amount": "Covers a portion of tuition at eligible Georgia public colleges/universities (amount varies by institution)",
+          "deadlineMonth": "No separate application — automatic based on GPA at graduation",
+          "essayRequired": false,
+          "separateApplication": false,
+          "eligibility": "Georgia resident, graduate from eligible Georgia high school, minimum 3.0 HOPE GPA. Must maintain 3.0 GPA in college.",
+          "url": "https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/",
+          "notes": "Avery qualifies with 3.85 GPA. Applies automatically if attending a Georgia public university (like UGA). Track status at GAfutures.org."
+        },
+        {
+          "name": "Georgia Zell Miller Scholarship",
+          "sponsor": "Georgia Student Finance Commission",
+          "amount": "Covers FULL tuition at eligible Georgia public colleges/universities",
+          "deadlineMonth": "No separate application — automatic based on GPA + test scores at graduation",
+          "essayRequired": false,
+          "separateApplication": false,
+          "eligibility": "Georgia resident, minimum 3.70 high school GPA (as calculated by GSFC) AND minimum 1200 SAT (math + reading) or 25 ACT composite. Must maintain 3.30 college GPA.",
+          "url": "https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/",
+          "notes": "STRONG FIT: Avery's 3.85 GPA and 27 ACT both meet the thresholds. If attending UGA, this could cover full tuition. Verify GPA calculation method with GSFC."
+        },
+        {
+          "name": "Coca-Cola Scholars Program",
+          "sponsor": "Coca-Cola Scholars Foundation",
+          "amount": "$20,000 (150 awards)",
+          "deadlineMonth": "September (opens August 1, closes September 30)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Current high school senior (or equivalent), U.S. citizen/permanent resident, minimum 3.0 GPA, planning to attend accredited U.S. college/university. Based on leadership and service.",
+          "url": "https://www.coca-colascholarsfoundation.org/apply/",
+          "notes": "Apply in fall of senior year (Aug-Sep 2026). Highly competitive but Avery qualifies. Strong community service/leadership record important."
+        },
+        {
+          "name": "Horatio Alger National Scholarship",
+          "sponsor": "Horatio Alger Association",
+          "amount": "$10,000-$25,000 (600+ awards)",
+          "deadlineMonth": "March (application open December 1 - March 1 for juniors)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "High school juniors/seniors who have overcome significant adversity, demonstrate financial need, integrity, and perseverance. Must be committed to earning a bachelor's degree.",
+          "url": "https://scholars.horatioalger.org/scholarships/",
+          "notes": "Need-based — specifically for students who have overcome adversity. Only applicable if Avery's circumstances fit this criteria."
+        },
+        {
+          "name": "Elks Most Valuable Student Scholarship",
+          "sponsor": "Elks National Foundation",
+          "amount": "$4,000-$30,000 over 4 years (500 awards; top 20 get $30,000)",
+          "deadlineMonth": "November (November 12 for 2026 cycle)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Current high school senior, U.S. citizen. Based on scholarship, leadership, and financial need.",
+          "url": "https://www.elks.org/scholars/scholarships/mvs.cfm",
+          "notes": "Apply in fall of senior year. No need to be affiliated with the Elks. 500 scholarships makes this less competitive than some national awards."
+        },
+        {
+          "name": "Breakthrough Junior Challenge",
+          "sponsor": "Breakthrough Prize Foundation",
+          "amount": "$250,000 (plus $50,000 for a teacher and $100,000 for school science lab)",
+          "deadlineMonth": "September (September 15, 2026)",
+          "essayRequired": false,
+          "separateApplication": true,
+          "eligibility": "Students aged 13-18. Must create an original video (under 90 seconds) explaining a concept in life sciences, physics, or math.",
+          "url": "https://breakthroughjuniorchallenge.org/",
+          "notes": "Extremely competitive but free to enter. Avery could explain a veterinary science or biology concept. Can apply now as a junior."
+        },
+        {
+          "name": "UNCF STEM Scholars Program",
+          "sponsor": "United Negro College Fund (UNCF)",
+          "amount": "Up to $25,000 (tiered over undergraduate years; 75 awards)",
+          "deadlineMonth": "April (April 15, 2026)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Students aspiring to earn STEM degrees. Check UNCF eligibility requirements.",
+          "url": "https://opportunitydesk.org/2026/02/26/uncf-stem-scholars-program-2026-2027/",
+          "notes": "Only applicable if Avery meets UNCF eligibility criteria."
+        },
+        {
+          "name": "Society of Women Engineers (SWE) Emerging First Year Scholarship",
+          "sponsor": "Society of Women Engineers",
+          "amount": "Up to $20,000",
+          "deadlineMonth": "March (opens Feb 10, closes March 31)",
+          "essayRequired": true,
+          "separateApplication": true,
+          "eligibility": "Female students entering first year of undergraduate study. Must plan to study ABET-accredited engineering, technology, or computing program. High school GPA above 3.5.",
+          "url": "https://swe.org/apply-for-a-swe-scholarship/",
+          "notes": "IMPORTANT LIMITATION: Requires ABET-accredited engineering/technology/computing major. Animal Science/Pre-Vet would NOT qualify unless the program is ABET-accredited. Likely not a fit."
+        },
+        {
+          "name": "Scholarships360 No Essay Scholarship",
+          "sponsor": "Scholarships360",
+          "amount": "$10,000",
+          "deadlineMonth": "June (June 30, 2026)",
+          "essayRequired": false,
+          "separateApplication": true,
+          "eligibility": "Open to high school students who plan to attend college. No essay required — just complete the form.",
+          "url": "https://scholarships360.org/scholarships/no-essay-scholarship/",
+          "notes": "Easy to apply. Low barrier, so worth submitting."
+        }
+      ]
+    },
+
+    "schoolSpecific": {
+      "label": "School-Specific Competitive Scholarships",
+      "schools": [
+        {
+          "school": "Auburn University",
+          "scholarships": [
+            {
+              "name": "Auburn Competitive Merit Scholarships (Presidential Excellence Award)",
+              "amount": "Resident tuition + mandatory fees (~$13,572/year for 2026-27)",
+              "deadlineMonth": "December (complete admission file by December 1; test scores by January 12)",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Automatic consideration for admitted freshmen with complete file by Dec 1. Based on GPA + standardized test score.",
+              "url": "https://www.auburn.edu/scholarship/undergraduate/competitive-merit.php",
+              "notes": "No separate application needed. With 3.85 GPA and 27 ACT, Avery may qualify for a smaller merit award but the Presidential level typically requires higher test scores. Consider retaking ACT."
+            },
+            {
+              "name": "Auburn AUSOM Departmental Scholarships (College of Agriculture)",
+              "amount": "Varies",
+              "deadlineMonth": "February (priority deadline February 16)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Accepted freshmen who complete the AUSOM scholarship application.",
+              "url": "https://www.auburn.edu/scholarship/ausom/",
+              "notes": "Must complete AUSOM application after being admitted."
+            }
+          ]
+        },
+        {
+          "school": "Texas A&M University",
+          "scholarships": [
+            {
+              "name": "Texas A&M Academic Scholarships (automatic merit)",
+              "amount": "Varies",
+              "deadlineMonth": "December (December 1 priority deadline via ApplyTexas or Common App)",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Automatic consideration based on admission application. Factors: GPA, leadership, community service, special talents, first-gen status.",
+              "url": "https://aggieonestop.tamu.edu/financial-aid/types-of-aid/scholarships/undergraduate-scholarships/academic-scholarships",
+              "notes": "Must also submit SRAR (Self-Reported Academic Record). Apply by Dec 1 for best consideration."
+            },
+            {
+              "name": "Texas A&M Department of Animal Science Scholarships",
+              "amount": "Varies ($150,000+ awarded annually to undergrads across the department)",
+              "deadlineMonth": "December (December 1 — same university scholarship application)",
+              "essayRequired": true,
+              "separateApplication": false,
+              "eligibility": "Apply through university scholarship application. Awards based on achievement aligned with donor intent.",
+              "url": "https://animalscience.tamu.edu/scholarships-and-financial-aid/",
+              "notes": "No separate departmental application — handled through the main university scholarship app."
+            },
+            {
+              "name": "Texas A&M Lechner Scholarship",
+              "amount": "Varies (includes $1,000 one-time study abroad stipend)",
+              "deadlineMonth": "December (December 1)",
+              "essayRequired": true,
+              "separateApplication": false,
+              "eligibility": "Incoming freshmen admitted in fall. Based on academic achievement, leadership, and community/extracurricular participation. Linked to Honors admission.",
+              "url": "https://scholarships.tamu.edu/",
+              "notes": "Requires Honors admission. Competitive — typically needs higher test scores."
+            }
+          ]
+        },
+        {
+          "school": "University of Georgia",
+          "scholarships": [
+            {
+              "name": "Georgia HOPE Scholarship (at UGA)",
+              "amount": "Covers portion of tuition (~$5,000-$6,000/year)",
+              "deadlineMonth": "Automatic — no separate application",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Georgia resident with 3.0+ HOPE GPA graduating from eligible GA high school.",
+              "url": "https://osfa.uga.edu/types-of-aid/undergraduate/scholarships/hope-and-zell-miller-scholarships/",
+              "notes": "Avery qualifies. Applied automatically."
+            },
+            {
+              "name": "Georgia Zell Miller Scholarship (at UGA)",
+              "amount": "Covers FULL tuition at UGA",
+              "deadlineMonth": "Automatic — no separate application",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Georgia resident, 3.70+ GPA (GSFC calculation), 25+ ACT or 1200+ SAT.",
+              "url": "https://osfa.uga.edu/types-of-aid/undergraduate/scholarships/hope-and-zell-miller-scholarships/",
+              "notes": "STRONG FIT: Avery meets both GPA (3.85) and ACT (27) thresholds. This is essentially free tuition at UGA."
+            },
+            {
+              "name": "UGA Foundation Fellowship",
+              "amount": "Full academic funding + travel-study stipends + research grants (UGA's top scholarship)",
+              "deadlineMonth": "November (November 1)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Minimum 3.7 GPA, minimum 1400 SAT or 31 ACT, exceptional extracurricular/leadership record. Interview required.",
+              "url": "https://honors.uga.edu/scholarships/prospective-students/foundation-fellowship/",
+              "notes": "ACT threshold (31) is above Avery's current 27. Would need significant ACT improvement to be competitive. Extremely selective."
+            },
+            {
+              "name": "UGA CAES (College of Agricultural & Environmental Sciences) Scholarships",
+              "amount": "Varies",
+              "deadlineMonth": "Check UGA OSFA for current deadlines",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Students enrolled in CAES majors (Animal Science, Animal Health, etc.). Available each academic year.",
+              "url": "https://www.caes.uga.edu/",
+              "notes": "Apply through UGA financial aid system once enrolled."
+            }
+          ]
+        },
+        {
+          "school": "Colorado State University",
+          "scholarships": [
+            {
+              "name": "CSU Green and Gold Scholarship (Non-Resident)",
+              "amount": "Up to $16,000/year (up to $64,000 over 4 years)",
+              "deadlineMonth": "Automatic with admission application",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Non-resident freshmen with 3.2+ GPA admitted to full-time degree-seeking program.",
+              "url": "https://admissions.colostate.edu/cost-financial-aid/financial-aid-scholarships/green-gold-scholarships-nonresidents/",
+              "notes": "Avery qualifies with 3.85 GPA as a Georgia (non-CO) resident. Automatic — no separate app needed."
+            },
+            {
+              "name": "CSU College of Veterinary Medicine & Biomedical Sciences Scholarships",
+              "amount": "Varies",
+              "deadlineMonth": "Complete CSUSA (CSU Scholarship Application) — deadline varies",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Undergrads in the College of Vet Med & Biomedical Sciences. Complete the CSUSA, then the supplemental CVMBS scholarship application.",
+              "url": "https://vetmedbiosci.colostate.edu/current-students/scholarships/",
+              "notes": "Must complete both the general CSU scholarship app AND the college-specific supplemental application."
+            },
+            {
+              "name": "CSU Vet Prep Scholarship",
+              "amount": "Varies (need-based)",
+              "deadlineMonth": "Check CSU AcademicWorks portal",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "First-year students in the Vet Prep Program in the College of Vet Med & Biomedical Sciences with demonstrated financial need.",
+              "url": "https://colostate.academicworks.com/opportunities/35106",
+              "notes": "Specific to Vet Prep students. Must file FAFSA."
+            }
+          ]
+        },
+        {
+          "school": "Purdue University",
+          "scholarships": [
+            {
+              "name": "Purdue University Merit Scholarships (automatic)",
+              "amount": "Varies",
+              "deadlineMonth": "November (November 1 priority deadline for admission + scholarship consideration)",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Automatic consideration for freshmen with complete admission application by Nov 1.",
+              "url": "https://admissions.purdue.edu/costsandfinaid/freshman.php",
+              "notes": "Apply early for best consideration."
+            },
+            {
+              "name": "Purdue Department of Animal Sciences Scholarships",
+              "amount": "Varies ($72,200 total awarded across department in 2025-26)",
+              "deadlineMonth": "December (December 15 priority deadline)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Complete the Purdue Departmental Scholarship Application. Minimum 2.70 GPA. Various named scholarships with specific criteria (swine industry interest, dairy, etc.).",
+              "url": "https://ag.purdue.edu/department/ansc/scholarships.html",
+              "notes": "Separate departmental application required. Also file FAFSA by Dec 15 for need-based scholarships."
+            },
+            {
+              "name": "Purdue REACH Program (Poultry Focus)",
+              "amount": "Full tuition for 8 semesters + book stipends + paid internship + study abroad",
+              "deadlineMonth": "Check with Purdue Animal Sciences",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "5 incoming freshmen pursuing animal sciences degrees with a focus on poultry.",
+              "url": "https://ag.purdue.edu/department/ansc/scholarships.html",
+              "notes": "Only if Avery has interest in the poultry industry. Full ride but very specific focus."
+            }
+          ]
+        },
+        {
+          "school": "NC State University",
+          "scholarships": [
+            {
+              "name": "NC State PACK ASSIST Scholarships",
+              "amount": "Varies by specific scholarship",
+              "deadlineMonth": "February (February 15 priority)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "New students may apply upon admission through PACK ASSIST portal. College of Agriculture & Life Sciences awards require extra materials/essays.",
+              "url": "https://ncsu.academicworks.com/",
+              "notes": "One portal for all NC State scholarships. Apply as soon as admitted."
+            },
+            {
+              "name": "NC State Goodnight Scholars Program",
+              "amount": "$23,000/year (renewable 4 years)",
+              "deadlineMonth": "February (apply to NC State by Feb 15, FAFSA by March 1 to be invited)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "NC residents only from low/middle-income families pursuing STEM or affiliated education majors. Invitation-based.",
+              "url": "https://goodnight.ncsu.edu/",
+              "notes": "NC RESIDENTS ONLY — Avery as a Georgia resident would NOT qualify."
+            },
+            {
+              "name": "NC State Park Scholarships",
+              "amount": "Full ride (tuition, fees, room, board, stipends, study abroad funding)",
+              "deadlineMonth": "October (typically mid-October for application)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Exceptional incoming freshmen. Highly competitive. Based on scholarship, leadership, service, and character.",
+              "url": "https://park.ncsu.edu/apply/",
+              "notes": "Extremely competitive — NC State's premier scholarship. Open to out-of-state students."
+            }
+          ]
+        },
+        {
+          "school": "University of Tennessee",
+          "scholarships": [
+            {
+              "name": "UTK Volunteer Scholarship (automatic merit)",
+              "amount": "Varies by GPA and test score tier",
+              "deadlineMonth": "November (November 1 priority for admission/scholarship)",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Automatic consideration based on admission application, GPA, and test scores.",
+              "url": "https://onestop.utk.edu/scholarships/",
+              "notes": "Apply early. Check UTK's specific GPA/ACT award tiers to estimate amount."
+            },
+            {
+              "name": "UTK College of Agricultural Sciences & Natural Resources Scholarships",
+              "amount": "Varies",
+              "deadlineMonth": "Check UTK CASNR website",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Students in CASNR majors including Animal Science.",
+              "url": "https://ag.tennessee.edu/",
+              "notes": "Departmental scholarships available once enrolled."
+            }
+          ]
+        },
+        {
+          "school": "Virginia Tech",
+          "scholarships": [
+            {
+              "name": "Virginia Tech General Scholarship Application (University-wide)",
+              "amount": "Varies — hundreds of scholarships available through one application",
+              "deadlineMonth": "January (January 22)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Complete the General Scholarship Application in Scholarship Central. Open to all admitted students.",
+              "url": "https://finaid.vt.edu/university-scholarships-and-financial-aid-home-page-Virginia-Tech-Scholarships.html",
+              "notes": "One application matches you to many scholarships. Also file FAFSA for need-based awards."
+            },
+            {
+              "name": "Virginia Tech School of Animal Sciences Departmental Scholarships",
+              "amount": "Varies",
+              "deadlineMonth": "January (through Scholarship Central)",
+              "essayRequired": true,
+              "separateApplication": false,
+              "eligibility": "Students in animal sciences. Applied through Scholarship Central.",
+              "url": "https://vt.academicworks.com/",
+              "notes": "Matched automatically based on Scholarship Central profile."
+            }
+          ]
+        },
+        {
+          "school": "Ohio State University",
+          "scholarships": [
+            {
+              "name": "Ohio State University Merit Scholarships (automatic)",
+              "amount": "Varies",
+              "deadlineMonth": "November (apply by early action deadline for merit consideration)",
+              "essayRequired": false,
+              "separateApplication": false,
+              "eligibility": "Automatic consideration based on admission application.",
+              "url": "https://undergrad.osu.edu/cost-and-aid/merit-based-scholarships",
+              "notes": "Apply early action for best merit scholarship consideration."
+            },
+            {
+              "name": "Ohio State Scholarship Universe (departmental + college scholarships)",
+              "amount": "Varies",
+              "deadlineMonth": "February (February 1 priority for FAFSA + Scholarship Universe profile)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Complete FAFSA and create Scholarship Universe profile. Animal Science-specific scholarships include Charles B. Boyles Memorial (OH/WV residents preferred) and others.",
+              "url": "https://sfa.osu.edu/incoming-freshmen/about-aid/ScholarshipU",
+              "notes": "One profile matches you to internal and external scholarships."
+            }
+          ]
+        },
+        {
+          "school": "Clemson University",
+          "scholarships": [
+            {
+              "name": "Clemson CAFLS Scholarships (College of Agriculture, Forestry and Life Sciences)",
+              "amount": "Varies",
+              "deadlineMonth": "Submit Scholarship Interest Form prior to admission (rolling)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Incoming and transfer students are encouraged to complete the CAFLS Scholarship Interest Form prior to admission. Awards made by CAFLS Scholarships and Awards Committee.",
+              "url": "https://www.clemson.edu/cafls/academics/scholarships/",
+              "notes": "Submit interest form early — before or at time of admission application."
+            },
+            {
+              "name": "Clemson National Scholars Program",
+              "amount": "Full cost of attendance (tuition, fees, housing, food, etc.)",
+              "deadlineMonth": "Requires Honors College application (check Clemson Honors for deadline)",
+              "essayRequired": true,
+              "separateApplication": true,
+              "eligibility": "Premier academic recruitment scholarship. Requires Honors College application and interview.",
+              "url": "https://www.clemson.edu/honors/",
+              "notes": "Extremely competitive. Typically requires very high test scores."
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "actionPlan": {
+    "applyNowAsJunior": [
+      "Breakthrough Junior Challenge — deadline September 15, 2026",
+      "Scholarships360 No Essay Scholarship — deadline June 30, 2026",
+      "Horatio Alger Scholarship — Dec 1 to March 1 (if applicable)"
+    ],
+    "applySeniorYearFall2026": [
+      "Coca-Cola Scholars — Aug 1 to Sep 30, 2026",
+      "Elks Most Valuable Student — November 12, 2026",
+      "NC State Park Scholarship — mid-October 2026",
+      "School admission applications (all trigger automatic merit consideration) — Nov 1 to Dec 1 depending on school",
+      "National FFA Scholarships — January 15, 2027 (if FFA member)",
+      "AQHA Scholarships — January 15, 2027 (if equine involvement)",
+      "Virginia Tech General Scholarship App — January 22, 2027",
+      "Auburn AUSOM — February 16, 2027",
+      "NC State PACK ASSIST — February 15, 2027",
+      "Ohio State Scholarship Universe — February 1, 2027"
+    ],
+    "applyOnceEnrolledFreshmanYear": [
+      "Vince's Pre-Veterinary Student Scholarship — October",
+      "APVMA Scholarships — check summer cycle",
+      "AKC Humane Fund Scholarship — July 1",
+      "National Dairy Shrine Maurice E. Core — April 15",
+      "CSU CVMBS Scholarships (if at CSU)",
+      "Purdue Animal Sciences Departmental (if at Purdue)"
+    ],
+    "keyTip": "The Georgia Zell Miller Scholarship is Avery's single highest-value opportunity if attending UGA — it covers full tuition with NO separate application. Avery already meets both the GPA (3.85 vs 3.70 required) and ACT (27 vs 25 required) thresholds."
+  }
+}
