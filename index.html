@@ -1912,17 +1912,17 @@ function runMigrations() {
     localStorage.setItem('rankingsDataV2', '1');
   }
 
-  // One-time migration: remove SAT from testReq, keep ACT only
-  if (!localStorage.getItem('actOnlyV1')) {
+  // Migration: remove SAT from testReq, keep ACT only. Reset all to DB values.
+  if (!localStorage.getItem('actOnlyV2')) {
     data.schools.forEach(s => {
-      if (s.testReq && /SAT/.test(s.testReq)) {
-        const m = s.testReq.match(/ACT\s+[\d\-]+/);
-        s.testReq = m ? m[0] : s.testReq.replace(/SAT\s*[\d\-]+\s*\/?\s*/, '').trim();
-      }
       const dbEntry = schoolDB[s.name];
       if (dbEntry) s.testReq = dbEntry.testReq;
+      else if (s.testReq) {
+        const m = s.testReq.match(/ACT\s+[\d\-]+/);
+        if (m) s.testReq = m[0];
+      }
     });
-    localStorage.setItem('actOnlyV1', '1');
+    localStorage.setItem('actOnlyV2', '1');
   }
 
   // One-time: set HOPE GPA default if not yet set by user
