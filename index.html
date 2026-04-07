@@ -1686,7 +1686,7 @@ const schoolDB = {
   'Virginia Tech':                  { domain:'vt.edu', color:'#861F41', location:'Blacksburg, VA', notes:'Virginia-Maryland CVM on campus; strong Animal & Poultry Sciences pre-vet path; rural setting with farm animal access', tuitionIn:'$16,526', tuitionOut:'$38,977', fees:'incl.', roomBoard:'$16,046', booksSupplies:'$1,120', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 28-32', acceptRate:'55%', oosAcceptRate:'40%', avgGPA:'4.09', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#19', lastVerified:'2026-03-27' },
   'North Carolina State University':{ domain:'ncsu.edu', color:'#CC0000', location:'Raleigh, NC', notes:'Top CVM; pre-vet students in Animal Science; teaching animal units on campus; guaranteed interview program', tuitionIn:'$9,028', tuitionOut:'$33,993', fees:'incl.', roomBoard:'$14,741', booksSupplies:'$624', deadline:'January 15', earlyDecision:'October 15', testReq:'ACT 28-32', acceptRate:'39%', oosAcceptRate:'34%', avgGPA:'3.83', usNewsOverall:'#64', usNewsPublic:'#29', vetSchoolRank:'#5', lastVerified:'2026-03-27' },
   'University of Wisconsin-Madison':{ domain:'wisc.edu', color:'#C5050C', location:'Madison, WI', notes:'School of Veterinary Medicine on campus; pre-vet through Animal & Dairy Sciences; strong research opportunities', tuitionIn:'$12,186', tuitionOut:'$44,210', fees:'incl.', roomBoard:'$14,520', booksSupplies:'$700', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'41%', oosAcceptRate:'40%', avgGPA:'3.9', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#5', lastVerified:'2026-03-27' },
-  'Auburn University':              { domain:'auburn.edu', color:'#DD550C', location:'Auburn, AL', notes:'Accredited CVM; pre-vet in Animal Sciences; teaching hospital and farm; strong small animal and equine programs. Honors College members can take ANSC Honors Special Problems & Honors Thesis for departmental honors credit', tuitionIn:'$13,318', tuitionOut:'$36,022', fees:'incl.', roomBoard:'$17,210', booksSupplies:'$1,260', deadline:'February 1', earlyDecision:'November 15', testReq:'ACT 26-31', acceptRate:'46%', oosAcceptRate:'35%', avgGPA:'4.09', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#11', lastVerified:'2026-03-27' },
+  'Auburn University':              { domain:'auburn.edu', color:'#DD550C', location:'Auburn, AL', notes:'Accredited CVM; pre-vet in Animal Sciences; teaching hospital and farm; strong small animal and equine programs. Honors College members can take ANSC Honors Special Problems & Honors Thesis for departmental honors credit', tuitionIn:'$13,318', tuitionOut:'$36,022', fees:'incl.', roomBoard:'$17,210', booksSupplies:'$1,260', deadline:'February 1', earlyDecision:'Sep 15 / Oct 15 / Nov 15 / Dec 1', earlyActionRounds:[{name:'EA I',deadline:'September 15',notification:'Mid-October'},{name:'EA II',deadline:'October 15',notification:'Mid-November'},{name:'EA III',deadline:'November 15',notification:'Mid-December'},{name:'EA IV',deadline:'December 1',notification:'Early February'}], testReq:'ACT 26-31', acceptRate:'46%', oosAcceptRate:'35%', avgGPA:'4.09', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#11', lastVerified:'2026-04-07' },
   'Oklahoma State University':      { domain:'okstate.edu', color:'#FF6600', location:'Stillwater, OK', notes:'Center for Veterinary Health Sciences; pre-vet track in Animal Science; hands-on from freshman year. Animal Science honors supplemental courses + Undergraduate Research Scholars Program for faculty-mentored research', tuitionIn:'$10,110', tuitionOut:'$25,630', fees:'$3,810', roomBoard:'$11,780', booksSupplies:'$1,400', deadline:'Rolling', earlyDecision:'November 1', testReq:'ACT 20-27', acceptRate:'75%', oosAcceptRate:'67%', avgGPA:'3.59', usNewsOverall:'#198', usNewsPublic:'#109', vetSchoolRank:'#23', lastVerified:'2026-03-27' },
   'Mississippi State University':   { domain:'msstate.edu', color:'#660000', location:'Starkville, MS', notes:'Accredited CVM; pre-vet in Animal & Dairy Sciences; wildlife and aquatic medicine specialties', tuitionIn:'$10,604', tuitionOut:'$28,736', fees:'incl.', roomBoard:'$13,514', booksSupplies:'$1,200', deadline:'January 5', earlyDecision:'October 1', testReq:'ACT 21-29', acceptRate:'76%', oosAcceptRate:'63%', avgGPA:'3.46', usNewsOverall:'#208', usNewsPublic:'#115', vetSchoolRank:'#24', lastVerified:'2026-03-27' },
   'University of Illinois':         { domain:'illinois.edu', color:'#E84A27', location:'Champaign, IL', notes:'Accredited CVM; pre-vet in Animal Sciences; strong companion animal and food animal medicine programs. Guaranteed tuition: rate locked at entry for 4 years', tuitionIn:'$18,046', tuitionOut:'$38,398', fees:'incl.', roomBoard:'$15,184', booksSupplies:'$1,200', deadline:'January 5', earlyDecision:'November 1', testReq:'ACT 30-34', acceptRate:'42%', oosAcceptRate:'37%', avgGPA:'3.85', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#15', lastVerified:'2026-03-27' },
@@ -1697,7 +1697,7 @@ const schoolDB = {
   // ── Schools without vet schools but with strong pre-vet undergrad programs ──
   'University of Kentucky':         { domain:'uky.edu', color:'#0033A0', location:'Lexington, KY', notes:'No vet school but outstanding pre-vet advising through Animal & Food Sciences; nationally renowned equine science program leveraging Kentucky horse industry; students place well at Auburn, Tufts, and other DVMs', tuitionIn:'$13,907', tuitionOut:'$35,164', fees:'incl.', roomBoard:'$16,696', booksSupplies:'$1,200', deadline:'February 15', earlyDecision:'December 1', testReq:'ACT 21-28', acceptRate:'93%', oosAcceptRate:'88%', avgGPA:'3.59', usNewsOverall:'#143', usNewsPublic:'#74', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
   'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', fees:'incl.', roomBoard:'$14,020', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 29-32', acceptRate:'19%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
-  'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,388', fees:'$1,986', roomBoard:'$16,376', booksSupplies:'$1,480', deadline:'December 1', earlyDecision:'October 15 (EA)', testReq:'ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
+  'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,388', fees:'$1,986', roomBoard:'$16,376', booksSupplies:'$1,480', deadline:'December 1', earlyDecision:'Oct 15 / Nov 15 / Dec 1', earlyActionRounds:[{name:'Early Action',deadline:'October 15',notification:'Mid-December',credentialsDue:'November 1'},{name:'Honors/Top Scholars',deadline:'November 15',notification:'Mid-February',credentialsDue:'December 1'},{name:'Regular Decision',deadline:'December 1',notification:'Mid-March',credentialsDue:'January 15'}], testReq:'ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-04-07' },
 };
 const schoolNames = Object.keys(schoolDB);
 // Aliases so common abbreviations also match
@@ -3363,7 +3363,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: L&S Honors does NOT apply (Animal Science is in CALS). CALS Honors in Research is available — requires freshman-year commitment, 3.25+ GPA, 4-year research pathway with thesis. Apply during first year if interested.', cat: 'honors' },
   ],
   'Auburn University': [
-    { text: 'Apply by Nov 15 (EA I) or Dec 1 (EA II) — MUST be admitted EA for scholarship eligibility', cat: 'deadline' },
+    { text: 'EA I by Sep 15 → decision mid-Oct | EA II by Oct 15 → mid-Nov | EA III by Nov 15 → mid-Dec | EA IV by Dec 1 → early Feb. MUST be admitted EA for scholarship eligibility', cat: 'deadline' },
     { text: 'Submit application via Common App or Auburn portal — $50 fee', cat: 'app' },
     { text: 'Request official high school transcript', cat: 'app' },
     { text: 'No supplemental essays required (Honors College has separate essays)', cat: 'app' },
@@ -3487,7 +3487,7 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: Select "Yes" to Honors interest on FSU application, then complete supplemental Honors app by Dec 1 — includes 1 short essay (250-350 words: design an interdisciplinary Honors Signature Course). Holistic review, no published GPA/ACT minimums.', cat: 'honors' },
   ],
   'University of South Carolina': [
-    { text: 'Apply by Oct 15 (Early Action) or Dec 1 (Regular Decision). For Honors College + Top Scholars: apply by Nov 15 with credentials due Dec 1', cat: 'deadline' },
+    { text: 'EA by Oct 15 (credentials Nov 1) → decision mid-Dec | Honors/Top Scholars by Nov 15 (credentials Dec 1) → mid-Feb | Regular by Dec 1 (credentials Jan 15) → mid-Mar', cat: 'deadline' },
     { text: 'Submit application via Common App or USC portal — $65 fee', cat: 'app' },
     { text: 'Upload unofficial high school transcript (JPG or PDF, must include grades through junior year). Official transcript only required upon enrollment.', cat: 'app' },
     { text: 'Write 1 essay — choose from prompts provided in application (approx. 200-500 words)', cat: 'app' },
@@ -3527,7 +3527,9 @@ function buildChecklistItems(school) {
   const items = [];
 
   // ── Deadlines ──
-  if (earlyDecision && earlyDecision !== 'N/A') {
+  if (db.earlyActionRounds && db.earlyActionRounds.length) {
+    items.push({ id: uid(), text: 'Early Action rounds: ' + db.earlyActionRounds.map(r => r.name + ' by ' + r.deadline).join(' | '), done: false });
+  } else if (earlyDecision && earlyDecision !== 'N/A') {
     items.push({ id: uid(), text: 'Early Action / Early Decision — due ' + earlyDecision, done: false });
   }
   if (deadline && deadline !== 'Rolling') {
@@ -4970,15 +4972,24 @@ function getDeadlineEvents() {
     }
 
     // EA/ED deadlines (Fall 2026)
-    if (earlyDecision && earlyDecision !== 'N/A') {
+    // Support schools with multiple EA rounds (e.g., Auburn)
+    if (db.earlyActionRounds && db.earlyActionRounds.length) {
+      for (const round of db.earlyActionRounds) {
+        const d = parseDeadline(round.deadline, 2026);
+        if (d) {
+          events.push({ date: d, school: name, type: 'ea', label: round.name, desc: round.deadline + (round.notification ? ' → ' + round.notification : '') });
+        }
+      }
+    } else if (earlyDecision && earlyDecision !== 'N/A') {
       const d = parseDeadline(earlyDecision, 2026);
       if (d) {
         events.push({ date: d, school: name, type: 'ea', label: 'Early Action', desc: earlyDecision });
       }
     }
 
-    // Regular deadlines
-    if (deadline && deadline !== 'Rolling') {
+    // Regular deadlines (skip if earlyActionRounds already covers the final deadline)
+    const hasRoundsWithRD = db.earlyActionRounds && db.earlyActionRounds.some(r => /regular/i.test(r.name));
+    if (deadline && deadline !== 'Rolling' && !hasRoundsWithRD) {
       // Deadlines in Jan/Feb are 2027, others are 2026
       const month = deadline.match(/^(January|February|March|April|May)/i);
       const yr = month ? 2027 : 2026;
@@ -5479,7 +5490,7 @@ function initDefaultScholarships() {
     { id: uid(), section:'competitive', name:'Presidential/Singletary Awards', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'Complete competitive scholarship section of application', url:'https://www.uky.edu/financialaid/scholarships' },
     { id: uid(), section:'competitive', name:'Lewis Honors College Essay', school:'University of Kentucky', amount:'Varies', deadline:'2026-12-01', essayReq:true, separateApp:false, status:'Not Started', notes:'500 words, "common good" prompt', url:'https://www.uky.edu/honors/' },
     { id: uid(), section:'competitive', name:'Animal Sciences Dept. Scholarships', school:'Purdue University', amount:'Varies', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic review with EA application', url:'https://ag.purdue.edu/department/ansc/scholarships.html' },
-    { id: uid(), section:'competitive', name:'Competitive Merit Scholarships', school:'Auburn University', amount:'$8K-$16K/year', deadline:'2026-11-15', essayReq:false, separateApp:false, status:'Not Started', notes:'Presidential and Academic; apply EA I by Nov 15', url:'https://www.auburn.edu/scholarship/undergraduate/competitive-merit.php' },
+    { id: uid(), section:'competitive', name:'Competitive Merit Scholarships', school:'Auburn University', amount:'$8K-$16K/year', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Presidential and Academic; must be admitted via any EA round (EA I–IV, Sep 15–Dec 1) for scholarship consideration. Score deadline Jan 12.', url:'https://www.auburn.edu/scholarship/undergraduate/competitive-merit.php' },
     { id: uid(), section:'competitive', name:'VT Scholarships (Presidential, Provost)', school:'Virginia Tech', amount:'Varies', deadline:'2026-11-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic consideration with EA application', url:'https://finaid.vt.edu/university-scholarships-and-financial-aid-home-page-Virginia-Tech-Scholarships.html' },
     { id: uid(), section:'competitive', name:'Schreyer Honors College Scholarship', school:'Penn State University', amount:'$4,500/year', deadline:'2026-12-01', essayReq:true, separateApp:true, status:'Not Started', notes:'800-word essay + short answers; test scores NOT used', url:'https://www.shc.psu.edu/admissions/' },
     { id: uid(), section:'competitive', name:'Calhoun Honors / CAFLS Scholarships', school:'Clemson University', amount:'Varies', deadline:'2026-12-01', essayReq:false, separateApp:false, status:'Not Started', notes:'Automatic with Dec 1 application; CAFLS departmental awards', url:'https://www.clemson.edu/cafls/academics/scholarships/' },
