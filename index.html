@@ -1694,6 +1694,7 @@ const schoolDB = {
   'University of Missouri':         { domain:'missouri.edu', color:'#F1B82D', location:'Columbia, MO', notes:'Accredited CVM; pre-vet in Animal Sciences; strong food animal and equine programs; guaranteed admission track. Tiered tuition by major', tuitionIn:'$15,548', tuitionOut:'$37,820', fees:'$1,250', roomBoard:'$15,234', booksSupplies:'$918', deadline:'Rolling', earlyDecision:'November 15', testReq:'ACT 23-29', acceptRate:'78%', oosAcceptRate:'68%', avgGPA:'3.55', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20', lastVerified:'2026-03-27' },
   'Clemson University':             { domain:'clemson.edu', color:'#F56600', location:'Clemson, SC', notes:'New $230M College of Veterinary Medicine opening Fall 2026 — SC\'s first vet school; pre-vet through Animal & Veterinary Sciences; ground-floor research and faculty access', tuitionIn:'$14,038', tuitionOut:'$40,562', fees:'$1,816', roomBoard:'$14,224', booksSupplies:'$1,496', deadline:'January 1', earlyDecision:'October 15', testReq:'ACT 28-32', acceptRate:'42%', oosAcceptRate:'30%', avgGPA:'3.75', usNewsOverall:'#75', usNewsPublic:'#36', vetSchoolRank:'Not yet ranked', lastVerified:'2026-03-27' },
   'Penn State University':          { domain:'psu.edu', color:'#041E42', location:'University Park, PA', notes:'Pre-vet through Animal Science; veterinary and biomedical sciences emphasis; strong advising for vet school apps', tuitionIn:'$20,468', tuitionOut:'$42,860', fees:'incl.', roomBoard:'$15,346', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'57%', oosAcceptRate:'42%', avgGPA:'3.84', usNewsOverall:'#59', usNewsPublic:'#26', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
+  'Cornell University':             { domain:'cornell.edu', color:'#B31B1B', location:'Ithaca, NY', notes:'Top-ranked CVM (#1); CALS is a NY State contract college with lower tuition for NY residents. Animal Science major with Pre-Veterinary Medicine concentration. 7-year B.S./DVM early assurance program through CALS — provisional CVM admission after freshman year. Pre-Vet Society active in CALS', tuitionIn:'$49,816', tuitionOut:'$73,946', fees:'$1,024', roomBoard:'$21,348', booksSupplies:'$1,234', deadline:'January 2', earlyDecision:'November 1', testReq:'ACT 33-35', acceptRate:'8%', oosAcceptRate:'8%', avgGPA:'4.0+', usNewsOverall:'#12', usNewsPublic:'N/A', vetSchoolRank:'#1', lastVerified:'2026-04-07' },
   // ── Schools without vet schools but with strong pre-vet undergrad programs ──
   'University of Kentucky':         { domain:'uky.edu', color:'#0033A0', location:'Lexington, KY', notes:'No vet school but outstanding pre-vet advising through Animal & Food Sciences; nationally renowned equine science program leveraging Kentucky horse industry; students place well at Auburn, Tufts, and other DVMs', tuitionIn:'$13,907', tuitionOut:'$35,164', fees:'incl.', roomBoard:'$16,696', booksSupplies:'$1,200', deadline:'February 15', earlyDecision:'December 1', testReq:'ACT 21-28', acceptRate:'93%', oosAcceptRate:'88%', avgGPA:'3.59', usNewsOverall:'#143', usNewsPublic:'#74', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
   'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', fees:'incl.', roomBoard:'$14,020', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 29-32', acceptRate:'19%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
@@ -1719,6 +1720,7 @@ const schoolAliases = {
   'University of Kentucky': ['uk','wildcats'],
   'Florida State University': ['fsu','seminoles','noles'],
   'University of South Carolina': ['usc','south carolina','gamecocks'],
+  'Cornell University': ['cornell','big red'],
 };
 
 // ─── Distance from Atlanta ───
@@ -1745,6 +1747,7 @@ const cityCoords = {
   'Lexington, KY': { lat: 38.040, lng: -84.504 },
   'Tallahassee, FL': { lat: 30.438, lng: -84.281 },
   'Columbia, SC': { lat: 34.000, lng: -81.035 },
+  'Ithaca, NY': { lat: 42.443, lng: -76.501 },
 };
 
 function getDistanceFromAtlanta(location) {
@@ -3500,6 +3503,19 @@ const SCHOOL_CHECKLISTS = {
     { text: 'OOS MERIT SCHOLARSHIPS: Automatic with Dec 1 application, no separate app. Tiers: McKissick (~$11K/yr, 33+ ACT / 4.0+ GPA), Excellence (~$9.5K/yr, 30+ ACT), Distinction (~$7K/yr, 28+ ACT), Leadership (~$5K/yr, 26+ ACT). All renewable with 3.0 GPA.', cat: 'scholarship' },
     { text: 'HONORS: South Carolina Honors College (top-ranked public honors college). Apply by Nov 15 — select "Yes" on university app, then complete SCHC app within 48 hrs. Requires 2 additional essays + 1 letter of recommendation. Middle 50%: ACT 32-34. Stretch target but worth applying — scores are optional for SCHC.', cat: 'honors' },
   ],
+  'Cornell University': [
+    { text: 'Early Decision by Nov 1 (binding) → decision mid-Dec | Regular Decision by Jan 2 → decision late Mar. Supplemental materials due 2 weeks after app.', cat: 'deadline' },
+    { text: 'Submit application via Common App — $85 fee (fee waiver available)', cat: 'app' },
+    { text: 'Request official high school transcript', cat: 'app' },
+    { text: 'Write Common App essay + CALS supplemental essay (Why CALS? ~650 words)', cat: 'app' },
+    { text: 'TESTING: REQUIRED for Fall 2027. Superscores accepted. Middle 50% ACT: 33-35. Submit by last Oct test date (ED) or Dec test date (RD).', cat: 'test' },
+    { text: 'Letters of recommendation — 2 teacher recs + 1 counselor rec required', cat: 'app' },
+    { text: 'Complete FAFSA + CSS Profile (CSS required — due Oct 1 for ED, Feb 15 for RD). Cornell meets 100% of demonstrated financial need.', cat: 'financial' },
+    { text: 'Research Animal Science major with Pre-Veterinary Medicine concentration in CALS', cat: 'program' },
+    { text: '7-YEAR BS/DVM EARLY ASSURANCE: Apply after freshman year for provisional CVM admission — saves application cycle. Highly competitive.', cat: 'program' },
+    { text: 'Explore Cornell Pre-Vet Society and undergraduate research in CVM labs', cat: 'program' },
+    { text: 'CALS is a NY State contract college — tuition is $49.8K (NY residents) or $73.9K (OOS). No merit scholarships; need-based aid only.', cat: 'scholarship' },
+  ],
 };
 
 function buildChecklistItems(school) {
@@ -3926,7 +3942,8 @@ function getRankingForSchool(name) {
       'Penn State University':           { vetProgram:2, costScore:3, planB:5, meritAid:2, notes:'No vet school. Strong Animal Science advising.' },
       'University of Massachusetts Amherst': { vetProgram:2, costScore:3, planB:3, meritAid:2, notes:'No vet school. Pre-vet track available.' },
       'Florida State University':         { vetProgram:2, costScore:3, planB:4, meritAid:3, notes:'No vet school. Strong bio program. Tallahassee near UF CVM.' },
-      'University of South Carolina':    { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'No vet school. Pre-vet advising available. SEC school.' }
+      'University of South Carolina':    { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'No vet school. Pre-vet advising available. SEC school.' },
+      'Cornell University':              { vetProgram:5, costScore:1, planB:5, meritAid:1, notes:'#1 vet school. 7-yr BS/DVM pathway. Need-based aid only (meets 100% demonstrated need). Ivy League reach.' }
     };
     data.rankings[name] = presets[name] || { vetProgram:3, costScore:3, planB:3, meritAid:3, notes:'' };
   }
@@ -4174,7 +4191,8 @@ const SCENARIO_SHORT_NAMES = {
   'Mississippi State University': 'Mississippi State',
   'University of Missouri': 'Mizzou', 'Penn State University': 'Penn State',
   'University of Massachusetts Amherst': 'UMass',
-  'Florida State University': 'FSU', 'University of South Carolina': 'South Carolina'
+  'Florida State University': 'FSU', 'University of South Carolina': 'South Carolina',
+  'Cornell University': 'Cornell'
 };
 
 function scenarioShortName(name) {
@@ -4320,7 +4338,8 @@ const FIN_DATA = [
   { group:'REACH SCHOOLS' },
   { school:'Florida State University', res:'OOS', tuition:21683, rb:14020, books:1200, merit:2000, notes:'Zell Miller' },
   { school:'University of Georgia', res:'In-State', tuition:12908, rb:12084, books:998, merit:5000, notes:'Zell Miller' },
-  { school:'University of Florida', res:'OOS', tuition:28659, rb:12615, books:1235, merit:0 }
+  { school:'University of Florida', res:'OOS', tuition:28659, rb:12615, books:1235, merit:0 },
+  { school:'Cornell University', res:'OOS', tuition:73946, rb:21348, books:1234, merit:0, notes:'Need-based aid only; CALS contract college' }
 ];
 
 function renderFinancials() {
@@ -4518,7 +4537,8 @@ const STRATEGY_DATA = [
   { school:'University of Kentucky', type:'University-Wide', overall:'~93%', advantage:'minimal', advDetail:'Very high overall rate; essentially open admission', major:'Animal Sciences', track:'Pre-Professional focus + Pre-Vet Certificate', backup:'Not required' },
   { school:'University of Tennessee', type:'Direct to College & Major', overall:'~39%', advantage:'structural', advDetail:'Herbert College of Ag admits separately; less competitive than Tickle Engineering', major:'Animal Science', track:'Pre-Vet Medicine Concentration', backup:'Not required' },
   { school:'Florida State University', type:'University-Wide', overall:'~25%', advantage:'minimal', advDetail:'University-wide admission; no separate Ag college rate', major:'Biological Science', track:'Pre-vet advising pathway', backup:'Not required' },
-  { school:'University of South Carolina', type:'University-Wide', overall:'~63%', advantage:'minimal', advDetail:'University-wide admission; moderate acceptance rate', major:'Biology or Animal Sciences (pending)', track:'Pre-vet advising pathway', backup:'Not required' }
+  { school:'University of South Carolina', type:'University-Wide', overall:'~63%', advantage:'minimal', advDetail:'University-wide admission; moderate acceptance rate', major:'Biology or Animal Sciences (pending)', track:'Pre-vet advising pathway', backup:'Not required' },
+  { school:'Cornell University', type:'Direct to College', overall:'~8%', advantage:'structural', advDetail:'Apply directly to CALS (~12-14% acceptance); historically higher rate than Arts & Sciences/Engineering', major:'Animal Science', track:'Pre-Veterinary Medicine Concentration', backup:'Not required (but college-specific)' }
 ];
 
 function renderStrategy() {
@@ -4818,6 +4838,7 @@ const GREEK_LIFE_DATA = {
   'University of Kentucky': { pctWomen: '~27%', npc: 14, total: '14+', recruitment: 'Fall', housing: 'Greek Park chapter houses', cost: '$2,000\u2013$9,600', greekPct: '~23%', gpa: 'Higher + 3x retention rate', vibe: 'Moderately central; well-established SEC system; Greek Park is traditional' },
   'Florida State University': { pctWomen: '~38%', npc: 18, total: '26+', recruitment: 'Fall (Aug)', housing: 'Chapter houses on Heritage Grove', cost: '$2,000–$4,500', greekPct: '~38%', gpa: 'Above campus avg', vibe: 'Very central; one of the largest Greek systems in the South; Heritage Grove is a social hub' },
   'University of South Carolina': { pctWomen: '~30%', npc: 14, total: '20+', recruitment: 'Fall (Aug)', housing: 'Greek Village on campus', cost: '$2,000–$4,000', greekPct: '~30%', gpa: 'Above campus avg', vibe: 'Prominent SEC Greek scene; Greek Village is central to social life; game-day culture' },
+  'Cornell University': { pctWomen: '~20%', npc: 12, total: '17 sororities', recruitment: 'Spring (Jan)', housing: 'Chapter houses on campus', cost: '$2,000–$4,000', greekPct: '~33%', gpa: 'Above campus avg', vibe: 'Significant but not dominant; diverse social scene with many alternatives; deferred recruitment means freshmen settle in first' },
 };
 
 function renderGreekLife() {
@@ -4945,6 +4966,10 @@ const SCHOOL_ESSAYS = {
   'University of South Carolina': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
     { name: 'UofSC Short Answer', words: 250, prompt: 'Optional short answer — describe your interest or goals', required: false }
+  ],
+  'Cornell University': [
+    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
+    { name: 'Cornell CALS Supplement', words: 650, prompt: 'Why CALS? How have your interests and experiences influenced your decision to study at Cornell CALS?', required: true }
   ]
 };
 
@@ -5007,6 +5032,10 @@ function getDeadlineEvents() {
     // CSS Profile for schools that need it
     if (name === 'University of Wisconsin-Madison') {
       events.push({ date: new Date(2026, 10, 1), school: name, type: 'fin', label: 'CSS Profile Due', desc: 'Required for need-based institutional aid' });
+    }
+    if (name === 'Cornell University') {
+      events.push({ date: new Date(2026, 9, 1), school: name, type: 'fin', label: 'CSS Profile (ED)', desc: 'Due Oct 1 for Early Decision applicants' });
+      events.push({ date: new Date(2027, 1, 15), school: name, type: 'fin', label: 'CSS Profile (RD)', desc: 'Due Feb 15 for Regular Decision applicants' });
     }
   }
 
