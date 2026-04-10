@@ -961,6 +961,7 @@
     <button class="subtab-btn" data-subtab="financial">Financial Analysis</button>
     <button class="subtab-btn" data-subtab="greeklife">Greek Life</button>
     <button class="subtab-btn" data-subtab="nationalRankings">National Rankings</button>
+    <button class="subtab-btn" data-subtab="agRankings">Ag Program Rankings</button>
     <button class="subtab-btn" data-subtab="methodology">How Rankings Work</button>
   </nav>
   <div id="schools" class="sub-panel active">
@@ -1093,6 +1094,31 @@
       <table class="rank-table">
         <thead id="natRankHead"><tr><th>School</th><th>US News</th><th>WSJ</th><th>Forbes</th><th>Niche</th><th>Avg Rank</th></tr></thead>
         <tbody id="natRankBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ag Program Rankings sub-panel -->
+  <div id="agRankings" class="sub-panel">
+    <div class="section-head">
+      <h2>Ag Program Rankings</h2>
+      <p>Rankings specific to agricultural / animal sciences programs &mdash; the closest published proxies for pre-vet program strength.</p>
+    </div>
+    <div style="padding:10px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">
+      <strong>Sources (all editable — click any cell to update):</strong><br>
+      <a href="https://www.niche.com/colleges/search/best-colleges-for-agricultural-sciences/" target="_blank" rel="noopener">Niche &mdash; Best Colleges for Agricultural Sciences</a> &nbsp;·&nbsp;
+      <a href="https://www.usnews.com/best-graduate-schools/top-health-schools/veterinarian-rankings" target="_blank" rel="noopener">US News &mdash; Best Graduate Vet Schools</a> &nbsp;·&nbsp;
+      <a href="https://www.topuniversities.com/university-subject-rankings/agriculture-forestry" target="_blank" rel="noopener">QS &mdash; Agriculture &amp; Forestry (Global)</a> &nbsp;·&nbsp;
+      <a href="https://www.collegefactual.com/majors/agriculture-agriculture-operations-and-related-sciences/rankings/top-ranked/" target="_blank" rel="noopener">CollegeFactual &mdash; Best Schools for Agriculture</a>
+      <div style="margin-top:6px;font-size:0.78rem;">US News column = grad-school vet rank (no US News undergrad ag list exists). QS values are <em>global</em> ranks. Verify against source links before relying on a specific value.</div>
+    </div>
+    <div id="agRankEmpty" class="empty-state" style="display:none;">
+      <p>Add schools in the <strong>School Comparison</strong> tab to see their ag program rankings.</p>
+    </div>
+    <div class="table-wrap" style="max-height:none;">
+      <table class="rank-table">
+        <thead id="agRankHead"><tr><th>School</th><th>Niche Ag</th><th>US News Vet (Grad)</th><th>QS Ag (Global)</th><th>CollegeFactual Ag</th><th>Avg Rank</th></tr></thead>
+        <tbody id="agRankBody"></tbody>
       </table>
     </div>
   </div>
@@ -1755,6 +1781,34 @@ const NATIONAL_RANK_PRESETS = {
   'Mississippi State University':    { wsj:'#358', forbes:'#262', niche:'#192' },
 };
 
+// ── Ag program rankings (Niche, QS Agriculture & Forestry, CollegeFactual) ──
+// US News column pulls from schoolDB.vetSchoolRank (Best Graduate Vet Schools).
+// All values are approximations; verify against source links in the Ag Rankings tab.
+const AG_RANK_PRESETS = {
+  'Cornell University':              { niche:'#1',  qs:'#11',  cf:'#3'  },
+  'Texas A&M University':            { niche:'#4',  qs:'#16',  cf:'#5'  },
+  'University of Wisconsin-Madison': { niche:'#5',  qs:'#22',  cf:'#8'  },
+  'Purdue University':               { niche:'#6',  qs:'#41',  cf:'#12' },
+  'University of Florida':           { niche:'#7',  qs:'#41',  cf:'#10' },
+  'University of Illinois':          { niche:'#9',  qs:'#28',  cf:'#9'  },
+  'University of Georgia':           { niche:'#10', qs:'#101', cf:'#15' },
+  'Penn State University':           { niche:'#14', qs:'#23',  cf:'#18' },
+  'Ohio State University':           { niche:'#15', qs:'#61',  cf:'#14' },
+  'Michigan State University':       { niche:'#16', qs:'#27',  cf:'#19' },
+  'North Carolina State University': { niche:'#18', qs:'#76',  cf:'#22' },
+  'Virginia Tech':                   { niche:'#20', qs:'#101', cf:'#25' },
+  'Auburn University':               { niche:'#22', qs:'#151', cf:'#28' },
+  'Colorado State University':       { niche:'#25', qs:'#101', cf:'#30' },
+  'University of Missouri':          { niche:'#28', qs:'#151', cf:'#38' },
+  'Clemson University':              { niche:'#29', qs:'#151', cf:'#33' },
+  'University of Tennessee':         { niche:'#30', qs:'#151', cf:'#40' },
+  'Oklahoma State University':       { niche:'#32', qs:'#201', cf:'#48' },
+  'University of Kentucky':          { niche:'#34', qs:'#151', cf:'#45' },
+  'Mississippi State University':    { niche:'#38', qs:'#251', cf:'#55' },
+  'Florida State University':        { niche:'',    qs:'',     cf:''    }, // no ag program
+  'University of South Carolina':    { niche:'',    qs:'',     cf:''    }, // no ag program
+};
+
 const schoolNames = Object.keys(schoolDB);
 // Aliases so common abbreviations also match
 const schoolAliases = {
@@ -1916,6 +1970,7 @@ function runMigrations() {
   if (!data.visitNotes) data.visitNotes = {};
   if (!data.rankings) data.rankings = {};
   if (!data.nationalRankings) data.nationalRankings = {};
+  if (!data.agRankings) data.agRankings = {};
   if (!data.tripNotes) data.tripNotes = {};
   if (!data.tourChecklist) data.tourChecklist = null;
   if (!data.finConfig) data.finConfig = { b529: 0, cashPerYr: 0 };
@@ -2621,6 +2676,16 @@ const NATIONAL_RANK_COLUMNS = [
   { field: 'forbes',   label: 'Forbes',   sortType: 'rank' },
   { field: 'niche',    label: 'Niche',    sortType: 'rank' },
   { field: 'sortAvg',  label: 'Avg Rank', sortType: 'numeric' },
+];
+
+const agRankSort = { field: 'sortAvg', dir: 'asc' };
+const AG_RANK_COLUMNS = [
+  { field: 'name',     label: 'School',             sortType: 'text' },
+  { field: 'niche',    label: 'Niche Ag',           sortType: 'rank' },
+  { field: 'usNews',   label: 'US News Vet (Grad)', sortType: 'rank' },
+  { field: 'qs',       label: 'QS Ag (Global)',     sortType: 'rank' },
+  { field: 'cf',       label: 'CollegeFactual Ag',  sortType: 'rank' },
+  { field: 'sortAvg',  label: 'Avg Rank',           sortType: 'numeric' },
 ];
 
 const RANKING_COLUMNS = [
@@ -4145,6 +4210,66 @@ function renderNationalRankings() {
   });
 
   setupSortableHeaders('natRankHead', NATIONAL_RANK_COLUMNS, natRankSort, renderNationalRankings);
+}
+
+// ─── Ag Program Rankings (Niche / US News Vet / QS / CollegeFactual) ───
+function getAgRanking(name) {
+  const preset = AG_RANK_PRESETS[name] || {};
+  if (!data.agRankings[name]) {
+    data.agRankings[name] = { niche: preset.niche || '', qs: preset.qs || '', cf: preset.cf || '' };
+  }
+  return data.agRankings[name];
+}
+
+function renderAgRankings() {
+  const tbody = document.getElementById('agRankBody');
+  const empty = document.getElementById('agRankEmpty');
+  if (!tbody) return;
+  const schools = getVisibleSchools();
+  if (schools.length === 0) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+
+  const rows = schools.map(s => {
+    const db = schoolDB[s.name] || {};
+    const ag = getAgRanking(s.name);
+    const usNews = s.vetSchoolRank || db.vetSchoolRank || '';
+    const nums = [rankNum(ag.niche), rankNum(usNews), rankNum(ag.qs), rankNum(ag.cf)].filter(n => n != null);
+    const avgRank = nums.length ? Math.round(nums.reduce((a,b) => a+b, 0) / nums.length) : null;
+    return { name: s.name, niche: ag.niche || '', usNews, qs: ag.qs || '', cf: ag.cf || '', avgRank, sortAvg: avgRank != null ? avgRank : 99999 };
+  });
+
+  const sorted = sortRows(rows, agRankSort, AG_RANK_COLUMNS);
+
+  tbody.innerHTML = sorted.map(r => `
+    <tr>
+      <td style="white-space:nowrap;text-align:left"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
+      <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="niche">${esc(r.niche || '—')}</span></td>
+      <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="usNews">${esc(r.usNews || '—')}</span></td>
+      <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="qs">${esc(r.qs || '—')}</span></td>
+      <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="cf">${esc(r.cf || '—')}</span></td>
+      <td style="font-weight:700">${r.avgRank != null ? '#' + r.avgRank : '—'}</td>
+    </tr>`).join('');
+
+  tbody.querySelectorAll('[data-ag-school]').forEach(el => {
+    el.addEventListener('blur', () => setAgRanking(el.dataset.agSchool, el.dataset.agField, el.textContent.trim()));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+  });
+
+  setupSortableHeaders('agRankHead', AG_RANK_COLUMNS, agRankSort, renderAgRankings);
+}
+
+function setAgRanking(school, field, raw) {
+  let val = (raw || '').replace(/—/g, '').trim();
+  if (val && !val.startsWith('#') && /^\d+$/.test(val)) val = '#' + val;
+  if (field === 'usNews') {
+    const s = data.schools.find(x => x.name === school);
+    if (s) s.vetSchoolRank = val;
+  } else {
+    const ag = getAgRanking(school);
+    ag[field] = val;
+  }
+  saveData();
+  renderAgRankings();
 }
 
 function setNationalRanking(school, field, raw) {
@@ -5978,6 +6103,7 @@ function renderAll() {
   renderEvaluation();
   renderRankings();
   renderNationalRankings();
+  renderAgRankings();
   renderStrategy();
   syncChecklists();
   renderTestPrep();
