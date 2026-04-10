@@ -1082,7 +1082,8 @@
       <strong>Sources (all editable — click any cell to update):</strong>
       <a href="https://www.usnews.com/best-colleges/rankings/national-universities" target="_blank" rel="noopener">US News 2026 National Universities</a> &nbsp;·&nbsp;
       <a href="https://www.wsj.com/rankings/college-rankings/best-colleges-2025" target="_blank" rel="noopener">WSJ/College Pulse 2025 Best Colleges</a> &nbsp;·&nbsp;
-      <a href="https://www.forbes.com/top-colleges/" target="_blank" rel="noopener">Forbes America's Top Colleges 2025</a>
+      <a href="https://www.forbes.com/top-colleges/" target="_blank" rel="noopener">Forbes America's Top Colleges 2025</a> &nbsp;·&nbsp;
+      <a href="https://www.niche.com/colleges/search/best-colleges/" target="_blank" rel="noopener">Niche Best Colleges in America 2025</a>
       <div style="margin-top:6px;font-size:0.78rem;">Each publication uses a different methodology &mdash; lower rank is better, but a school's position can vary widely across them. Verify against the source before any major decision.</div>
     </div>
     <div id="natRankEmpty" class="empty-state" style="display:none;">
@@ -1090,7 +1091,7 @@
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table class="rank-table">
-        <thead id="natRankHead"><tr><th>School</th><th>US News</th><th>WSJ</th><th>Forbes</th><th>Avg Rank</th></tr></thead>
+        <thead id="natRankHead"><tr><th>School</th><th>US News</th><th>WSJ</th><th>Forbes</th><th>Niche</th><th>Avg Rank</th></tr></thead>
         <tbody id="natRankBody"></tbody>
       </table>
     </div>
@@ -1725,33 +1726,33 @@ const schoolDB = {
   'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', fees:'incl.', roomBoard:'$14,020', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 29-32', acceptRate:'19%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
   'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,388', fees:'$1,986', roomBoard:'$16,376', booksSupplies:'$1,480', deadline:'December 1', earlyDecision:'Oct 15 / Nov 15 / Dec 1', earlyActionRounds:[{name:'Early Action',deadline:'October 15',notification:'Mid-December',credentialsDue:'November 1'},{name:'Honors/Top Scholars',deadline:'November 15',notification:'Mid-February',credentialsDue:'December 1'},{name:'Regular Decision',deadline:'December 1',notification:'Mid-March',credentialsDue:'January 15'}], testReq:'ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-04-07' },
 };
-// ── National rankings (WSJ/College Pulse 2025 & Forbes America's Top Colleges 2025) ──
-// US News ranks are pulled from schoolDB.usNewsOverall — these are for the other two.
+// ── National rankings (WSJ/College Pulse 2025, Forbes 2025, Niche 2025) ──
+// US News ranks are pulled from schoolDB.usNewsOverall — these are for the others.
 // Values are approximations pulled from published lists; verify against source links
 // in the National Rankings tab. All cells are editable.
 const NATIONAL_RANK_PRESETS = {
-  'Cornell University':              { wsj:'#14',  forbes:'#15'  },
-  'University of Florida':           { wsj:'#94',  forbes:'#56'  },
-  'University of Wisconsin-Madison': { wsj:'#59',  forbes:'#60'  },
-  'University of Illinois':          { wsj:'#68',  forbes:'#58'  },
-  'Ohio State University':           { wsj:'#138', forbes:'#85'  },
-  'University of Georgia':           { wsj:'#112', forbes:'#84'  },
-  'Purdue University':               { wsj:'#139', forbes:'#62'  },
-  'Texas A&M University':            { wsj:'#170', forbes:'#88'  },
-  'Virginia Tech':                   { wsj:'#189', forbes:'#114' },
-  'Florida State University':        { wsj:'#193', forbes:'#131' },
-  'Penn State University':           { wsj:'#151', forbes:'#99'  },
-  'Michigan State University':       { wsj:'#229', forbes:'#127' },
-  'North Carolina State University': { wsj:'#161', forbes:'#107' },
-  'Clemson University':              { wsj:'#214', forbes:'#118' },
-  'Auburn University':               { wsj:'#240', forbes:'#142' },
-  'University of Tennessee':         { wsj:'#232', forbes:'#157' },
-  'University of Missouri':          { wsj:'#217', forbes:'#158' },
-  'University of South Carolina':    { wsj:'#282', forbes:'#172' },
-  'University of Kentucky':          { wsj:'#300', forbes:'#174' },
-  'Colorado State University':       { wsj:'#268', forbes:'#183' },
-  'Oklahoma State University':       { wsj:'#288', forbes:'#225' },
-  'Mississippi State University':    { wsj:'#358', forbes:'#262' },
+  'Cornell University':              { wsj:'#14',  forbes:'#15',  niche:'#11'  },
+  'University of Florida':           { wsj:'#94',  forbes:'#56',  niche:'#39'  },
+  'University of Wisconsin-Madison': { wsj:'#59',  forbes:'#60',  niche:'#37'  },
+  'University of Illinois':          { wsj:'#68',  forbes:'#58',  niche:'#39'  },
+  'Ohio State University':           { wsj:'#138', forbes:'#85',  niche:'#42'  },
+  'University of Georgia':           { wsj:'#112', forbes:'#84',  niche:'#34'  },
+  'Purdue University':               { wsj:'#139', forbes:'#62',  niche:'#46'  },
+  'Texas A&M University':            { wsj:'#170', forbes:'#88',  niche:'#69'  },
+  'Virginia Tech':                   { wsj:'#189', forbes:'#114', niche:'#86'  },
+  'Florida State University':        { wsj:'#193', forbes:'#131', niche:'#92'  },
+  'Penn State University':           { wsj:'#151', forbes:'#99',  niche:'#67'  },
+  'Michigan State University':       { wsj:'#229', forbes:'#127', niche:'#107' },
+  'North Carolina State University': { wsj:'#161', forbes:'#107', niche:'#73'  },
+  'Clemson University':              { wsj:'#214', forbes:'#118', niche:'#90'  },
+  'Auburn University':               { wsj:'#240', forbes:'#142', niche:'#80'  },
+  'University of Tennessee':         { wsj:'#232', forbes:'#157', niche:'#101' },
+  'University of Missouri':          { wsj:'#217', forbes:'#158', niche:'#143' },
+  'University of South Carolina':    { wsj:'#282', forbes:'#172', niche:'#114' },
+  'University of Kentucky':          { wsj:'#300', forbes:'#174', niche:'#147' },
+  'Colorado State University':       { wsj:'#268', forbes:'#183', niche:'#118' },
+  'Oklahoma State University':       { wsj:'#288', forbes:'#225', niche:'#180' },
+  'Mississippi State University':    { wsj:'#358', forbes:'#262', niche:'#192' },
 };
 
 const schoolNames = Object.keys(schoolDB);
@@ -2618,6 +2619,7 @@ const NATIONAL_RANK_COLUMNS = [
   { field: 'usNews',   label: 'US News',  sortType: 'rank' },
   { field: 'wsj',      label: 'WSJ',      sortType: 'rank' },
   { field: 'forbes',   label: 'Forbes',   sortType: 'rank' },
+  { field: 'niche',    label: 'Niche',    sortType: 'rank' },
   { field: 'sortAvg',  label: 'Avg Rank', sortType: 'numeric' },
 ];
 
@@ -4093,9 +4095,11 @@ function setRankingField(school, field, val) {
 
 // ─── National Rankings (US News / WSJ / Forbes) ───
 function getNationalRanking(name) {
+  const preset = NATIONAL_RANK_PRESETS[name] || {};
   if (!data.nationalRankings[name]) {
-    const preset = NATIONAL_RANK_PRESETS[name] || {};
-    data.nationalRankings[name] = { wsj: preset.wsj || '', forbes: preset.forbes || '' };
+    data.nationalRankings[name] = { wsj: preset.wsj || '', forbes: preset.forbes || '', niche: preset.niche || '' };
+  } else if (data.nationalRankings[name].niche === undefined) {
+    data.nationalRankings[name].niche = preset.niche || '';
   }
   return data.nationalRankings[name];
 }
@@ -4118,9 +4122,9 @@ function renderNationalRankings() {
     const db = schoolDB[s.name] || {};
     const nr = getNationalRanking(s.name);
     const usNews = s.usNewsOverall || db.usNewsOverall || '';
-    const nums = [rankNum(usNews), rankNum(nr.wsj), rankNum(nr.forbes)].filter(n => n != null);
+    const nums = [rankNum(usNews), rankNum(nr.wsj), rankNum(nr.forbes), rankNum(nr.niche)].filter(n => n != null);
     const avgRank = nums.length ? Math.round(nums.reduce((a,b) => a+b, 0) / nums.length) : null;
-    return { name: s.name, usNews, wsj: nr.wsj || '', forbes: nr.forbes || '', avgRank, sortAvg: avgRank != null ? avgRank : 99999 };
+    return { name: s.name, usNews, wsj: nr.wsj || '', forbes: nr.forbes || '', niche: nr.niche || '', avgRank, sortAvg: avgRank != null ? avgRank : 99999 };
   });
 
   const sorted = sortRows(rows, natRankSort, NATIONAL_RANK_COLUMNS);
@@ -4131,6 +4135,7 @@ function renderNationalRankings() {
       <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="usNews">${esc(r.usNews || '—')}</span></td>
       <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="wsj">${esc(r.wsj || '—')}</span></td>
       <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="forbes">${esc(r.forbes || '—')}</span></td>
+      <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="niche">${esc(r.niche || '—')}</span></td>
       <td style="font-weight:700">${r.avgRank != null ? '#' + r.avgRank : '—'}</td>
     </tr>`).join('');
 
