@@ -1921,6 +1921,27 @@
      doesn't show the rank twice. */
   .summary-school-rank-inline { display: none; }
 
+  /* Final-list star toggle inline in the school-name cell on Overview rankings.
+     Visible on every row, filled when the school is on the final list. */
+  .summary-final-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 2px 6px;
+    margin-left: 4px;
+    border-radius: 4px;
+    color: var(--text-light, #888);
+    transition: transform 0.12s, color 0.12s;
+  }
+  .summary-final-toggle:hover {
+    transform: scale(1.15);
+    background: var(--cream, #f7efe2);
+  }
+  .summary-final-toggle.on { color: var(--hot-deep, #b04060); }
+  .summary-on-final-list td.summary-school-cell { background: rgba(214, 51, 108, 0.04); }
+
   /* ── Strategic Context panel (feeds AI Analysis) ── */
   .strategic-context {
     background: var(--paper);
@@ -3675,6 +3696,31 @@ function hasOnCampusVetSchool(name) {
   return !!r && r !== 'N/A' && r !== 'Not yet ranked';
 }
 
+// "Visited" = any signal that an actual visit happened. getEvalForSchool
+// lazily creates an all-zero record on first read, so presence of an entry is
+// not enough — we need a non-default signal: a visit date, ANY non-zero
+// rating in any category, or any text in the intangibles.
+function wasVisited(name) {
+  const ev = data.evaluations && data.evaluations[name];
+  if (!ev) return false;
+  if (ev.visitDate && String(ev.visitDate).trim()) return true;
+  if (ev.letterGrade && String(ev.letterGrade).trim()) return true;
+  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
+    const sec = ev[catKey];
+    if (!sec) continue;
+    for (const it of cat.items) {
+      if ((sec[it.key] || 0) > 0) return true;
+    }
+  }
+  const intg = ev.intangibles;
+  if (intg) {
+    for (const k of ['bestThing', 'biggestConcern', 'surprised', 'vibeWords']) {
+      if (intg[k] && String(intg[k]).trim()) return true;
+    }
+  }
+  return false;
+}
+
 function parseAdmitRateDecimal(name) {
   const db = schoolDB[name];
   if (!db) return null;
@@ -3864,7 +3910,7 @@ function getVisibleSchools() {
 
 function toggleFinalList(school) {
   const s = data.schools.find(sc => sc.name === school || sc.id === school);
-  if (s) { s.finalList = !s.finalList; saveData(); renderSchools(); updateFinalListUI(); }
+  if (s) { s.finalList = !s.finalList; saveData(); renderSchools(); renderSummary(); updateFinalListUI(); }
 }
 
 function setFinalListFilter(on) {
@@ -5711,6 +5757,8 @@ function renderSummary() {
     const costInfo = getSummaryCost(s.name);
 
     return {
+      id: s.id,
+      finalList: !!s.finalList,
       name: s.name,
       cat,
       vet,
@@ -5731,9 +5779,11 @@ function renderSummary() {
 
   tbody.innerHTML = summaryRows.map(r => {
     const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
-    return `<tr>
+    const starIcon = r.finalList ? '\u2B50' : '\u2606';
+    const starTitle = r.finalList ? 'On Final List — click to remove' : 'Add to Final List';
+    return `<tr${r.finalList ? ' class="summary-on-final-list"' : ''}>
       <td class="summary-rank-cell compact">${r.rank}</td>
-      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span></span></td>
+      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span><button class="summary-final-toggle${r.finalList ? ' on' : ''}" type="button" onclick="toggleFinalList('${r.id}')" title="${starTitle}" aria-label="${starTitle}">${starIcon}</button></span></td>
       <td class="compact"><span class="badge ${catClass}">${r.cat}</span></td>
       <td class="compact" style="font-weight:700">${r.cost}</td>
       <td class="compact" style="font-weight:800;color:var(--hot-deep)">${r.combined.toFixed(2)}</td>
@@ -6882,7 +6932,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v2';
+const PROMPT_VERSION = 'v3';
 const SYSTEM_PROMPT_V2 = [
   "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly — speak to them, not about them. Be direct, analytical, and willing to push back on list construction or strategy choices you disagree with. Avoid generic reassurance.",
   "",
@@ -6912,6 +6962,7 @@ const SYSTEM_PROMPT_V2 = [
   "",
   "- Do not repeat the ratings or costs back to the user — they see that data. Your value is interpretation and recommendation.",
   "- When you use a rating, refer to the descriptor, not the number. (\"You rated the visit a 4 with notes about weather concerns\" → \"The visit went well but weather gave Avery pause.\") If a descriptor is empty, fall back to the rubric anchor language and signal you're inferring from the score alone.",
+  "- The visit score is a 1–5 rating. Do not characterize a school as unvisited based on visit score alone. Use the per-school `visited` boolean: if `visited` is false (or `ratings.visit.score` is null), say the school has not been visited yet. If `ratings.visit.score` is a number, treat it as a visit rating, not as a proxy for whether a visit occurred.",
   "- If the data is insufficient to answer a strategic question, say so and name what specifically would help.",
   "- Push back if the weighting scheme seems miscalibrated for the decision at hand. The family wants honest input, not validation.",
   "- Respect non-negotiables absolutely — do not recommend a school that violates one without explicitly flagging the violation.",
@@ -6954,6 +7005,7 @@ function gatherAIData() {
     const netAnnual = Math.max(0, sticker - guaranteed - competitive);
 
     const visitNormRounded = Math.round(visitNorm * 10) / 10;
+    const visited = wasVisited(s.name);
     const desc = rk.descriptors || {};
 
     return {
@@ -6964,8 +7016,12 @@ function gatherAIData() {
       category: formatCategory(getSummaryCategory(s.name)),
       hasOnCampusVetSchool: hasOnCampusVetSchool(s.name),
       admitRate: parseAdmitRateDecimal(s.name),
+      visited: visited,
       ratings: {
-        visit:      { score: visitNormRounded, descriptor: desc.visit || '' },
+        // visit.score is null when visited=false. The combined score still
+        // treats unvisited visits as 0 internally, but the model should not
+        // interpret a null score as a low rating.
+        visit:      { score: visited ? visitNormRounded : null, descriptor: desc.visit || '' },
         vetProgram: { score: rk.vetProgram || 3, descriptor: desc.vetProgram || '' },
         cost:       { score: rk.costScore || 3, descriptor: desc.cost || '' },
         meritAid:   { score: rk.meritAid || 3, descriptor: desc.meritAid || '' },
@@ -7057,6 +7113,7 @@ function aiCacheFingerprint(aiData) {
   const sigSchools = aiData.schools.map(s => ({
     n: s.name,
     fl: s.onFinalList,
+    v: s.visited,
     cs: s.combinedScore,
     cat: s.category,
     r: [s.ratings.visit.score, s.ratings.vetProgram.score, s.ratings.cost.score, s.ratings.meritAid.score, s.ratings.planB.score],
