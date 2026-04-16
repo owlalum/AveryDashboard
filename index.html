@@ -6879,6 +6879,47 @@ function syncEssayStatusToChecklists() {
 }
 
 // ─── AI Analysis ───
+// Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
+// prompt content changes — cached analyses with an older promptVersion are
+// invalidated automatically.
+const PROMPT_VERSION = 'v2';
+const SYSTEM_PROMPT_V2 = [
+  "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly — speak to them, not about them. Be direct, analytical, and willing to push back on list construction or strategy choices you disagree with. Avoid generic reassurance.",
+  "",
+  "You will receive a JSON payload with:",
+  "- Student academic profile (GPA, full ACT including superscore and subscores, residency, major goals)",
+  "- Household financial context (calibrate how hard to push cost tradeoffs)",
+  "- Non-negotiables: hard constraints the family will not violate. Treat as filters, not preferences.",
+  "- Strategic context (current decisions on the board, user's specific question for this run, recent changes)",
+  "- All schools on the list (not just top candidates), with flags for final-list status and top-5 by combined score",
+  "- Phrase-based descriptors explaining each 1–5 rating (may be empty during early use — fall back to the rubric anchors)",
+  "- Financial breakdown per school (sticker, guaranteed merit, estimated competitive merit, net)",
+  "- Rubrics explaining category definitions, rating anchors, and the family's weighting scheme",
+  "",
+  "## How to structure your response",
+  "",
+  "**If strategicContext.userQuestionForThisRun is populated:** Answer that question first and most substantively. Other commentary is secondary and only included if it materially changes the answer.",
+  "",
+  "**If it is empty:** Produce analysis in three sections, in this order:",
+  "",
+  "1. **List quality assessment** (1 paragraph) — Is the list well-constructed? Too reach-heavy? Missing a true safety? Redundant schools doing the same job? You see all schools including those outside the top 5, so you can speak to list shape.",
+  "",
+  "2. **Strategic decisions** (1–2 paragraphs) — Address the items in currentDecisions. Give a direct recommendation with reasoning, not both-sides framing. For ED specifically, weigh admit-rate lift against binding commitment and fit confidence.",
+  "",
+  "3. **Watchpoints** (1 paragraph) — Deadlines, scores to improve, financial scenarios to plan for, or specific schools where the data suggests a closer look.",
+  "",
+  "## Rules",
+  "",
+  "- Do not repeat the ratings or costs back to the user — they see that data. Your value is interpretation and recommendation.",
+  "- When you use a rating, refer to the descriptor, not the number. (\"You rated the visit a 4 with notes about weather concerns\" → \"The visit went well but weather gave Avery pause.\") If a descriptor is empty, fall back to the rubric anchor language and signal you're inferring from the score alone.",
+  "- If the data is insufficient to answer a strategic question, say so and name what specifically would help.",
+  "- Push back if the weighting scheme seems miscalibrated for the decision at hand. The family wants honest input, not validation.",
+  "- Respect non-negotiables absolutely — do not recommend a school that violates one without explicitly flagging the violation.",
+  "- Keep total length under ~500 words unless a specific question warrants more.",
+  "- Do not hedge. If you think an ED commitment is the wrong move, say it. If you think the list needs a true safety, say it.",
+  "- Write in flowing paragraphs, not bullet points or numbered lists, except where the spec above calls for numbered sections."
+].join('\n');
+
 // Format category as title case (Reach/Match/Safety) for the AI payload —
 // the in-app badges use uppercase but the rubric/spec uses title case.
 function formatCategory(c) {
@@ -7032,16 +7073,16 @@ function aiCacheFingerprint(aiData) {
 }
 
 function buildAIPrompt(aiData) {
-  // Phase 1: send the full structured JSON payload. System prompt is unchanged
-  // intentionally so we can verify the model handles the richer context before
-  // changing the prompt structure (Phase 2).
+  // Phase 2: structured prompt lives in SYSTEM_PROMPT_V2 (top-level constant).
+  // User message just hands over the JSON payload — no inline restating of
+  // structure rules, since those belong in the system prompt.
   return {
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 1024,
-    system: 'You are an experienced college admissions counselor specializing in pre-veterinary programs. You give specific, actionable advice grounded in the data provided. Be direct and confident. Do not use bullet points or headers \u2014 write in flowing paragraphs.',
+    max_tokens: 1536,
+    system: SYSTEM_PROMPT_V2,
     messages: [{
       role: 'user',
-      content: 'Analyze this student\'s college application strategy for Fall 2027 enrollment. The JSON payload below contains the full picture: student profile (with full ACT detail and superscore), household financial context, non-negotiables (hard constraints to respect), strategic context (current decisions and the user\'s specific question for this run, if any), all schools on the list with flags for final-list status and top-5 by combined score, phrase-based rating descriptors, financial breakdown (sticker / guaranteed merit / competitive merit estimate / net), and rubrics explaining the rating anchors and weighting scheme.\n\nIf strategicContext.userQuestionForThisRun is populated, prioritize answering that question. Otherwise, structure your response in three paragraphs: (1) BEST FIT ANALYSIS, (2) FINANCIAL STRATEGY, (3) FALL APPLICATION WATCHPOINTS.\n\nPayload:\n' + JSON.stringify(aiData, null, 2)
+      content: 'Analyze this college application strategy for Fall 2027 enrollment. Payload follows.\n\n' + JSON.stringify(aiData, null, 2)
     }]
   };
 }
@@ -7056,7 +7097,8 @@ async function openAIAnalysis(forceRegenerate) {
   const fingerprint = aiCacheFingerprint(aiData);
 
   // Check cache first — invalidate when fingerprint (strategic context + school
-  // ratings/costs/final-list flags) changes, OR when older than 24 hours.
+  // ratings/costs/final-list flags) changes, when the prompt version changes,
+  // OR when older than 24 hours.
   if (!forceRegenerate) {
     const cached = localStorage.getItem('aiAnalysisCache');
     if (cached) {
@@ -7064,7 +7106,8 @@ async function openAIAnalysis(forceRegenerate) {
         const parsed = JSON.parse(cached);
         const ageHours = (Date.now() - parsed.timestamp) / (1000 * 60 * 60);
         const fingerprintMatches = parsed.fingerprint === fingerprint;
-        if (ageHours < 24 && fingerprintMatches) {
+        const promptVersionMatches = parsed.promptVersion === PROMPT_VERSION;
+        if (ageHours < 24 && fingerprintMatches && promptVersionMatches) {
           showAIResult(content, parsed.text, parsed.timestamp, parsed.userQuestion);
           return;
         }
@@ -7095,6 +7138,7 @@ async function openAIAnalysis(forceRegenerate) {
       text: text,
       timestamp: Date.now(),
       fingerprint: fingerprint,
+      promptVersion: PROMPT_VERSION,
       userQuestion: aiData.strategicContext.userQuestionForThisRun || ''
     };
     localStorage.setItem('aiAnalysisCache', JSON.stringify(cacheEntry));
