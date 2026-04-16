@@ -10,7 +10,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="College Planner">
-<meta name="theme-color" content="#2c5364">
+<meta name="theme-color" content="#FF2E7E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
   :root {
     --bg: #f4f7fa;
@@ -863,6 +866,776 @@
   .update-toast.show{transform:translateX(-50%) translateY(0)}
   .update-toast button{background:#3b82f6;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;font-size:.85rem}
   .update-toast button:active{background:#2563eb}
+
+  /* ═══════════════════════════════════════════════════════
+     V2 — "Confident Editorial Pop" design system
+     Bold magenta + sunny goldenrod + ink aubergine on warm cream.
+     Fraunces display + Plus Jakarta Sans body.
+     ═══════════════════════════════════════════════════════ */
+  :root {
+    --cream: #FFF6EC;
+    --cream-2: #FFEFDE;
+    --paper: #FFFBF5;
+    --ink: #1A0F2E;
+    --ink-2: #3D2B5C;
+    --ink-3: #7E6E8F;
+    --rule: #2A1B45;
+
+    --hot: #FF2E7E;
+    --hot-deep: #C81E5E;
+    --hot-soft: #FFE0EE;
+    --coral: #FF6B47;
+    --coral-soft: #FFE1D3;
+    --sun: #FFC53D;
+    --sun-soft: #FFEEB8;
+    --leaf: #2D7E4F;
+    --leaf-soft: #C8E8D2;
+    --plum: #6B2EAF;
+    --plum-soft: #E8DAFB;
+    --sky: #2D7AAF;
+    --sky-soft: #D4ECFB;
+
+    --bg: var(--cream);
+    --surface: var(--paper);
+    --primary: var(--hot);
+    --primary-dark: var(--hot-deep);
+    --primary-light: var(--hot-soft);
+    --accent: var(--leaf);
+    --accent-light: var(--leaf-soft);
+    --text: var(--ink);
+    --text-light: var(--ink-3);
+    --border: #ECD9C1;
+    --danger: #E63946;
+    --warn: #B5832A;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-lg: 26px;
+    --shadow: 0 2px 0 rgba(26,15,46,0.04), 0 14px 28px -16px rgba(26,15,46,0.18);
+
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--cream);
+    color: var(--ink);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(26,15,46,0.045) 1px, transparent 0);
+    background-size: 22px 22px;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Masthead ── */
+  header {
+    background: var(--paper);
+    border-bottom: 3px solid var(--ink);
+    padding: 20px 32px 16px;
+    box-shadow: none;
+    overflow: visible;
+    color: var(--ink);
+  }
+  header::before, header::after { content: none; display: none; }
+  .masthead-inner {
+    max-width: 1340px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .masthead-brand { display: flex; align-items: center; gap: 16px; }
+  .brand-mark {
+    width: 54px; height: 54px;
+    background: var(--hot);
+    color: var(--paper);
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem; font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-6deg);
+    font-family: var(--font-display);
+    line-height: 1;
+  }
+  .brand-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--hot-deep);
+  }
+  .brand-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin: 2px 0 0;
+    text-shadow: none;
+  }
+  .brand-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--hot);
+  }
+
+  .masthead-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .mast-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+    transition: transform 0.12s ease, background 0.15s, box-shadow 0.12s ease;
+    position: relative;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .mast-btn:hover { background: var(--sun-soft); transform: translate(-1px, -1px); box-shadow: 2px 2px 0 var(--ink); }
+  .mast-btn.fav-on { background: var(--sun); }
+  .mast-btn.sync-spinning { background: var(--coral-soft); color: var(--coral); }
+  .mast-badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    background: var(--hot);
+    color: var(--paper);
+    font-size: 0.6rem;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 5px;
+    border: 2px solid var(--paper);
+  }
+  /* Override legacy changelog-bell/badge when used inside masthead */
+  header .changelog-bell {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    width: 38px; height: 38px;
+    font-size: 0.95rem;
+  }
+  header .changelog-bell:hover { background: var(--sun-soft); transform: translate(-1px, -1px); box-shadow: 2px 2px 0 var(--ink); }
+  header .changelog-badge {
+    background: var(--hot);
+    color: var(--paper);
+    border: 2px solid var(--paper);
+    min-width: 18px; height: 18px;
+    top: -5px; right: -5px;
+  }
+
+  /* ── Tab Bar — pill row ── */
+  .tab-bar {
+    background: var(--cream);
+    padding: 12px 24px;
+    border-bottom: 2px solid var(--ink);
+    gap: 8px;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  .tab-btn {
+    font-family: var(--font-body);
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 0;
+    transition: all 0.12s;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+  .tab-btn:hover { background: var(--sun-soft); color: var(--ink); }
+  .tab-btn.active {
+    background: var(--ink);
+    color: var(--cream);
+    border-color: var(--ink);
+    box-shadow: 2px 2px 0 var(--hot);
+  }
+
+  /* ── Next-up strip ── */
+  .next-up-strip {
+    background: var(--sun-soft);
+    border-bottom: 2px solid var(--ink);
+    padding: 10px 24px;
+    color: var(--ink);
+  }
+  .next-up-label {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .next-up-label::before { content: '✦ '; color: var(--hot); }
+  .next-up-item {
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+    padding: 4px 12px;
+  }
+  .next-up-item .nui-days { color: var(--hot-deep); font-weight: 800; }
+  .next-up-item.on-track { background: var(--leaf-soft); border-color: var(--leaf); color: var(--leaf); }
+
+  /* ── Content frame ── */
+  .content { padding: 32px 24px 60px; max-width: 1340px; }
+
+  /* ═══ OVERVIEW HERO ═══ */
+  .hero {
+    position: relative;
+    padding: 8px 0 10px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s cubic-bezier(.2,.7,.2,1) both;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .hero-sticker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--sun);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.8rem;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    transform: rotate(5deg);
+    box-shadow: 3px 3px 0 var(--ink);
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--hot-deep);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px; height: 2px;
+    background: var(--hot);
+  }
+  .hero-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--hot);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hero-edit:hover { color: var(--hot-deep); }
+  .hero-name {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 8vw, 5rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+    margin: 0;
+  }
+  .hero-name em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--hot);
+    background: linear-gradient(180deg, transparent 62%, var(--sun-soft) 62%, var(--sun-soft) 92%, transparent 92%);
+    padding: 0 4px;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--ink-2);
+    margin: 14px 0 0;
+    max-width: 620px;
+    line-height: 1.55;
+  }
+  .hero-sub strong { font-weight: 700; color: var(--ink); }
+
+  /* Stat tiles (sticker-style) */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 26px;
+  }
+  .stat-tile {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 16px 18px 14px;
+    position: relative;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 4px 4px 0 var(--ink);
+    animation: tileIn 0.5s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .stat-tile:nth-child(1) { animation-delay: 0.05s; }
+  .stat-tile:nth-child(2) { animation-delay: 0.12s; }
+  .stat-tile:nth-child(3) { animation-delay: 0.19s; }
+  .stat-tile:nth-child(4) { animation-delay: 0.26s; }
+  @keyframes tileIn { from { opacity: 0; transform: translateY(16px) rotate(-1deg); } to { opacity: 1; transform: none; } }
+  .stat-tile:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+  .stat-tile.pink  { background: var(--hot-soft); }
+  .stat-tile.coral { background: var(--coral-soft); }
+  .stat-tile.sun   { background: var(--sun-soft); }
+  .stat-tile.plum  { background: var(--plum-soft); }
+  .stat-tile .st-label {
+    font-size: 0.66rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-2);
+  }
+  .stat-tile .st-value {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 600;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-top: 4px;
+    letter-spacing: -0.025em;
+  }
+  .stat-tile .st-foot {
+    font-size: 0.74rem;
+    color: var(--ink-2);
+    margin-top: 4px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .stat-tile .st-value .act-edit,
+  .stat-tile [contenteditable] {
+    border-bottom: none;
+    display: inline-block;
+    min-width: 1ch;
+    outline: none;
+    padding: 0 2px;
+    border-radius: 4px;
+    font: inherit;
+    color: inherit;
+  }
+  .stat-tile [contenteditable]:hover { background: rgba(255,255,255,0.55); }
+  .stat-tile [contenteditable]:focus { background: var(--paper); box-shadow: 0 0 0 2px var(--hot); }
+
+  /* ACT subscore strip */
+  .act-breakdown {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: var(--paper);
+    border: 2px dashed var(--ink);
+    border-radius: var(--radius);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items: center;
+  }
+  .act-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--ink-2);
+    margin-right: auto;
+  }
+  .act-sub {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 0.74rem;
+    color: var(--ink-3);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .act-sub b {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 600;
+    font-variation-settings: 'opsz' 144;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .act-sub small {
+    color: var(--ink-3);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .act-sub .act-edit {
+    border-bottom: none;
+    padding: 0;
+    min-width: 1ch;
+  }
+  .act-sub .act-edit:hover { background: var(--sun-soft); }
+  .act-sub .act-edit:focus { background: var(--paper); box-shadow: 0 0 0 2px var(--hot); }
+
+  /* Application status card */
+  .status-card {
+    margin-top: 26px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    position: relative;
+    box-shadow: 5px 5px 0 var(--plum);
+    animation: fadeUp 0.55s cubic-bezier(.2,.7,.2,1) 0.18s both;
+  }
+  .status-card-eyebrow {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.25rem;
+    color: var(--ink);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.01em;
+  }
+  .status-card-eyebrow::before {
+    content: '◆';
+    color: var(--hot);
+    font-style: normal;
+    font-size: 0.85rem;
+    transform: translateY(-2px);
+  }
+  .status-card #appStatusBody { font-family: var(--font-body); font-size: 0.92rem; color: var(--ink); }
+  .status-card #appStatusBody > div:first-child {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+
+  /* Callout */
+  .callout {
+    position: relative;
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px 24px 84px;
+    margin: 32px 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    font-weight: 500;
+    box-shadow: 6px 6px 0 var(--hot);
+    animation: fadeUp 0.55s cubic-bezier(.2,.7,.2,1) 0.28s both;
+  }
+  .callout strong { color: var(--sun); font-weight: 700; }
+  .callout::before {
+    content: '✦';
+    position: absolute;
+    left: 22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    background: var(--hot);
+    color: var(--cream);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    border: 2px solid var(--cream);
+  }
+  .callout-tag {
+    display: block;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--sun);
+    text-transform: uppercase;
+    letter-spacing: 0.26em;
+    margin-bottom: 6px;
+  }
+
+  /* Section heads (Overview only) */
+  #summary .section-head {
+    margin: 36px 0 18px;
+    align-items: flex-end;
+  }
+  #summary .section-head h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    line-height: 1.02;
+  }
+  #summary .section-head h2 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--hot);
+  }
+
+  /* AI button pill style */
+  .btn-ai {
+    background: var(--hot);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .btn-ai:hover {
+    background: var(--hot-deep);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  /* Rankings table (Overview) */
+  #summary .table-wrap {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: auto;
+    max-height: none;
+    animation: fadeUp 0.6s cubic-bezier(.2,.7,.2,1) 0.34s both;
+  }
+  #summary table { min-width: 640px; border-collapse: collapse; }
+  #summary thead th {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    padding: 14px 14px;
+    text-align: left;
+    border: none;
+    position: sticky;
+    top: 0;
+  }
+  #summary thead th.sortable:hover { background: var(--ink-2); }
+  #summary thead th .sort-hint { color: rgba(255,246,236,0.35); }
+  #summary tbody td {
+    padding: 14px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  #summary tbody tr:nth-child(even) td { background: var(--cream); }
+  #summary tbody tr:hover td { background: var(--hot-soft); }
+  #summary tbody tr:last-child td { border-bottom: none; }
+  #summary tbody td:first-child {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-variation-settings: 'opsz' 144;
+    color: var(--hot);
+    width: 64px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+
+  /* Overview badges */
+  #summary .badge {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 0.64rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--ink);
+    letter-spacing: 0.08em;
+  }
+  #summary .badge-safety { background: var(--leaf-soft); color: var(--leaf); border-color: var(--leaf); }
+  #summary .badge-match  { background: var(--sun-soft); color: #7A5A00; border-color: #B5832A; }
+  #summary .badge-reach  { background: var(--hot-soft); color: var(--hot-deep); border-color: var(--hot); }
+
+  /* Insight-box (unused in new layout, kept neutral in case) */
+  .insight-box { background: var(--sun-soft); border-left: 4px solid var(--hot); color: var(--ink); }
+
+  /* Backup banner refresh */
+  .backup-banner {
+    background: var(--sun-soft);
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .backup-banner .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.78rem;
+  }
+  .backup-banner .btn-primary:hover { background: var(--hot); color: var(--cream); transform: translateY(-1px); box-shadow: 2px 2px 0 var(--ink); }
+  .backup-banner .btn-sm {
+    background: var(--paper);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-weight: 600;
+    font-size: 0.78rem;
+  }
+
+  /* PWA safe areas override with new padding */
+  @supports (padding: env(safe-area-inset-top)) {
+    header {
+      padding-top: calc(20px + env(safe-area-inset-top));
+      padding-left: calc(32px + env(safe-area-inset-left));
+      padding-right: calc(32px + env(safe-area-inset-right));
+    }
+  }
+
+  /* ── Mobile (tablet + large phone) ── */
+  @media (max-width: 820px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .hero-name { font-size: clamp(2.3rem, 9vw, 3.4rem); }
+    .act-breakdown { gap: 12px 18px; padding: 12px 14px; }
+    .brand-title { font-size: 1.4rem; }
+    .brand-mark { width: 46px; height: 46px; font-size: 1.35rem; box-shadow: 3px 3px 0 var(--ink); }
+    header { padding: 14px 16px 12px; }
+    .masthead-inner { gap: 12px; flex-wrap: nowrap; }
+    .masthead-brand { min-width: 0; flex: 1 1 auto; }
+    .masthead-actions { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .mast-btn { width: 40px; height: 40px; font-size: 0.95rem; }
+    .tab-bar { padding: 10px 12px; gap: 6px; overflow-x: auto; }
+    .tab-btn { padding: 8px 16px; font-size: 0.82rem; min-height: 40px; }
+    .next-up-strip { padding: 8px 14px; gap: 8px; }
+    .content { padding: 22px 16px 40px; }
+    #summary .section-head { margin: 28px 0 14px; }
+    #summary thead th { padding: 12px 10px; font-size: 0.62rem; letter-spacing: 0.1em; }
+    #summary tbody td { padding: 12px 10px; font-size: 0.85rem; }
+    #summary tbody td:first-child { width: 44px; font-size: 1.3rem; }
+    .status-card { padding: 18px 18px; box-shadow: 4px 4px 0 var(--plum); }
+    .status-card-eyebrow { font-size: 1.1rem; }
+    .status-card #appStatusBody > div:first-child { font-size: 1.2rem; }
+  }
+
+  /* ── Phone (iPhone-class) ── */
+  @media (max-width: 520px) {
+    body { background-size: 18px 18px; }
+    .hero-eyebrow { font-size: 0.66rem; letter-spacing: 0.2em; gap: 8px; margin-bottom: 8px; }
+    .hero-eyebrow::before { width: 18px; }
+    .hero-edit { font-size: 0.66rem; }
+    .hero-name { font-size: clamp(2rem, 11vw, 3rem); letter-spacing: -0.03em; }
+    .hero-sub { font-size: 0.9rem; line-height: 1.45; margin-top: 10px; }
+    .masthead-inner { gap: 10px; }
+    .masthead-brand { gap: 12px; }
+    .brand-mark { width: 42px; height: 42px; font-size: 1.2rem; }
+    .brand-title { font-size: 1.25rem; }
+    .brand-eyebrow { font-size: 0.6rem; letter-spacing: 0.16em; }
+    .mast-btn { width: 38px; height: 38px; font-size: 0.88rem; border-width: 2px; }
+    header { padding: 12px 14px 10px; border-bottom-width: 2px; }
+
+    .stat-grid { margin-top: 18px; gap: 10px; }
+    .stat-tile { padding: 12px 14px 12px; box-shadow: 3px 3px 0 var(--ink); border-radius: 14px; }
+    .stat-tile .st-value { font-size: 1.9rem; /* stay readable (>=16px-equivalent) */ }
+    .stat-tile .st-label { font-size: 0.6rem; letter-spacing: 0.12em; }
+    .stat-tile .st-foot { font-size: 0.7rem; }
+
+    /* ACT strip: two rows of two, aligned */
+    .act-breakdown { padding: 12px 14px; gap: 10px 18px; }
+    .act-title { flex-basis: 100%; margin-right: 0; font-size: 0.88rem; }
+    .act-sub { flex: 1 1 40%; font-size: 0.66rem; gap: 5px; letter-spacing: 0.06em; }
+    .act-sub b { font-size: 1.15rem; }
+    .act-sub small { font-size: 0.66rem; }
+
+    /* Status + section heads */
+    .status-card { margin-top: 20px; padding: 16px 16px; border-radius: 22px; box-shadow: 4px 4px 0 var(--plum); }
+    .status-card-eyebrow { font-size: 1.05rem; margin-bottom: 10px; }
+    .status-card #appStatusBody { font-size: 0.88rem; }
+    .status-card #appStatusBody > div:first-child { font-size: 1.15rem; }
+
+    #summary .section-head { margin: 26px 0 12px; }
+    #summary .section-head h2 { font-size: 1.75rem; }
+    .btn-ai { padding: 9px 16px; font-size: 0.8rem; min-height: 40px; }
+
+    /* Rankings table: compact + sticky rank/school so swipe reveals cost/score/notes */
+    #summary .table-wrap { border-radius: 20px; border-width: 2px; }
+    #summary table { min-width: 560px; }
+    #summary thead th { padding: 10px 10px; font-size: 0.58rem; letter-spacing: 0.08em; }
+    #summary tbody td { padding: 11px 10px; font-size: 0.82rem; }
+    #summary tbody td:first-child {
+      position: sticky; left: 0; z-index: 2;
+      width: 42px; font-size: 1.15rem;
+      background: var(--paper);
+      box-shadow: 1px 0 0 var(--border);
+    }
+    #summary tbody tr:nth-child(even) td:first-child { background: var(--cream); }
+    #summary tbody tr:hover td:first-child { background: var(--hot-soft); }
+    #summary thead th:first-child {
+      position: sticky; left: 0; z-index: 3;
+    }
+
+    /* Tabs */
+    .tab-bar { padding: 10px 12px; }
+    .tab-btn { padding: 7px 14px; font-size: 0.78rem; border-width: 2px; }
+
+    .content { padding: 18px 14px 32px; }
+    .next-up-strip { padding: 8px 12px; font-size: 0.76rem; }
+    .next-up-label { font-size: 0.88rem; }
+    .next-up-item { padding: 3px 10px; font-size: 0.74rem; }
+
+    /* Keep the tap targets friendly */
+    [contenteditable] { font-size: 1em; }
+  }
+
+  /* ── Extra-small (iPhone SE 1st gen) ── */
+  @media (max-width: 360px) {
+    .brand-title { font-size: 1.1rem; }
+    .brand-mark { width: 38px; height: 38px; font-size: 1rem; }
+    .hero-name { font-size: 2rem; }
+    .stat-tile .st-value { font-size: 1.65rem; }
+    .mast-btn { width: 36px; height: 36px; }
+  }
+
+  /* ── Safe area bottom for PWA on iPhone ── */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .content {
+      padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    }
+  }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -871,23 +1644,24 @@
 <body>
 
 <header>
-  <div class="header-content">
-    <div>
-      <h1 id="dashboardTitle">College Planning Dashboard</h1>
-      <p>Pre-Veterinary Program Search &amp; Application Tracker</p>
-      <span class="header-badge">Class of 2031 &bull; Animal Science &bull; DVM Track</span>
+  <div class="masthead-inner">
+    <div class="masthead-brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-text">
+        <div class="brand-eyebrow">Class of 2027 &bull; Pre-Vet &bull; DVM Track</div>
+        <h1 class="brand-title" id="dashboardTitle">Avery's <em>Plan</em></h1>
+      </div>
     </div>
-    <div class="header-icon" style="display:flex;align-items:center;gap:10px">
-      <button class="changelog-bell" onclick="toggleChangelog()" title="What's New" aria-label="What's New">
-        &#128276;<span class="changelog-badge" id="changelogBadge" style="display:none">0</span>
+    <div class="masthead-actions">
+      <button class="mast-btn changelog-bell" onclick="toggleChangelog()" title="What's New" aria-label="What's New">
+        &#128276;<span class="changelog-badge mast-badge" id="changelogBadge" style="display:none">0</span>
       </button>
-      <button id="finalListBtn" onclick="setFinalListFilter(!finalListOnly)" title="Show Final List only" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Toggle Final List">&#11088;</button>
-      <span id="syncIndicator" title="Saving..." style="background:rgba(255,255,255,.15);color:#ffd666;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;cursor:default">&#9203;</span>
-      <button onclick="backupToJSON()" title="Backup data" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Backup data">&#128190;</button>
-      <button onclick="document.getElementById('restoreInput').click()" title="Restore from backup" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center" aria-label="Restore from backup">&#128194;</button>
+      <button id="finalListBtn" class="mast-btn" onclick="setFinalListFilter(!finalListOnly)" title="Show Final List only" aria-label="Toggle Final List">&#11088;</button>
+      <span id="syncIndicator" class="mast-btn" title="Saving..." style="cursor:default;color:#B5832A">&#9203;</span>
+      <button class="mast-btn" onclick="backupToJSON()" title="Backup data" aria-label="Backup data">&#128190;</button>
+      <button class="mast-btn" onclick="document.getElementById('restoreInput').click()" title="Restore from backup" aria-label="Restore from backup">&#128194;</button>
       <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreFromJSON(this)">
-      <button onclick="checkForUpdates()" title="Check for updates" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center" aria-label="Check for updates">&#x21bb;</button>
-      <span>&#127891;</span>
+      <button class="mast-btn" onclick="checkForUpdates()" title="Check for updates" aria-label="Check for updates">&#x21bb;</button>
     </div>
   </div>
 </header>
@@ -917,38 +1691,60 @@
   <!-- ═══════════ GROUP: OVERVIEW ═══════════ -->
   <div id="group-overview" class="tab-group active">
   <div id="summary" class="sub-panel active">
-    <div class="section-head"><h2>Executive Summary</h2><button class="btn btn-ai" onclick="openAIAnalysis()">&#x2728; AI Analysis</button></div>
-    <div class="profile-grid">
-      <div class="profile-card" id="profileCard">
-        <h3>Student Profile <button onclick="openScoreEditor()" style="background:none;border:none;cursor:pointer;font-size:0.95rem;vertical-align:middle;padding:2px 6px;border-radius:4px;color:var(--primary);" title="Edit scores">&#9998;</button></h3>
-        <div class="profile-row"><span class="label">Student</span><span class="value" id="profileStudentName">—</span></div>
-        <div class="profile-row"><span class="label">Targeted GPA</span><span class="value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></span></div>
-        <div class="profile-row"><span class="label">HOPE GPA</span><span class="value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.609</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-field="hopeGPA-status"></span></span></div>
-        <div class="profile-row"><span class="label">ACT Composite</span><span class="value"><span class="act-edit" data-act="composite" contenteditable="true">27</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="composite-pct">(87th %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">English</span><span class="value"><span class="act-edit" data-act="english" contenteditable="true">23</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="english-pct">(73rd %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">Math</span><span class="value"><span class="act-edit" data-act="math" contenteditable="true">28</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="math-pct">(90th %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">Reading</span><span class="value"><span class="act-edit" data-act="reading" contenteditable="true">30</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="reading-pct">(90th %ile)</span></span></div>
-        <div class="profile-row" style="padding-left:12px;"><span class="label">Science</span><span class="value"><span class="act-edit" data-act="science" contenteditable="true">33</span> <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;" data-act="science-pct">(97th %ile)</span></span></div>
-        <div class="profile-row"><span class="label">Target ACT</span><span class="value">29 <span style="font-weight:400;color:var(--text-light);font-size:0.82rem;">(91st %ile)</span></span></div>
-        <div class="profile-row"><span class="label">Intended Major</span><span class="value">Animal Science / Pre-Veterinary</span></div>
-        <div class="profile-row"><span class="label">Goal</span><span class="value">Doctor of Veterinary Medicine (DVM)</span></div>
-        <div class="profile-row"><span class="label">Residency</span><span class="value">Georgia (In-State for UGA)</span></div>
+    <section class="hero">
+      <div class="hero-eyebrow">Student Profile <button class="hero-edit" onclick="openScoreEditor()" title="Edit scores">edit scores &rarr;</button></div>
+      <h1 class="hero-name" id="profileStudentName">Avery <em>Denney</em></h1>
+      <p class="hero-sub">Aspiring <strong>Doctor of Veterinary Medicine</strong> &middot; Animal Science &middot; Georgia resident (in-state for UGA) &middot; Class of 2027</p>
+
+      <div id="profileCard">
+        <div class="stat-grid">
+          <div class="stat-tile pink">
+            <div class="st-label">Targeted GPA</div>
+            <div class="st-value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></div>
+            <div class="st-foot">cumulative goal</div>
+          </div>
+          <div class="stat-tile coral">
+            <div class="st-label">HOPE GPA</div>
+            <div class="st-value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.609</span></div>
+            <div class="st-foot" data-field="hopeGPA-status">&mdash;</div>
+          </div>
+          <div class="stat-tile sun">
+            <div class="st-label">ACT Composite</div>
+            <div class="st-value"><span class="act-edit" data-act="composite" contenteditable="true">27</span></div>
+            <div class="st-foot" data-act="composite-pct">(87th %ile)</div>
+          </div>
+          <div class="stat-tile plum">
+            <div class="st-label">Target ACT</div>
+            <div class="st-value">29</div>
+            <div class="st-foot">91st %ile &middot; stretch goal</div>
+          </div>
+        </div>
+
+        <div class="act-breakdown">
+          <span class="act-title">ACT subscores &nearr;</span>
+          <span class="act-sub">Eng <b><span class="act-edit" data-act="english" contenteditable="true">23</span></b><small data-act="english-pct">(73rd)</small></span>
+          <span class="act-sub">Math <b><span class="act-edit" data-act="math" contenteditable="true">28</span></b><small data-act="math-pct">(90th)</small></span>
+          <span class="act-sub">Read <b><span class="act-edit" data-act="reading" contenteditable="true">30</span></b><small data-act="reading-pct">(90th)</small></span>
+          <span class="act-sub">Sci <b><span class="act-edit" data-act="science" contenteditable="true">33</span></b><small data-act="science-pct">(97th)</small></span>
+        </div>
       </div>
-      <div class="profile-card" id="appStatusCard">
-        <h3>Application Status</h3>
-        <div id="appStatusBody" style="font-size:0.88rem;"></div>
-      </div>
+    </section>
+
+    <section class="status-card" id="appStatusCard">
+      <div class="status-card-eyebrow">Where things stand</div>
+      <div id="appStatusBody"></div>
+    </section>
+
+    <div class="section-head">
+      <h2>School <em>Rankings</em></h2>
+      <button class="btn btn-ai" onclick="openAIAnalysis()">&#x2728; AI Analysis</button>
     </div>
-    <div class="insight-box"><strong>Key Insight:</strong> Applying to Animal Science (vs. Engineering/CS/Business) provides 15-25 percentage point admission advantage at most schools.</div>
-    <div class="section-head"><h2>Comprehensive School Rankings</h2></div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead id="summaryHead"><tr><th>Rank</th><th>School</th><th>Category</th><th>Visit Score</th><th>Vet School</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
+        <thead id="summaryHead"><tr><th>Rank</th><th>School</th><th>Category</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
         <tbody id="summaryRankBody"></tbody>
       </table>
     </div>
-    <div class="section-head" style="margin-top:28px"><h2>Decision Scenarios</h2></div>
-    <div class="scenarios-grid" id="scenariosGrid"></div>
   </div>
 
   </div><!-- /group-overview -->
@@ -2124,10 +2920,15 @@ function renderProfile() {
 
   // Title & name
   const titleEl = document.getElementById('dashboardTitle');
-  if (titleEl) titleEl.textContent = name ? name.split(' ')[0] + '\u2019s College Planning Dashboard' : 'College Planning Dashboard';
-  document.title = name ? name.split(' ')[0] + '\u2019s College Planning Dashboard' : 'College Planning Dashboard';
+  if (titleEl) titleEl.innerHTML = (name ? esc(name.split(' ')[0]) : 'Avery') + '\u2019s <em>Plan</em>';
+  document.title = (name ? name.split(' ')[0] : 'Avery') + '\u2019s College Plan';
   const nameEl = document.getElementById('profileStudentName');
-  if (nameEl) nameEl.textContent = name || 'Not set';
+  if (nameEl && name) {
+    const parts = name.trim().split(/\s+/);
+    const first = esc(parts[0] || 'Student');
+    const rest = parts.slice(1).join(' ');
+    nameEl.innerHTML = rest ? first + ' <em>' + esc(rest) + '</em>' : first;
+  }
 
   // Profile card
   const pc = document.getElementById('profileCard');
@@ -2546,7 +3347,7 @@ function updateFinalListUI() {
   const banner = document.getElementById('finalListBanner');
   const count = data.schools.filter(s => s.finalList).length;
   if (btn) {
-    btn.style.background = finalListOnly ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,.15)';
+    btn.classList.toggle('fav-on', !!finalListOnly);
     btn.title = finalListOnly ? 'Showing Final List only' : 'Show Final List only';
   }
   if (banner) {
@@ -2730,8 +3531,6 @@ const SUMMARY_COLUMNS = [
   { field: 'rank', label: 'Rank', sortType: 'numeric' },
   { field: 'name', label: 'School', sortType: 'text' },
   { field: 'cat', label: 'Category', sortType: 'text' },
-  { field: 'visitNorm', label: 'Visit Score', sortType: 'numeric' },
-  { field: 'vet', label: 'Vet School', sortType: 'text' },
   { field: 'cost', label: '4-Yr Cost', sortType: 'currency' },
   { field: 'combined', label: 'Score', sortType: 'numeric' },
   { field: 'notes', label: 'Key Notes', sortType: null },
@@ -4368,7 +5167,7 @@ function renderSummary() {
   const maxTotal = calcMaxWeightedTotal();
 
   if (data.schools.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see the executive summary.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see the executive summary.</td></tr>';
     return;
   }
 
@@ -4411,17 +5210,13 @@ function renderSummary() {
 
   tbody.innerHTML = summaryRows.map(r => {
     const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
-    const vetClass = r.vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
-    const visitDisplay = r.visitScore > 0 ? r.visitNorm.toFixed(1) : '\u2014';
     return `<tr>
-      <td class="compact" style="font-weight:700;color:var(--primary)">${r.rank}</td>
-      <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
+      <td class="compact">${r.rank}</td>
+      <td style="font-weight:700;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:8px">${schoolLogoHTML(r.name, 24)} ${esc(r.name)}</span></td>
       <td class="compact"><span class="badge ${catClass}">${r.cat}</span></td>
-      <td class="compact" style="font-weight:600">${visitDisplay}</td>
-      <td class="compact"><span class="badge ${vetClass}">${esc(r.vet)}</span></td>
-      <td class="compact" style="font-weight:600">${r.cost}</td>
-      <td class="compact" style="font-weight:700">${r.combined.toFixed(2)}</td>
-      <td style="font-size:0.82rem;max-width:260px">${esc(r.notes)}</td>
+      <td class="compact" style="font-weight:700">${r.cost}</td>
+      <td class="compact" style="font-weight:800;color:var(--hot-deep)">${r.combined.toFixed(2)}</td>
+      <td style="font-size:0.82rem;max-width:260px;color:var(--ink-2)">${esc(r.notes)}</td>
     </tr>`;
   }).join('');
 
@@ -4461,6 +5256,7 @@ function scenarioShortName(name) {
 
 function renderScenarios() {
   const grid = document.getElementById('scenariosGrid');
+  if (!grid) return;
   if (data.schools.length === 0) { grid.innerHTML = ''; return; }
 
   // Build scored rows for all active schools
