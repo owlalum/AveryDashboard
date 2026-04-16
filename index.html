@@ -924,7 +924,10 @@
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 
-  html { overflow-x: hidden; }
+  /* overflow-x: clip (not hidden) — hidden creates a scroll container which
+     breaks position: sticky on iOS Safari; clip prevents overflow without
+     that side-effect. */
+  html { overflow-x: clip; }
   body {
     font-family: var(--font-body);
     background: var(--cream);
@@ -934,7 +937,7 @@
     background-size: 22px 22px;
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   /* ── Masthead ── */
