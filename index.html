@@ -1921,6 +1921,278 @@
      doesn't show the rank twice. */
   .summary-school-rank-inline { display: none; }
 
+  /* Estimated score marker — italic + muted color + asterisk.
+     Applied when a ranking score uses the 3.0 placeholder because no visit
+     data has been entered. Signals "this is a guess" at a glance. */
+  .score-estimated {
+    font-style: italic;
+    color: var(--text-light, #888);
+    font-weight: 600;
+    border-bottom: 1px dotted currentColor;
+  }
+
+  /* ── Visit Evaluation list view (v20) ── */
+  .visit-summary-bar {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+    color: var(--ink);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 18px;
+  }
+  .visit-summary-bar strong { color: var(--hot-deep); }
+  .visit-summary-bar .vsb-progress {
+    flex: 1;
+    min-width: 140px;
+    height: 8px;
+    background: var(--cream);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--ink);
+  }
+  .visit-summary-bar .vsb-progress-fill {
+    height: 100%;
+    background: var(--hot);
+    transition: width 0.3s;
+  }
+  .visit-list { display: flex; flex-direction: column; gap: 10px; }
+  .visit-row {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 3px 3px 0 var(--ink);
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .visit-row.vr-complete { border-color: var(--leaf, #4a7c59); }
+  .visit-row.vr-partial { border-color: #b5832a; }
+  .visit-row.vr-not-visited { opacity: 0.85; }
+  .visit-row-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .visit-row-head .vrh-name {
+    flex: 1;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .visit-row-head .vrh-name .school-logo { flex-shrink: 0; }
+  .visit-row-head .vrh-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .visit-row-head .vrh-final-star { font-size: 1rem; color: var(--hot-deep); flex-shrink: 0; }
+  .visit-row-head .vrh-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .visit-row-head .vrh-badge.complete { background: var(--leaf-soft, #d9f0d9); color: var(--leaf, #3a6a3f); border: 1.5px solid var(--leaf, #4a7c59); }
+  .visit-row-head .vrh-badge.partial { background: var(--sun-soft, #fcefc9); color: #7a5a00; border: 1.5px solid #b5832a; }
+  .visit-row-head .vrh-badge.empty { background: var(--cream); color: var(--text-light); border: 1.5px solid var(--border); }
+  .visit-row-head .vrh-badge.not-visited { background: var(--cream); color: var(--text-light); border: 1.5px solid var(--border); }
+  .visit-row-head .vrh-chevron {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .visit-row.open .vrh-chevron { transform: rotate(180deg); }
+  .visit-row-body {
+    display: none;
+    padding: 14px 16px 16px;
+    border-top: 1px dashed var(--border);
+    background: var(--cream);
+  }
+  .visit-row.open .visit-row-body { display: block; }
+  .visit-row-body .vrb-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .visit-row-body .vrb-toggle-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex: 1;
+  }
+  .visit-row-body .vrb-toggle-row input[type="checkbox"] {
+    width: 18px; height: 18px; cursor: pointer;
+  }
+  .visit-row-body .vrb-restore-btn {
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    color: var(--text-light);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .visit-row-body .vrb-restore-btn:hover {
+    background: var(--cream);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .visit-row-body .vrb-field { margin-bottom: 14px; }
+  .visit-row-body .vrb-field:last-child { margin-bottom: 0; }
+  .visit-row-body .vrb-label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .visit-row-body .vrb-hint {
+    font-weight: 500;
+    color: var(--text-light);
+    font-size: 0.74rem;
+    margin-left: 6px;
+  }
+  .visit-row-body .vrb-stars {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .visit-row-body .vrb-stars button {
+    flex: 1;
+    min-width: 44px;
+    padding: 10px 0;
+    border: 1.5px solid var(--border);
+    background: var(--paper);
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.12s;
+    color: var(--ink);
+  }
+  .visit-row-body .vrb-stars button:hover { background: var(--sun-soft, #fcefc9); }
+  .visit-row-body .vrb-stars button.active {
+    background: var(--hot);
+    color: var(--paper);
+    border-color: var(--hot-deep);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .visit-row-body .vrb-text {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    resize: vertical;
+    background: var(--paper);
+    color: var(--ink);
+    box-sizing: border-box;
+  }
+  .visit-row-body .vrb-text:focus { outline: none; border-color: var(--hot); }
+  .visit-row-body .vrb-charcount {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 4px;
+    text-align: right;
+  }
+  .visit-row-body .vrb-charcount.over { color: var(--hot-deep); font-weight: 600; }
+  .visit-row-body .vrb-ratings-summary {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 8px;
+  }
+  .visit-row-body .vrb-not-visited-note {
+    padding: 12px;
+    background: var(--paper);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: var(--text-light);
+    text-align: center;
+  }
+  @media (max-width: 520px) {
+    .visit-row-head { padding: 10px 12px; gap: 8px; }
+    .visit-row-head .vrh-name { font-size: 0.92rem; gap: 8px; }
+    .visit-row-body { padding: 12px 14px; }
+    .visit-row-body .vrb-stars button { min-width: 38px; padding: 9px 0; font-size: 0.88rem; }
+  }
+
+  /* ── Visit migration preview modal ── */
+  .visit-migration-modal .modal {
+    max-width: 780px;
+    width: calc(100vw - 32px);
+  }
+  .visit-migration-modal .vmm-intro {
+    font-size: 0.9rem;
+    color: var(--ink);
+    line-height: 1.5;
+    margin: 6px 0 14px;
+  }
+  .visit-migration-modal .vmm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-bottom: 14px;
+  }
+  .visit-migration-modal .vmm-table th,
+  .visit-migration-modal .vmm-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .visit-migration-modal .vmm-table th {
+    background: var(--cream);
+    font-weight: 700;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+  }
+  .visit-migration-modal .vmm-school-cell { font-weight: 700; }
+  .visit-migration-modal .vmm-rating { font-weight: 600; }
+  .visit-migration-modal .vmm-rating.null { color: var(--text-light); font-style: italic; font-weight: 500; }
+  .visit-migration-modal .vmm-text {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .visit-migration-modal .vmm-note {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin: 10px 0 14px;
+  }
+
   /* Final-list star toggle inline in the school-name cell on Overview rankings.
      Visible on every row, filled when the school is on the final list. */
   .summary-final-toggle {
@@ -2608,45 +2880,16 @@
     <div id="tourChecklistContainer"></div>
   </div>
 
-  <!-- Visit Evaluation sub-panel -->
+  <!-- Visit Evaluation sub-panel (v20: simplified 5-field list view) -->
   <div id="evaluation" class="sub-panel">
     <div class="section-head">
       <h2>Visit Evaluation</h2>
-      <p>Rate each school during or right after your campus visit. Scores auto-calculate using weighted categories.</p>
+      <p>Five fields per school. Autosaves as you go.</p>
     </div>
-    <div class="eval-school-picker">
-      <label style="font-weight:600;font-size:0.9rem;">Evaluating:</label>
-      <select id="evalSchoolSelect" onchange="renderEvaluation()"></select>
-    </div>
-    <div id="evalTotalBar"></div>
-    <div id="evalContainer"></div>
-    <div id="evalNotesContainer"></div>
+    <div class="visit-summary-bar" id="visitSummaryBar"></div>
+    <div id="visitList" class="visit-list"></div>
     <div class="empty-state" id="evalEmpty" style="display:none;">
-      <p>Add schools in the <strong>School Comparison</strong> tab, then evaluate them here after visiting.</p>
-    </div>
-
-    <div style="margin-top:32px">
-      <div class="section-head">
-        <h2>Evaluation Summary</h2>
-        <button class="btn btn-export" onclick="promptExport('evaluations')">Download Excel / CSV</button>
-      </div>
-      <div class="table-wrap" id="evalSummaryWrap" style="max-height:none;">
-        <table class="summary-table">
-          <thead>
-            <tr>
-              <th>School</th>
-              <th>Campus</th>
-              <th>Academic</th>
-              <th>Life</th>
-              <th>Practical</th>
-              <th>Weighted Total</th>
-              <th>Grade</th>
-              <th>Rank</th>
-            </tr>
-          </thead>
-          <tbody id="evalSummaryBody"></tbody>
-        </table>
-      </div>
+      <p>Add schools in the <strong>School Comparison</strong> tab, then rate them here after visiting.</p>
     </div>
   </div>
   </div><!-- /group-visits -->
@@ -3696,30 +3939,7 @@ function hasOnCampusVetSchool(name) {
   return !!r && r !== 'N/A' && r !== 'Not yet ranked';
 }
 
-// "Visited" = any signal that an actual visit happened. getEvalForSchool
-// lazily creates an all-zero record on first read, so presence of an entry is
-// not enough — we need a non-default signal: a visit date, ANY non-zero
-// rating in any category, or any text in the intangibles.
-function wasVisited(name) {
-  const ev = data.evaluations && data.evaluations[name];
-  if (!ev) return false;
-  if (ev.visitDate && String(ev.visitDate).trim()) return true;
-  if (ev.letterGrade && String(ev.letterGrade).trim()) return true;
-  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
-    const sec = ev[catKey];
-    if (!sec) continue;
-    for (const it of cat.items) {
-      if ((sec[it.key] || 0) > 0) return true;
-    }
-  }
-  const intg = ev.intangibles;
-  if (intg) {
-    for (const k of ['bestThing', 'biggestConcern', 'surprised', 'vibeWords']) {
-      if (intg[k] && String(intg[k]).trim()) return true;
-    }
-  }
-  return false;
-}
+// wasVisited() is defined near getEvalForSchool — single source of truth.
 
 function parseAdmitRateDecimal(name) {
   const db = schoolDB[name];
@@ -5170,14 +5390,67 @@ const EVAL_CATEGORIES = {
 
 function getEvalForSchool(name) {
   if (!data.evaluations[name]) {
-    data.evaluations[name] = { visitDate: '', weather: '', tourGuide: '', letterGrade: '' };
-    for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
-      data.evaluations[name][catKey] = {};
-      cat.items.forEach(it => data.evaluations[name][catKey][it.key] = 0);
-    }
-    data.evaluations[name].intangibles = { bestThing: '', biggestConcern: '', surprised: '', vibeWords: '' };
+    // Fresh shape: simplified 5-field visit form + back-compat containers for
+    // any legacy fields carried forward by migration. New fields:
+    //   visited       — explicit boolean (was inferred before)
+    //   overallFit    — 1-5 rating, null = not rated
+    //   campusVibe    — 1-5 rating, null = not rated
+    //   academicFit   — 1-5 rating, null = not rated
+    //   loved         — short text
+    //   concerned     — short text
+    //   legacyVisitData — the pre-v20 evaluation + visitNotes blob, preserved
+    data.evaluations[name] = {
+      visited: false,
+      overallFit: null,
+      campusVibe: null,
+      academicFit: null,
+      loved: '',
+      concerned: '',
+      legacyVisitData: null
+    };
   }
-  return data.evaluations[name];
+  // Backfill any fields missing on an existing record (e.g. schools added
+  // pre-v20 that haven't been through migration yet).
+  const ev = data.evaluations[name];
+  if (ev.visited === undefined) ev.visited = false;
+  if (ev.overallFit === undefined) ev.overallFit = null;
+  if (ev.campusVibe === undefined) ev.campusVibe = null;
+  if (ev.academicFit === undefined) ev.academicFit = null;
+  if (ev.loved === undefined) ev.loved = '';
+  if (ev.concerned === undefined) ev.concerned = '';
+  if (ev.legacyVisitData === undefined) ev.legacyVisitData = null;
+  return ev;
+}
+
+// wasVisited() was an inferred heuristic in the v19 AI Analysis fix. In v20
+// the visited state is stored explicitly — but we keep the helper as a reader
+// so existing call sites continue to work, and we fall back to the legacy
+// inference when the stored field is still default-false (i.e. pre-migration
+// records or someone who cleared their storage).
+function wasVisited(name) {
+  const ev = data.evaluations && data.evaluations[name];
+  if (!ev) return false;
+  if (ev.visited === true) return true;
+  // Legacy inference only meaningful when legacy data is present (unmigrated)
+  const legacy = ev.legacyVisitData || ev;
+  if (legacy && typeof legacy === 'object') {
+    if (legacy.visitDate && String(legacy.visitDate).trim()) return true;
+    if (legacy.letterGrade && String(legacy.letterGrade).trim()) return true;
+    for (const catKey of ['gutCheck','campus','academic','studentLife','practical']) {
+      const sec = legacy[catKey];
+      if (!sec || typeof sec !== 'object') continue;
+      for (const v of Object.values(sec)) {
+        if ((typeof v === 'number' ? v : 0) > 0) return true;
+      }
+    }
+    const intg = legacy.intangibles;
+    if (intg) {
+      for (const k of ['bestThing','biggestConcern','surprised','vibeWords']) {
+        if (intg[k] && String(intg[k]).trim()) return true;
+      }
+    }
+  }
+  return false;
 }
 
 function getVisitNotesForSchool(name) {
@@ -5211,126 +5484,517 @@ function calcMaxWeightedTotal() {
   return max;
 }
 
-function renderEvalSchoolPicker() {
-  const sel = document.getElementById('evalSchoolSelect');
-  const prev = sel.value;
-  sel.innerHTML = getVisibleSchools().map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');
-  if (prev && data.schools.find(s => s.name === prev)) sel.value = prev;
+// ─── Visit Score (v20) — Phase 2 ───
+// New visit score is derived from the three-rating simplified form:
+//   overallFit * 0.5 + campusVibe * 0.25 + academicFit * 0.25
+// Returns null if the school is not visited or any of the three ratings is
+// missing. This replaces the 31-item weighted-category total for ranking
+// purposes; the legacy score still exists in ev.legacyVisitData.
+function calcNewVisitScore(ev) {
+  if (!ev || !ev.visited) return null;
+  const { overallFit, campusVibe, academicFit } = ev;
+  if (overallFit == null || campusVibe == null || academicFit == null) return null;
+  const raw = (overallFit * 0.5) + (campusVibe * 0.25) + (academicFit * 0.25);
+  return Math.round(raw * 10) / 10;
 }
 
-function renderEvaluation() {
-  const sel = document.getElementById('evalSchoolSelect');
-  const container = document.getElementById('evalContainer');
-  const notesContainer = document.getElementById('evalNotesContainer');
-  const totalBar = document.getElementById('evalTotalBar');
-  const empty = document.getElementById('evalEmpty');
+// For ranking / summary consumers: returns { score, isEstimated }.
+// - If the new three-rating score is available, use it (isEstimated = false).
+// - Otherwise fall back to the neutral 3.0 placeholder (isEstimated = true)
+//   so the school still appears in rankings but is visibly flagged.
+// The UI should render isEstimated=true scores in italic + muted color + "*".
+function getVisitScoreInfo(name) {
+  const ev = getEvalForSchool(name);
+  const score = calcNewVisitScore(ev);
+  if (score != null) return { score: score, isEstimated: false, hasData: true };
+  return { score: 3.0, isEstimated: true, hasData: false };
+}
 
-  renderEvalSchoolPicker();
+// Completion status for the Visits-tab list view. Returns one of:
+//   'not-visited'  — visited=false
+//   'empty'        — visited=true but no ratings given
+//   'partial'      — visited=true with 1 or 2 of 3 ratings
+//   'complete'     — visited=true with all 3 ratings (loved/concerned optional)
+function getVisitCompletion(name) {
+  const ev = getEvalForSchool(name);
+  if (!ev.visited) return { state: 'not-visited', rated: 0, total: 3 };
+  const rated = ['overallFit', 'campusVibe', 'academicFit'].filter(k => ev[k] != null).length;
+  if (rated === 0) return { state: 'empty', rated: 0, total: 3 };
+  if (rated < 3) return { state: 'partial', rated, total: 3 };
+  return { state: 'complete', rated: 3, total: 3 };
+}
+
+// v20: list view of all schools with inline expandable form.
+// Sort order: (1) visited=true but incomplete ratings, (2) visited=false on
+// final list, (3) visited=false off list, (4) visited + complete.
+// Within each bucket, finalList=true first.
+function renderEvaluation() {
+  const container = document.getElementById('visitList');
+  const summaryBar = document.getElementById('visitSummaryBar');
+  const empty = document.getElementById('evalEmpty');
+  if (!container) return;
 
   if (data.schools.length === 0) {
     container.innerHTML = '';
-    notesContainer.innerHTML = '';
-    totalBar.innerHTML = '';
-    empty.style.display = 'block';
+    if (summaryBar) summaryBar.innerHTML = '';
+    if (empty) empty.style.display = 'block';
     return;
   }
-  empty.style.display = 'none';
+  if (empty) empty.style.display = 'none';
 
-  const schoolName = sel.value;
-  if (!schoolName) return;
-  const ev = getEvalForSchool(schoolName);
-  const maxTotal = calcMaxWeightedTotal();
-  const weightedTotal = calcWeightedTotal(ev);
+  const schools = data.schools.map(s => {
+    const ev = getEvalForSchool(s.name);
+    const comp = getVisitCompletion(s.name);
+    return { school: s, ev, comp };
+  });
 
-  // Total bar
-  totalBar.innerHTML = `
-    <div class="eval-total-bar">
-      <div>
-        <div class="total-score">${weightedTotal} <span style="font-size:0.85rem;font-weight:400;color:var(--text-light)">/ ${maxTotal}</span></div>
-        <div class="total-label">Weighted Total Score</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:14px">
-        <button class="btn btn-sm" onclick="expandAllEvalSections()" style="font-size:0.78rem;padding:6px 12px;">Expand All</button>
-        <button class="btn btn-sm" onclick="collapseAllEvalSections()" style="font-size:0.78rem;padding:6px 12px;">Collapse All</button>
-        <div class="eval-grade-picker">
-          <label style="font-size:0.78rem;font-weight:600;color:var(--text-light);margin-right:6px;">Letter Grade:</label>
-          <select onchange="setEvalField('${esc(schoolName)}','letterGrade',this.value)">
-            <option value="">—</option>
-            ${['A','A-','B+','B','B-','C+','C','D','F'].map(g => `<option value="${g}" ${ev.letterGrade===g?'selected':''}>${g}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-    </div>`;
+  // Bucket assignment
+  const bucket = (o) => {
+    if (o.comp.state === 'partial' || o.comp.state === 'empty') return 1; // needs attention
+    if (o.comp.state === 'not-visited' && o.school.finalList) return 2;
+    if (o.comp.state === 'not-visited') return 3;
+    return 4; // complete
+  };
+  schools.sort((a, b) => {
+    const ba = bucket(a), bb = bucket(b);
+    if (ba !== bb) return ba - bb;
+    // within bucket, finalList first
+    if (!!a.school.finalList !== !!b.school.finalList) return a.school.finalList ? -1 : 1;
+    return a.school.name.localeCompare(b.school.name);
+  });
 
-  // Visit info
-  let html = `
-    <div class="eval-section">
-      <div class="eval-section-header">Visit Information</div>
-      <div class="eval-text">
-        <label>Visit Date</label>
-        <input type="date" value="${ev.visitDate||''}" onchange="setEvalField('${esc(schoolName)}','visitDate',this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;">
-      </div>
-      <div class="eval-text">
-        <label>Weather That Day</label>
-        <input type="text" value="${esc(ev.weather||'')}" onchange="setEvalField('${esc(schoolName)}','weather',this.value)" placeholder="e.g., Sunny, 72°F" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;">
-      </div>
-      <div class="eval-text">
-        <label>Tour Guide Name</label>
-        <input type="text" value="${esc(ev.tourGuide||'')}" onchange="setEvalField('${esc(schoolName)}','tourGuide',this.value)" placeholder="Name of your tour guide" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;">
-      </div>
-    </div>`;
-
-  // Rating categories (collapsible — gutCheck expanded by default)
-  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
-    const subtotal = calcCategorySubtotal(ev, catKey);
-    const maxSub = cat.items.length * 5;
-    const collapsed = catKey !== 'gutCheck' ? ' eval-collapsed' : '';
-    html += `
-    <div class="eval-section${collapsed}" data-evalcat="${catKey}">
-      <div class="eval-section-header" onclick="toggleEvalSection(this)">
-        <span><span class="eval-chevron">&#9654;</span> ${cat.label} ${cat.weight > 0 ? `<span class="weight-badge">${cat.weight}x weight</span>` : ''}</span>
-        <span class="subtotal">${subtotal} / ${maxSub}</span>
-      </div>
-      <div class="eval-section-body">
-        ${cat.note ? `<div style="padding:8px 18px;font-size:0.8rem;color:var(--text-light);font-style:italic;">${cat.note}</div>` : ''}
-        ${cat.items.map(it => `
-        <div class="eval-row">
-          <label>${it.label}</label>
-          <div class="eval-stars">
-            ${[1,2,3,4,5].map(n => `<button class="${(ev[catKey][it.key]||0)>=n?'active':''}" onclick="setEvalRating('${esc(schoolName)}','${catKey}','${it.key}',${n})">${n}</button>`).join('')}
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`;
+  // Summary bar
+  const total = schools.length;
+  const complete = schools.filter(o => o.comp.state === 'complete').length;
+  const partial = schools.filter(o => o.comp.state === 'partial' || o.comp.state === 'empty').length;
+  const unvisited = schools.filter(o => o.comp.state === 'not-visited').length;
+  const pct = total ? Math.round((complete / total) * 100) : 0;
+  if (summaryBar) {
+    summaryBar.innerHTML =
+      '<span><strong>' + complete + '</strong> of ' + total + ' rated</span>' +
+      (partial ? '<span style="color:#7a5a00">' + partial + ' in progress</span>' : '') +
+      (unvisited ? '<span style="color:var(--text-light)">' + unvisited + ' not visited</span>' : '') +
+      '<div class="vsb-progress" aria-label="Visit data completion: ' + pct + '%"><div class="vsb-progress-fill" style="width:' + pct + '%"></div></div>';
   }
 
-  // Intangibles
-  const intang = ev.intangibles || {};
-  html += `
-    <div class="eval-section">
-      <div class="eval-section-header">Intangibles (Open Response)</div>
-      <div class="eval-text"><label>Best thing about this school</label><textarea onchange="setEvalIntangible('${esc(schoolName)}','bestThing',this.value)">${esc(intang.bestThing||'')}</textarea></div>
-      <div class="eval-text"><label>Biggest concern</label><textarea onchange="setEvalIntangible('${esc(schoolName)}','biggestConcern',this.value)">${esc(intang.biggestConcern||'')}</textarea></div>
-      <div class="eval-text"><label>What surprised you</label><textarea onchange="setEvalIntangible('${esc(schoolName)}','surprised',this.value)">${esc(intang.surprised||'')}</textarea></div>
-      <div class="eval-text"><label>The 'vibe' in 3 words</label><input type="text" value="${esc(intang.vibeWords||'')}" onchange="setEvalIntangible('${esc(schoolName)}','vibeWords',this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.88rem;width:100%;"></div>
+  container.innerHTML = schools.map(o => renderVisitRow(o.school, o.ev, o.comp)).join('');
+}
+
+function renderVisitRow(s, ev, comp) {
+  const stateClass = comp.state === 'complete' ? 'vr-complete'
+    : (comp.state === 'partial' || comp.state === 'empty') ? 'vr-partial'
+    : 'vr-not-visited';
+  const badgeClass = comp.state;
+  const badgeText = comp.state === 'complete' ? comp.rated + '/' + comp.total + ' done'
+    : comp.state === 'partial' ? comp.rated + '/' + comp.total + ' rated'
+    : comp.state === 'empty' ? 'Visited, not rated'
+    : 'Not visited';
+  const star = s.finalList ? '<span class="vrh-final-star" title="On Final List">\u2B50</span>' : '';
+
+  return `
+    <div class="visit-row ${stateClass}" id="visitrow-${esc(s.id)}">
+      <div class="visit-row-head" onclick="toggleVisitRow('${esc(s.id)}')">
+        <span class="vrh-name">${schoolLogoHTML(s.name, 24)}<span>${esc(s.name)}</span></span>
+        ${star}
+        <span class="vrh-badge ${badgeClass}">${badgeText}</span>
+        <span class="vrh-chevron">\u25BE</span>
+      </div>
+      <div class="visit-row-body">
+        ${renderVisitRowBody(s, ev)}
+      </div>
     </div>`;
+}
 
-  container.innerHTML = html;
+function renderVisitRowBody(s, ev) {
+  const name = s.name;
+  const visited = !!ev.visited;
+  const ratingButtons = (field, val) => [1,2,3,4,5].map(n =>
+    `<button type="button" class="${(val === n) ? 'active' : ''}" onclick="setVisitRating('${esc(name)}','${field}',${n})">${n}</button>`
+  ).join('');
 
-  // Visit Notes
-  const vn = getVisitNotesForSchool(schoolName);
-  notesContainer.innerHTML = `
-    <div class="visit-notes-section">
-      <h4>Visit Notes — ${esc(schoolName)}</h4>
-      <div class="visit-notes-prompt"><label>What I loved</label><textarea onchange="setVisitNote('${esc(schoolName)}','loved',this.value)">${esc(vn.loved||'')}</textarea></div>
-      <div class="visit-notes-prompt"><label>What concerned me</label><textarea onchange="setVisitNote('${esc(schoolName)}','concerned',this.value)">${esc(vn.concerned||'')}</textarea></div>
-      <div class="visit-notes-prompt"><label>Questions answered</label><textarea onchange="setVisitNote('${esc(schoolName)}','answered',this.value)">${esc(vn.answered||'')}</textarea></div>
-      <div class="visit-notes-prompt"><label>Questions still open</label><textarea onchange="setVisitNote('${esc(schoolName)}','openQuestions',this.value)">${esc(vn.openQuestions||'')}</textarea></div>
-      <div class="visit-notes-prompt"><label>Would I be happy here? Why/why not</label><textarea onchange="setVisitNote('${esc(schoolName)}','happyHere',this.value)">${esc(vn.happyHere||'')}</textarea></div>
+  const notVisitedNote = !visited
+    ? '<div class="vrb-not-visited-note">Mark this school as visited to enter ratings.</div>'
+    : '';
+
+  const ratingsSection = visited ? `
+    <div class="vrb-field">
+      <label class="vrb-label">Could you see yourself here? <span class="vrb-hint">(Overall fit)</span></label>
+      <div class="vrb-stars">${ratingButtons('overallFit', ev.overallFit)}</div>
+    </div>
+    <div class="vrb-field">
+      <label class="vrb-label">How did the place feel? <span class="vrb-hint">(People, energy, setting)</span></label>
+      <div class="vrb-stars">${ratingButtons('campusVibe', ev.campusVibe)}</div>
+    </div>
+    <div class="vrb-field">
+      <label class="vrb-label">Did the pre-vet program feel right for you? <span class="vrb-hint">(Academic fit)</span></label>
+      <div class="vrb-stars">${ratingButtons('academicFit', ev.academicFit)}</div>
+    </div>
+    <div class="vrb-field">
+      <label class="vrb-label">One thing you loved <span class="vrb-hint">(optional, ~200 char)</span></label>
+      <textarea class="vrb-text" rows="2" maxlength="220" oninput="updateVisitCharCount(this)" onblur="setVisitField('${esc(name)}','loved',this.value)">${esc(ev.loved || '')}</textarea>
+      <div class="vrb-charcount" data-max="200">${(ev.loved || '').length}/200</div>
+    </div>
+    <div class="vrb-field">
+      <label class="vrb-label">One thing that concerned you <span class="vrb-hint">(optional, ~200 char)</span></label>
+      <textarea class="vrb-text" rows="2" maxlength="220" oninput="updateVisitCharCount(this)" onblur="setVisitField('${esc(name)}','concerned',this.value)">${esc(ev.concerned || '')}</textarea>
+      <div class="vrb-charcount" data-max="200">${(ev.concerned || '').length}/200</div>
+    </div>
+  ` : '';
+
+  const hasLegacy = !!ev.legacyVisitData;
+  const legacyButton = hasLegacy
+    ? `<button type="button" class="vrb-restore-btn" onclick="restoreVisitFromLegacy('${esc(name)}')" title="Re-apply the migration mapping from the original pre-v20 visit data">&#8634; Restore from legacy</button>`
+    : '';
+
+  return `
+    <div class="vrb-toggle-row">
+      <label>
+        <input type="checkbox" ${visited ? 'checked' : ''} onchange="setVisitVisited('${esc(name)}', this.checked)">
+        Mark as visited
+      </label>
+      ${legacyButton}
+    </div>
+    ${notVisitedNote}
+    ${ratingsSection}
+  `;
+}
+
+function toggleVisitRow(schoolId) {
+  const row = document.getElementById('visitrow-' + schoolId);
+  if (row) row.classList.toggle('open');
+}
+
+function setVisitVisited(school, visited) {
+  const ev = getEvalForSchool(school);
+  ev.visited = !!visited;
+  saveData();
+  renderEvaluation();
+  // Keep the just-toggled row open so the user can continue rating immediately
+  const s = data.schools.find(x => x.name === school);
+  if (s) {
+    const row = document.getElementById('visitrow-' + s.id);
+    if (row) row.classList.add('open');
+  }
+  renderSummary();
+}
+
+function setVisitRating(school, field, n) {
+  const ev = getEvalForSchool(school);
+  if (!ev.visited) ev.visited = true;
+  // Toggle off if clicking the same value
+  ev[field] = (ev[field] === n) ? null : n;
+  saveData();
+  renderEvaluation();
+  const s = data.schools.find(x => x.name === school);
+  if (s) {
+    const row = document.getElementById('visitrow-' + s.id);
+    if (row) row.classList.add('open');
+  }
+  renderSummary();
+}
+
+function setVisitField(school, field, value) {
+  const ev = getEvalForSchool(school);
+  const trimmed = (value || '').trim();
+  if (ev[field] === trimmed) return; // no-op on blur without changes
+  ev[field] = trimmed;
+  saveData();
+  // Re-render the summary only — don't re-render the whole visit list because
+  // that would lose focus / collapse the open row.
+  renderSummary();
+}
+
+function updateVisitCharCount(textarea) {
+  const counter = textarea.parentElement.querySelector('.vrb-charcount');
+  if (!counter) return;
+  const len = textarea.value.length;
+  const max = parseInt(counter.dataset.max || '200', 10);
+  counter.textContent = len + '/' + max;
+  counter.classList.toggle('over', len > max);
+}
+
+// ─── Phase 3 migration: legacy visit data → v20 simplified schema ───
+const VISIT_MIGRATION_SENTINEL = 'visitFormV2Migrated';
+
+function roundToHalf(n) { return Math.round(n * 2) / 2; }
+
+// Returns { overallFit, campusVibe, academicFit } derived from the legacy
+// ratings. Null when the source items are all zero (per the "don't average
+// zeros into a low score" rule).
+function mapLegacyRatings(legacy) {
+  if (!legacy || typeof legacy !== 'object') {
+    return { overallFit: null, campusVibe: null, academicFit: null };
+  }
+  const gut = legacy.gutCheck || {};
+  const sl = legacy.studentLife || {};
+  const ac = legacy.academic || {};
+
+  // overallFit: prefer gutCheck.seeMyself. If 0, fall back to avg of the other
+  // two gut-check items (only non-zero values count).
+  let overallFit = null;
+  if ((gut.seeMyself || 0) > 0) {
+    overallFit = gut.seeMyself;
+  } else {
+    const fallback = [gut.comfortable, gut.myPeople].filter(v => (v || 0) > 0);
+    if (fallback.length > 0) overallFit = fallback.reduce((a, b) => a + b, 0) / fallback.length;
+  }
+
+  // campusVibe: avg of studentLife.happy/friendly/spirit/social/town, non-zero only
+  const vibeItems = [sl.happy, sl.friendly, sl.spirit, sl.social, sl.town]
+    .filter(v => (v || 0) > 0);
+  const campusVibe = vibeItems.length > 0
+    ? vibeItems.reduce((a, b) => a + b, 0) / vibeItems.length
+    : null;
+
+  // academicFit: avg of all academic items, non-zero only
+  const acItems = Object.values(ac).filter(v => (v || 0) > 0);
+  const academicFit = acItems.length > 0
+    ? acItems.reduce((a, b) => a + b, 0) / acItems.length
+    : null;
+
+  return {
+    overallFit: overallFit != null ? roundToHalf(overallFit) : null,
+    campusVibe: campusVibe != null ? roundToHalf(campusVibe) : null,
+    academicFit: academicFit != null ? roundToHalf(academicFit) : null
+  };
+}
+
+// Returns { loved, concerned } per spec: visitNotes first, then intangibles,
+// then empty. No prose-parsing fallback in v1 (avoid false sentiment tags).
+function mapLegacyText(legacyEval, legacyNotes) {
+  const notes = legacyNotes || {};
+  const intg = (legacyEval && legacyEval.intangibles) || {};
+  const loved = (notes.loved && notes.loved.trim())
+    || (intg.bestThing && intg.bestThing.trim())
+    || '';
+  const concerned = (notes.concerned && notes.concerned.trim())
+    || (intg.biggestConcern && intg.biggestConcern.trim())
+    || '';
+  return { loved, concerned };
+}
+
+// Builds a preview-only plan; no mutation. Used by the migration modal and
+// the apply step. Skips schools already migrated (ev.legacyVisitData set).
+function buildVisitMigrationPlan() {
+  const plan = [];
+  for (const s of data.schools) {
+    const ev = data.evaluations && data.evaluations[s.name];
+    const notes = data.visitNotes && data.visitNotes[s.name];
+    const alreadyMigrated = ev && ev.legacyVisitData;
+    if (alreadyMigrated) continue;
+
+    // Detect meaningful legacy data — does this school need migration?
+    const legacyEval = ev || {};
+    const hadLegacyRatings = ['gutCheck','campus','academic','studentLife','practical'].some(k => {
+      const sec = legacyEval[k];
+      return sec && typeof sec === 'object' && Object.values(sec).some(v => (v || 0) > 0);
+    });
+    const hadLegacyText = !!(
+      (legacyEval.intangibles && Object.values(legacyEval.intangibles).some(v => v && String(v).trim())) ||
+      (notes && Object.values(notes).some(v => v && String(v).trim()))
+    );
+    const hadLegacyMeta = !!(legacyEval.visitDate || legacyEval.letterGrade || legacyEval.weather || legacyEval.tourGuide);
+
+    if (!hadLegacyRatings && !hadLegacyText && !hadLegacyMeta) continue;
+
+    const newRatings = mapLegacyRatings(legacyEval);
+    const newText = mapLegacyText(legacyEval, notes);
+    plan.push({
+      name: s.name,
+      id: s.id,
+      before: {
+        hadRatings: hadLegacyRatings,
+        hadText: hadLegacyText,
+        visitDate: legacyEval.visitDate || '',
+        letterGrade: legacyEval.letterGrade || '',
+        notesLoved: (notes && notes.loved) || '',
+        notesConcerned: (notes && notes.concerned) || '',
+        intgBest: (legacyEval.intangibles && legacyEval.intangibles.bestThing) || '',
+        intgConcern: (legacyEval.intangibles && legacyEval.intangibles.biggestConcern) || '',
+      },
+      after: {
+        visited: true,
+        overallFit: newRatings.overallFit,
+        campusVibe: newRatings.campusVibe,
+        academicFit: newRatings.academicFit,
+        loved: newText.loved,
+        concerned: newText.concerned
+      }
+    });
+  }
+  return plan;
+}
+
+// Mutates data — apply the migration. Preserves old evaluation + visitNotes
+// inside ev.legacyVisitData, sets sentinel, saves, re-renders.
+//
+// NOTE on legacyVisitData lifecycle: this blob holds the entire pre-v20
+// evaluation + visitNotes record per school. It exists so users can revert
+// individual school migrations via the "Restore from legacy" button. Once
+// you've validated the migration across the board and don't need the
+// fallback, legacyVisitData can be cleared (set to null) to slim down the
+// stored data and simplify future schema work. There is no automated cleanup
+// UI for this in v20 — clear via the console or a future cleanup pass.
+function applyVisitMigration() {
+  const plan = buildVisitMigrationPlan();
+  for (const entry of plan) {
+    const name = entry.name;
+    const oldEval = (data.evaluations && data.evaluations[name]) || {};
+    const oldNotes = (data.visitNotes && data.visitNotes[name]) || {};
+
+    // Snapshot legacy data BEFORE mutating
+    const legacyBlob = {
+      evaluation: JSON.parse(JSON.stringify(oldEval)),
+      visitNotes: JSON.parse(JSON.stringify(oldNotes))
+    };
+
+    // Overwrite the evaluation record with the new shape, preserving legacy blob
+    data.evaluations[name] = {
+      visited: entry.after.visited,
+      overallFit: entry.after.overallFit,
+      campusVibe: entry.after.campusVibe,
+      academicFit: entry.after.academicFit,
+      loved: entry.after.loved,
+      concerned: entry.after.concerned,
+      legacyVisitData: legacyBlob
+    };
+  }
+  localStorage.setItem(VISIT_MIGRATION_SENTINEL, '1');
+  saveData();
+  renderAll();
+}
+
+// Per-school revert: re-runs the migration mapping against the saved legacy
+// snapshot for THIS school, overwriting any v20 edits. Used when the user
+// wants to undo a manual rating change or recover from an accidental clear.
+// No-op (with notice) if the school has no legacy snapshot (added post-v20).
+function restoreVisitFromLegacy(schoolName) {
+  const ev = data.evaluations && data.evaluations[schoolName];
+  if (!ev || !ev.legacyVisitData) {
+    alert('No legacy visit data exists for ' + schoolName + ' — nothing to restore.');
+    return;
+  }
+  const ok = confirm(
+    'Restore ' + schoolName + ' from the original visit data?\n\n' +
+    'This will discard your current ratings and re-apply the migration ' +
+    'mapping from the legacy snapshot. The legacy snapshot itself is kept.'
+  );
+  if (!ok) return;
+
+  const legacyEval = ev.legacyVisitData.evaluation || {};
+  const legacyNotes = ev.legacyVisitData.visitNotes || {};
+  const newRatings = mapLegacyRatings(legacyEval);
+  const newText = mapLegacyText(legacyEval, legacyNotes);
+
+  data.evaluations[schoolName] = {
+    visited: true,
+    overallFit: newRatings.overallFit,
+    campusVibe: newRatings.campusVibe,
+    academicFit: newRatings.academicFit,
+    loved: newText.loved,
+    concerned: newText.concerned,
+    legacyVisitData: ev.legacyVisitData // preserve the snapshot
+  };
+  saveData();
+  renderAll();
+  // Re-open the row so the user sees the restored values immediately
+  const s = data.schools.find(x => x.name === schoolName);
+  if (s) {
+    const row = document.getElementById('visitrow-' + s.id);
+    if (row) row.classList.add('open');
+  }
+}
+
+function dismissVisitMigration() {
+  // Record that we've shown the modal; don't spam on every reload. Data is
+  // unchanged. User can re-trigger via the console if needed.
+  localStorage.setItem(VISIT_MIGRATION_SENTINEL, 'skipped');
+  const overlay = document.getElementById('visitMigrationModal');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function showVisitMigrationModal() {
+  const plan = buildVisitMigrationPlan();
+  if (plan.length === 0) {
+    localStorage.setItem(VISIT_MIGRATION_SENTINEL, '1');
+    return;
+  }
+  let overlay = document.getElementById('visitMigrationModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'visitMigrationModal';
+    overlay.className = 'modal-overlay visit-migration-modal';
+    overlay.addEventListener('click', e => { if (e.target === overlay) dismissVisitMigration(); });
+    document.body.appendChild(overlay);
+  }
+  const ratingCell = (v) => v == null
+    ? '<span class="vmm-rating null">—</span>'
+    : '<span class="vmm-rating">' + v + '</span>';
+  const textCell = (v) => v
+    ? '<div class="vmm-text" title="' + esc(v) + '">' + esc(v) + '</div>'
+    : '<span class="vmm-rating null">—</span>';
+
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>Visit Data Migration — Review Before Applying</h3>
+      <p class="vmm-intro">The visit form has been simplified from 31 ratings to 3. Below is how your existing visit data will be mapped into the new schema. Your legacy data is preserved in <code>legacyVisitData</code> either way — nothing is lost. <strong>Nothing changes until you click Apply.</strong></p>
+      <div style="max-height:50vh;overflow:auto;-webkit-overflow-scrolling:touch;">
+        <table class="vmm-table">
+          <thead>
+            <tr>
+              <th>School</th>
+              <th>Overall Fit</th>
+              <th>Campus Vibe</th>
+              <th>Academic Fit</th>
+              <th>Loved</th>
+              <th>Concerned</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${plan.map(p => `
+              <tr>
+                <td class="vmm-school-cell">${esc(p.name)}</td>
+                <td>${ratingCell(p.after.overallFit)}</td>
+                <td>${ratingCell(p.after.campusVibe)}</td>
+                <td>${ratingCell(p.after.academicFit)}</td>
+                <td>${textCell(p.after.loved)}</td>
+                <td>${textCell(p.after.concerned)}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <p class="vmm-note">Null (—) ratings mean the legacy source items were all zero, so the new field is left unrated. You can fill them in via the Visits tab.</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="dismissVisitMigration()">Skip for now</button>
+        <button class="btn btn-primary" onclick="applyVisitMigration();document.getElementById('visitMigrationModal').classList.remove('open');">Apply Migration</button>
+      </div>
     </div>`;
+  overlay.classList.add('open');
+}
 
-  // Summary table
-  renderEvalSummary();
+// Trigger the modal on first load after v20 if there's legacy data to migrate.
+// Skips if the user has already applied OR explicitly dismissed.
+function maybeTriggerVisitMigration() {
+  const sentinel = localStorage.getItem(VISIT_MIGRATION_SENTINEL);
+  if (sentinel === '1') return; // already applied
+  // We intentionally re-show even if 'skipped' was set, UNLESS the user has
+  // actively filled out the new form. If any school has a non-default v20
+  // field set, assume the user is using the new form and don't nag.
+  if (sentinel === 'skipped') {
+    const anyV20Data = data.schools.some(s => {
+      const ev = data.evaluations && data.evaluations[s.name];
+      return ev && (ev.visited === true || ev.overallFit != null || ev.campusVibe != null || ev.academicFit != null || ev.loved || ev.concerned);
+    });
+    if (anyV20Data) return;
+  }
+  const plan = buildVisitMigrationPlan();
+  if (plan.length === 0) {
+    localStorage.setItem(VISIT_MIGRATION_SENTINEL, '1');
+    return;
+  }
+  // Defer slightly so the dashboard has rendered and the user sees the modal
+  // land on top of a fully-populated UI rather than a blank page.
+  setTimeout(showVisitMigrationModal, 600);
 }
 
 function toggleEvalSection(header) {
@@ -5457,14 +6121,13 @@ function renderRankings() {
   const maxTotal = calcMaxWeightedTotal();
 
   const rows = getVisibleSchools().map(s => {
-    const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
-    const visitScore = calcWeightedTotal(ev);
-    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    const visitInfo = getVisitScoreInfo(s.name);
     return {
       name: s.name,
-      visitScore,
-      visitNorm: Math.round(visitNorm * 10) / 10,
+      visitScore: visitInfo.score, // 0–5 scale directly
+      visitNorm: Math.round(visitInfo.score * 10) / 10,
+      visitScoreIsEstimated: visitInfo.isEstimated,
       vetProgram: rk.vetProgram || 3,
       costScore: rk.costScore || 3,
       planB: rk.planB || 3,
@@ -5474,7 +6137,8 @@ function renderRankings() {
     };
   });
 
-  // Calculate visit ranks
+  // Calculate visit ranks (unrated schools with placeholder 3.0 end up tied
+  // in the middle, which is intentional — they have no data to rank by).
   const visitSorted = [...rows].sort((a, b) => b.visitScore - a.visitScore);
   visitSorted.forEach((r, i) => r.visitRank = i + 1);
 
@@ -5500,19 +6164,27 @@ function renderRankings() {
     </select>`;
   }
 
-  tbody.innerHTML = sortedRows.map(r => `
+  tbody.innerHTML = sortedRows.map(r => {
+    const visitCell = r.visitScoreIsEstimated
+      ? `<span class="score-estimated" title="No visit data — using 3.0 placeholder">${r.visitScore.toFixed(1)}*</span>`
+      : r.visitScore.toFixed(1);
+    const combinedCell = r.visitScoreIsEstimated
+      ? `<span class="score-estimated" title="Combined score uses a visit-score placeholder">${r.combined}*</span>`
+      : r.combined;
+    return `
     <tr>
       <td>${r.finalRank}</td>
       <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
-      <td>${r.visitScore}</td>
+      <td>${visitCell}</td>
       <td>#${r.visitRank}</td>
       <td>${ratingSelect(r.name,'vetProgram',r.vetProgram)}</td>
       <td>${ratingSelect(r.name,'costScore',r.costScore)}</td>
       <td>${ratingSelect(r.name,'planB',r.planB)}</td>
       <td>${ratingSelect(r.name,'meritAid',r.meritAid)}</td>
-      <td style="font-weight:700">${r.combined}</td>
+      <td style="font-weight:700">${combinedCell}</td>
       <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(r.name)}','notes',this.value)"></td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   setupSortableHeaders('rankingsHead', RANKING_COLUMNS, rankingsSort, renderRankings);
 }
@@ -5740,10 +6412,9 @@ function renderSummary() {
 
   // Build rows dynamically from live data
   const rows = getVisibleSchools().map(s => {
-    const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
-    const visitScore = calcWeightedTotal(ev);
-    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    const visitInfo = getVisitScoreInfo(s.name);
+    const visitNorm = visitInfo.score; // already 0–5 from the new calc
     const combined = Math.round((
       visitNorm * RANK_WEIGHTS.visit +
       (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
@@ -5766,7 +6437,7 @@ function renderSummary() {
       noMerit: costInfo.noMerit || false,
       notes: rk.notes || '',
       visitNorm: Math.round(visitNorm * 10) / 10,
-      visitScore,
+      visitScoreIsEstimated: visitInfo.isEstimated,
       combined
     };
   });
@@ -5781,12 +6452,15 @@ function renderSummary() {
     const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
     const starIcon = r.finalList ? '\u2B50' : '\u2606';
     const starTitle = r.finalList ? 'On Final List — click to remove' : 'Add to Final List';
+    const combinedDisplay = r.visitScoreIsEstimated
+      ? `<span class="score-estimated" title="Visit score estimated (no data entered yet) — combined score is a placeholder">${r.combined.toFixed(2)}*</span>`
+      : r.combined.toFixed(2);
     return `<tr${r.finalList ? ' class="summary-on-final-list"' : ''}>
       <td class="summary-rank-cell compact">${r.rank}</td>
       <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span><button class="summary-final-toggle${r.finalList ? ' on' : ''}" type="button" onclick="toggleFinalList('${r.id}')" title="${starTitle}" aria-label="${starTitle}">${starIcon}</button></span></td>
       <td class="compact"><span class="badge ${catClass}">${r.cat}</span></td>
       <td class="compact" style="font-weight:700">${r.cost}</td>
-      <td class="compact" style="font-weight:800;color:var(--hot-deep)">${r.combined.toFixed(2)}</td>
+      <td class="compact" style="font-weight:800;color:var(--hot-deep)">${combinedDisplay}</td>
       <td style="font-size:0.82rem;max-width:260px;color:var(--ink-2)">${esc(r.notes)}</td>
     </tr>`;
   }).join('');
@@ -6932,7 +7606,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v3';
+const PROMPT_VERSION = 'v4';
 const SYSTEM_PROMPT_V2 = [
   "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly — speak to them, not about them. Be direct, analytical, and willing to push back on list construction or strategy choices you disagree with. Avoid generic reassurance.",
   "",
@@ -6962,7 +7636,9 @@ const SYSTEM_PROMPT_V2 = [
   "",
   "- Do not repeat the ratings or costs back to the user — they see that data. Your value is interpretation and recommendation.",
   "- When you use a rating, refer to the descriptor, not the number. (\"You rated the visit a 4 with notes about weather concerns\" → \"The visit went well but weather gave Avery pause.\") If a descriptor is empty, fall back to the rubric anchor language and signal you're inferring from the score alone.",
-  "- The visit score is a 1–5 rating. Do not characterize a school as unvisited based on visit score alone. Use the per-school `visited` boolean: if `visited` is false (or `ratings.visit.score` is null), say the school has not been visited yet. If `ratings.visit.score` is a number, treat it as a visit rating, not as a proxy for whether a visit occurred.",
+  "- The visit score is a 1–5 rating. Do not characterize a school as unvisited based on visit score alone. Use the per-school `visited` boolean and the `visitData` block: if `visited` is false (or `visitData.visited` is false), the school has not been visited — do not infer anything about the school's fit for the student from the absence of visit data. Treat it as missing information. Recommend a visit if the school is strategically important.",
+  "- If `visitData.visitScoreIsEstimated` is true, the visitScore is a 3.0 placeholder, not a real rating. Do not reason from that number; say the visit data is missing.",
+  "- When visit data is present, use `visitData.loved` and `visitData.concerned` as the qualitative descriptors for the visit. They are the family's own words and should be treated as the most authoritative signal of fit.",
   "- If the data is insufficient to answer a strategic question, say so and name what specifically would help.",
   "- Push back if the weighting scheme seems miscalibrated for the decision at hand. The family wants honest input, not validation.",
   "- Respect non-negotiables absolutely — do not recommend a school that violates one without explicitly flagging the violation.",
@@ -6988,8 +7664,8 @@ function gatherAIData() {
   const rows = getVisibleSchools().map(s => {
     const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
-    const visitScore = calcWeightedTotal(ev);
-    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    const visitInfo = getVisitScoreInfo(s.name);
+    const visitNorm = visitInfo.score; // 0–5; placeholder 3.0 when estimated
     const combined = Math.round((
       visitNorm * RANK_WEIGHTS.visit +
       (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
@@ -7004,24 +7680,46 @@ function gatherAIData() {
     const competitive = getCompetitiveMeritAnnual(s.name);
     const netAnnual = Math.max(0, sticker - guaranteed - competitive);
 
-    const visitNormRounded = Math.round(visitNorm * 10) / 10;
-    const visited = wasVisited(s.name);
+    const visited = !!ev.visited;
     const desc = rk.descriptors || {};
+
+    // New visit payload (v20): structured visitData sibling to ratings.
+    // When visited=false, send only { visited: false }; model must treat as
+    // missing information per the system prompt.
+    const visitData = visited
+      ? {
+          visited: true,
+          visitScore: visitInfo.hasData ? visitInfo.score : null,
+          visitScoreIsEstimated: visitInfo.isEstimated,
+          ratings: {
+            overallFit:  ev.overallFit,
+            campusVibe:  ev.campusVibe,
+            academicFit: ev.academicFit
+          },
+          loved: ev.loved || '',
+          concerned: ev.concerned || ''
+        }
+      : { visited: false };
 
     return {
       name: s.name,
       onFinalList: !!s.finalList,
       rankOrder: 0, // assigned after sort
       combinedScore: combined,
+      combinedScoreIsEstimated: visitInfo.isEstimated,
       category: formatCategory(getSummaryCategory(s.name)),
       hasOnCampusVetSchool: hasOnCampusVetSchool(s.name),
       admitRate: parseAdmitRateDecimal(s.name),
       visited: visited,
+      visitData: visitData,
       ratings: {
-        // visit.score is null when visited=false. The combined score still
-        // treats unvisited visits as 0 internally, but the model should not
-        // interpret a null score as a low rating.
-        visit:      { score: visited ? visitNormRounded : null, descriptor: desc.visit || '' },
+        // ratings.visit is kept for back-compat / rubric consistency, but the
+        // authoritative visit payload is `visitData` above. The visit
+        // descriptor now pulls from loved+concerned when available.
+        visit: {
+          score: visitInfo.hasData ? visitInfo.score : null,
+          descriptor: [ev.loved, ev.concerned && ('Concern: ' + ev.concerned)].filter(Boolean).join(' / ') || desc.visit || ''
+        },
         vetProgram: { score: rk.vetProgram || 3, descriptor: desc.vetProgram || '' },
         cost:       { score: rk.costScore || 3, descriptor: desc.cost || '' },
         meritAid:   { score: rk.meritAid || 3, descriptor: desc.meritAid || '' },
@@ -7114,7 +7812,9 @@ function aiCacheFingerprint(aiData) {
     n: s.name,
     fl: s.onFinalList,
     v: s.visited,
+    vd: s.visitData,
     cs: s.combinedScore,
+    ce: s.combinedScoreIsEstimated,
     cat: s.category,
     r: [s.ratings.visit.score, s.ratings.vetProgram.score, s.ratings.cost.score, s.ratings.meritAid.score, s.ratings.planB.score],
     f: [s.financials.stickerAnnual, s.financials.guaranteedMeritAnnual, s.financials.estimatedCompetitiveMeritAnnual]
@@ -7700,6 +8400,7 @@ function renderAll() {
   updateFinalListUI();
 }
 renderAll();
+maybeTriggerVisitMigration();
 
 // ─── ACT Score Editor Modal ───
 function openScoreEditor() {
