@@ -1601,12 +1601,138 @@
     #summary .section-head h2 { font-size: 1.75rem; }
     .btn-ai { padding: 9px 16px; font-size: 0.8rem; min-height: 40px; }
 
-    /* Rankings table: compact on phone */
-    #summary .table-wrap { border-radius: 20px; border-width: 2px; }
-    #summary table { min-width: 560px; }
-    #summary thead th { padding: 10px 10px; font-size: 0.58rem; letter-spacing: 0.08em; }
-    #summary tbody td { padding: 11px 10px; font-size: 0.82rem; }
-    #summary tbody td:first-child { width: 42px; font-size: 1.15rem; }
+    /* Rankings table → card layout on phone.
+       The wide-table approach doesn't fit: sticky Rank+School columns plus
+       nowrap school names push Category/Cost/Score/Notes off-screen. */
+    #summary .table-wrap {
+      overflow: visible;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+      max-height: none;
+    }
+    #summary table {
+      min-width: 0;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: transparent;
+    }
+    #summary thead { display: none; }
+    #summary tbody, #summary tbody tr, #summary tbody td { display: block; width: 100%; }
+    #summary tbody tr {
+      position: relative;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 14px 16px 12px;
+      margin-bottom: 14px;
+    }
+    /* Neutralize desktop sticky positioning on phone */
+    #summaryHead th:first-child,
+    #summaryHead th:nth-child(2),
+    #summaryRankBody td:first-child,
+    #summaryRankBody td:nth-child(2) {
+      position: static;
+      left: auto;
+      min-width: 0;
+      background: transparent;
+      border-right: none;
+    }
+    #summaryRankBody tr:nth-child(even) td:first-child,
+    #summaryRankBody tr:nth-child(even) td:nth-child(2),
+    #summaryRankBody tr:hover td:first-child,
+    #summaryRankBody tr:hover td:nth-child(2) {
+      background: transparent;
+    }
+    /* Rank → badge pinned top-right of card */
+    #summary tbody td:first-child:not(:only-child) {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      width: auto;
+      padding: 2px 10px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--hot-deep);
+      background: var(--hot-soft);
+      border: 1.5px solid var(--hot-deep);
+      border-radius: 999px;
+      line-height: 1.2;
+    }
+    #summary tbody td:first-child:not(:only-child)::before {
+      content: '#';
+      font-weight: 700;
+      margin-right: 1px;
+      opacity: 0.75;
+    }
+    /* School name → card title. Allow wrapping, leave room for rank badge */
+    #summary tbody td:nth-child(2):not(:only-child) {
+      padding: 0 68px 10px 0;
+      margin-bottom: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      border-bottom: 1px dashed var(--border);
+      white-space: normal !important;
+    }
+    #summary tbody td:nth-child(2):not(:only-child) span {
+      flex-wrap: wrap;
+    }
+    /* Category / Cost / Score → inline labeled row */
+    #summary tbody td:nth-child(3),
+    #summary tbody td:nth-child(4),
+    #summary tbody td:nth-child(5) {
+      display: inline-flex;
+      align-items: baseline;
+      width: auto;
+      padding: 4px 0;
+      margin: 0 16px 4px 0;
+      font-size: 0.88rem;
+    }
+    #summary tbody td:nth-child(4)::before {
+      content: 'Cost';
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    #summary tbody td:nth-child(5)::before {
+      content: 'Score';
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    /* Notes → full-width footer, hide if empty */
+    #summary tbody td:nth-child(6) {
+      padding: 10px 0 0;
+      margin-top: 6px;
+      max-width: none !important;
+      font-size: 0.8rem !important;
+      line-height: 1.45;
+      border-top: 1px dashed var(--border);
+      color: var(--ink-2);
+    }
+    #summary tbody td:nth-child(6):empty {
+      display: none;
+      border-top: none;
+      padding: 0;
+      margin: 0;
+    }
+    /* Empty-state row (single td with colspan) keeps normal layout */
+    #summary tbody td:only-child {
+      padding: 20px 16px;
+      text-align: center;
+      border-radius: 16px;
+    }
 
     /* Tabs */
     .tab-bar { padding: 10px 12px; }
