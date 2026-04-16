@@ -1630,6 +1630,34 @@
     .mast-btn { width: 36px; height: 36px; }
   }
 
+  /* ── Superscore + Admit Rate tags ── */
+  .ss-tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: var(--leaf-soft);
+    color: var(--leaf);
+    border: 1px solid var(--leaf);
+    padding: 1px 5px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  .admit-tag {
+    display: inline-block;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 1px 4px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
+
   /* ── Sticky school-name columns (all data tables) ── */
 
   /* Tables where School = column 1 */
@@ -1872,7 +1900,6 @@
     <div class="section-head">
       <h2>School Comparison</h2>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button id="compareBtn" class="btn btn-primary" onclick="openCompareModal()" style="display:none;">Compare Selected</button>
         <button class="btn btn-primary" onclick="openModal('school')">+ Add School</button>
         <button class="btn btn-export" onclick="promptExport('comparison')">Download Excel / CSV</button>
       </div>
@@ -3484,29 +3511,26 @@ function getSuperscoreStatus(schoolName) {
 }
 
 const SCHOOL_COLUMNS = [
-  { field: '_compare',        label: '',               sortType: null },
   { field: '_finalList',      label: '',               sortType: null },
-  { field: null,              label: '',               sortType: null },
   { field: 'name',            label: 'School',         sortType: 'text' },
   { field: 'location',        label: 'Location',       sortType: 'text' },
-  { field: '_distance',       label: 'Distance',       sortType: 'numeric' },
-  { field: 'notes',           label: 'Program Notes',  sortType: 'text' },
-  { field: 'usNewsOverall',   label: 'US\u00a0News',    sortType: 'rank' },
-  { field: 'usNewsPublic',    label: 'Public\u00a0Rank', sortType: 'rank' },
-  { field: 'vetSchoolRank',   label: 'Vet\u00a0School', sortType: 'rank' },
   { field: 'avgGPA',          label: 'GPA',            sortType: 'numeric' },
-  { field: 'testReq',         label: 'ACT',             sortType: 'text' },
-  { field: '_superscore',     label: 'Superscore',     sortType: 'text' },
-  { field: 'acceptRate',      label: 'Accept\u00a0%',  sortType: 'percent' },
-  { field: 'oosAcceptRate',   label: 'OOS\u00a0%',     sortType: 'percent' },
-  { field: 'tuitionIn',       label: 'In-State\u00a0$',sortType: 'currency' },
-  { field: 'tuitionOut',      label: 'OOS\u00a0$',     sortType: 'currency' },
-  { field: 'roomBoard',      label: 'Room\u00a0&\u00a0Board', sortType: 'currency' },
+  { field: 'testReq',         label: 'ACT',            sortType: 'text' },
+  { field: '_admitRate',      label: 'Admit\u00a0%',   sortType: 'percent' },
   { field: 'deadline',        label: 'Deadline',       sortType: 'date' },
   { field: 'earlyDecision',   label: 'Early\u00a0DL',  sortType: 'date' },
   { field: 'status',          label: 'Status',         sortType: 'status' },
   { field: null,              label: '',               sortType: null },
 ];
+
+function getSmartAdmitRate(school) {
+  const loc = (school.location || (schoolDB[school.name] || {}).location || '').trim();
+  const isGA = loc.endsWith(', GA');
+  if (isGA) {
+    return { rate: school.acceptRate || '', tag: 'IS' };
+  }
+  return { rate: school.oosAcceptRate || school.acceptRate || '', tag: 'OOS' };
+}
 
 function parseSortValue(val, sortType) {
   if (val == null || val === '') return -Infinity;
@@ -3555,6 +3579,9 @@ function sortSchools(field, dir) {
     } else if (field === '_superscore') {
       va = getSuperscoreStatus(a.name);
       vb = getSuperscoreStatus(b.name);
+    } else if (field === '_admitRate') {
+      va = parseSortValue(getSmartAdmitRate(a).rate, 'percent');
+      vb = parseSortValue(getSmartAdmitRate(b).rate, 'percent');
     } else {
       va = parseSortValue(a[field] || (schoolDB[a.name] && schoolDB[a.name][field]) || '', col.sortType);
       vb = parseSortValue(b[field] || (schoolDB[b.name] && schoolDB[b.name][field]) || '', col.sortType);
@@ -3809,8 +3836,7 @@ function openCompareModal() {
 }
 
 function renderSchools() {
-  // Build dynamic thead
-  const stickyCount = 4; // checkbox, star, logo, school name
+  const stickyCount = 2; // star, school name (with logo)
   const thead = document.getElementById('schoolHead');
   thead.innerHTML = '<tr>' + SCHOOL_COLUMNS.map((col, i) => {
     const lastSticky = i === stickyCount - 1 ? ' sticky-col-last' : '';
@@ -3818,8 +3844,8 @@ function renderSchools() {
     if (!col.sortType && i < stickyCount) return `<th${sticky}>${col.label}</th>`;
     if (!col.sortType) return `<th>${col.label}</th>`;
     const isActive = schoolSort.field === col.field;
-    const arrow = isActive ? (schoolSort.dir === 'asc' ? ' ▲' : ' ▼') : '';
-    const hint = !isActive ? ' <span class="sort-hint">▲▼</span>' : '';
+    const arrow = isActive ? (schoolSort.dir === 'asc' ? ' \u25B2' : ' \u25BC') : '';
+    const hint = !isActive ? ' <span class="sort-hint">\u25B2\u25BC</span>' : '';
     if (i < stickyCount) return `<th${sticky} data-field="${col.field}">${col.label}${arrow}${hint}</th>`;
     return `<th class="sortable" data-field="${col.field}">${col.label}${arrow}${hint}</th>`;
   }).join('') + '</tr>';
@@ -3840,30 +3866,18 @@ function renderSchools() {
   const tbody = document.getElementById('schoolBody');
   tbody.innerHTML = getVisibleSchools().map(s => {
     const dbEntry = schoolDB[s.name];
-    const schoolColor = s.color || (dbEntry && dbEntry.color) || '#4a7c8a';
-    const initials = s.name.split(' ').map(w => w[0]).filter(c => c && c === c.toUpperCase()).slice(0,2).join('');
-    const dist = getDistanceFromAtlanta(s.location);
-    const distDisplay = dist != null ? dist + ' mi' : '\u2014';
+    const ss = getSuperscoreStatus(s.name);
+    const ssBadge = ss === 'Yes' ? ' <span class="ss-tag" title="Superscores ACT">SS</span>' : '';
+    const admit = getSmartAdmitRate(s);
+    const admitTag = admit.rate ? `<span class="admit-tag">${admit.tag}</span>` : '';
     return `
     <tr data-id="${s.id}">
-      <td class="compact sticky-col" style="width:28px;"><input type="checkbox" class="compare-cb" data-school="${esc(s.name)}" ${compareSelected.includes(s.name) ? 'checked' : ''} onchange="toggleCompare(this)" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;" title="Select to compare"></td>
-      <td class="compact sticky-col" style="width:28px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
-      <td class="logo-cell sticky-col">${schoolLogoHTML(s.name)}</td>
-      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span contenteditable="true" data-field="name">${esc(s.name)}</span></td>
+      <td class="compact sticky-col" style="width:34px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
+      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name)} <span contenteditable="true" data-field="name">${esc(s.name)}</span></span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
-      <td class="compact">${distDisplay}</td>
-      <td class="notes-cell"><span contenteditable="true" data-field="notes">${esc(s.notes)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="usNewsOverall">${esc(s.usNewsOverall || (dbEntry && dbEntry.usNewsOverall) || '')}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="usNewsPublic">${esc(s.usNewsPublic || (dbEntry && dbEntry.usNewsPublic) || '')}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="vetSchoolRank">${esc(s.vetSchoolRank || (dbEntry && dbEntry.vetSchoolRank) || '')}</span></td>
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
-      <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span></td>
-      <td class="compact">${getSuperscoreStatus(s.name)}</td>
-      <td class="compact"><span contenteditable="true" data-field="acceptRate">${esc(s.acceptRate)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="oosAcceptRate">${esc(s.oosAcceptRate)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="tuitionIn">${esc(s.tuitionIn)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="tuitionOut">${esc(s.tuitionOut)}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="roomBoard">${esc(s.roomBoard || (dbEntry && dbEntry.roomBoard) || '')}</span></td>
+      <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span>${ssBadge}</td>
+      <td class="compact">${esc(admit.rate)} ${admitTag}</td>
       <td class="compact"><span contenteditable="true" data-field="deadline">${esc(s.deadline)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="earlyDecision">${esc(s.earlyDecision)}</span></td>
       <td>
@@ -3902,7 +3916,6 @@ function renderSchools() {
     for (let i = 0; i < stickyCount && i < ths.length; i++) {
       ths[i].style.left = left + 'px';
       const w = ths[i].offsetWidth;
-      // Apply same offset to all body rows
       tbody.querySelectorAll('tr').forEach(tr => { tr.children[i].style.left = left + 'px'; });
       left += w;
     }
