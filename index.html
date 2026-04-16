@@ -1631,7 +1631,8 @@
       padding: 14px 16px 12px;
       margin-bottom: 14px;
     }
-    /* Neutralize desktop sticky positioning on phone */
+    /* Neutralize desktop sticky positioning on phone (for the school-name
+       cell; rank cell is hidden outright below) */
     #summaryHead th:first-child,
     #summaryHead th:nth-child(2),
     #summaryRankBody td:first-child,
@@ -1642,63 +1643,51 @@
       background: transparent;
       border-right: none;
     }
-    #summaryRankBody tr:nth-child(even) td:first-child,
-    #summaryRankBody tr:nth-child(even) td:nth-child(2),
-    #summaryRankBody tr:hover td:first-child,
-    #summaryRankBody tr:hover td:nth-child(2) {
-      background: transparent;
-    }
-    /* Rank → badge pinned top-right of card */
-    #summary tbody td:first-child:not(:only-child) {
-      position: absolute;
-      top: 10px;
-      right: 14px;
-      width: auto;
-      padding: 2px 10px;
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--hot-deep);
-      background: var(--hot-soft);
-      border: 1.5px solid var(--hot-deep);
-      border-radius: 999px;
-      line-height: 1.2;
-    }
-    #summary tbody td:first-child:not(:only-child)::before {
-      content: '#';
-      font-weight: 700;
-      margin-right: 1px;
-      opacity: 0.75;
-    }
-    /* School name → card title. Reserve space on the right for the rank badge
-       and let long names wrap cleanly inside the card (not into the badge). */
+    /* Hide the separate rank column on phone; we inline the rank as a pill
+       inside the school-name cell instead (position:absolute on display:block
+       tds is flaky in iOS Safari). */
+    #summary tbody td.summary-rank-cell { display: none !important; }
+
+    /* School name → card title. Uses a 3-column grid:
+       [rank pill] [logo] [school name (wraps)] */
     #summary tbody td.summary-school-cell {
-      padding: 2px 76px 10px 0;
+      padding: 2px 0 10px 0;
       margin-bottom: 10px;
       font-size: 1.05rem;
       font-weight: 700;
       line-height: 1.3;
-      min-height: 34px;
       border-bottom: 1px dashed var(--border);
       white-space: normal !important;
     }
-    /* Grid layout: fixed logo column + flexible name column that wraps.
-       Grid handles this more reliably than flex (where anonymous text
-       children don't always shrink-to-wrap). */
     #summary tbody td.summary-school-cell .summary-school-wrap {
       display: grid !important;
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: auto auto minmax(0, 1fr);
       column-gap: 10px;
       align-items: center;
       width: 100%;
       max-width: 100%;
       white-space: normal !important;
     }
+    #summary tbody td.summary-school-cell .summary-school-rank-inline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--hot-deep);
+      background: var(--hot-soft);
+      border: 1.5px solid var(--hot-deep);
+      border-radius: 999px;
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+    }
     #summary tbody td.summary-school-cell .summary-school-wrap > img,
     #summary tbody td.summary-school-cell .summary-school-wrap > .logo-fallback {
-      grid-column: 1;
+      flex-shrink: 0;
     }
     #summary tbody td.summary-school-cell .summary-school-name {
-      grid-column: 2;
       min-width: 0;
       max-width: 100%;
       white-space: normal !important;
@@ -1888,6 +1877,11 @@
   #summaryRankBody tr:hover td:nth-child(2) {
     background: var(--hot-soft);
   }
+
+  /* Inline rank pill inside school-name cell — only rendered on phones.
+     Hidden by default so the desktop view (which has its own rank column)
+     doesn't show the rank twice. */
+  .summary-school-rank-inline { display: none; }
 
   /* Rankings (Schools tab) — rank + school sticky */
   #rankingsHead th:first-child,
@@ -5483,8 +5477,8 @@ function renderSummary() {
   tbody.innerHTML = summaryRows.map(r => {
     const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
     return `<tr>
-      <td class="compact">${r.rank}</td>
-      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px">${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span></span></td>
+      <td class="summary-rank-cell compact">${r.rank}</td>
+      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span></span></td>
       <td class="compact"><span class="badge ${catClass}">${r.cat}</span></td>
       <td class="compact" style="font-weight:700">${r.cost}</td>
       <td class="compact" style="font-weight:800;color:var(--hot-deep)">${r.combined.toFixed(2)}</td>
