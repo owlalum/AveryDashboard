@@ -550,6 +550,25 @@
   @keyframes aispin { to { transform: rotate(360deg); } }
   .ai-error { background: #fce8e8; border: 1px solid #e8b3b3; border-radius: 8px; padding: 16px; color: var(--danger); font-size: 0.88rem; }
   .ai-cached-badge { font-size: 0.75rem; color: var(--text-light); font-weight: 400; margin-left: 8px; }
+  .ai-question-recap {
+    background: var(--cream, #f7efe2);
+    border-left: 3px solid var(--hot, #d6336c);
+    padding: 10px 14px;
+    margin: 12px 0 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--ink, #1a0f2e);
+  }
+  .ai-question-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--hot-deep, #b04060);
+    margin-right: 6px;
+  }
 
   /* ── Compare Modal ── */
   .compare-overlay {
@@ -1902,6 +1921,119 @@
      doesn't show the rank twice. */
   .summary-school-rank-inline { display: none; }
 
+  /* ── Strategic Context panel (feeds AI Analysis) ── */
+  .strategic-context {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 3px 3px 0 var(--ink);
+    margin: 24px 0 18px;
+    overflow: hidden;
+  }
+  .strategic-context > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: var(--ink);
+    user-select: none;
+  }
+  .strategic-context > summary::-webkit-details-marker { display: none; }
+  .strategic-context .sc-icon { font-size: 1.1rem; }
+  .strategic-context .sc-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+  }
+  .strategic-context .sc-summary {
+    flex: 1;
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    font-family: var(--font-body);
+    font-style: normal;
+  }
+  .strategic-context .sc-chevron {
+    font-size: 0.9rem;
+    color: var(--ink);
+    transition: transform 0.18s;
+  }
+  .strategic-context[open] > summary .sc-chevron { transform: rotate(180deg); }
+  .strategic-context .sc-body {
+    padding: 4px 18px 18px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .strategic-context .sc-note {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    margin: 8px 0 4px;
+    line-height: 1.45;
+  }
+  .strategic-context .sc-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 6px;
+  }
+  .strategic-context .sc-hint {
+    font-weight: 500;
+    color: var(--text-light);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.74rem;
+    margin-left: 4px;
+  }
+  .strategic-context .sc-textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--ink);
+    background: var(--cream);
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .strategic-context .sc-textarea:focus {
+    outline: none;
+    border-color: var(--hot);
+    background: var(--paper);
+  }
+  .strategic-context .sc-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .strategic-context .sc-saved {
+    font-size: 0.78rem;
+    color: var(--leaf);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .strategic-context .sc-saved.show { opacity: 1; }
+  @media (max-width: 520px) {
+    .strategic-context > summary { padding: 12px 14px; gap: 10px; }
+    .strategic-context .sc-title { font-size: 1.05rem; }
+    .strategic-context .sc-body { padding: 4px 14px 14px; }
+    .strategic-context .sc-textarea { font-size: 0.85rem; }
+  }
+
   /* Rankings (Schools tab) — rank + school sticky */
   #rankingsHead th:first-child,
   #rankingsBody td:first-child {
@@ -2034,6 +2166,39 @@
       <div class="status-card-eyebrow">Where things stand</div>
       <div id="appStatusBody"></div>
     </section>
+
+    <!-- Strategic context (feeds AI Analysis payload) -->
+    <details class="strategic-context" id="strategicContextPanel">
+      <summary>
+        <span class="sc-icon">&#127919;</span>
+        <span class="sc-title">Strategic Context</span>
+        <span class="sc-summary" id="scSummaryLine"></span>
+        <span class="sc-chevron">&#9662;</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-note">These fields feed directly into the AI Analysis payload. Edit anytime — the analysis cache invalidates when these change.</p>
+
+        <label class="sc-label" for="scQuestion">Question for next analysis <span class="sc-hint">(optional — Claude prioritizes answering this)</span></label>
+        <textarea id="scQuestion" class="sc-textarea" rows="2" placeholder="e.g., Is Cornell ED worth the binding commitment given Avery's competitive personality?"></textarea>
+
+        <label class="sc-label" for="scDecisions">Decisions on the board <span class="sc-hint">(blank line between items)</span></label>
+        <textarea id="scDecisions" class="sc-textarea" rows="4" placeholder="e.g., Cornell CALS ED — decide by Nov 1.&#10;&#10;Purdue Honors EA — keep or drop?&#10;&#10;Is the list too top-heavy on reaches?"></textarea>
+
+        <label class="sc-label" for="scRecent">Recent changes <span class="sc-hint">(optional — what's moved since last run)</span></label>
+        <textarea id="scRecent" class="sc-textarea" rows="2" placeholder="e.g., Added Cornell to list. April ACT retake came back at 29."></textarea>
+
+        <label class="sc-label" for="scNonNeg">Non-negotiables <span class="sc-hint">(one per line — hard constraints Claude should respect)</span></label>
+        <textarea id="scNonNeg" class="sc-textarea" rows="3" placeholder="e.g., Must have on-campus DVM program.&#10;Total 4-yr cost cap of $200K."></textarea>
+
+        <label class="sc-label" for="scHousehold">Household financial context</label>
+        <textarea id="scHousehold" class="sc-textarea" rows="3" placeholder="Brief description of cost sensitivity / posture."></textarea>
+
+        <div class="sc-actions">
+          <button class="btn btn-primary btn-sm" onclick="saveStrategicContext()">Save</button>
+          <span class="sc-saved" id="scSavedFlash"></span>
+        </div>
+      </div>
+    </details>
 
     <div class="section-head">
       <h2>School <em>Rankings</em></h2>
@@ -3070,6 +3235,26 @@ function runMigrations() {
   if (!data.tourChecklist) data.tourChecklist = null;
   if (!data.finConfig) data.finConfig = { b529: 0, cashPerYr: 0 };
   if (!data.actScores) data.actScores = { composite: 0, english: 0, math: 0, reading: 0, science: 0 };
+  // Phase 1 AI Analysis: extended ACT context
+  if (data.actScores.superscore == null) data.actScores.superscore = data.actScores.composite || 0;
+  if (data.actScores.latestSittingDate === undefined) data.actScores.latestSittingDate = null;
+  if (data.actScores.aprilRetakeReflected === undefined) data.actScores.aprilRetakeReflected = false;
+  if (data.actScores.nextSittingPlanned === undefined) data.actScores.nextSittingPlanned = null;
+  // Phase 1 AI Analysis: strategic context, household context, non-negotiables
+  if (data.householdContext === undefined) {
+    data.householdContext = "Dual-income household with stable primary earner; secondary income in transition. Cost sensitivity is moderate — meaningful merit matters, but we can support a higher-cost school if the program fit justifies it.";
+  }
+  if (!Array.isArray(data.nonNegotiables)) data.nonNegotiables = [];
+  if (!data.strategicContext) {
+    data.strategicContext = { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
+  }
+  // Per-rating descriptors (empty by default; fill in over time via Rankings tab)
+  Object.keys(data.rankings || {}).forEach(name => {
+    const r = data.rankings[name];
+    if (!r.descriptors) {
+      r.descriptors = { visit: '', vetProgram: '', cost: '', meritAid: '', planB: '' };
+    }
+  });
   if (!data.gpa) data.gpa = 0;
   if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
   if (!data.studentName) data.studentName = '';
@@ -3458,6 +3643,54 @@ function getAutoMeritForSchool(school, fallback) {
     'University of South Carolina': getSCMerit,
   };
   return fns[school] ? fns[school]() : fallback;
+}
+
+// ─── Phase 1 AI Analysis: helpers for richer payload ───
+// Schools with published, stats-based automatic merit grids — guaranteed merit
+const AUTO_MERIT_SCHOOLS = new Set([
+  'University of Kentucky',
+  'University of Tennessee',
+  'Oklahoma State University',
+  'Mississippi State University',
+  'University of South Carolina',
+  'University of Georgia',
+  'Colorado State University',
+]);
+
+function getGuaranteedMeritAnnual(school) {
+  if (!AUTO_MERIT_SCHOOLS.has(school)) return 0;
+  return getAutoMeritForSchool(school, 0) || 0;
+}
+
+function getCompetitiveMeritAnnual(school) {
+  if (AUTO_MERIT_SCHOOLS.has(school)) return 0;
+  const fin = FIN_DATA.find(r => r.school === school);
+  return fin ? (fin.merit || 0) : 0;
+}
+
+function hasOnCampusVetSchool(name) {
+  const db = schoolDB[name];
+  if (!db) return false;
+  const r = db.vetSchoolRank;
+  return !!r && r !== 'N/A' && r !== 'Not yet ranked';
+}
+
+function parseAdmitRateDecimal(name) {
+  const db = schoolDB[name];
+  if (!db) return null;
+  const isInState = name === 'University of Georgia';
+  const raw = isInState ? db.acceptRate : (db.oosAcceptRate || db.acceptRate);
+  if (!raw || raw === 'N/A') return null;
+  const n = parseFloat(String(raw).replace('%', ''));
+  return isNaN(n) ? null : Math.round(n) / 100;
+}
+
+// Stable djb2 hash → base36 string. Used as cache-key fingerprint over the
+// payload signals that should invalidate the cached AI analysis.
+function djb2Hash(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
 }
 
 // ─── Dynamic UGA Merit Aid Based on HOPE GPA + ACT ───
@@ -5163,6 +5396,9 @@ function getRankingForSchool(name) {
     };
     data.rankings[name] = presets[name] || { vetProgram:3, costScore:3, planB:3, meritAid:3, notes:'' };
   }
+  if (!data.rankings[name].descriptors) {
+    data.rankings[name].descriptors = { visit: '', vetProgram: '', cost: '', meritAid: '', planB: '' };
+  }
   return data.rankings[name];
 }
 
@@ -6643,12 +6879,20 @@ function syncEssayStatusToChecklists() {
 }
 
 // ─── AI Analysis ───
+// Format category as title case (Reach/Match/Safety) for the AI payload —
+// the in-app badges use uppercase but the rubric/spec uses title case.
+function formatCategory(c) {
+  if (!c) return 'Match';
+  return c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
+}
+
 function gatherAIData() {
   const act = getStudentACT();
   const gpa = getStudentGPA();
   const name = getStudentName();
   const maxTotal = calcMaxWeightedTotal();
 
+  // Build school rows — ALL schools, not just top 5. Sort by combined score.
   const rows = getVisibleSchools().map(s => {
     const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
@@ -6661,45 +6905,143 @@ function gatherAIData() {
       (rk.planB || 3) * RANK_WEIGHTS.planB +
       (rk.meritAid || 3) * RANK_WEIGHTS.meritAid
     ) * 100) / 100;
-    const costInfo = getSummaryCost(s.name);
+
+    const fin = FIN_DATA.find(r => r.school === s.name) || {};
+    const sticker = (fin.tuition || 0) + (fin.rb || 0) + (fin.books || 0);
+    const guaranteed = getGuaranteedMeritAnnual(s.name);
+    const competitive = getCompetitiveMeritAnnual(s.name);
+    const netAnnual = Math.max(0, sticker - guaranteed - competitive);
+
+    const visitNormRounded = Math.round(visitNorm * 10) / 10;
+    const desc = rk.descriptors || {};
+
     return {
       name: s.name,
-      category: getSummaryCategory(s.name),
-      vetStatus: getSummaryVetStatus(s.name),
-      cost4yr: costInfo.cost,
-      vetProgram: rk.vetProgram || 3,
-      costScore: rk.costScore || 3,
-      meritAid: rk.meritAid || 3,
-      visitScore: Math.round(visitNorm * 10) / 10,
-      combined,
-      notes: rk.notes || ''
+      onFinalList: !!s.finalList,
+      rankOrder: 0, // assigned after sort
+      combinedScore: combined,
+      category: formatCategory(getSummaryCategory(s.name)),
+      hasOnCampusVetSchool: hasOnCampusVetSchool(s.name),
+      admitRate: parseAdmitRateDecimal(s.name),
+      ratings: {
+        visit:      { score: visitNormRounded, descriptor: desc.visit || '' },
+        vetProgram: { score: rk.vetProgram || 3, descriptor: desc.vetProgram || '' },
+        cost:       { score: rk.costScore || 3, descriptor: desc.cost || '' },
+        meritAid:   { score: rk.meritAid || 3, descriptor: desc.meritAid || '' },
+        planB:      { score: rk.planB || 3, descriptor: desc.planB || '' },
+      },
+      financials: {
+        stickerAnnual: sticker || null,
+        guaranteedMeritAnnual: guaranteed,
+        estimatedCompetitiveMeritAnnual: competitive,
+        netAnnualEstimate: sticker ? netAnnual : null,
+        fourYearNet: sticker ? netAnnual * 4 : null,
+        meritBasedOnStats: AUTO_MERIT_SCHOOLS.has(s.name)
+          ? 'Stats-based grid: ACT ' + (act.composite || '?') + ' / GPA ' + (gpa || '?')
+          : (sticker ? 'Competitive estimate — no published grid' : 'N/A')
+      },
+      applicationNotes: s.notes || '',
+      rankingNotes: rk.notes || ''
     };
   });
 
-  rows.sort((a, b) => b.combined - a.combined);
+  rows.sort((a, b) => b.combinedScore - a.combinedScore);
+  rows.forEach((r, i) => {
+    r.rankOrder = i + 1;
+    r.inTopFive = i < 5;
+  });
+
+  const sc = data.strategicContext || { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
+  const decisionsArr = (sc.currentDecisions || '')
+    .split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+
   return {
-    studentName: name,
-    gpa,
-    act,
-    intendedMajor: 'Animal Science / Pre-Veterinary',
-    goal: 'Doctor of Veterinary Medicine (DVM)',
-    residency: 'Georgia',
-    top5: rows.slice(0, 5)
+    student: {
+      name,
+      gpa,
+      act: {
+        composite: act.composite || 0,
+        subscores: {
+          english: act.english || 0,
+          math: act.math || 0,
+          reading: act.reading || 0,
+          science: act.science || 0
+        },
+        superscore: act.superscore || act.composite || 0,
+        latestSittingDate: act.latestSittingDate || null,
+        aprilRetakeReflected: !!act.aprilRetakeReflected,
+        nextSittingPlanned: act.nextSittingPlanned || null
+      },
+      intendedMajor: 'Animal Science / Pre-Veterinary',
+      ultimateGoal: 'DVM',
+      residency: 'Georgia'
+    },
+    householdContext: data.householdContext || '',
+    nonNegotiables: Array.isArray(data.nonNegotiables) ? data.nonNegotiables : [],
+    strategicContext: {
+      currentDecisions: decisionsArr,
+      userQuestionForThisRun: sc.userQuestionForThisRun || '',
+      recentChanges: sc.recentChanges || ''
+    },
+    schools: rows,
+    rubrics: {
+      categoryDefinitions: {
+        Reach: 'Admit rate <25%, or student ACT well below the school\'s 25th percentile',
+        Match: 'Acceptance rate 25–70% and ACT/GPA within the school\'s middle 50% range',
+        Safety: 'Acceptance rate >70%, or student ACT/GPA well above the school\'s middle 50% range'
+      },
+      ratingAnchors: {
+        visit: '5 = Avery would be thrilled to enroll; 1 = ruled out based on visit',
+        vetProgram: '5 = on-campus DVM with strong advising; 3 = no on-campus vet but clear pipeline; 1 = no meaningful pre-vet infrastructure',
+        cost: '5 = minimal out-of-pocket after merit; 1 = full sticker, no aid',
+        meritAid: '5 = guaranteed large merit based on current stats; 1 = no merit available',
+        planB: '5 = strong across many majors if pre-vet doesn\'t work out; 1 = narrowly useful only for this path'
+      },
+      weightings: {
+        visit: 0.40, vetProgram: 0.25, cost: 0.15, planB: 0.10, meritAid: 0.10,
+        note: 'User-adjustable on Rankings tab. combinedScore in each school reflects these weights.'
+      }
+    },
+    meta: {
+      lastUpdatedPerSchool: {},
+      analysisRunTimestamp: new Date().toISOString()
+    }
   };
 }
 
-function buildAIPrompt(aiData) {
-  const schoolList = aiData.top5.map((s, i) =>
-    (i + 1) + '. ' + s.name + ' (' + s.category + ') \u2014 Visit: ' + s.visitScore + '/5, Vet Program: ' + s.vetProgram + '/5, Cost: ' + s.costScore + '/5, Merit Aid: ' + s.meritAid + '/5, 4yr Cost: ' + s.cost4yr + ', Combined: ' + s.combined + (s.notes ? ', Notes: ' + s.notes : '')
-  ).join('\n');
+// Build a stable fingerprint of payload signals that should invalidate the
+// cached AI analysis. Includes strategic context AND school-side data
+// (ratings, costs, final-list flags) so the cache busts when any input shifts.
+function aiCacheFingerprint(aiData) {
+  const sigSchools = aiData.schools.map(s => ({
+    n: s.name,
+    fl: s.onFinalList,
+    cs: s.combinedScore,
+    cat: s.category,
+    r: [s.ratings.visit.score, s.ratings.vetProgram.score, s.ratings.cost.score, s.ratings.meritAid.score, s.ratings.planB.score],
+    f: [s.financials.stickerAnnual, s.financials.guaranteedMeritAnnual, s.financials.estimatedCompetitiveMeritAnnual]
+  }));
+  const sig = {
+    student: aiData.student,
+    householdContext: aiData.householdContext,
+    nonNegotiables: aiData.nonNegotiables,
+    strategicContext: aiData.strategicContext,
+    schools: sigSchools
+  };
+  return djb2Hash(JSON.stringify(sig));
+}
 
+function buildAIPrompt(aiData) {
+  // Phase 1: send the full structured JSON payload. System prompt is unchanged
+  // intentionally so we can verify the model handles the richer context before
+  // changing the prompt structure (Phase 2).
   return {
     model: 'claude-sonnet-4-20250514',
     max_tokens: 1024,
     system: 'You are an experienced college admissions counselor specializing in pre-veterinary programs. You give specific, actionable advice grounded in the data provided. Be direct and confident. Do not use bullet points or headers \u2014 write in flowing paragraphs.',
     messages: [{
       role: 'user',
-      content: 'Analyze this student\'s college application strategy for Fall 2027 enrollment.\n\nStudent: ' + aiData.studentName + '\nGPA: ' + aiData.gpa + '\nACT: Composite ' + aiData.act.composite + ' (E:' + aiData.act.english + ' M:' + aiData.act.math + ' R:' + aiData.act.reading + ' S:' + aiData.act.science + ')\nIntended Major: ' + aiData.intendedMajor + '\nGoal: ' + aiData.goal + '\nResidency: ' + aiData.residency + '\n\nTop 5 schools by combined ranking score:\n' + schoolList + '\n\nPlease provide exactly 3 paragraphs:\n1. BEST FIT ANALYSIS: Which of these schools is the strongest overall fit and why, considering vet program quality, visit impressions, and admission likelihood.\n2. FINANCIAL STRATEGY: How to optimize the financial outcome across this list \u2014 where merit aid is realistic, where costs are concerning, and what the smart financial play is.\n3. FALL APPLICATION WATCHPOINTS: What to prioritize in the next 6 months \u2014 deadlines to hit, scores to improve, and any strategic moves that could strengthen the application portfolio.'
+      content: 'Analyze this student\'s college application strategy for Fall 2027 enrollment. The JSON payload below contains the full picture: student profile (with full ACT detail and superscore), household financial context, non-negotiables (hard constraints to respect), strategic context (current decisions and the user\'s specific question for this run, if any), all schools on the list with flags for final-list status and top-5 by combined score, phrase-based rating descriptors, financial breakdown (sticker / guaranteed merit / competitive merit estimate / net), and rubrics explaining the rating anchors and weighting scheme.\n\nIf strategicContext.userQuestionForThisRun is populated, prioritize answering that question. Otherwise, structure your response in three paragraphs: (1) BEST FIT ANALYSIS, (2) FINANCIAL STRATEGY, (3) FALL APPLICATION WATCHPOINTS.\n\nPayload:\n' + JSON.stringify(aiData, null, 2)
     }]
   };
 }
@@ -6709,15 +7051,21 @@ async function openAIAnalysis(forceRegenerate) {
   const content = document.getElementById('aiModalContent');
   overlay.classList.add('open');
 
-  // Check cache first
+  // Compute the payload up front so we can fingerprint it for cache invalidation
+  const aiData = gatherAIData();
+  const fingerprint = aiCacheFingerprint(aiData);
+
+  // Check cache first — invalidate when fingerprint (strategic context + school
+  // ratings/costs/final-list flags) changes, OR when older than 24 hours.
   if (!forceRegenerate) {
     const cached = localStorage.getItem('aiAnalysisCache');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         const ageHours = (Date.now() - parsed.timestamp) / (1000 * 60 * 60);
-        if (ageHours < 24) {
-          showAIResult(content, parsed.text, parsed.timestamp);
+        const fingerprintMatches = parsed.fingerprint === fingerprint;
+        if (ageHours < 24 && fingerprintMatches) {
+          showAIResult(content, parsed.text, parsed.timestamp, parsed.userQuestion);
           return;
         }
       } catch (e) { /* ignore bad cache */ }
@@ -6728,7 +7076,6 @@ async function openAIAnalysis(forceRegenerate) {
   content.innerHTML = '<h3>AI Analysis</h3><div class="ai-loading"><div class="spinner"></div><p style="margin-top:14px">Analyzing your college list...</p></div>';
 
   try {
-    const aiData = gatherAIData();
     const payload = buildAIPrompt(aiData);
     const resp = await fetch(AI_WORKER_URL, {
       method: 'POST',
@@ -6744,10 +7091,15 @@ async function openAIAnalysis(forceRegenerate) {
     const result = await resp.json();
     const text = (result.content && result.content[0] && result.content[0].text) || 'No analysis returned.';
 
-    const cacheEntry = { text: text, timestamp: Date.now() };
+    const cacheEntry = {
+      text: text,
+      timestamp: Date.now(),
+      fingerprint: fingerprint,
+      userQuestion: aiData.strategicContext.userQuestionForThisRun || ''
+    };
     localStorage.setItem('aiAnalysisCache', JSON.stringify(cacheEntry));
 
-    showAIResult(content, text, cacheEntry.timestamp);
+    showAIResult(content, text, cacheEntry.timestamp, cacheEntry.userQuestion);
   } catch (err) {
     const isNetwork = err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('fetch');
     content.innerHTML = '<h3>AI Analysis</h3>' +
@@ -6763,11 +7115,15 @@ async function openAIAnalysis(forceRegenerate) {
   }
 }
 
-function showAIResult(container, text, timestamp) {
+function showAIResult(container, text, timestamp, userQuestion) {
   const ageHours = Math.round((Date.now() - timestamp) / (1000 * 60 * 60) * 10) / 10;
   const ageLabel = ageHours < 0.1 ? 'Just generated' : ageHours < 1 ? Math.round(ageHours * 60) + 'm ago' : Math.round(ageHours) + 'h ago';
   const paragraphs = text.split('\n\n').filter(function(p) { return p.trim(); }).map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
+  const questionBlock = (userQuestion && userQuestion.trim())
+    ? '<div class="ai-question-recap"><span class="ai-question-label">You asked:</span> ' + esc(userQuestion.trim()) + '</div>'
+    : '';
   container.innerHTML = '<h3>AI Analysis <span class="ai-cached-badge">' + ageLabel + '</span></h3>' +
+    questionBlock +
     '<div class="ai-analysis-content">' + paragraphs + '</div>' +
     '<div class="modal-actions">' +
     '<button class="btn" onclick="closeAIModal()">Close</button>' +
@@ -7175,8 +7531,52 @@ function exportScholarships() {
   XLSX.writeFile(wb, firstName + '_Scholarships.xlsx');
 }
 
+// ─── Strategic Context (feeds AI Analysis) ───
+function renderStrategicContext() {
+  const sc = data.strategicContext || {};
+  const q = document.getElementById('scQuestion');
+  const dec = document.getElementById('scDecisions');
+  const rec = document.getElementById('scRecent');
+  const nn = document.getElementById('scNonNeg');
+  const hh = document.getElementById('scHousehold');
+  if (!q || !dec || !rec || !nn || !hh) return;
+  q.value = sc.userQuestionForThisRun || '';
+  dec.value = sc.currentDecisions || '';
+  rec.value = sc.recentChanges || '';
+  nn.value = (data.nonNegotiables || []).join('\n');
+  hh.value = data.householdContext || '';
+
+  const decisionCount = (sc.currentDecisions || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).length;
+  const nnCount = (data.nonNegotiables || []).filter(s => s && s.trim()).length;
+  const parts = [];
+  if (decisionCount > 0) parts.push(decisionCount + ' decision' + (decisionCount === 1 ? '' : 's'));
+  if (sc.userQuestionForThisRun && sc.userQuestionForThisRun.trim()) parts.push('question set');
+  if (nnCount > 0) parts.push(nnCount + ' non-negotiable' + (nnCount === 1 ? '' : 's'));
+  const summary = document.getElementById('scSummaryLine');
+  if (summary) summary.textContent = parts.length ? '· ' + parts.join(' · ') : '· empty — click to set up';
+}
+
+function saveStrategicContext() {
+  if (!data.strategicContext) data.strategicContext = { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
+  data.strategicContext.userQuestionForThisRun = (document.getElementById('scQuestion').value || '').trim();
+  data.strategicContext.currentDecisions = (document.getElementById('scDecisions').value || '').trim();
+  data.strategicContext.recentChanges = (document.getElementById('scRecent').value || '').trim();
+  data.nonNegotiables = (document.getElementById('scNonNeg').value || '')
+    .split('\n').map(s => s.trim()).filter(Boolean);
+  data.householdContext = (document.getElementById('scHousehold').value || '').trim();
+  saveData();
+  renderStrategicContext();
+  const flash = document.getElementById('scSavedFlash');
+  if (flash) {
+    flash.textContent = 'Saved · AI cache invalidated';
+    flash.classList.add('show');
+    setTimeout(() => flash.classList.remove('show'), 2200);
+  }
+}
+
 function renderAll() {
   renderSummary();
+  renderStrategicContext();
   renderSchools();
   renderFinancials();
   renderRoadTrip();
@@ -7220,11 +7620,16 @@ function openScoreEditor() {
     { key: 'english', label: 'English', value: act.english, min: 1, max: 36, step: 1, indent: true },
     { key: 'math', label: 'Math', value: act.math, min: 1, max: 36, step: 1, indent: true },
     { key: 'reading', label: 'Reading', value: act.reading, min: 1, max: 36, step: 1, indent: true },
-    { key: 'science', label: 'Science', value: act.science, min: 1, max: 36, step: 1, indent: true }
+    { key: 'science', label: 'Science', value: act.science, min: 1, max: 36, step: 1, indent: true },
+    { key: 'superscore', label: 'ACT Superscore', value: act.superscore || act.composite || 0, min: 1, max: 36, step: 1 }
   ];
 
+  const latestSitting = act.latestSittingDate || '';
+  const aprilReflected = !!act.aprilRetakeReflected;
+  const nextSitting = act.nextSittingPlanned || '';
+
   overlay.innerHTML = `
-    <div class="modal" style="max-width:380px;">
+    <div class="modal" style="max-width:420px;">
       <h3>Edit Profile</h3>
       <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
         <div style="display:flex;align-items:center;gap:10px;">
@@ -7246,6 +7651,23 @@ function openScoreEditor() {
               ${f.isGpa ? '' : actPercentile(f.value) + getSuffix(actPercentile(f.value)) + ' %ile'}
             </span>
           </div>`).join('')}
+        <hr style="border:none;border-top:1px solid var(--border);margin:2px 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">Latest sitting date</label>
+          <input type="date" id="scoreEdit_latestSittingDate" value="${esc(latestSitting)}"
+            style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit;">
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">April retake reflected above?</label>
+          <input type="checkbox" id="scoreEdit_aprilRetakeReflected" ${aprilReflected ? 'checked' : ''}
+            style="width:18px;height:18px;cursor:pointer;">
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">Next sitting planned</label>
+          <input type="date" id="scoreEdit_nextSittingPlanned" value="${esc(nextSitting)}"
+            style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit;">
+        </div>
+        <p id="scoreEdit_error" style="display:none;color:#b04040;font-size:0.82rem;font-weight:600;margin:4px 0 0;"></p>
       </div>
       <div class="modal-actions">
         <button class="btn" onclick="document.getElementById('scoreEditorModal').classList.remove('open')">Cancel</button>
@@ -7268,6 +7690,21 @@ function previewPercentile(key, val) {
 
 function saveScoreEditor() {
   const oldComposite = (data.actScores || {}).composite || 0;
+  const errEl = document.getElementById('scoreEdit_error');
+  const showError = msg => {
+    if (!errEl) return;
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  };
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
+  // Validate superscore >= composite before mutating any state
+  const compositeRaw = parseInt(document.getElementById('scoreEdit_composite').value);
+  const superscoreRaw = parseInt(document.getElementById('scoreEdit_superscore').value);
+  if (!isNaN(compositeRaw) && !isNaN(superscoreRaw) && superscoreRaw < compositeRaw) {
+    showError('Superscore must be ≥ composite (' + superscoreRaw + ' < ' + compositeRaw + ').');
+    return;
+  }
 
   const nameVal = (document.getElementById('scoreEdit_name').value || '').trim();
   data.studentName = nameVal;
@@ -7277,10 +7714,17 @@ function saveScoreEditor() {
   const hopeGPAVal = parseFloat(document.getElementById('scoreEdit_hopeGPA').value);
   if (!isNaN(hopeGPAVal) && hopeGPAVal >= 0 && hopeGPAVal <= 5) data.hopeGPA = hopeGPAVal;
 
-  ['composite', 'english', 'math', 'reading', 'science'].forEach(key => {
+  ['composite', 'english', 'math', 'reading', 'science', 'superscore'].forEach(key => {
     const val = parseInt(document.getElementById('scoreEdit_' + key).value);
     if (!isNaN(val) && val >= 1 && val <= 36) data.actScores[key] = val;
   });
+
+  // New ACT context fields
+  const sitDate = (document.getElementById('scoreEdit_latestSittingDate').value || '').trim();
+  data.actScores.latestSittingDate = sitDate || null;
+  data.actScores.aprilRetakeReflected = !!document.getElementById('scoreEdit_aprilRetakeReflected').checked;
+  const nextDate = (document.getElementById('scoreEdit_nextSittingPlanned').value || '').trim();
+  data.actScores.nextSittingPlanned = nextDate || null;
 
   const newComposite = data.actScores.composite;
   saveData();
