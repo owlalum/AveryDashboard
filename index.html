@@ -2141,6 +2141,115 @@
     .visit-row-body .vrb-stars button { min-width: 38px; padding: 9px 0; font-size: 0.88rem; }
   }
 
+  /* ── Visit Evaluation: Archive footer + back-links on archived panels ── */
+  .archive-back-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+  }
+  .archive-back-link a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1.5px dashed var(--ink);
+    padding-bottom: 1px;
+  }
+  .archive-back-link a:hover { color: var(--hot-deep); border-bottom-color: var(--hot-deep); }
+  .archive-back-link .archive-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    color: var(--text-light);
+  }
+  .visit-archive {
+    margin-top: 28px;
+    background: transparent;
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .visit-archive > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-light);
+    font-size: 0.88rem;
+    user-select: none;
+  }
+  .visit-archive > summary::-webkit-details-marker { display: none; }
+  .visit-archive .va-icon { font-size: 1rem; }
+  .visit-archive .va-title {
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.92rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .visit-archive .va-hint {
+    flex: 1;
+    font-size: 0.78rem;
+    color: var(--text-light);
+    font-style: italic;
+  }
+  .visit-archive .va-chevron {
+    transition: transform 0.18s;
+    font-size: 0.85rem;
+  }
+  .visit-archive[open] > summary .va-chevron { transform: rotate(180deg); }
+  .visit-archive .va-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 14px 14px;
+    border-top: 1px dashed var(--border);
+    padding-top: 12px;
+  }
+  .visit-archive .va-btn {
+    flex: 1 1 240px;
+    background: var(--paper);
+    border: 1.5px solid var(--border);
+    color: var(--ink);
+    padding: 12px 14px;
+    text-align: left;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.12s;
+  }
+  .visit-archive .va-btn:hover {
+    border-color: var(--ink);
+    background: var(--cream);
+  }
+  .visit-archive .va-btn-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .visit-archive .va-btn-title {
+    display: block;
+    font-weight: 700;
+    font-size: 0.92rem;
+    margin-bottom: 2px;
+  }
+  .visit-archive .va-btn-sub {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  @media (max-width: 520px) {
+    .visit-archive > summary { padding: 10px 12px; gap: 8px; }
+    .visit-archive .va-hint { display: none; }
+    .visit-archive .va-body { padding: 12px; gap: 8px; }
+    .visit-archive .va-btn { flex: 1 1 100%; padding: 10px 12px; }
+  }
+
   /* ── Visit migration preview modal ── */
   .visit-migration-modal .modal {
     max-width: 780px;
@@ -2842,13 +2951,13 @@
   <!-- ═══════════ GROUP: VISITS ═══════════ -->
   <div id="group-visits" class="tab-group">
   <nav class="subtab-bar">
-    <button class="subtab-btn active" data-subtab="tourchk">Tour Checklist</button>
-    <button class="subtab-btn" data-subtab="evaluation">Evaluation</button>
-    <button class="subtab-btn" data-subtab="roadtrip">Visit Log — March 2026</button>
+    <button class="subtab-btn active" data-subtab="evaluation">Evaluation</button>
   </nav>
 
-  <!-- Visit Log sub-panel -->
+  <!-- Visit Log sub-panel — archived (March 2026 trip is complete).
+       Reachable via the Archive footer on the Evaluation panel. -->
   <div id="roadtrip" class="sub-panel">
+    <div class="archive-back-link"><a href="#" onclick="showSubtab(event,'evaluation')">&larr; Back to Evaluation</a><span class="archive-badge">Archive</span></div>
     <div class="section-head"><h2>March 2026 Visit Log <span class="badge badge-safety" style="font-size:0.7rem;vertical-align:middle;margin-left:8px;">COMPLETED</span></h2><p>Pre-Vet / Animal Science Focus &mdash; All schools in session during visit!</p></div>
     <div class="trip-stats">
       <div class="trip-stat"><div class="stat-val">6</div><div class="stat-lbl">Days</div></div>
@@ -2870,8 +2979,10 @@
     </div>
   </div>
 
-  <!-- Tour Checklist sub-panel -->
-  <div id="tourchk" class="sub-panel active">
+  <!-- Tour Checklist sub-panel — archived (trip is complete).
+       Reachable via the Archive footer on the Evaluation panel. -->
+  <div id="tourchk" class="sub-panel">
+    <div class="archive-back-link"><a href="#" onclick="showSubtab(event,'evaluation')">&larr; Back to Evaluation</a><span class="archive-badge">Archive</span></div>
     <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border:1px solid #a5d6a7;padding:12px 18px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-weight:600;color:#2e7d32;font-size:0.92rem;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       Trip completed March 6, 2026
@@ -2881,7 +2992,7 @@
   </div>
 
   <!-- Visit Evaluation sub-panel (v20: simplified 5-field list view) -->
-  <div id="evaluation" class="sub-panel">
+  <div id="evaluation" class="sub-panel active">
     <div class="section-head">
       <h2>Visit Evaluation</h2>
       <p>Five fields per school. Autosaves as you go.</p>
@@ -2891,6 +3002,33 @@
     <div class="empty-state" id="evalEmpty" style="display:none;">
       <p>Add schools in the <strong>School Comparison</strong> tab, then rate them here after visiting.</p>
     </div>
+
+    <!-- Archive — March 2026 trip prep. Tabs hidden from primary nav since
+         the trip is done; data is preserved and reachable via these links. -->
+    <details class="visit-archive">
+      <summary>
+        <span class="va-icon">&#128194;</span>
+        <span class="va-title">Archive</span>
+        <span class="va-hint">March 2026 trip prep — kept for reference</span>
+        <span class="va-chevron">&#9662;</span>
+      </summary>
+      <div class="va-body">
+        <button class="btn va-btn" type="button" onclick="showSubtab(event,'tourchk')">
+          <span class="va-btn-icon">&#128203;</span>
+          <span>
+            <span class="va-btn-title">Campus Visit Checklist</span>
+            <span class="va-btn-sub">What to look for and ask on tour</span>
+          </span>
+        </button>
+        <button class="btn va-btn" type="button" onclick="showSubtab(event,'roadtrip')">
+          <span class="va-btn-icon">&#128663;</span>
+          <span>
+            <span class="va-btn-title">March 2026 Visit Log</span>
+            <span class="va-btn-sub">6-day, 5-school itinerary with notes</span>
+          </span>
+        </button>
+      </div>
+    </details>
   </div>
   </div><!-- /group-visits -->
 
@@ -4098,6 +4236,33 @@ document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
   });
 });
 
+// Programmatic subtab switch — used by archive footer buttons and "Back to
+// Evaluation" links since those aren't .subtab-btn elements. Switches the
+// visible sub-panel within the current tab-group, and updates the matching
+// subtab-btn's active class IF one exists (archived panels have no nav
+// button, so we just leave whichever button was active alone in that case).
+function showSubtab(event, name) {
+  if (event && event.preventDefault) event.preventDefault();
+  const panel = document.getElementById(name);
+  if (!panel) return;
+  const group = panel.closest('.tab-group');
+  if (!group) return;
+  group.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+  panel.classList.add('active');
+  const matchingBtn = group.querySelector('.subtab-btn[data-subtab="' + name + '"]');
+  if (matchingBtn) {
+    group.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+    matchingBtn.classList.add('active');
+  }
+  sessionStorage.setItem('activeSubtab', name);
+}
+
+// Subtabs whose nav buttons have been removed (archive). If sessionStorage
+// holds one of these from a prior session, restoreTab() should fall through
+// to the default active subtab in the group rather than activating an
+// orphaned panel.
+const ARCHIVED_SUBTABS = new Set(['tourchk', 'roadtrip']);
+
 // ─── Restore active tab on refresh ───
 (function restoreTab() {
   const savedTab = sessionStorage.getItem('activeTab');
@@ -4108,7 +4273,7 @@ document.querySelectorAll('.subtab-btn[data-subtab]').forEach(btn => {
     const tabBtn = document.querySelector(`.tab-btn[data-group="${savedTab}"]`);
     if (tabBtn) { tabBtn.classList.add('active'); document.getElementById(savedTab).classList.add('active'); }
   }
-  if (savedSub) {
+  if (savedSub && !ARCHIVED_SUBTABS.has(savedSub)) {
     const subBtn = document.querySelector(`.tab-group.active .subtab-btn[data-subtab="${savedSub}"]`);
     if (subBtn) {
       const group = subBtn.closest('.tab-group');

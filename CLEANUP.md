@@ -58,6 +58,26 @@ schools are accurate, this blob can be cleared (set to `null` per school) to
 slim down the stored data. There is no UI to clear it in v20 — set it
 manually via the console or in a future cleanup pass.
 
+## v20.1 — Visits tab nav cleanup
+
+The "Tour Checklist" and "Visit Log — March 2026" subtab buttons were
+removed from the Visits group nav since the March 2026 trip is complete and
+neither view is actionable for fall application decisions. The sub-panels
+(`#tourchk` and `#roadtrip`) and their data stores are intact and reachable
+via the Archive footer at the bottom of the Evaluation panel.
+
+If we get to a point where the road trip data is no longer useful as
+reference and we're confident we won't re-surface these panels:
+
+- HTML: delete the `#tourchk` and `#roadtrip` `<div>`s in the Visits group.
+- Renderers: delete `renderTourChecklist()` and `renderRoadTrip()`.
+- Initialization: delete `getTourChecklist()` and the `TOUR_CHECKLIST_SECTIONS` constant.
+- `TRIP_DAYS` constant: delete (hardcoded itinerary).
+- `data.tourChecklist` and `data.tripNotes` stores: delete via console once you're sure.
+- Archive footer (`<details class="visit-archive">`) in `#evaluation`: delete.
+- `ARCHIVED_SUBTABS` set + the guard in `restoreTab()`: delete.
+- CSS for `.visit-archive`, `.archive-back-link`, `.archive-badge`: delete.
+
 ## Anything I should add here
 
 When you finish a refactor and leave dead code behind on purpose, drop a
