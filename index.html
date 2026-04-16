@@ -173,7 +173,11 @@
     border-bottom: 2px solid var(--border);
     margin-bottom: 18px;
     border-radius: var(--radius) var(--radius) 0 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .subtab-bar::-webkit-scrollbar { display: none; }
   .subtab-btn {
     padding: 8px 16px;
     border: none;
@@ -187,6 +191,7 @@
     transition: all 0.2s;
     white-space: nowrap;
     border-radius: 6px 6px 0 0;
+    flex-shrink: 0;
   }
   .subtab-btn:hover { color: var(--accent); background: var(--accent-light); }
   .subtab-btn.active {
@@ -916,6 +921,7 @@
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 
+  html { overflow-x: hidden; }
   body {
     font-family: var(--font-body);
     background: var(--cream);
@@ -925,6 +931,7 @@
     background-size: 22px 22px;
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   /* ── Masthead ── */
