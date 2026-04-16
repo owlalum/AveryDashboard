@@ -1601,22 +1601,12 @@
     #summary .section-head h2 { font-size: 1.75rem; }
     .btn-ai { padding: 9px 16px; font-size: 0.8rem; min-height: 40px; }
 
-    /* Rankings table: compact + sticky rank/school so swipe reveals cost/score/notes */
+    /* Rankings table: compact on phone */
     #summary .table-wrap { border-radius: 20px; border-width: 2px; }
     #summary table { min-width: 560px; }
     #summary thead th { padding: 10px 10px; font-size: 0.58rem; letter-spacing: 0.08em; }
     #summary tbody td { padding: 11px 10px; font-size: 0.82rem; }
-    #summary tbody td:first-child {
-      position: sticky; left: 0; z-index: 2;
-      width: 42px; font-size: 1.15rem;
-      background: var(--paper);
-      box-shadow: 1px 0 0 var(--border);
-    }
-    #summary tbody tr:nth-child(even) td:first-child { background: var(--cream); }
-    #summary tbody tr:hover td:first-child { background: var(--hot-soft); }
-    #summary thead th:first-child {
-      position: sticky; left: 0; z-index: 3;
-    }
+    #summary tbody td:first-child { width: 42px; font-size: 1.15rem; }
 
     /* Tabs */
     .tab-bar { padding: 10px 12px; }
@@ -1638,6 +1628,114 @@
     .hero-name { font-size: 2rem; }
     .stat-tile .st-value { font-size: 1.65rem; }
     .mast-btn { width: 36px; height: 36px; }
+  }
+
+  /* ── Sticky school-name columns (all data tables) ── */
+
+  /* Tables where School = column 1 */
+  #finHead th:first-child,
+  #finBody td:first-child,
+  #greekHead th:first-child,
+  #greekBody td:first-child,
+  #natRankHead th:first-child,
+  #natRankBody td:first-child,
+  #agRankHead th:first-child,
+  #agRankBody td:first-child,
+  #evalSummaryWrap thead th:first-child,
+  #evalSummaryBody td:first-child,
+  #strategy table thead th:first-child,
+  #strategyBody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--paper);
+    min-width: 140px;
+    border-right: 2px solid var(--border);
+  }
+  #finHead th:first-child,
+  #greekHead th:first-child,
+  #natRankHead th:first-child,
+  #agRankHead th:first-child,
+  #evalSummaryWrap thead th:first-child,
+  #strategy table thead th:first-child {
+    z-index: 3;
+    background: var(--primary-light);
+  }
+  /* Hover row: keep sticky cell background matching */
+  #finBody tr:hover td:first-child,
+  #greekBody tr:hover td:first-child,
+  #natRankBody tr:hover td:first-child,
+  #agRankBody tr:hover td:first-child,
+  #evalSummaryBody tr:hover td:first-child,
+  #strategyBody tr:hover td:first-child {
+    background: #fafcfd;
+  }
+  /* Even-row striping for summary table sticky cells */
+  #finBody tr:nth-child(even) td:first-child,
+  #greekBody tr:nth-child(even) td:first-child,
+  #natRankBody tr:nth-child(even) td:first-child,
+  #agRankBody tr:nth-child(even) td:first-child {
+    background: var(--cream);
+  }
+  /* Financial group header rows span full width */
+  .fin-group-header td { position: static !important; border-right: none !important; }
+
+  /* Tables where School = column 2 (Rank is col 1) */
+  /* Summary (Overview) — rank + school sticky */
+  #summaryHead th:first-child,
+  #summaryRankBody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--paper);
+    min-width: 50px;
+  }
+  #summaryHead th:nth-child(2),
+  #summaryRankBody td:nth-child(2) {
+    position: sticky;
+    left: 50px;
+    z-index: 2;
+    background: var(--paper);
+    min-width: 140px;
+    border-right: 2px solid var(--border);
+  }
+  #summaryHead th:first-child { z-index: 3; background: var(--ink); }
+  #summaryHead th:nth-child(2) { z-index: 3; background: var(--ink); }
+  #summaryRankBody tr:nth-child(even) td:first-child,
+  #summaryRankBody tr:nth-child(even) td:nth-child(2) {
+    background: var(--cream);
+  }
+  #summaryRankBody tr:hover td:first-child,
+  #summaryRankBody tr:hover td:nth-child(2) {
+    background: var(--hot-soft);
+  }
+
+  /* Rankings (Schools tab) — rank + school sticky */
+  #rankingsHead th:first-child,
+  #rankingsBody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--paper);
+    min-width: 50px;
+  }
+  #rankingsHead th:nth-child(2),
+  #rankingsBody td:nth-child(2) {
+    position: sticky;
+    left: 50px;
+    z-index: 2;
+    background: var(--paper);
+    min-width: 140px;
+    border-right: 2px solid var(--border);
+  }
+  #rankingsHead th:first-child,
+  #rankingsHead th:nth-child(2) {
+    z-index: 3;
+    background: var(--primary-light);
+  }
+  #rankingsBody tr:hover td:first-child,
+  #rankingsBody tr:hover td:nth-child(2) {
+    background: #fafcfd;
   }
 
   /* ── Safe area bottom for PWA on iPhone ── */
