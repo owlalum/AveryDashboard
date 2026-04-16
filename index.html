@@ -174,7 +174,10 @@
     margin-bottom: 18px;
     border-radius: var(--radius) var(--radius) 0 0;
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x;
     scrollbar-width: none;
   }
   .subtab-bar::-webkit-scrollbar { display: none; }
