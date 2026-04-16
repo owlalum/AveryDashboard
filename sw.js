@@ -1,4 +1,4 @@
-const CACHE_NAME = 'avery-dashboard-v11';
+const CACHE_NAME = 'avery-dashboard-v12';
 const PRECACHE_URLS = [
   './',
   './index.html',
