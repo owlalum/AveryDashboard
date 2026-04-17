@@ -2602,6 +2602,33 @@
       </div>
     </details>
 
+    <!-- Student preferences (feeds AI Analysis payload) -->
+    <details class="strategic-context" id="studentPreferencesPanel">
+      <summary>
+        <span class="sc-icon">&#127891;</span>
+        <span class="sc-title">Student Preferences</span>
+        <span class="sc-summary" id="spSummaryLine"></span>
+        <span class="sc-chevron">&#9662;</span>
+      </summary>
+      <div class="sc-body">
+        <p class="sc-note">Durable student preferences about campus type, fit, and exceptions. These gate what schools the AI will suggest adding to the list. Edit when preferences evolve — the analysis cache invalidates on save.</p>
+
+        <label class="sc-label" for="spCampusType">Campus type preference</label>
+        <textarea id="spCampusType" class="sc-textarea" rows="4" placeholder="e.g., Large public university with big-time athletics and Greek life. Conferences that fit: ACC, Big Ten, Big 12, SEC."></textarea>
+
+        <label class="sc-label" for="spExceptions">Exceptions <span class="sc-hint">(schools that break the pattern and why)</span></label>
+        <textarea id="spExceptions" class="sc-textarea" rows="3" placeholder="e.g., Cornell is the sole exception — Ivy prestige outweighs the campus-type preference."></textarea>
+
+        <label class="sc-label" for="spImplications">Implications for recommendations <span class="sc-hint">(what Claude should and shouldn't suggest)</span></label>
+        <textarea id="spImplications" class="sc-textarea" rows="4" placeholder="e.g., Do not suggest schools outside ACC/Big Ten/Big 12/SEC as additions, with the single exception of Ivy-level schools."></textarea>
+
+        <div class="sc-actions">
+          <button class="btn btn-primary btn-sm" onclick="saveStudentPreferences()">Save</button>
+          <span class="sc-saved" id="spSavedFlash"></span>
+        </div>
+      </div>
+    </details>
+
     <div class="section-head">
       <h2>School <em>Rankings</em></h2>
       <button class="btn btn-ai" onclick="openAIAnalysis()">&#x2728; AI Analysis</button>
@@ -3643,12 +3670,28 @@ function runMigrations() {
   if (data.actScores.aprilRetakeReflected === undefined) data.actScores.aprilRetakeReflected = false;
   if (data.actScores.nextSittingPlanned === undefined) data.actScores.nextSittingPlanned = null;
   // Phase 1 AI Analysis: strategic context, household context, non-negotiables
+  const DEFAULT_HOUSEHOLD_CONTEXT_V2 = "Dual-income household with stable primary earner; secondary income in transition. Cost sensitivity is moderate — meaningful merit matters, but we can support a higher-cost school if the program fit justifies it.";
+  const DEFAULT_HOUSEHOLD_CONTEXT_V5 = "We can fund any school on this list, including Cornell at full sticker. We are not making a decision based on affordability. We are making it based on value — whether a higher-cost school offers enough program quality, fit, or career advantage to justify the premium over strong lower-cost alternatives. Cost analysis should frame tradeoffs in terms of value per dollar and opportunity cost, not in terms of affordability or financial risk. Cost conversations are family territory between the parents and Avery; the analysis should treat cost as strategic information, not as a gating concern for the student.";
   if (data.householdContext === undefined) {
-    data.householdContext = "Dual-income household with stable primary earner; secondary income in transition. Cost sensitivity is moderate — meaningful merit matters, but we can support a higher-cost school if the program fit justifies it.";
+    data.householdContext = DEFAULT_HOUSEHOLD_CONTEXT_V5;
+  } else if (data.householdContext === DEFAULT_HOUSEHOLD_CONTEXT_V2) {
+    data.householdContext = DEFAULT_HOUSEHOLD_CONTEXT_V5;
+  } else if (!data.householdContextV5ResetApplied && data.householdContext !== DEFAULT_HOUSEHOLD_CONTEXT_V5) {
+    // One-time reset: earlier customization still framed cost as a sensitivity,
+    // which v5 explicitly moves away from. User requested overwrite.
+    data.householdContext = DEFAULT_HOUSEHOLD_CONTEXT_V5;
   }
+  data.householdContextV5ResetApplied = true;
   if (!Array.isArray(data.nonNegotiables)) data.nonNegotiables = [];
   if (!data.strategicContext) {
     data.strategicContext = { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
+  }
+  if (!data.studentPreferences) {
+    data.studentPreferences = {
+      campusType: "Large public university with big-time athletics (football, men's basketball) and Greek life presence. Conferences that fit: ACC, Big Ten, Big 12, SEC. Does not need to be Greek-dominant like Auburn, but Greek life should be available. Consistent, strongly-held preference Avery has expressed repeatedly.",
+      exceptions: "Cornell is the sole exception — Ivy League prestige outweighs the campus-type preference. No other non-P5 schools should be suggested even if pre-vet program quality is strong.",
+      implicationsForRecommendations: "Do not suggest schools outside ACC/Big Ten/Big 12/SEC as additions or alternatives, with the single exception of Ivy-level schools like Cornell. Colorado State, Kansas State, UC Davis, and similar are not viable additions regardless of program quality."
+    };
   }
   // Per-rating descriptors (empty by default; fill in over time via Rankings tab)
   Object.keys(data.rankings || {}).forEach(name => {
@@ -3660,6 +3703,9 @@ function runMigrations() {
   if (!data.gpa) data.gpa = 0;
   if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
   if (!data.studentName) data.studentName = '';
+  if (data.graduationYear === undefined) data.graduationYear = 2027;
+  if (data.currentGrade === undefined) data.currentGrade = 'junior';
+  if (data.applicationCycle === undefined) data.applicationCycle = 'Fall 2026 applications for Fall 2027 enrollment';
   if (!data.lastModified) data.lastModified = Date.now();
   if (!data.scholarships) data.scholarships = initDefaultScholarships();
   // Backfill url field on existing scholarship entries
@@ -7771,45 +7817,76 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v4';
+const PROMPT_VERSION = 'v7';
 const SYSTEM_PROMPT_V2 = [
-  "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly — speak to them, not about them. Be direct, analytical, and willing to push back on list construction or strategy choices you disagree with. Avoid generic reassurance.",
+  "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly. The analysis may be read by both the parent (primary strategic decision-maker) and the student (age 16, a high-achiever navigating an intense process). Your language choices need to serve both readers.",
   "",
   "You will receive a JSON payload with:",
   "- Student academic profile (GPA, full ACT including superscore and subscores, residency, major goals)",
-  "- Household financial context (calibrate how hard to push cost tradeoffs)",
-  "- Non-negotiables: hard constraints the family will not violate. Treat as filters, not preferences.",
+  "- Household context (calibrate how to frame cost tradeoffs)",
+  "- Non-negotiables (hard constraints — these are filters, not preferences)",
+  "- Student preferences (durable fit criteria — campus type, exceptions, and explicit implications for what schools may/may not be recommended)",
   "- Strategic context (current decisions on the board, user's specific question for this run, recent changes)",
   "- All schools on the list (not just top candidates), with flags for final-list status and top-5 by combined score",
-  "- Phrase-based descriptors explaining each 1–5 rating (may be empty during early use — fall back to the rubric anchors)",
+  "- Phrase-based descriptors explaining each 1–5 rating where available",
   "- Financial breakdown per school (sticker, guaranteed merit, estimated competitive merit, net)",
-  "- Rubrics explaining category definitions, rating anchors, and the family's weighting scheme",
+  "- Rubrics explaining category definitions, rating anchors, and user's weighting scheme",
   "",
   "## How to structure your response",
   "",
-  "**If strategicContext.userQuestionForThisRun is populated:** Answer that question first and most substantively. Other commentary is secondary and only included if it materially changes the answer.",
+  "**If strategicContext.userQuestionForThisRun is populated:** Answer that question first and most substantively — 3–4 paragraphs of focused analysis. Then add a brief \"Other observations\" section (1–2 paragraphs) covering any list-shape issues, deadline concerns, data gaps, or non-negotiable violations worth flagging. Only include other observations if genuinely relevant; do not force them.",
   "",
-  "**If it is empty:** Produce analysis in three sections, in this order:",
+  "**If userQuestionForThisRun is empty:** Produce analysis in three sections, in this order:",
   "",
-  "1. **List quality assessment** (1 paragraph) — Is the list well-constructed? Too reach-heavy? Missing a true safety? Redundant schools doing the same job? You see all schools including those outside the top 5, so you can speak to list shape.",
+  "1. **List quality assessment** (1 paragraph) — Is the list well-constructed? Too reach-heavy? Missing a true safety? Redundant schools doing the same job? You see all schools on the list, including those outside the top 5, so you can speak to list shape.",
   "",
-  "2. **Strategic decisions** (1–2 paragraphs) — Address the items in currentDecisions. Give a direct recommendation with reasoning, not both-sides framing. For ED specifically, weigh admit-rate lift against binding commitment and fit confidence.",
+  "2. **Strategic decisions** (1–2 paragraphs) — Address items in currentDecisions. Give a direct recommendation with reasoning, not both-sides framing. For ED specifically, weigh admit-rate lift against binding commitment and fit confidence.",
   "",
-  "3. **Watchpoints** (1 paragraph) — Deadlines, scores to improve, financial scenarios to plan for, or specific schools where the data suggests a closer look.",
+  "3. **Watchpoints** (1 paragraph) — Deadlines, scores to improve, data gaps, or specific schools where a closer look is warranted.",
+  "",
+  "## Non-negotiables handling",
+  "",
+  "Non-negotiables are hard filters, not soft preferences. If any school on the list violates a non-negotiable:",
+  "- Review EVERY school on the list, not just top-ranked schools",
+  "- Flag each violating school by name",
+  "- Recommend either removal from the list OR explicit family discussion about relaxing the constraint",
+  "- Do not treat violating schools as viable options in other parts of the analysis unless the non-negotiable is explicitly resolved",
+  "",
+  "## Cost framing",
+  "",
+  "The family can fund any school on the list. Cost is a value-analysis variable, not a financial constraint. When discussing cost:",
+  "- Frame cost tradeoffs as \"is the premium justified by program strength, fit, or outcomes\" — not as \"can the family afford this\"",
+  "- Never characterize a school as \"prohibitive,\" \"burdensome,\" \"unaffordable,\" \"financially risky,\" or similar",
+  "- Flag significant cost differences as strategic information (\"Cornell at $386K is roughly 5x UGA at $68K — the premium needs to be justified by Cornell-specific advantages\") but not as reasons to eliminate schools",
+  "- Cost discussion is family territory. Do not frame cost observations in ways that would make the student feel her preferences are financially inappropriate. Cost concerns are for the parents to weigh together, not for the student to read and feel guilty about.",
+  "",
+  "## Tone and language",
+  "",
+  "Give direct recommendations with specific reasoning. Substantive pushback is expected. However:",
+  "- Frame critique around the decision, data, or strategy — never around the student's judgment or character",
+  "- Avoid loaded words like \"reckless,\" \"dangerous,\" \"foolish,\" \"naive,\" \"blind bet\" when describing choices",
+  "- Say \"this decision carries significant risk because X\" rather than \"this decision is reckless\"",
+  "- Frame recommendations as actions the family can take, not as judgments about current choices: \"Consider visiting UGA before finalizing\" reads constructively; \"You're making a mistake by ignoring UGA\" reads as criticism",
+  "- The goal is substantive counsel that helps a family decide, not language that could discourage a student who is already navigating an intense process",
+  "",
+  "## Factual grounding",
+  "",
+  "- Do not recommend specific admission pathways (Early Decision, Early Action, Restrictive Early Action, rolling admission) without evidence from the payload that the school offers them. If uncertain, say \"check whether [School] offers [pathway]\" rather than assuming.",
+  "- Do not invent scholarship names, program specifics, deadlines, or other facts not in the payload. If a fact would strengthen your recommendation but isn't in the payload, flag the gap: \"Worth verifying [X] directly with the school.\"",
+  "- Do not infer or invent the student's grade level, graduation year, application timeline, age, or other biographical details. Reason only from explicit timeline fields in the payload: student.currentGrade, student.graduationYear, student.applicationCycle, act.nextSittingPlanned, and similar. If timing matters to a recommendation, cite those fields directly — do not infer grade level from conversational context, from ACT scores, or from the urgency of the question being asked.",
+  "- Do not characterize a school as \"unvisited\" based on visit score alone. Check the `visited` boolean. If visited: false, treat visit data as missing information. If visited: true with a numeric score, treat the score as a real rating.",
+  "- Do not infer narrative from numeric ratings when descriptors are empty. Treat missing descriptors as missing information, not as implied sentiment.",
+  "- When visitScoreIsEstimated is true, treat that school's ranking position as a placeholder, not as strong data.",
   "",
   "## Rules",
   "",
-  "- Do not repeat the ratings or costs back to the user — they see that data. Your value is interpretation and recommendation.",
-  "- When you use a rating, refer to the descriptor, not the number. (\"You rated the visit a 4 with notes about weather concerns\" → \"The visit went well but weather gave Avery pause.\") If a descriptor is empty, fall back to the rubric anchor language and signal you're inferring from the score alone.",
-  "- The visit score is a 1–5 rating. Do not characterize a school as unvisited based on visit score alone. Use the per-school `visited` boolean and the `visitData` block: if `visited` is false (or `visitData.visited` is false), the school has not been visited — do not infer anything about the school's fit for the student from the absence of visit data. Treat it as missing information. Recommend a visit if the school is strategically important.",
-  "- If `visitData.visitScoreIsEstimated` is true, the visitScore is a 3.0 placeholder, not a real rating. Do not reason from that number; say the visit data is missing.",
-  "- When visit data is present, use `visitData.loved` and `visitData.concerned` as the qualitative descriptors for the visit. They are the family's own words and should be treated as the most authoritative signal of fit.",
-  "- If the data is insufficient to answer a strategic question, say so and name what specifically would help.",
+  "- Do not repeat ratings or costs back to the family — they see that data. Your value is interpretation and recommendation.",
+  "- When you reference a rating, refer to the descriptor where available, not the number.",
+  "- If data is insufficient to answer a strategic question, say so and name what would help.",
   "- Push back if the weighting scheme seems miscalibrated for the decision at hand. The family wants honest input, not validation.",
-  "- Respect non-negotiables absolutely — do not recommend a school that violates one without explicitly flagging the violation.",
+  "- When recommending schools to add to the list, respect studentPreferences.implicationsForRecommendations. Do not suggest schools that violate stated student preferences even if their pre-vet program quality is objectively strong. The student's willingness to enroll is a prerequisite for any recommendation to be useful. If you believe a preference is miscalibrated for a specific decision, you may flag that belief explicitly — but do not silently propose schools that fall outside the stated preferences.",
   "- Keep total length under ~500 words unless a specific question warrants more.",
-  "- Do not hedge. If you think an ED commitment is the wrong move, say it. If you think the list needs a true safety, say it.",
-  "- Write in flowing paragraphs, not bullet points or numbered lists, except where the spec above calls for numbered sections."
+  "- Do not hedge. Give direct recommendations. But critique the decision, not the decision-maker."
 ].join('\n');
 
 // Format category as title case (Reach/Match/Safety) for the AI payload —
@@ -7934,10 +8011,18 @@ function gatherAIData() {
       },
       intendedMajor: 'Animal Science / Pre-Veterinary',
       ultimateGoal: 'DVM',
-      residency: 'Georgia'
+      residency: 'Georgia',
+      graduationYear: data.graduationYear || 2027,
+      currentGrade: data.currentGrade || 'junior',
+      applicationCycle: data.applicationCycle || 'Fall 2026 applications for Fall 2027 enrollment'
     },
     householdContext: data.householdContext || '',
     nonNegotiables: Array.isArray(data.nonNegotiables) ? data.nonNegotiables : [],
+    studentPreferences: {
+      campusType: (data.studentPreferences && data.studentPreferences.campusType) || '',
+      exceptions: (data.studentPreferences && data.studentPreferences.exceptions) || '',
+      implicationsForRecommendations: (data.studentPreferences && data.studentPreferences.implicationsForRecommendations) || ''
+    },
     strategicContext: {
       currentDecisions: decisionsArr,
       userQuestionForThisRun: sc.userQuestionForThisRun || '',
@@ -7988,6 +8073,7 @@ function aiCacheFingerprint(aiData) {
     student: aiData.student,
     householdContext: aiData.householdContext,
     nonNegotiables: aiData.nonNegotiables,
+    studentPreferences: aiData.studentPreferences,
     strategicContext: aiData.strategicContext,
     schools: sigSchools
   };
@@ -8540,9 +8626,44 @@ function saveStrategicContext() {
   }
 }
 
+// ─── Student Preferences (feeds AI Analysis) ───
+function renderStudentPreferences() {
+  const sp = data.studentPreferences || {};
+  const ct = document.getElementById('spCampusType');
+  const ex = document.getElementById('spExceptions');
+  const im = document.getElementById('spImplications');
+  if (!ct || !ex || !im) return;
+  ct.value = sp.campusType || '';
+  ex.value = sp.exceptions || '';
+  im.value = sp.implicationsForRecommendations || '';
+
+  const parts = [];
+  if (sp.campusType && sp.campusType.trim()) parts.push('campus type set');
+  if (sp.exceptions && sp.exceptions.trim()) parts.push('exceptions set');
+  if (sp.implicationsForRecommendations && sp.implicationsForRecommendations.trim()) parts.push('gating rule set');
+  const summary = document.getElementById('spSummaryLine');
+  if (summary) summary.textContent = parts.length ? '· ' + parts.join(' · ') : '· empty — click to set up';
+}
+
+function saveStudentPreferences() {
+  if (!data.studentPreferences) data.studentPreferences = { campusType: '', exceptions: '', implicationsForRecommendations: '' };
+  data.studentPreferences.campusType = (document.getElementById('spCampusType').value || '').trim();
+  data.studentPreferences.exceptions = (document.getElementById('spExceptions').value || '').trim();
+  data.studentPreferences.implicationsForRecommendations = (document.getElementById('spImplications').value || '').trim();
+  saveData();
+  renderStudentPreferences();
+  const flash = document.getElementById('spSavedFlash');
+  if (flash) {
+    flash.textContent = 'Saved · AI cache invalidated';
+    flash.classList.add('show');
+    setTimeout(() => flash.classList.remove('show'), 2200);
+  }
+}
+
 function renderAll() {
   renderSummary();
   renderStrategicContext();
+  renderStudentPreferences();
   renderSchools();
   renderFinancials();
   renderRoadTrip();
@@ -8594,6 +8715,10 @@ function openScoreEditor() {
   const latestSitting = act.latestSittingDate || '';
   const aprilReflected = !!act.aprilRetakeReflected;
   const nextSitting = act.nextSittingPlanned || '';
+  const gradYear = data.graduationYear || 2027;
+  const curGrade = data.currentGrade || 'junior';
+  const appCycle = data.applicationCycle || 'Fall 2026 applications for Fall 2027 enrollment';
+  const gradeOptions = ['freshman', 'sophomore', 'junior', 'senior'];
 
   overlay.innerHTML = `
     <div class="modal" style="max-width:420px;">
@@ -8633,6 +8758,24 @@ function openScoreEditor() {
           <label style="flex:1;font-size:0.85rem;font-weight:600;">Next sitting planned</label>
           <input type="date" id="scoreEdit_nextSittingPlanned" value="${esc(nextSitting)}"
             style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit;">
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:2px 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">Current grade</label>
+          <select id="scoreEdit_currentGrade"
+            style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;font-family:inherit;">
+            ${gradeOptions.map(g => `<option value="${g}"${g === curGrade ? ' selected' : ''}>${g.charAt(0).toUpperCase() + g.slice(1)}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">Graduation year</label>
+          <input type="number" id="scoreEdit_graduationYear" value="${gradYear}" min="2024" max="2035" step="1"
+            style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;text-align:center;font-family:inherit;">
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;padding-top:6px;">Application cycle</label>
+          <textarea id="scoreEdit_applicationCycle" rows="2"
+            style="flex:2;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.85rem;font-family:inherit;resize:vertical;">${esc(appCycle)}</textarea>
         </div>
         <p id="scoreEdit_error" style="display:none;color:#b04040;font-size:0.82rem;font-weight:600;margin:4px 0 0;"></p>
       </div>
@@ -8692,6 +8835,14 @@ function saveScoreEditor() {
   data.actScores.aprilRetakeReflected = !!document.getElementById('scoreEdit_aprilRetakeReflected').checked;
   const nextDate = (document.getElementById('scoreEdit_nextSittingPlanned').value || '').trim();
   data.actScores.nextSittingPlanned = nextDate || null;
+
+  // Timeline fields (prevents AI from inferring grade level / cycle)
+  const gradeVal = (document.getElementById('scoreEdit_currentGrade').value || '').trim();
+  if (gradeVal) data.currentGrade = gradeVal;
+  const gradYearVal = parseInt(document.getElementById('scoreEdit_graduationYear').value);
+  if (!isNaN(gradYearVal) && gradYearVal >= 2024 && gradYearVal <= 2035) data.graduationYear = gradYearVal;
+  const appCycleVal = (document.getElementById('scoreEdit_applicationCycle').value || '').trim();
+  data.applicationCycle = appCycleVal;
 
   const newComposite = data.actScores.composite;
   saveData();
