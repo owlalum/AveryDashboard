@@ -7817,7 +7817,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v7';
+const PROMPT_VERSION = 'v8';
 const SYSTEM_PROMPT_V2 = [
   "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly. The analysis may be read by both the parent (primary strategic decision-maker) and the student (age 16, a high-achiever navigating an intense process). Your language choices need to serve both readers.",
   "",
@@ -7843,6 +7843,10 @@ const SYSTEM_PROMPT_V2 = [
   "2. **Strategic decisions** (1–2 paragraphs) — Address items in currentDecisions. Give a direct recommendation with reasoning, not both-sides framing. For ED specifically, weigh admit-rate lift against binding commitment and fit confidence.",
   "",
   "3. **Watchpoints** (1 paragraph) — Deadlines, scores to improve, data gaps, or specific schools where a closer look is warranted.",
+  "",
+  "## List-quality critique",
+  "",
+  "List-quality assessment is the single most valuable thing you can provide. Do not soft-pedal structural issues — a reach-heavy list, a missing true safety, schools that rationalize their way onto the list despite violating implicit criteria, redundant schools doing the same strategic job. Constructive tone applies to how you deliver the critique, not whether you deliver it. A supportive-sounding assessment that fails to surface real structural problems is a failure, not a success. If the list has real issues, the list-quality section must name them specifically and directly — do not default to \"well-constructed\" or \"balanced\" framings when structural problems exist.",
   "",
   "## Non-negotiables handling",
   "",
@@ -7877,6 +7881,7 @@ const SYSTEM_PROMPT_V2 = [
   "- Do not characterize a school as \"unvisited\" based on visit score alone. Check the `visited` boolean. If visited: false, treat visit data as missing information. If visited: true with a numeric score, treat the score as a real rating.",
   "- Do not infer narrative from numeric ratings when descriptors are empty. Treat missing descriptors as missing information, not as implied sentiment.",
   "- When visitScoreIsEstimated is true, treat that school's ranking position as a placeholder, not as strong data.",
+  "- Avery's goal is a DVM. Schools without on-campus vet programs represent a structural compromise relative to that goal, even when not listed as a formal non-negotiable. Flag any such school explicitly rather than constructing justifications (equine programs, alternative pathways, brand-new vet schools) that make their inclusion appear coherent. The family can choose to keep those schools on the list, but that is an explicit family decision, not a model inference.",
   "",
   "## Rules",
   "",
