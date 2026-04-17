@@ -3703,9 +3703,23 @@ function runMigrations() {
   if (!data.gpa) data.gpa = 0;
   if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
   if (!data.studentName) data.studentName = '';
-  if (data.graduationYear === undefined) data.graduationYear = 2027;
   if (data.currentGrade === undefined) data.currentGrade = 'junior';
-  if (data.applicationCycle === undefined) data.applicationCycle = 'Fall 2026 applications for Fall 2027 enrollment';
+  // v9: split graduationYear into HS graduation + college enrollment (can diverge via gap year)
+  if (data.highSchoolGraduationYear === undefined) {
+    data.highSchoolGraduationYear = data.graduationYear || 2027;
+  }
+  if (data.collegeEnrollmentYear === undefined) {
+    data.collegeEnrollmentYear = data.graduationYear || 2027;
+  }
+  delete data.graduationYear;
+  // v9: applicationCycle is now structured (string → object); overwrite legacy string
+  if (!data.applicationCycle || typeof data.applicationCycle === 'string') {
+    data.applicationCycle = {
+      applicationsSubmitted: 'Fall 2026',
+      decisionsReceived: 'Winter/Spring 2027',
+      enrollmentStart: 'Fall 2027'
+    };
+  }
   if (!data.lastModified) data.lastModified = Date.now();
   if (!data.scholarships) data.scholarships = initDefaultScholarships();
   // Backfill url field on existing scholarship entries
@@ -7817,7 +7831,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v8';
+const PROMPT_VERSION = 'v9';
 const SYSTEM_PROMPT_V2 = [
   "You are an experienced independent college admissions consultant with deep specialization in pre-veterinary pathways. You are advising a family directly. The analysis may be read by both the parent (primary strategic decision-maker) and the student (age 16, a high-achiever navigating an intense process). Your language choices need to serve both readers.",
   "",
@@ -7877,7 +7891,8 @@ const SYSTEM_PROMPT_V2 = [
   "",
   "- Do not recommend specific admission pathways (Early Decision, Early Action, Restrictive Early Action, rolling admission) without evidence from the payload that the school offers them. If uncertain, say \"check whether [School] offers [pathway]\" rather than assuming.",
   "- Do not invent scholarship names, program specifics, deadlines, or other facts not in the payload. If a fact would strengthen your recommendation but isn't in the payload, flag the gap: \"Worth verifying [X] directly with the school.\"",
-  "- Do not infer or invent the student's grade level, graduation year, application timeline, age, or other biographical details. Reason only from explicit timeline fields in the payload: student.currentGrade, student.graduationYear, student.applicationCycle, act.nextSittingPlanned, and similar. If timing matters to a recommendation, cite those fields directly — do not infer grade level from conversational context, from ACT scores, or from the urgency of the question being asked.",
+  "- Do not infer or invent the student's grade level, graduation year, application timeline, age, or other biographical details. Reason only from explicit timeline fields in the payload: student.currentGrade, student.highSchoolGraduationYear, student.collegeEnrollmentYear, student.applicationCycle (an object with applicationsSubmitted, decisionsReceived, enrollmentStart), act.nextSittingPlanned, and similar. If timing matters to a recommendation, cite those fields directly — do not infer grade level from conversational context, from ACT scores, or from the urgency of the question being asked.",
+  "- When reasoning about timeline-sensitive facts (new programs opening, facilities completing, policy changes, etc.), verify the date against student.collegeEnrollmentYear — not against applicationCycle.applicationsSubmitted. A program opening Fall 2026 means it will have been operating for one year when a Fall 2027 enrollee arrives on campus. Do not conflate the application cycle window with the enrollment window.",
   "- Do not characterize a school as \"unvisited\" based on visit score alone. Check the `visited` boolean. If visited: false, treat visit data as missing information. If visited: true with a numeric score, treat the score as a real rating.",
   "- Do not infer narrative from numeric ratings when descriptors are empty. Treat missing descriptors as missing information, not as implied sentiment.",
   "- When visitScoreIsEstimated is true, treat that school's ranking position as a placeholder, not as strong data.",
@@ -8017,9 +8032,14 @@ function gatherAIData() {
       intendedMajor: 'Animal Science / Pre-Veterinary',
       ultimateGoal: 'DVM',
       residency: 'Georgia',
-      graduationYear: data.graduationYear || 2027,
       currentGrade: data.currentGrade || 'junior',
-      applicationCycle: data.applicationCycle || 'Fall 2026 applications for Fall 2027 enrollment'
+      highSchoolGraduationYear: data.highSchoolGraduationYear || 2027,
+      collegeEnrollmentYear: data.collegeEnrollmentYear || 2027,
+      applicationCycle: {
+        applicationsSubmitted: (data.applicationCycle && data.applicationCycle.applicationsSubmitted) || 'Fall 2026',
+        decisionsReceived: (data.applicationCycle && data.applicationCycle.decisionsReceived) || 'Winter/Spring 2027',
+        enrollmentStart: (data.applicationCycle && data.applicationCycle.enrollmentStart) || 'Fall 2027'
+      }
     },
     householdContext: data.householdContext || '',
     nonNegotiables: Array.isArray(data.nonNegotiables) ? data.nonNegotiables : [],
@@ -8720,9 +8740,10 @@ function openScoreEditor() {
   const latestSitting = act.latestSittingDate || '';
   const aprilReflected = !!act.aprilRetakeReflected;
   const nextSitting = act.nextSittingPlanned || '';
-  const gradYear = data.graduationYear || 2027;
+  const hsGradYear = data.highSchoolGraduationYear || 2027;
+  const collegeEnrollYear = data.collegeEnrollmentYear || 2027;
   const curGrade = data.currentGrade || 'junior';
-  const appCycle = data.applicationCycle || 'Fall 2026 applications for Fall 2027 enrollment';
+  const appCycle = data.applicationCycle || { applicationsSubmitted: '', decisionsReceived: '', enrollmentStart: '' };
   const gradeOptions = ['freshman', 'sophomore', 'junior', 'senior'];
 
   overlay.innerHTML = `
@@ -8773,14 +8794,33 @@ function openScoreEditor() {
           </select>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
-          <label style="flex:1;font-size:0.85rem;font-weight:600;">Graduation year</label>
-          <input type="number" id="scoreEdit_graduationYear" value="${gradYear}" min="2024" max="2035" step="1"
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">HS graduation year</label>
+          <input type="number" id="scoreEdit_highSchoolGraduationYear" value="${hsGradYear}" min="2024" max="2035" step="1"
             style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;text-align:center;font-family:inherit;">
         </div>
-        <div style="display:flex;align-items:flex-start;gap:10px;">
-          <label style="flex:1;font-size:0.85rem;font-weight:600;padding-top:6px;">Application cycle</label>
-          <textarea id="scoreEdit_applicationCycle" rows="2"
-            style="flex:2;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.85rem;font-family:inherit;resize:vertical;">${esc(appCycle)}</textarea>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="flex:1;font-size:0.85rem;font-weight:600;">College enrollment year <span style="font-weight:400;color:var(--text-light);font-size:0.78rem;">(may differ — gap year etc.)</span></label>
+          <input type="number" id="scoreEdit_collegeEnrollmentYear" value="${collegeEnrollYear}" min="2024" max="2036" step="1"
+            style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.9rem;text-align:center;font-family:inherit;">
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-light);font-weight:600;margin-top:4px;">Application cycle</div>
+        <div style="display:flex;align-items:center;gap:10px;padding-left:12px;">
+          <label style="flex:1;font-size:0.82rem;">Applications submitted</label>
+          <input type="text" id="scoreEdit_applicationsSubmitted" value="${esc(appCycle.applicationsSubmitted || '')}"
+            placeholder="e.g., Fall 2026"
+            style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.85rem;font-family:inherit;">
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding-left:12px;">
+          <label style="flex:1;font-size:0.82rem;">Decisions received</label>
+          <input type="text" id="scoreEdit_decisionsReceived" value="${esc(appCycle.decisionsReceived || '')}"
+            placeholder="e.g., Winter/Spring 2027"
+            style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.85rem;font-family:inherit;">
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding-left:12px;">
+          <label style="flex:1;font-size:0.82rem;">Enrollment start</label>
+          <input type="text" id="scoreEdit_enrollmentStart" value="${esc(appCycle.enrollmentStart || '')}"
+            placeholder="e.g., Fall 2027"
+            style="width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.85rem;font-family:inherit;">
         </div>
         <p id="scoreEdit_error" style="display:none;color:#b04040;font-size:0.82rem;font-weight:600;margin:4px 0 0;"></p>
       </div>
@@ -8844,10 +8884,14 @@ function saveScoreEditor() {
   // Timeline fields (prevents AI from inferring grade level / cycle)
   const gradeVal = (document.getElementById('scoreEdit_currentGrade').value || '').trim();
   if (gradeVal) data.currentGrade = gradeVal;
-  const gradYearVal = parseInt(document.getElementById('scoreEdit_graduationYear').value);
-  if (!isNaN(gradYearVal) && gradYearVal >= 2024 && gradYearVal <= 2035) data.graduationYear = gradYearVal;
-  const appCycleVal = (document.getElementById('scoreEdit_applicationCycle').value || '').trim();
-  data.applicationCycle = appCycleVal;
+  const hsGradYearVal = parseInt(document.getElementById('scoreEdit_highSchoolGraduationYear').value);
+  if (!isNaN(hsGradYearVal) && hsGradYearVal >= 2024 && hsGradYearVal <= 2035) data.highSchoolGraduationYear = hsGradYearVal;
+  const collegeEnrollYearVal = parseInt(document.getElementById('scoreEdit_collegeEnrollmentYear').value);
+  if (!isNaN(collegeEnrollYearVal) && collegeEnrollYearVal >= 2024 && collegeEnrollYearVal <= 2036) data.collegeEnrollmentYear = collegeEnrollYearVal;
+  if (!data.applicationCycle || typeof data.applicationCycle === 'string') data.applicationCycle = {};
+  data.applicationCycle.applicationsSubmitted = (document.getElementById('scoreEdit_applicationsSubmitted').value || '').trim();
+  data.applicationCycle.decisionsReceived = (document.getElementById('scoreEdit_decisionsReceived').value || '').trim();
+  data.applicationCycle.enrollmentStart = (document.getElementById('scoreEdit_enrollmentStart').value || '').trim();
 
   const newComposite = data.actScores.composite;
   saveData();
