@@ -7297,14 +7297,15 @@ function renderScenarios() {
 // increase on 2026-04-14 but UGA's OSFA page is still 2025-26.
 // tuition = tuition+fees, rb = room & board, books = books/supplies — sticker computed as tuition + rb + books
 const FIN_DATA = [
-  { group:'SAFETY SCHOOLS' },
+  // SAFETY / MATCH / REACH group headers were removed April 2026 — those
+  // categories reflected an admit-rate framing that Strategic Fit v1
+  // replaced. The rows stay in their historical order for stable diffs.
   { school:'University of Kentucky', res:'OOS', tuition:35164, rb:16696, books:1200, merit:18000, costYear:'2025-26' },
   { school:'Colorado State University', res:'OOS', tuition:36407, rb:17508, books:1200, merit:9000, costYear:'2025-26' },
   { school:'Oklahoma State University', res:'OOS', tuition:29440, rb:11780, books:1400, merit:9000, costYear:'2025-26' },
   { school:'Mississippi State University', res:'OOS', tuition:28736, rb:13514, books:1200, merit:11000, costYear:'2025-26' },
   { school:'Michigan State University', res:'OOS', tuition:44758, rb:12928, books:1420, merit:8000, costYear:'2025-26' },
   { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000, costYear:'2025-26' },
-  { group:'MATCH SCHOOLS' },
   { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000, costYear:'2025-26' },
   { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:4000, costYear:'2026-27' },
   { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000, costYear:'2025-26' },
@@ -7317,7 +7318,6 @@ const FIN_DATA = [
   { school:'University of Wisconsin-Madison', res:'OOS', tuition:44210, rb:14520, books:700, merit:2000, costYear:'2025-26' },
   { school:'University of Illinois', res:'OOS', tuition:38398, rb:15184, books:1200, merit:1000, costYear:'2025-26' },
   { school:'Penn State University', res:'OOS', tuition:42860, rb:15346, books:1200, merit:1500, costYear:'2025-26' },
-  { group:'REACH SCHOOLS' },
   { school:'Florida State University', res:'OOS', tuition:21683, rb:14020, books:1200, merit:2000, notes:'Zell Miller', costYear:'2025-26' },
   { school:'University of Georgia', res:'In-State', tuition:12908, rb:12084, books:998, merit:5000, notes:'Zell Miller', costYear:'2025-26' },
   { school:'University of Florida', res:'OOS', tuition:28659, rb:12615, books:1235, merit:0, costYear:'2025-26' },
