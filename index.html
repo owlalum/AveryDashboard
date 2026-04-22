@@ -2768,10 +2768,10 @@
   <!-- Financial Analysis sub-panel -->
   <div id="financial" class="sub-panel">
     <div class="section-head"><h2>Financial Analysis</h2></div>
-    <div style="padding:8px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">Cost breakdown reflects 2025-26 published rates from each school's official COA page. Update annually in August when schools release new figures.</div>
+    <div style="padding:8px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">Cost breakdown reflects published rates from each school's official COA page. See the <strong>Cost Year</strong> column for which academic year each school's figures are based on (2025-26 vs 2026-27). Update annually in August when remaining schools release 2026-27 figures.</div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead id="finHead"><tr><th>School</th><th>Residency</th><th>Tuition &amp; Fees</th><th>Room &amp; Board</th><th>Books</th><th>Sticker COA/Yr</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th></tr></thead>
+        <thead id="finHead"><tr><th>School</th><th>Residency</th><th>Cost Year</th><th>Tuition &amp; Fees</th><th>Room &amp; Board</th><th>Books</th><th>Sticker COA/Yr</th><th>Merit/Yr</th><th>Realistic/Yr</th><th>4-Yr Realistic</th></tr></thead>
         <tbody id="finBody"></tbody>
       </table>
     </div>
@@ -2964,13 +2964,14 @@
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Fair &mdash; limited career options if vet school doesn't work out</td></tr>
       </table>
 
-      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Cost</h4>
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Cost (value tier)</h4>
+      <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 6px;">This is a <em>value tier</em>, not an affordability gate. Any school on this list is fundable; the rating places it on the value-per-dollar spectrum relative to the rest of the list, so the composite score reflects the premium (or discount) a school carries.</p>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Under $140K (well within budget, leaves cushion for vet school)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>$140K &ndash; $170K</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>$170K &ndash; $200K</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>$200K &ndash; $220K</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>Over $220K (significant gap vs. family budget)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td><strong>Exceptional value</strong> &mdash; under $100K (4-yr realistic). Cheapest path to the DVM goal on this list.</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td><strong>Strong value</strong> &mdash; $100K&ndash;$190K. Meaningfully below the list's middle range; cost is not a real factor.</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td><strong>Typical</strong> &mdash; $190K&ndash;$215K. Mid-pack for this list; cost is about where you'd expect for the program quality.</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td><strong>Premium</strong> &mdash; $215K&ndash;$245K. Above-average cost; program quality, fit, or career outcome should justify the premium.</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td><strong>Elite sticker</strong> &mdash; over $245K. Top of the cost range; only justified by reach-level prestige or a specific career advantage (e.g., Cornell).</td></tr>
       </table>
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Scoir Label (Admission Probability)</h4>
@@ -3952,6 +3953,43 @@ function runMigrations() {
     });
     data.strategicFitV1MigrationApplied = true;
   }
+
+  // ── Cost rubric v2 one-time migration ──
+  // The Cost rubric was re-drafted in April 2026 to reflect 2026-27 tuition
+  // inflation and shift framing from "affordability gate" to "value tier"
+  // (the household context says affordability is not the decision driver).
+  // New bands:
+  //   5: <$100K (Exceptional value)
+  //   4: $100K–$190K (Strong value)
+  //   3: $190K–$215K (Typical)
+  //   2: $215K–$245K (Premium)
+  //   1: >$245K (Elite sticker)
+  // This block re-seeds costScore for the 12 focused schools so the ratings
+  // match the new rubric. Runs once per dataset (data-level sentinel, same
+  // pattern as strategicFitV1MigrationApplied). Schools outside this map keep
+  // their current costScore; user can still override any value via the UI.
+  if (!data.costRubricV2MigrationApplied) {
+    const costScorePresets = {
+      'University of Georgia':            5,
+      'University of Kentucky':           4,
+      'University of Tennessee':          4,
+      'Purdue University':                4,
+      'North Carolina State University':  4,
+      'Clemson University':               3,
+      'Texas A&M University':             3,
+      'Auburn University':                3,
+      'Virginia Tech':                    2,
+      'Ohio State University':            2,
+      'University of Wisconsin-Madison':  2,
+      'Cornell University':               1
+    };
+    Object.keys(costScorePresets).forEach(name => {
+      const rk = getRankingForSchool(name);
+      rk.costScore = costScorePresets[name];
+    });
+    data.costRubricV2MigrationApplied = true;
+  }
+
   if (!data.gpa) data.gpa = 0;
   if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
   if (!data.studentName) data.studentName = '';
@@ -4938,6 +4976,7 @@ const RANKING_COLUMNS = [
 const FINANCIAL_COLUMNS = [
   { field: 'school', label: 'School', sortType: 'text' },
   { field: 'res', label: 'Residency', sortType: 'text' },
+  { field: 'costYear', label: 'Cost\u00a0Year', sortType: 'text' },
   { field: 'tuition', label: 'Tuition\u00a0&\u00a0Fees', sortType: 'numeric' },
   { field: 'rb', label: 'Room\u00a0&\u00a0Board', sortType: 'numeric' },
   { field: 'books', label: 'Books', sortType: 'numeric' },
@@ -7259,30 +7298,30 @@ function renderScenarios() {
 // tuition = tuition+fees, rb = room & board, books = books/supplies — sticker computed as tuition + rb + books
 const FIN_DATA = [
   { group:'SAFETY SCHOOLS' },
-  { school:'University of Kentucky', res:'OOS', tuition:35164, rb:16696, books:1200, merit:18000 },
-  { school:'Colorado State University', res:'OOS', tuition:36407, rb:17508, books:1200, merit:9000 },
-  { school:'Oklahoma State University', res:'OOS', tuition:29440, rb:11780, books:1400, merit:9000 },
-  { school:'Mississippi State University', res:'OOS', tuition:28736, rb:13514, books:1200, merit:11000 },
-  { school:'Michigan State University', res:'OOS', tuition:44758, rb:12928, books:1420, merit:8000 },
-  { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000 },
+  { school:'University of Kentucky', res:'OOS', tuition:35164, rb:16696, books:1200, merit:18000, costYear:'2025-26' },
+  { school:'Colorado State University', res:'OOS', tuition:36407, rb:17508, books:1200, merit:9000, costYear:'2025-26' },
+  { school:'Oklahoma State University', res:'OOS', tuition:29440, rb:11780, books:1400, merit:9000, costYear:'2025-26' },
+  { school:'Mississippi State University', res:'OOS', tuition:28736, rb:13514, books:1200, merit:11000, costYear:'2025-26' },
+  { school:'Michigan State University', res:'OOS', tuition:44758, rb:12928, books:1420, merit:8000, costYear:'2025-26' },
+  { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000, costYear:'2025-26' },
   { group:'MATCH SCHOOLS' },
-  { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000 },
-  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:4000 },
-  { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000 },
-  { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000 },
-  { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000 },
-  { school:'North Carolina State University', res:'OOS', tuition:34961, rb:14741, books:642, merit:4000 },
-  { school:'Virginia Tech', res:'OOS', tuition:40206, rb:17708, books:1120, merit:3000 },
-  { school:'Ohio State University', res:'OOS', tuition:44122, rb:15630, books:1020, merit:4000 },
-  { school:'Clemson University', res:'OOS', tuition:42378, rb:14224, books:1496, merit:6000 },
-  { school:'University of Wisconsin-Madison', res:'OOS', tuition:44210, rb:14520, books:700, merit:2000 },
-  { school:'University of Illinois', res:'OOS', tuition:38398, rb:15184, books:1200, merit:1000 },
-  { school:'Penn State University', res:'OOS', tuition:42860, rb:15346, books:1200, merit:1500 },
+  { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000, costYear:'2025-26' },
+  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:4000, costYear:'2026-27' },
+  { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000, costYear:'2025-26' },
+  { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000, costYear:'2025-26' },
+  { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000, costYear:'2025-26 (2026-27 tuition confirmed frozen)' },
+  { school:'North Carolina State University', res:'OOS', tuition:34961, rb:14741, books:642, merit:4000, costYear:'2026-27 (r&b pending)' },
+  { school:'Virginia Tech', res:'OOS', tuition:40206, rb:17708, books:1120, merit:3000, costYear:'2026-27' },
+  { school:'Ohio State University', res:'OOS', tuition:44122, rb:15630, books:1020, merit:4000, costYear:'2026-27' },
+  { school:'Clemson University', res:'OOS', tuition:42378, rb:14224, books:1496, merit:6000, costYear:'2025-26' },
+  { school:'University of Wisconsin-Madison', res:'OOS', tuition:44210, rb:14520, books:700, merit:2000, costYear:'2025-26' },
+  { school:'University of Illinois', res:'OOS', tuition:38398, rb:15184, books:1200, merit:1000, costYear:'2025-26' },
+  { school:'Penn State University', res:'OOS', tuition:42860, rb:15346, books:1200, merit:1500, costYear:'2025-26' },
   { group:'REACH SCHOOLS' },
-  { school:'Florida State University', res:'OOS', tuition:21683, rb:14020, books:1200, merit:2000, notes:'Zell Miller' },
-  { school:'University of Georgia', res:'In-State', tuition:12908, rb:12084, books:998, merit:5000, notes:'Zell Miller' },
-  { school:'University of Florida', res:'OOS', tuition:28659, rb:12615, books:1235, merit:0 },
-  { school:'Cornell University', res:'OOS', tuition:73946, rb:21348, books:1234, merit:0, notes:'Need-based aid only; CALS contract college' }
+  { school:'Florida State University', res:'OOS', tuition:21683, rb:14020, books:1200, merit:2000, notes:'Zell Miller', costYear:'2025-26' },
+  { school:'University of Georgia', res:'In-State', tuition:12908, rb:12084, books:998, merit:5000, notes:'Zell Miller', costYear:'2025-26' },
+  { school:'University of Florida', res:'OOS', tuition:28659, rb:12615, books:1235, merit:0, costYear:'2025-26' },
+  { school:'Cornell University', res:'OOS', tuition:73946, rb:21348, books:1234, merit:0, notes:'Need-based aid only; CALS contract college', costYear:'2025-26 (2026-27 tuition confirmed unchanged)' }
 ];
 
 function renderFinancials() {
@@ -7301,7 +7340,7 @@ function renderFinancials() {
   });
 
   if (cleanedFin.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see financial analysis.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see financial analysis.</td></tr>';
     return;
   }
 
@@ -7317,11 +7356,12 @@ function renderFinancials() {
   const rowsToRender = displayRows || cleanedFin;
 
   tbody.innerHTML = rowsToRender.map(row => {
-    if (row.group) return `<tr class="fin-group-header"><td colspan="9">${row.group}</td></tr>`;
+    if (row.group) return `<tr class="fin-group-header"><td colspan="10">${row.group}</td></tr>`;
     const r = displayRows ? row : finRows.find(f => f.school === row.school) || row;
     return `<tr>
       <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.school, 22)} ${esc(r.school)}</span></td>
       <td class="compact">${r.res}</td>
+      <td class="compact" style="font-size:0.78rem;color:var(--text-light);white-space:nowrap">${esc(r.costYear || '—')}</td>
       <td class="compact">$${(r.tuition||0).toLocaleString()}</td>
       <td class="compact">$${(r.rb||0).toLocaleString()}</td>
       <td class="compact">$${(r.books||0).toLocaleString()}</td>
