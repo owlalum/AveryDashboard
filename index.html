@@ -3285,12 +3285,34 @@ function loadData() {
   return getDefaults();
 }
 
+// Resolver fn for the currently-scheduled debounced save, if any. If a new
+// saveData() supersedes the in-flight one (clearTimeout), we settle its promise
+// with { synced: false, reason: 'superseded' } so awaiters don't hang.
+let savePromiseResolve = null;
+
 function saveData() {
   data.lastModified = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  if (firestoreSyncEnabled && firestoreInitialized) {
+  if (!firestoreSyncEnabled || !firestoreInitialized) {
+    return Promise.resolve({ synced: false, reason: 'offline' });
+  }
+  // Supersede any previously-scheduled debounced save. Settle its promise so
+  // anything awaiting it unblocks; the new saveData call takes over.
+  if (saveDebounceTimer !== null) {
     clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = null;
+    if (savePromiseResolve) {
+      savePromiseResolve({ synced: false, reason: 'superseded' });
+      savePromiseResolve = null;
+    }
+  }
+  return new Promise((resolve) => {
+    savePromiseResolve = resolve;
     saveDebounceTimer = setTimeout(async () => {
+      saveDebounceTimer = null;
+      const myResolve = savePromiseResolve;
+      savePromiseResolve = null;
+
       // Fast-fail sanity check (kept as belt-and-braces alongside the
       // transaction): if remote has a meaningfully populated schools list
       // (>=5) and local has almost none (<=2), refuse without even running
@@ -3313,6 +3335,7 @@ function saveData() {
                 'first edit a school or add one back to raise localCount above 2.'
               );
               updateSyncIndicator('error');
+              myResolve({ synced: false, reason: 'precheck-refused', localCount: localCount, remoteCount: remoteCount });
               return;
             }
           }
@@ -3341,6 +3364,7 @@ function saveData() {
         // Success: our write is the new remote baseline.
         lastSyncedRemoteTs = data.lastModified;
         updateSyncIndicator('synced');
+        myResolve({ synced: true });
       } catch (err) {
         if (err && err._conflict) {
           console.warn(
@@ -3351,13 +3375,15 @@ function saveData() {
           );
           updateSyncIndicator('error');
           showConflictBanner();
+          myResolve({ synced: false, reason: 'conflict', remoteTs: err._conflictRemoteTs, baseline: err._baseline });
         } else {
           console.error('Firestore save:', err);
           updateSyncIndicator('error');
+          myResolve({ synced: false, reason: 'error', error: err });
         }
       }
     }, 1500);
-  }
+  });
 }
 
 function updateSyncIndicator(status) {
@@ -3397,7 +3423,7 @@ function restoreFromJSON(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     try {
       const parsed = JSON.parse(e.target.result);
       const restored = parsed.data || parsed;
@@ -3415,9 +3441,38 @@ function restoreFromJSON(input) {
       }
       data = restored;
       data.lastModified = Date.now();
-      saveData();
+      // Ensure structural migrations run against the restored data before the
+      // UI tries to render it. Without this, an old backup missing fields
+      // (e.g. data.rankings, data.essays, Strategic Fit sentinels) would
+      // render through partially-initialized state. runPostInitMigrations is
+      // intentionally NOT called here — its wipe-style migrations shouldn't
+      // fire on restored data that already has its own sentinels or populated
+      // collections; they will run on the next page reload if needed.
+      runMigrations();
+      // Render immediately so the user sees the restored state right away.
+      // The local restore has already completed (data + localStorage);
+      // awaiting the Firestore push only gates which alert to show.
       renderAll();
-      alert('Backup restored successfully! (' + schoolCount + ' schools loaded)');
+      const saveResultPromise = saveData();
+      const syncResult = await saveResultPromise;
+      if (syncResult && syncResult.synced) {
+        alert('Backup restored successfully! (' + schoolCount + ' schools loaded)');
+      } else {
+        const reason = syncResult ? syncResult.reason : 'unknown';
+        let detail;
+        if (reason === 'conflict') {
+          detail = 'another session updated Firestore while the restore was pushing. Reload the page to pick up the latest remote state, then restore again.';
+        } else if (reason === 'precheck-refused') {
+          detail = 'the safety pre-check refused the push (local schools list too small compared to remote). Local data has been restored, but Firestore was not updated.';
+        } else if (reason === 'offline') {
+          detail = 'Firestore sync is not available (offline). Local data has been restored; reload after reconnecting to push.';
+        } else if (reason === 'superseded') {
+          detail = 'another save fired during the restore and replaced it. Reload and retry.';
+        } else {
+          detail = 'an error occurred during sync (' + reason + '). Check the console for details.';
+        }
+        alert('Backup restored locally — ' + schoolCount + ' schools loaded — BUT sync to Firestore did not complete: ' + detail);
+      }
     } catch (err) {
       alert('Error reading backup file: ' + err.message);
     }
@@ -3991,6 +4046,87 @@ function runMigrations() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+// ─── Post-Firestore-init migrations ────────────────────────────────────────
+// These three used to live at script top level, where they fired before
+// Firestore data arrived and could wipe real remote data on any browser
+// missing the localStorage sentinel (fresh device, cleared storage, new PWA).
+// They run here, AFTER initFromFirestore has loaded the real data, with
+// three-stage guards:
+//   1. Authoritative check: data-level sentinel — if set, skip (already done
+//      for this dataset regardless of which browser is loading it).
+//   2. Legacy check: localStorage sentinel — for existing browsers that
+//      completed the migration before this refactor; adopt the data-level
+//      sentinel without running the wipe.
+//   3. Populated-data heuristic: if the collection already has entries, treat
+//      the migration as already applied and just mark the sentinel. Closes
+//      the gap where a new browser loads real remote data that predates the
+//      data-level sentinel — we must not wipe populated data just because
+//      neither sentinel is explicitly set.
+// Only actually wipes when no sentinel says done AND the collection is empty.
+function runPostInitMigrations() {
+  let changed = false;
+
+  // ── checklistV12: regenerate checklists with tailored items ──
+  if (!data.checklistV12MigrationApplied) {
+    if (localStorage.getItem('checklistV12')) {
+      data.checklistV12MigrationApplied = true;
+      changed = true;
+    } else if (Array.isArray(data.checklists) && data.checklists.length > 0) {
+      // Populated — treat as already migrated
+      data.checklistV12MigrationApplied = true;
+      localStorage.setItem('checklistV12', 'true');
+      changed = true;
+    } else {
+      data.checklists = [];
+      if (!data.honorsOptOut) data.honorsOptOut = {};
+      data.checklistV12MigrationApplied = true;
+      localStorage.setItem('checklistV12', 'true');
+      changed = true;
+    }
+  }
+
+  // ── rankingsV2: reset rankings to use detailed presets ──
+  if (!data.rankingsV2MigrationApplied) {
+    if (localStorage.getItem('rankingsV2')) {
+      data.rankingsV2MigrationApplied = true;
+      changed = true;
+    } else if (data.rankings && typeof data.rankings === 'object' && Object.keys(data.rankings).length > 0) {
+      data.rankingsV2MigrationApplied = true;
+      localStorage.setItem('rankingsV2', 'true');
+      changed = true;
+    } else {
+      data.rankings = {};
+      data.rankingsV2MigrationApplied = true;
+      localStorage.setItem('rankingsV2', 'true');
+      changed = true;
+    }
+  }
+
+  // ── essaysV2: initialize essays (v2 adds honors essays) ──
+  if (!data.essaysV2MigrationApplied) {
+    if (localStorage.getItem('essaysV2')) {
+      data.essaysV2MigrationApplied = true;
+      changed = true;
+    } else if (Array.isArray(data.essays) && data.essays.length > 0) {
+      data.essaysV2MigrationApplied = true;
+      localStorage.setItem('essaysV2', 'true');
+      changed = true;
+    } else {
+      data.essays = [];
+      data.essaysV2MigrationApplied = true;
+      localStorage.setItem('essaysV2', 'true');
+      changed = true;
+    }
+  }
+
+  // Persist locally. Firestore push intentionally not triggered here: the
+  // mutation is idempotent and the sentinels will ride along on the next
+  // natural saveData() call (or an immediate one, if the caller chooses).
+  if (changed) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+}
+
 // ─── Firestore-first async initialization ───
 (async function initFromFirestore() {
   // Run migrations on local data first for immediate render
@@ -4031,6 +4167,10 @@ function runMigrations() {
     firestoreInitialized = true;
     updateSyncIndicator('offline');
   }
+  // Run post-init migrations on the finalized data (remote if reachable,
+  // local fallback otherwise) BEFORE first render. See the function's header
+  // comment for why these live here rather than at top-level script scope.
+  runPostInitMigrations();
   renderAll();
 
   // First-use welcome: prompt for student name if not set
@@ -7591,24 +7731,15 @@ function promptExport(type) {
   };
 }
 
-// ─── One-time migration: regenerate checklists with tailored items ───
-if (!localStorage.getItem('checklistV12')) {
-  data.checklists = [];
-  if (!data.honorsOptOut) data.honorsOptOut = {};
-  localStorage.setItem('checklistV12', 'true');
-}
-// ─── One-time migration: reset rankings to use detailed presets ───
-if (!localStorage.getItem('rankingsV2')) {
-  data.rankings = {};
-  localStorage.setItem('rankingsV2', 'true');
-  saveData();
-}
-// ─── One-time migration: initialize essays (v2 adds honors essays) ───
-if (!localStorage.getItem('essaysV2')) {
-  data.essays = [];
-  localStorage.setItem('essaysV2', 'true');
-  saveData();
-}
+// The three "wipe-and-reinit" migrations (checklistV12, rankingsV2, essaysV2)
+// that used to live at this top-level scope have moved into
+// runPostInitMigrations() in the init block above. They ran synchronously on
+// every page load here, firing before Firestore data arrived — on fresh
+// browsers with no localStorage sentinel that wiped real remote data. The new
+// location runs them after Firestore init completes, uses data-level
+// sentinels as the authoritative guard (with the legacy localStorage
+// sentinels retained as a fallback for existing browsers), and uses a
+// non-empty heuristic to skip the wipe when data already looks populated.
 
 // ─── Greek Life Data ───
 const GREEK_LIFE_DATA = {
@@ -9358,13 +9489,29 @@ docRef.onSnapshot(
       const remoteTs = remote.lastModified || 0;
       const localTs = data.lastModified || 0;
       if (remoteTs > localTs) {
+        // Guard: if a debounced local save is pending, accepting remote here
+        // would clobber the user's unpushed edit. Refuse the overwrite, show
+        // the conflict banner, and leave lastSyncedRemoteTs un-advanced so
+        // the upcoming transactional save will itself detect the conflict
+        // and refuse rather than pushing over another session's newer state.
+        if (saveDebounceTimer !== null) {
+          console.warn(
+            'onSnapshot: remote is newer but a local save is pending. ' +
+            'Skipping local overwrite to preserve unpushed edit. ' +
+            'Showing conflict banner so user can reload after redoing their change.'
+          );
+          showConflictBanner();
+          updateSyncIndicator('error');
+          return;
+        }
         data = remote;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         renderAll();
       }
-      // Either way, this snapshot confirms what's in remote right now.
-      // Advance our concurrency baseline so the next save won't be flagged
-      // as a conflict against state we've already observed.
+      // Either way (other than the guarded-return path above), this snapshot
+      // confirms what's in remote right now. Advance our concurrency baseline
+      // so the next save won't be flagged as a conflict against state we've
+      // already observed.
       lastSyncedRemoteTs = remoteTs;
     }
 
