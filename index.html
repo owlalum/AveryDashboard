@@ -3262,7 +3262,37 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if (firestoreSyncEnabled && firestoreInitialized) {
     clearTimeout(saveDebounceTimer);
-    saveDebounceTimer = setTimeout(() => {
+    saveDebounceTimer = setTimeout(async () => {
+      // Pre-write sanity check: if remote has a meaningfully populated
+      // schools list (>=5) and local has almost none (<=2), this write
+      // would effectively wipe remote. Refuse and log. This is a backstop
+      // against the "fresh-browser overwrites Firestore with defaults"
+      // class of bug (see initFromFirestore conflict resolution).
+      try {
+        const localCount = (data.schools || []).length;
+        if (localCount <= 2) {
+          const remoteSnap = await docRef.get();
+          if (remoteSnap.exists) {
+            const remote = remoteSnap.data();
+            const remoteCount = (remote.schools || []).length;
+            if (remoteCount >= 5) {
+              console.warn(
+                'Firestore save REFUSED: remote has', remoteCount,
+                'schools, local only has', localCount,
+                '— this looks like a stale-defaults overwrite. ' +
+                'If this is intentional (e.g. deliberate bulk delete), ' +
+                'first edit a school or add one back to raise localCount above 2.'
+              );
+              updateSyncIndicator('error');
+              return;
+            }
+          }
+        }
+      } catch (preCheckErr) {
+        // Fail open on pre-check errors — a transient Firestore hiccup
+        // during the sanity read shouldn't block legitimate saves forever.
+        console.warn('Firestore save pre-check failed (allowing save):', preCheckErr);
+      }
       docRef.set(JSON.parse(JSON.stringify(data))).then(() => {
         updateSyncIndicator('synced');
       }).catch(err => {
@@ -3830,7 +3860,13 @@ function runMigrations() {
       enrollmentStart: 'Fall 2027'
     };
   }
-  if (!data.lastModified) data.lastModified = Date.now();
+  // Intentionally do NOT initialize data.lastModified here. A fresh-browser
+  // session loads getDefaults() with no lastModified; if we stamped Date.now()
+  // here, that stamp would beat the real Firestore timestamp and cause the
+  // init conflict resolution to keep the empty local defaults and push them
+  // to Firestore on the next save — wiping the real remote data. Let
+  // lastModified stay 0/undefined until the user actually edits something
+  // (saveData stamps it on first real edit). See initFromFirestore below.
   if (!data.scholarships) data.scholarships = initDefaultScholarships();
   // Backfill url field on existing scholarship entries
   if (data.scholarships.length > 0 && data.scholarships[0].url === undefined) {
@@ -3909,14 +3945,17 @@ function runMigrations() {
       const remote = snap.data();
       const remoteTs = remote.lastModified || 0;
       const localTs = data.lastModified || 0;
-      if (remoteTs >= localTs) {
-        // Firestore has newer or equal data — use it
+      // Local can only "win" the conflict resolution if the user has actually
+      // saved something locally (localTs > 0). A fresh getDefaults() load has
+      // localTs === 0 and must always lose to remote — otherwise opening the
+      // app in a new browser would clobber Firestore with empty defaults.
+      const localWins = localTs > 0 && localTs > remoteTs;
+      if (localWins) {
+        console.log('Local data is newer than remote, will sync on next save (localTs:', localTs, '> remoteTs:', remoteTs, ')');
+      } else {
         data = remote;
         runMigrations();
-        console.log('Initialized from Firestore (remote timestamp:', remoteTs, ')');
-      } else {
-        // Local is newer (e.g. offline edits) — push local to Firestore
-        console.log('Local data is newer, will sync to Firestore');
+        console.log('Initialized from Firestore (remoteTs:', remoteTs, ', localTs:', localTs, ')');
       }
     } else {
       // Firestore doc doesn't exist — don't push defaults
