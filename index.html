@@ -164,6 +164,23 @@
     flex-wrap: wrap;
   }
 
+  /* ── Conflict Banner (another session wrote after us) ── */
+  .conflict-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 24px;
+    background: #fde8e8;
+    border-bottom: 2px solid #dc2626;
+    font-size: 0.85rem;
+    color: #7f1d1d;
+    font-weight: 600;
+    flex-wrap: wrap;
+  }
+  .conflict-banner .cb-icon { font-size: 1.1rem; margin-right: 4px; }
+  .conflict-banner .btn { font-size: 0.82rem; }
+
   /* ── Subtabs ── */
   .subtab-bar {
     display: flex;
@@ -2549,6 +2566,12 @@
     <button class="btn btn-sm" onclick="dismissBackupBanner()">Remind me later</button>
   </div>
 </div>
+<div id="conflictBanner" class="conflict-banner" style="display:none;">
+  <span><span class="cb-icon">&#9888;</span>Another session updated this dashboard after you loaded it. Your recent edits were not saved. Reload to see the latest &mdash; you'll need to redo your last change.</span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button class="btn btn-primary btn-sm" onclick="window.location.reload()">Reload Now</button>
+  </div>
+</div>
 <div id="finalListBanner" style="display:none;padding:8px 24px;background:#fef9e7;border-bottom:1px solid #f0d86e;font-size:0.85rem;color:#7a6a1e;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
   <span class="flb-text"></span>
   <button class="btn btn-sm" onclick="setFinalListFilter(false)" style="font-size:0.78rem;">Show All</button>
@@ -3243,6 +3266,11 @@ let firestoreSyncEnabled = false;
 let firestoreInitialized = false;
 let syncStatus = 'connecting';
 let saveDebounceTimer = null;
+// Baseline timestamp of the remote state our local `data` is derived from.
+// Used for optimistic-concurrency checks in saveData's transaction: if the
+// actual remote is newer than this baseline when we go to write, another
+// session wrote after us and we refuse rather than clobber their work.
+let lastSyncedRemoteTs = 0;
 
 // ─── AI Analysis ───
 // Set this to your deployed Cloudflare Worker URL
@@ -3263,11 +3291,12 @@ function saveData() {
   if (firestoreSyncEnabled && firestoreInitialized) {
     clearTimeout(saveDebounceTimer);
     saveDebounceTimer = setTimeout(async () => {
-      // Pre-write sanity check: if remote has a meaningfully populated
-      // schools list (>=5) and local has almost none (<=2), this write
-      // would effectively wipe remote. Refuse and log. This is a backstop
-      // against the "fresh-browser overwrites Firestore with defaults"
-      // class of bug (see initFromFirestore conflict resolution).
+      // Fast-fail sanity check (kept as belt-and-braces alongside the
+      // transaction): if remote has a meaningfully populated schools list
+      // (>=5) and local has almost none (<=2), refuse without even running
+      // the transaction. Catches the "fresh-browser overwrites defaults"
+      // class of bug and user-error mass deletes. Transactions catch the
+      // concurrent-write case; this catches the intentional-but-wrong case.
       try {
         const localCount = (data.schools || []).length;
         if (localCount <= 2) {
@@ -3289,16 +3318,44 @@ function saveData() {
           }
         }
       } catch (preCheckErr) {
-        // Fail open on pre-check errors — a transient Firestore hiccup
-        // during the sanity read shouldn't block legitimate saves forever.
         console.warn('Firestore save pre-check failed (allowing save):', preCheckErr);
       }
-      docRef.set(JSON.parse(JSON.stringify(data))).then(() => {
+
+      // Transactional save: read current remote, refuse if another session
+      // has written since our baseline (lastSyncedRemoteTs). Prevents the
+      // "two sessions fight and last writer wins even with stale data"
+      // clobber path that cost us real data earlier.
+      try {
+        await db.runTransaction(async (tx) => {
+          const snap = await tx.get(docRef);
+          const remoteTs = snap.exists ? (snap.data().lastModified || 0) : 0;
+          if (remoteTs > lastSyncedRemoteTs) {
+            const err = new Error('CONFLICT');
+            err._conflict = true;
+            err._conflictRemoteTs = remoteTs;
+            err._baseline = lastSyncedRemoteTs;
+            throw err;
+          }
+          tx.set(docRef, JSON.parse(JSON.stringify(data)));
+        });
+        // Success: our write is the new remote baseline.
+        lastSyncedRemoteTs = data.lastModified;
         updateSyncIndicator('synced');
-      }).catch(err => {
-        console.error('Firestore save:', err);
-        updateSyncIndicator('error');
-      });
+      } catch (err) {
+        if (err && err._conflict) {
+          console.warn(
+            'Firestore save REFUSED (conflict): another session wrote after our baseline. ' +
+            'theirRemoteTs=', err._conflictRemoteTs,
+            'ourBaseline=', err._baseline,
+            '. Showing reload banner so user can pick up the latest.'
+          );
+          updateSyncIndicator('error');
+          showConflictBanner();
+        } else {
+          console.error('Firestore save:', err);
+          updateSyncIndicator('error');
+        }
+      }
     }, 1500);
   }
 }
@@ -3957,9 +4014,14 @@ function runMigrations() {
         runMigrations();
         console.log('Initialized from Firestore (remoteTs:', remoteTs, ', localTs:', localTs, ')');
       }
+      // Record remote's timestamp as our concurrency baseline either way:
+      // it's the most recent remote state we know about. When we next save,
+      // the transaction refuses if remote has advanced past this baseline.
+      lastSyncedRemoteTs = remoteTs;
     } else {
       // Firestore doc doesn't exist — don't push defaults
       console.log('Firestore empty, using local data');
+      lastSyncedRemoteTs = 0;
     }
     firestoreSyncEnabled = true;
     firestoreInitialized = true;
@@ -3995,6 +4057,16 @@ function runMigrations() {
 function dismissBackupBanner() {
   const banner = document.getElementById('backupBanner');
   if (banner) banner.style.display = 'none';
+}
+
+// Shown when a saveData transaction detects that another session wrote to
+// Firestore after our local baseline. The user's edit stays in memory +
+// localStorage (not lost), but we refuse to push it — reloading pulls the
+// latest remote and the user redoes their change. No merge attempt: that
+// would require field-level conflict resolution we don't have.
+function showConflictBanner() {
+  const banner = document.getElementById('conflictBanner');
+  if (banner) banner.style.display = '';
 }
 
 // ─── ACT Score Helpers ───
@@ -9290,6 +9362,10 @@ docRef.onSnapshot(
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         renderAll();
       }
+      // Either way, this snapshot confirms what's in remote right now.
+      // Advance our concurrency baseline so the next save won't be flagged
+      // as a conflict against state we've already observed.
+      lastSyncedRemoteTs = remoteTs;
     }
 
     firestoreSyncEnabled = true;
