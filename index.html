@@ -1519,6 +1519,22 @@
   #summary .badge-match  { background: var(--sun-soft); color: #7A5A00; border-color: #B5832A; }
   #summary .badge-reach  { background: var(--hot-soft); color: var(--hot-deep); border-color: var(--hot); }
 
+  /* Strategic Fit v1 badges (dashboard-computed label) */
+  .badge-priority-target { background: var(--hot-soft); color: var(--hot-deep); border: 1.5px solid var(--hot); }
+  .badge-strong-fit      { background: var(--sun-soft); color: #7A5A00; border: 1.5px solid #B5832A; }
+  .badge-happy-landing   { background: var(--leaf-soft); color: var(--leaf); border: 1.5px solid var(--leaf); }
+
+  /* Scoir admission-probability badges (manually entered) */
+  .badge-scoir-very-likely { background: var(--leaf-soft); color: var(--leaf); border: 1.5px solid var(--leaf); }
+  .badge-scoir-likely      { background: #DFF0D8; color: #3c7a50; border: 1.5px solid #7aae8e; }
+  .badge-scoir-target      { background: var(--sun-soft); color: #7A5A00; border: 1.5px solid #B5832A; }
+  .badge-scoir-reach       { background: var(--coral-soft); color: #B5400C; border: 1.5px solid var(--coral); }
+  .badge-scoir-far-reach   { background: var(--hot-soft); color: var(--hot-deep); border: 1.5px solid var(--hot); }
+  .badge-scoir-unset       { background: transparent; color: var(--text-light); border: 1.5px dashed var(--border); }
+
+  /* Mobile-only stacked badge block inside the school cell; hidden on desktop */
+  .summary-badge-stack { display: none; }
+
   /* Insight-box (unused in new layout, kept neutral in case) */
   .insight-box { background: var(--sun-soft); border-left: 4px solid var(--hot); color: var(--ink); }
 
@@ -1734,10 +1750,28 @@
       line-height: 1.25;
       hyphens: auto;
     }
-    /* Category / Cost / Score → inline labeled row */
+    /* Strategic Fit (col 3) and Scoir (col 4) → hidden on phone; badges are
+       rendered as a stacked block inside the school cell instead. */
     #summary tbody td:nth-child(3),
-    #summary tbody td:nth-child(4),
-    #summary tbody td:nth-child(5) {
+    #summary tbody td:nth-child(4) { display: none !important; }
+
+    /* Stacked badges inside the school cell (mobile only) */
+    #summary tbody td.summary-school-cell .summary-badge-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start;
+      margin-top: 8px;
+      grid-column: 2 / -1;
+    }
+    #summary tbody td.summary-school-cell .summary-badge-stack .badge {
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+    }
+
+    /* Cost (col 5) / Score (col 6) → inline labeled row */
+    #summary tbody td:nth-child(5),
+    #summary tbody td:nth-child(6) {
       display: inline-flex;
       align-items: baseline;
       width: auto;
@@ -1745,7 +1779,7 @@
       margin: 0 16px 4px 0;
       font-size: 0.88rem;
     }
-    #summary tbody td:nth-child(4)::before {
+    #summary tbody td:nth-child(5)::before {
       content: 'Cost';
       font-size: 0.62rem;
       letter-spacing: 0.12em;
@@ -1754,7 +1788,7 @@
       font-weight: 700;
       margin-right: 6px;
     }
-    #summary tbody td:nth-child(5)::before {
+    #summary tbody td:nth-child(6)::before {
       content: 'Score';
       font-size: 0.62rem;
       letter-spacing: 0.12em;
@@ -1763,8 +1797,8 @@
       font-weight: 700;
       margin-right: 6px;
     }
-    /* Notes → full-width footer, hide if empty */
-    #summary tbody td:nth-child(6) {
+    /* Notes (col 7) → full-width footer, hide if empty */
+    #summary tbody td:nth-child(7) {
       padding: 10px 0 0;
       margin-top: 6px;
       max-width: none !important;
@@ -1773,7 +1807,7 @@
       border-top: 1px dashed var(--border);
       color: var(--ink-2);
     }
-    #summary tbody td:nth-child(6):empty {
+    #summary tbody td:nth-child(7):empty {
       display: none;
       border-top: none;
       padding: 0;
@@ -2635,7 +2669,7 @@
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table>
-        <thead id="summaryHead"><tr><th>Rank</th><th>School</th><th>Category</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
+        <thead id="summaryHead"><tr><th>Rank</th><th>School</th><th>Strategic Fit</th><th>Scoir</th><th>4-Yr Cost</th><th>Score</th><th>Key Notes</th></tr></thead>
         <tbody id="summaryRankBody"></tbody>
       </table>
     </div>
@@ -2674,14 +2708,14 @@
   <div id="rankings" class="sub-panel">
     <div class="section-head">
       <h2>Final Rankings</h2>
-      <p>Combines your visit impressions (40%) with objective factors to produce a final ranking.</p>
+      <p>Strategic Fit ranking. Combines Program, Fit, Plan B, and Cost into one composite score; the Scoir column tracks admission probability separately.</p>
     </div>
     <div class="rank-weights">
-      <div>Visit Score: <span>40%</span></div>
-      <div>Vet Program: <span>25%</span></div>
-      <div>Cost Score: <span>15%</span></div>
-      <div>Plan B Strength: <span>10%</span></div>
-      <div>Merit Aid Potential: <span>10%</span></div>
+      <div>Program: <span>20%</span></div>
+      <div>Fit: <span>30%</span></div>
+      <div>Plan B: <span>30%</span></div>
+      <div>Cost: <span>20%</span></div>
+      <div>Merit: <span>reference only</span></div>
       <div style="margin-left:auto;font-style:italic;">Rating key: 5 = Excellent, 4 = Strong, 3 = Average, 2 = Below Avg, 1 = Weak</div>
     </div>
     <div class="table-wrap" style="max-height:none;">
@@ -2690,13 +2724,13 @@
           <tr>
             <th>Rank</th>
             <th>School</th>
-            <th>Visit Score</th>
-            <th>Visit Rank</th>
-            <th>Vet Program</th>
-            <th>Cost Score</th>
+            <th>Program</th>
+            <th>Fit</th>
             <th>Plan B</th>
-            <th>Merit Aid</th>
+            <th>Cost</th>
+            <th>Merit (ref)</th>
             <th>Combined</th>
+            <th>Scoir</th>
             <th>Notes</th>
           </tr>
         </thead>
@@ -2842,7 +2876,7 @@
     <!-- Ranking Formula -->
     <div class="strat-explainer">
       <h3>Ranking Formula</h3>
-      <p>Each school receives a <strong>composite score</strong> from 1&ndash;5 based on four weighted factors:</p>
+      <p>Each school receives a <strong>composite score</strong> from 1&ndash;5 based on four weighted factors. Admission probability is tracked separately via the <em>Scoir Label</em> column and is not part of this score.</p>
       <table style="width:100%;margin-top:10px;font-size:0.88rem;border-collapse:collapse;">
         <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
           <th style="padding:6px 12px 6px 0;">Factor</th>
@@ -2851,35 +2885,36 @@
         </tr></thead>
         <tbody>
           <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;">Vet School Quality &amp; Access</td>
-            <td style="padding:8px 12px;">35%</td>
-            <td style="padding:8px 12px;">The entire purpose of undergrad is to get into vet school</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Program</td>
+            <td style="padding:8px 12px;">20%</td>
+            <td style="padding:8px 12px;">Vet program strength and pre-vet infrastructure (access to a DVM is the whole point of undergrad)</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;">4-Year Cost</td>
-            <td style="padding:8px 12px;">35%</td>
-            <td style="padding:8px 12px;">Must still afford 4 years of vet school after undergrad</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Fit</td>
+            <td style="padding:8px 12px;">30%</td>
+            <td style="padding:8px 12px;">How well the school matches Avery&rsquo;s visit impressions and cultural preferences &mdash; manually set per school</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;">Admission Likelihood</td>
-            <td style="padding:8px 12px;">10%</td>
-            <td style="padding:8px 12px;">Most schools are accessible; low weight avoids over-penalizing reaches</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Plan B</td>
+            <td style="padding:8px 12px;">30%</td>
+            <td style="padding:8px 12px;">If the DVM path doesn&rsquo;t happen, the undergrad degree still needs strong career value</td>
           </tr>
           <tr>
-            <td style="padding:8px 12px 8px 0;font-weight:600;">Plan B Strength</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;">Cost</td>
             <td style="padding:8px 12px;">20%</td>
-            <td style="padding:8px 12px;">If vet school doesn't happen, the degree should still have strong career value</td>
+            <td style="padding:8px 12px;">Must still afford 4 years of vet school after undergrad</td>
           </tr>
         </tbody>
       </table>
-      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Formula:</strong> Score = (Vet &times; 0.35) + (Cost &times; 0.35) + (Admission &times; 0.10) + (Plan B &times; 0.20)</p>
+      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Formula:</strong> Score = (Program &times; 0.20) + (Fit &times; 0.30) + (Plan B &times; 0.30) + (Cost &times; 0.20)</p>
+      <p style="margin-top:6px;color:var(--muted);font-size:0.85rem;"><strong>Merit Aid</strong> is shown on the Rankings tab for reference but is <em>not</em> part of the composite score. Realistic merit already flows through the Cost factor via the Financial Analysis tab.</p>
     </div>
 
     <!-- Scoring Rubrics -->
     <div class="strat-explainer">
       <h3>Scoring Rubrics (1&ndash;5 Scale)</h3>
 
-      <h4 style="margin-top:14px;margin-bottom:6px;color:var(--primary);">Vet School Quality &amp; Access</h4>
+      <h4 style="margin-top:14px;margin-bottom:6px;color:var(--primary);">Program</h4>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Guaranteed or early admission to own CVM (e.g., UGA, Clemson guarantee programs)</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Top-ranked CVM with guaranteed interview or strong pipeline (e.g., NC State, Purdue)</td></tr>
@@ -2888,7 +2923,25 @@
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>No CVM, limited pre-vet infrastructure</td></tr>
       </table>
 
-      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">4-Year Cost</h4>
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Fit</h4>
+      <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 6px;">Subjective rating set manually after visits and research. Captures how well the campus culture, student body, and day-to-day experience match Avery&rsquo;s preferences.</p>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Strong fit &mdash; would be thrilled to enroll; campus, vibe, and academics all resonate</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Good fit &mdash; mostly aligned, a couple of minor reservations</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Neutral &mdash; acceptable fit, no strong pull in either direction</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Weak fit &mdash; would consider only as a last resort</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>Poor fit &mdash; effectively ruled out based on visit / cultural mismatch</td></tr>
+      </table>
+
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Plan B</h4>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Excellent &mdash; degree leads directly to strong careers outside vet (e.g., Purdue engineering)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Strong &mdash; well-regarded program with good job placement</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Good &mdash; solid program, regional reputation</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Fair &mdash; limited career options if vet school doesn't work out</td></tr>
+      </table>
+
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Cost</h4>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Under $140K (well within budget, leaves cushion for vet school)</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>$140K &ndash; $170K</td></tr>
@@ -2897,47 +2950,42 @@
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>Over $220K (significant gap vs. family budget)</td></tr>
       </table>
 
-      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Admission Likelihood</h4>
+      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Scoir Label (Admission Probability)</h4>
+      <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 6px;">Entered manually from Scoir&rsquo;s peer-benchmarked admission probability. Not part of the composite score &mdash; admission odds and strategic fit are tracked separately so a high-odds school doesn&rsquo;t get inflated into a top strategic pick.</p>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>SAFETY &mdash; acceptance rate &gt;70%, or student's ACT/GPA well above the school's middle 50% range</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>MATCH &mdash; acceptance rate 25&ndash;70% and ACT/GPA within the school's middle 50% range</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>REACH &mdash; acceptance rate &lt;25%, or student's ACT well below the school's 25th percentile</td></tr>
-      </table>
-
-      <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Plan B Strength</h4>
-      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>Excellent &mdash; degree leads directly to strong careers outside vet (e.g., Purdue engineering)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>Strong &mdash; well-regarded program with good job placement</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>Good &mdash; solid program, regional reputation</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Fair &mdash; limited career options if vet school doesn't work out</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:110px;">Very Likely</td><td>Scoir shows very high admit probability for this profile</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Likely</td><td>Strong admit probability, no concerns</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Target</td><td>Balanced odds &mdash; realistic admit at current stats</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Reach</td><td>Admit possible but not expected at current stats</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">Far Reach</td><td>Very low admit probability for this profile (e.g., Cornell)</td></tr>
       </table>
     </div>
 
-    <!-- Admission Categories -->
+    <!-- Strategic Fit Labels -->
     <div class="strat-explainer">
-      <h3>Admission Categories</h3>
-      <p>Each school is classified as SAFETY, MATCH, or REACH based on how the student's profile compares:</p>
+      <h3>Strategic Fit Labels</h3>
+      <p>The dashboard groups schools into three labels based on the composite score. Fit acts as a soft gate: a school scoring 4.0+ overall but below 3 on fit caps at Strong Fit rather than Priority Target &mdash; cultural mismatch shouldn&rsquo;t produce a #1 recommendation.</p>
       <table style="width:100%;margin-top:10px;font-size:0.88rem;border-collapse:collapse;">
         <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
-          <th style="padding:6px 12px 6px 0;">Category</th>
+          <th style="padding:6px 12px 6px 0;">Label</th>
           <th style="padding:6px 12px;">Criteria</th>
         </tr></thead>
         <tbody>
           <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;color:#16a34a;">SAFETY</td>
-            <td id="catSafetyDesc" style="padding:8px 12px;">Acceptance rate &gt;70%, or student's GPA and ACT are well above the school's middle 50% range</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:var(--hot-deep);">Priority Target</td>
+            <td style="padding:8px 12px;">Composite score &ge; 4.00 <em>and</em> Fit &ge; 3 &mdash; top-tier strategic pick</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:8px 12px 8px 0;font-weight:600;color:#ca8a04;">MATCH</td>
-            <td style="padding:8px 12px;">Acceptance rate 25&ndash;70%, GPA and ACT near or within the school's middle 50%</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:#7A5A00;">Strong Fit</td>
+            <td style="padding:8px 12px;">Composite 3.30&ndash;3.99, or 4.00+ with Fit &lt; 3 &mdash; solid addition to the list</td>
           </tr>
           <tr>
-            <td style="padding:8px 12px 8px 0;font-weight:600;color:#dc2626;">REACH</td>
-            <td id="catReachDesc" style="padding:8px 12px;">Acceptance rate &lt;25%, or student's ACT well below the school's 25th percentile (e.g., UGA ACT 32+, UF at 14% OOS)</td>
+            <td style="padding:8px 12px 8px 0;font-weight:600;color:var(--leaf);">Happy Landing</td>
+            <td style="padding:8px 12px;">Composite &lt; 3.30 &mdash; acceptable outcome but not a strategic priority</td>
           </tr>
         </tbody>
       </table>
-      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Note:</strong> At schools with direct-admit or college-level admission (e.g., Purdue, Virginia Tech, NC State), applying to Animal Science rather than Engineering/CS/Business can provide a meaningful advantage. The degree of benefit varies by school &mdash; see the <strong>Admission Strategy</strong> tab for per-school details.</p>
+      <p style="margin-top:12px;color:var(--muted);font-size:0.85rem;"><strong>Note:</strong> Strategic Fit describes <em>how well the school serves Avery&rsquo;s plan</em>, not how likely she is to get in. Admission probability lives in the Scoir column. A Priority Target can still be a Reach in Scoir, and a Happy Landing can still be Very Likely.</p>
     </div>
 
     <!-- Data Sources & Assumptions -->
@@ -3699,7 +3747,69 @@ function runMigrations() {
     if (!r.descriptors) {
       r.descriptors = { visit: '', vetProgram: '', cost: '', meritAid: '', planB: '' };
     }
+    // Strategic Fit v1 structural fields (defaults are harmless; real values
+    // arrive via the one-time preset migration below)
+    if (r.scoirLabel === undefined) r.scoirLabel = '';
+    if (r.fit === undefined) r.fit = 3;
   });
+
+  // ── Strategic Fit v1 one-time preset migration ──
+  // Seeds scoirLabel + fit for the current active list and aligns a handful of
+  // existing ratings that the new model expects. Guarded by a sentinel on
+  // `data` (not localStorage) so that when Firestore data replaces local data
+  // and runMigrations fires again, the guard travels with the dataset. Using
+  // a localStorage sentinel here caused the migration to be skipped on the
+  // Firestore-loaded data when local ran first and set the flag.
+  if (!data.strategicFitV1MigrationApplied) {
+    const scoirPresets = {
+      'Auburn University': 'Very Likely',
+      'University of Kentucky': 'Very Likely',
+      'University of Tennessee': 'Likely',
+      'Clemson University': 'Likely',
+      'Purdue University': 'Target',
+      'Texas A&M University': 'Target',
+      'Ohio State University': 'Target',
+      'Virginia Tech': 'Target',
+      'North Carolina State University': 'Reach',
+      'University of Georgia': 'Reach',
+      'University of Wisconsin-Madison': 'Reach',
+      'Cornell University': 'Far Reach'
+    };
+    const fitPresets = {
+      'Auburn University': 3,
+      'University of Kentucky': 3,
+      'University of Tennessee': 3,
+      'Clemson University': 3,
+      'Purdue University': 4,
+      'Texas A&M University': 3,
+      'Ohio State University': 3,
+      'Virginia Tech': 5,
+      'North Carolina State University': 4,
+      'University of Georgia': 5,
+      'University of Wisconsin-Madison': 3,
+      'Cornell University': 2
+    };
+    const ratingOverrides = {
+      'Auburn University':               { planB: 2 },
+      'University of Kentucky':          { vetProgram: 1, planB: 2 },
+      'University of Tennessee':         { planB: 2 },
+      'Texas A&M University':            { planB: 4 },
+      'Virginia Tech':                   { planB: 4 },
+      'University of Wisconsin-Madison': { planB: 5 }
+    };
+    Object.keys(scoirPresets).forEach(name => {
+      // Route through getRankingForSchool so the preset ratings (vetProgram,
+      // costScore, planB, meritAid, notes) get seeded from the in-file presets
+      // map when the entry is missing — otherwise migration would stamp
+      // all-3 defaults on top of scoirLabel/fit.
+      const rk = getRankingForSchool(name);
+      rk.scoirLabel = scoirPresets[name];
+      rk.fit = fitPresets[name];
+      const ov = ratingOverrides[name];
+      if (ov) Object.keys(ov).forEach(k => { rk[k] = ov[k]; });
+    });
+    data.strategicFitV1MigrationApplied = true;
+  }
   if (!data.gpa) data.gpa = 0;
   if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
   if (!data.studentName) data.studentName = '';
@@ -4562,16 +4672,16 @@ const AG_RANK_COLUMNS = [
 ];
 
 const RANKING_COLUMNS = [
-  { field: 'finalRank', label: 'Rank', sortType: 'numeric' },
-  { field: 'name', label: 'School', sortType: 'text' },
-  { field: 'visitScore', label: 'Visit Score', sortType: 'numeric' },
-  { field: 'visitRank', label: 'Visit Rank', sortType: 'numeric' },
-  { field: 'vetProgram', label: 'Vet Program', sortType: 'numeric' },
-  { field: 'costScore', label: 'Cost Score', sortType: 'numeric' },
-  { field: 'planB', label: 'Plan B', sortType: 'numeric' },
-  { field: 'meritAid', label: 'Merit Aid', sortType: 'numeric' },
-  { field: 'combined', label: 'Combined', sortType: 'numeric' },
-  { field: 'notes', label: 'Notes', sortType: null },
+  { field: 'finalRank',  label: 'Rank',       sortType: 'numeric' },
+  { field: 'name',       label: 'School',     sortType: 'text' },
+  { field: 'vetProgram', label: 'Program',    sortType: 'numeric' },
+  { field: 'fit',        label: 'Fit',        sortType: 'numeric' },
+  { field: 'planB',      label: 'Plan B',     sortType: 'numeric' },
+  { field: 'costScore',  label: 'Cost',       sortType: 'numeric' },
+  { field: 'meritAid',   label: 'Merit (ref)',sortType: 'numeric' },
+  { field: 'combined',   label: 'Combined',   sortType: 'numeric' },
+  { field: 'scoirLabel', label: 'Scoir',      sortType: 'text' },
+  { field: 'notes',      label: 'Notes',      sortType: null },
 ];
 
 const FINANCIAL_COLUMNS = [
@@ -4600,12 +4710,13 @@ const GREEK_COLUMNS = [
 ];
 
 const SUMMARY_COLUMNS = [
-  { field: 'rank', label: 'Rank', sortType: 'numeric' },
-  { field: 'name', label: 'School', sortType: 'text' },
-  { field: 'cat', label: 'Category', sortType: 'text' },
-  { field: 'cost', label: '4-Yr Cost', sortType: 'currency' },
-  { field: 'combined', label: 'Score', sortType: 'numeric' },
-  { field: 'notes', label: 'Key Notes', sortType: null },
+  { field: 'rank',         label: 'Rank',          sortType: 'numeric' },
+  { field: 'name',         label: 'School',        sortType: 'text' },
+  { field: 'strategicFit', label: 'Strategic Fit', sortType: 'text' },
+  { field: 'scoirLabel',   label: 'Scoir',         sortType: 'text' },
+  { field: 'cost',         label: '4-Yr Cost',     sortType: 'currency' },
+  { field: 'combined',     label: 'Score',         sortType: 'numeric' },
+  { field: 'notes',        label: 'Key Notes',     sortType: null },
 ];
 
 function setupSortableHeaders(theadId, columns, sortState, renderFn) {
@@ -4697,8 +4808,11 @@ function openCompareModal() {
     const s = data.schools.find(sc => sc.name === name);
     if (!s) return '';
     const db = schoolDB[name] || {};
-    const cat = getSummaryCategory(name);
-    const catClass = cat === 'SAFETY' ? 'badge-safety' : cat === 'REACH' ? 'badge-reach' : 'badge-match';
+    const sf = computeStrategicFit(name);
+    const fitClass = strategicFitBadgeClass(sf.label);
+    const rkForBadges = getRankingForSchool(name);
+    const scoirText = rkForBadges.scoirLabel || '—';
+    const scoirClass = scoirBadgeClass(rkForBadges.scoirLabel);
     const vet = getSummaryVetStatus(name);
     const vetClass = vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
     const costInfo = getSummaryCost(name);
@@ -4717,7 +4831,8 @@ function openCompareModal() {
         ${schoolLogoHTML(name, 32)}
         <h3>${esc(name)}</h3>
       </div>
-      <div class="compare-row"><span class="cr-label">Category</span><span class="cr-value"><span class="badge ${catClass}">${cat}</span></span></div>
+      <div class="compare-row"><span class="cr-label">Strategic Fit</span><span class="cr-value"><span class="badge ${fitClass}">${sf.label}</span></span></div>
+      <div class="compare-row"><span class="cr-label">Scoir</span><span class="cr-value"><span class="badge ${scoirClass}">${esc(scoirText)}</span></span></div>
       <div class="compare-row"><span class="cr-label">Visit Score</span><span class="cr-value">${visitDisplay}</span></div>
       <div class="compare-row"><span class="cr-label">4-Year Cost</span><span class="cr-value">${costInfo.cost}</span></div>
       <div class="compare-row"><span class="cr-label">Vet School</span><span class="cr-value"><span class="badge ${vetClass}">${esc(vet)}</span></span></div>
@@ -6345,7 +6460,11 @@ function renderEvalSummary() {
 }
 
 // ─── Final Rankings ───
-const RANK_WEIGHTS = { visit: 0.40, vetProgram: 0.25, costScore: 0.15, planB: 0.10, meritAid: 0.10 };
+// Strategic Fit v1 weights (Program/Fit/Plan B/Cost). Merit aid is kept as
+// reference data on the Rankings tab but is NOT part of the Strategic Fit
+// calculation. Visit impressions are now represented through the manually-set
+// Fit rating, not an auto-derived visit score.
+const RANK_WEIGHTS = { program: 0.20, fit: 0.30, planB: 0.30, cost: 0.20 };
 
 function getRankingForSchool(name) {
   if (!data.rankings[name]) {
@@ -6383,6 +6502,10 @@ function getRankingForSchool(name) {
   if (!data.rankings[name].descriptors) {
     data.rankings[name].descriptors = { visit: '', vetProgram: '', cost: '', meritAid: '', planB: '' };
   }
+  // Strategic Fit v1 fields (neutral defaults; real values come from the
+  // one-time preset migration in runMigrations for the seeded list)
+  if (data.rankings[name].fit === undefined) data.rankings[name].fit = 3;
+  if (data.rankings[name].scoirLabel === undefined) data.rankings[name].scoirLabel = '';
   return data.rankings[name];
 }
 
@@ -6392,38 +6515,28 @@ function renderRankings() {
   if (data.schools.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  const maxTotal = calcMaxWeightedTotal();
-
   const rows = getVisibleSchools().map(s => {
     const rk = getRankingForSchool(s.name);
-    const visitInfo = getVisitScoreInfo(s.name);
     return {
       name: s.name,
-      visitScore: visitInfo.score, // 0–5 scale directly
-      visitNorm: Math.round(visitInfo.score * 10) / 10,
-      visitScoreIsEstimated: visitInfo.isEstimated,
       vetProgram: rk.vetProgram || 3,
-      costScore: rk.costScore || 3,
+      fit: rk.fit || 3,
       planB: rk.planB || 3,
+      costScore: rk.costScore || 3,
       meritAid: rk.meritAid || 3,
+      scoirLabel: rk.scoirLabel || '',
       notes: rk.notes || '',
       combined: 0
     };
   });
 
-  // Calculate visit ranks (unrated schools with placeholder 3.0 end up tied
-  // in the middle, which is intentional — they have no data to rank by).
-  const visitSorted = [...rows].sort((a, b) => b.visitScore - a.visitScore);
-  visitSorted.forEach((r, i) => r.visitRank = i + 1);
-
-  // Calculate combined scores
+  // Calculate combined scores (Strategic Fit v1: Program 20% | Fit 30% | Plan B 30% | Cost 20%)
   rows.forEach(r => {
     r.combined = Math.round((
-      r.visitNorm * RANK_WEIGHTS.visit +
-      r.vetProgram * RANK_WEIGHTS.vetProgram +
-      r.costScore * RANK_WEIGHTS.costScore +
-      r.planB * RANK_WEIGHTS.planB +
-      r.meritAid * RANK_WEIGHTS.meritAid
+      r.vetProgram * RANK_WEIGHTS.program +
+      r.fit        * RANK_WEIGHTS.fit +
+      r.planB      * RANK_WEIGHTS.planB +
+      r.costScore  * RANK_WEIGHTS.cost
     ) * 100) / 100;
   });
 
@@ -6437,25 +6550,26 @@ function renderRankings() {
       ${[1,2,3,4,5].map(n => `<option value="${n}" ${val===n?'selected':''}>${n}</option>`).join('')}
     </select>`;
   }
+  function scoirSelect(school, val) {
+    const opts = ['', 'Very Likely', 'Likely', 'Target', 'Reach', 'Far Reach'];
+    return `<select onchange="setRankingField('${esc(school)}','scoirLabel',this.value)">
+      ${opts.map(o => `<option value="${esc(o)}" ${val===o?'selected':''}>${o || '\u2014'}</option>`).join('')}
+    </select>`;
+  }
 
   tbody.innerHTML = sortedRows.map(r => {
-    const visitCell = r.visitScoreIsEstimated
-      ? `<span class="score-estimated" title="No visit data — using 3.0 placeholder">${r.visitScore.toFixed(1)}*</span>`
-      : r.visitScore.toFixed(1);
-    const combinedCell = r.visitScoreIsEstimated
-      ? `<span class="score-estimated" title="Combined score uses a visit-score placeholder">${r.combined}*</span>`
-      : r.combined;
+    const scoirClass = scoirBadgeClass(r.scoirLabel);
     return `
     <tr>
       <td>${r.finalRank}</td>
       <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
-      <td>${visitCell}</td>
-      <td>#${r.visitRank}</td>
       <td>${ratingSelect(r.name,'vetProgram',r.vetProgram)}</td>
-      <td>${ratingSelect(r.name,'costScore',r.costScore)}</td>
+      <td>${ratingSelect(r.name,'fit',r.fit)}</td>
       <td>${ratingSelect(r.name,'planB',r.planB)}</td>
+      <td>${ratingSelect(r.name,'costScore',r.costScore)}</td>
       <td>${ratingSelect(r.name,'meritAid',r.meritAid)}</td>
-      <td style="font-weight:700">${combinedCell}</td>
+      <td style="font-weight:700">${r.combined}</td>
+      <td>${scoirSelect(r.name, r.scoirLabel)}</td>
       <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(r.name)}','notes',this.value)"></td>
     </tr>`;
   }).join('');
@@ -6468,6 +6582,9 @@ function setRankingField(school, field, val) {
   rk[field] = val;
   saveData();
   renderRankings();
+  // Summary table now depends on editable fit/scoirLabel fields, so re-render
+  // the Overview summary to keep badges and row order in sync.
+  if (typeof renderSummary === 'function') renderSummary();
 }
 
 // ─── National Rankings (US News / WSJ / Forbes) ───
@@ -6599,34 +6716,46 @@ function setNationalRanking(school, field, raw) {
 }
 
 // ─── Executive Summary Rankings ───
-// ─── Ranking Formula: Visit 40% | Vet Program 25% | Cost 15% | Plan B 10% | Merit Aid 10% ───
-// Dynamically derives category, vet status, cost, and budget fit from live data
+// Strategic Fit v1 — Program 20% | Fit 30% | Plan B 30% | Cost 20%
+// Fit and Plan B drive the label; Fit also acts as a soft gate so a school
+// that scores high overall but poorly on fit cannot land at the top tier.
 
-// Manual overrides where OOS rate misrepresents Avery's actual odds
-// (e.g., Ag college admits at a higher rate than university OOS overall)
-const CATEGORY_OVERRIDES = {
-  'Ohio State University': 'MATCH',      // CFAES admits above 27% OOS university rate
-  'University of Georgia': 'REACH',      // 33% in-state, but ACT 32-35 range — Avery's 27 is well below 25th %ile
-  'University of Florida': 'REACH',      // 14% OOS; highly selective even for Ag/CALS
-  'Florida State University': 'REACH',   // 19% OOS; no Ag advantage, university-wide
-  'Oklahoma State University': 'SAFETY', // 67% OOS but Avery's ACT at 75th %ile of their range
-  'Mississippi State University': 'SAFETY', // 63% OOS; Avery's ACT mid-range; accessible school
-  'University of Missouri': 'SAFETY',    // 68% OOS; Avery's ACT mid-range; near-open admission
-};
+function computeStrategicFit(schoolName) {
+  const rk = getRankingForSchool(schoolName);
+  const program = rk.vetProgram || 3;
+  const fit     = rk.fit || 3;
+  const planB   = rk.planB || 3;
+  const cost    = rk.costScore || 3;
 
-function getSummaryCategory(schoolName) {
-  if (CATEGORY_OVERRIDES[schoolName]) return CATEGORY_OVERRIDES[schoolName];
-  const db = schoolDB[schoolName];
-  if (!db) return 'MATCH';
-  // UGA is in-state for Avery — use overall accept rate
-  const isInState = schoolName === 'University of Georgia';
-  let rateStr = isInState ? db.acceptRate : (db.oosAcceptRate || db.acceptRate);
-  if (!rateStr || rateStr === 'N/A') return 'MATCH';
-  const rate = parseInt(rateStr);
-  if (isNaN(rate)) return 'MATCH';
-  if (rate >= 70) return 'SAFETY';
-  if (rate < 25) return 'REACH';
-  return 'MATCH';
+  const score = (program * 0.20) + (fit * 0.30) + (planB * 0.30) + (cost * 0.20);
+
+  let label;
+  if (score >= 4.0) {
+    label = fit < 3 ? 'Strong Fit' : 'Priority Target';
+  } else if (score >= 3.3) {
+    label = 'Strong Fit';
+  } else {
+    label = 'Happy Landing';
+  }
+
+  return { label, score: Math.round(score * 100) / 100 };
+}
+
+function strategicFitBadgeClass(label) {
+  if (label === 'Priority Target') return 'badge-priority-target';
+  if (label === 'Strong Fit')      return 'badge-strong-fit';
+  return 'badge-happy-landing';
+}
+
+function scoirBadgeClass(label) {
+  switch (label) {
+    case 'Very Likely': return 'badge-scoir-very-likely';
+    case 'Likely':      return 'badge-scoir-likely';
+    case 'Target':      return 'badge-scoir-target';
+    case 'Reach':       return 'badge-scoir-reach';
+    case 'Far Reach':   return 'badge-scoir-far-reach';
+    default:            return 'badge-scoir-unset';
+  }
 }
 
 function getSummaryVetStatus(schoolName) {
@@ -6677,42 +6806,28 @@ function getSummaryCost(schoolName) {
 
 function renderSummary() {
   const tbody = document.getElementById('summaryRankBody');
-  const maxTotal = calcMaxWeightedTotal();
 
   if (data.schools.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see the executive summary.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:24px">Add schools in the <strong>School Comparison</strong> tab to see the executive summary.</td></tr>';
     return;
   }
 
-  // Build rows dynamically from live data
+  // Build rows from Strategic Fit v1 data
   const rows = getVisibleSchools().map(s => {
     const rk = getRankingForSchool(s.name);
-    const visitInfo = getVisitScoreInfo(s.name);
-    const visitNorm = visitInfo.score; // already 0–5 from the new calc
-    const combined = Math.round((
-      visitNorm * RANK_WEIGHTS.visit +
-      (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
-      (rk.costScore || 3) * RANK_WEIGHTS.costScore +
-      (rk.planB || 3) * RANK_WEIGHTS.planB +
-      (rk.meritAid || 3) * RANK_WEIGHTS.meritAid
-    ) * 100) / 100;
-
-    const cat = getSummaryCategory(s.name);
-    const vet = getSummaryVetStatus(s.name);
+    const sf = computeStrategicFit(s.name);
     const costInfo = getSummaryCost(s.name);
 
     return {
       id: s.id,
       finalList: !!s.finalList,
       name: s.name,
-      cat,
-      vet,
+      strategicFit: sf.label,
+      scoirLabel: rk.scoirLabel || '',
       cost: costInfo.cost,
       noMerit: costInfo.noMerit || false,
       notes: rk.notes || '',
-      visitNorm: Math.round(visitNorm * 10) / 10,
-      visitScoreIsEstimated: visitInfo.isEstimated,
-      combined
+      combined: sf.score
     };
   });
 
@@ -6723,16 +6838,17 @@ function renderSummary() {
   const summaryRows = summarySort.field ? sortRows(rows, summarySort, SUMMARY_COLUMNS) : rows;
 
   tbody.innerHTML = summaryRows.map(r => {
-    const catClass = r.cat === 'SAFETY' ? 'badge-safety' : r.cat === 'REACH' ? 'badge-reach' : 'badge-match';
-    const starIcon = r.finalList ? '\u2B50' : '\u2606';
-    const starTitle = r.finalList ? 'On Final List — click to remove' : 'Add to Final List';
-    const combinedDisplay = r.visitScoreIsEstimated
-      ? `<span class="score-estimated" title="Visit score estimated (no data entered yet) — combined score is a placeholder">${r.combined.toFixed(2)}*</span>`
-      : r.combined.toFixed(2);
+    const fitClass   = strategicFitBadgeClass(r.strategicFit);
+    const scoirClass = scoirBadgeClass(r.scoirLabel);
+    const scoirText  = r.scoirLabel || '\u2014';
+    const starIcon   = r.finalList ? '\u2B50' : '\u2606';
+    const starTitle  = r.finalList ? 'On Final List — click to remove' : 'Add to Final List';
+    const combinedDisplay = r.combined.toFixed(2);
     return `<tr${r.finalList ? ' class="summary-on-final-list"' : ''}>
       <td class="summary-rank-cell compact">${r.rank}</td>
-      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span><button class="summary-final-toggle${r.finalList ? ' on' : ''}" type="button" onclick="toggleFinalList('${r.id}')" title="${starTitle}" aria-label="${starTitle}">${starIcon}</button></span></td>
-      <td class="compact"><span class="badge ${catClass}">${r.cat}</span></td>
+      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span><button class="summary-final-toggle${r.finalList ? ' on' : ''}" type="button" onclick="toggleFinalList('${r.id}')" title="${starTitle}" aria-label="${starTitle}">${starIcon}</button></span><div class="summary-badge-stack"><span class="badge ${fitClass}">${r.strategicFit}</span><span class="badge ${scoirClass}">${esc(scoirText)}</span></div></td>
+      <td class="compact"><span class="badge ${fitClass}">${r.strategicFit}</span></td>
+      <td class="compact"><span class="badge ${scoirClass}">${esc(scoirText)}</span></td>
       <td class="compact" style="font-weight:700">${r.cost}</td>
       <td class="compact" style="font-weight:800;color:var(--hot-deep)">${combinedDisplay}</td>
       <td style="font-size:0.82rem;max-width:260px;color:var(--ink-2)">${esc(r.notes)}</td>
@@ -6778,13 +6894,10 @@ function renderScenarios() {
   if (!grid) return;
   if (data.schools.length === 0) { grid.innerHTML = ''; return; }
 
-  // Build scored rows for all active schools
-  const maxTotal = calcMaxWeightedTotal();
+  // Build scored rows for all active schools (Strategic Fit v1)
   const scored = getVisibleSchools().map(s => {
     const rk = getRankingForSchool(s.name);
-    const ev = getEvalForSchool(s.name);
-    const visitScore = calcWeightedTotal(ev);
-    const visitNorm = maxTotal > 0 ? (visitScore / maxTotal) * 5 : 0;
+    const sf = computeStrategicFit(s.name);
     const costInfo = getSummaryCost(s.name);
     const db = schoolDB[s.name] || {};
     const dist = getDistanceFromAtlanta(s.location || db.location || '');
@@ -6793,20 +6906,16 @@ function renderScenarios() {
       short: scenarioShortName(s.name),
       costScore: rk.costScore || 3,
       vetProgram: rk.vetProgram || 3,
+      fit: rk.fit || 3,
       planB: rk.planB || 3,
       meritAid: rk.meritAid || 3,
+      scoirLabel: rk.scoirLabel || '',
       fourYrCost: costInfo.fourYr,
       distance: dist || 0,
       hasHonors: /\bhonors\b/i.test(db.notes || ''),
       actLow: (() => { const m = (db.testReq || '').match(/ACT\s+(\d+)/); return m ? parseInt(m[1]) : null; })(),
       location: s.location || db.location || '',
-      combined: Math.round((
-        visitNorm * RANK_WEIGHTS.visit +
-        (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
-        (rk.costScore || 3) * RANK_WEIGHTS.costScore +
-        (rk.planB || 3) * RANK_WEIGHTS.planB +
-        (rk.meritAid || 3) * RANK_WEIGHTS.meritAid
-      ) * 100) / 100
+      combined: sf.score
     };
   });
 
@@ -7880,7 +7989,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v12';
+const PROMPT_VERSION = 'v12-bridge';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -7959,21 +8068,14 @@ function gatherAIData() {
   const act = getStudentACT();
   const gpa = getStudentGPA();
   const name = getStudentName();
-  const maxTotal = calcMaxWeightedTotal();
 
-  // Build school rows — ALL schools, not just top 5. Sort by combined score.
+  // Build school rows — ALL schools, not just top 5. Sort by Strategic Fit composite.
   const rows = getVisibleSchools().map(s => {
     const ev = getEvalForSchool(s.name);
     const rk = getRankingForSchool(s.name);
     const visitInfo = getVisitScoreInfo(s.name);
-    const visitNorm = visitInfo.score; // 0–5; placeholder 3.0 when estimated
-    const combined = Math.round((
-      visitNorm * RANK_WEIGHTS.visit +
-      (rk.vetProgram || 3) * RANK_WEIGHTS.vetProgram +
-      (rk.costScore || 3) * RANK_WEIGHTS.costScore +
-      (rk.planB || 3) * RANK_WEIGHTS.planB +
-      (rk.meritAid || 3) * RANK_WEIGHTS.meritAid
-    ) * 100) / 100;
+    const sf = computeStrategicFit(s.name);
+    const combined = sf.score;
 
     const fin = FIN_DATA.find(r => r.school === s.name) || {};
     const sticker = (fin.tuition || 0) + (fin.rb || 0) + (fin.books || 0);
@@ -8007,8 +8109,14 @@ function gatherAIData() {
       onFinalList: !!s.finalList,
       rankOrder: 0, // assigned after sort
       combinedScore: combined,
-      combinedScoreIsEstimated: visitInfo.isEstimated,
-      category: formatCategory(getSummaryCategory(s.name)),
+      combinedScoreIsEstimated: false,
+      // Strategic Fit v1: dashboard-computed label + Scoir admission label.
+      // `category` is a temporary compatibility bridge for the v12 prompt
+      // (which still reads a single category field) — it mirrors the
+      // Strategic Fit label until the prompt is rewritten.
+      strategicFit: sf,
+      scoirLabel: rk.scoirLabel || '',
+      category: sf.label,
       hasOnCampusVetSchool: hasOnCampusVetSchool(s.name),
       admitRate: parseAdmitRateDecimal(s.name),
       visited: visited,
@@ -8022,9 +8130,10 @@ function gatherAIData() {
           descriptor: [ev.loved, ev.concerned && ('Concern: ' + ev.concerned)].filter(Boolean).join(' / ') || desc.visit || ''
         },
         vetProgram: { score: rk.vetProgram || 3, descriptor: desc.vetProgram || '' },
-        cost:       { score: rk.costScore || 3, descriptor: desc.cost || '' },
-        meritAid:   { score: rk.meritAid || 3, descriptor: desc.meritAid || '' },
-        planB:      { score: rk.planB || 3, descriptor: desc.planB || '' },
+        fit:        { score: rk.fit || 3,        descriptor: '' },
+        cost:       { score: rk.costScore || 3,  descriptor: desc.cost || '' },
+        meritAid:   { score: rk.meritAid || 3,   descriptor: desc.meritAid || '' },
+        planB:      { score: rk.planB || 3,      descriptor: desc.planB || '' },
       },
       financials: {
         stickerAnnual: sticker || null,
@@ -8095,21 +8204,30 @@ function gatherAIData() {
     schools: rows,
     candidatePool: buildCandidatePool(),
     rubrics: {
+      // Strategic Fit v1 — composite label computed by the dashboard.
+      // Admission probability is tracked separately in each school's scoirLabel.
       categoryDefinitions: {
-        Reach: 'Admit rate <25%, or student ACT well below the school\'s 25th percentile',
-        Match: 'Acceptance rate 25–70% and ACT/GPA within the school\'s middle 50% range',
-        Safety: 'Acceptance rate >70%, or student ACT/GPA well above the school\'s middle 50% range'
+        'Priority Target': 'Composite score >= 4.00 and Fit >= 3 — top-tier strategic pick',
+        'Strong Fit': 'Composite 3.30–3.99, or 4.00+ with Fit < 3 — solid addition to the list',
+        'Happy Landing': 'Composite < 3.30 — acceptable outcome but not a strategic priority'
+      },
+      scoirLabelDefinitions: {
+        'Very Likely': 'Very high peer-benchmarked admit probability for this profile',
+        'Likely': 'Strong admit probability, no concerns',
+        'Target': 'Balanced odds — realistic admit at current stats',
+        'Reach': 'Admit possible but not expected at current stats',
+        'Far Reach': 'Very low admit probability for this profile (e.g., Cornell)'
       },
       ratingAnchors: {
-        visit: '5 = Avery would be thrilled to enroll; 1 = ruled out based on visit',
         vetProgram: '5 = on-campus DVM with strong advising; 3 = no on-campus vet but clear pipeline; 1 = no meaningful pre-vet infrastructure',
+        fit: '5 = strong fit; 3 = neutral; 1 = poor fit / effectively ruled out — manually set based on visits and cultural match',
+        planB: '5 = strong across many majors if pre-vet doesn\'t work out; 1 = narrowly useful only for this path',
         cost: '5 = minimal out-of-pocket after merit; 1 = full sticker, no aid',
-        meritAid: '5 = guaranteed large merit based on current stats; 1 = no merit available',
-        planB: '5 = strong across many majors if pre-vet doesn\'t work out; 1 = narrowly useful only for this path'
+        meritAid: 'Reference only — not part of the composite score. 5 = guaranteed large merit based on current stats; 1 = no merit available'
       },
       weightings: {
-        visit: 0.40, vetProgram: 0.25, cost: 0.15, planB: 0.10, meritAid: 0.10,
-        note: 'User-adjustable on Rankings tab. combinedScore in each school reflects these weights.'
+        program: 0.20, fit: 0.30, planB: 0.30, cost: 0.20,
+        note: 'Merit aid is reference-only and NOT in the composite score. combinedScore in each school reflects Program/Fit/Plan B/Cost weights.'
       }
     },
     meta: {
@@ -8131,7 +8249,9 @@ function aiCacheFingerprint(aiData) {
     cs: s.combinedScore,
     ce: s.combinedScoreIsEstimated,
     cat: s.category,
-    r: [s.ratings.visit.score, s.ratings.vetProgram.score, s.ratings.cost.score, s.ratings.meritAid.score, s.ratings.planB.score],
+    sc: s.scoirLabel,
+    sf: s.strategicFit && s.strategicFit.label,
+    r: [s.ratings.vetProgram.score, s.ratings.fit.score, s.ratings.planB.score, s.ratings.cost.score, s.ratings.meritAid.score],
     f: [s.financials.stickerAnnual, s.financials.guaranteedMeritAnnual, s.financials.estimatedCompetitiveMeritAnnual]
   }));
   const sig = {
