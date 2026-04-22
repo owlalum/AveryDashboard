@@ -2778,18 +2778,14 @@
     <div style="margin-top:22px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;">
       <h3 style="font-size:1rem;color:var(--primary-dark);margin-bottom:10px;">Merit Aid Notes</h3>
       <ul style="font-size:0.88rem;line-height:1.7;color:var(--text);padding-left:18px;">
-        <li id="meritKentucky"><strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT.</li>
-        <li id="meritTennessee"><strong>Tennessee:</strong> Volunteer Scholarships automatic with stats.</li>
-        <li id="meritCSU"><strong>Colorado State:</strong> Green &amp; Gold Scholarship, GPA-driven.</li>
-        <li id="meritOKState"><strong>Oklahoma State:</strong> Automatic OOS merit grid.</li>
-        <li id="meritMissState"><strong>Mississippi State:</strong> Automatic OOS merit.</li>
-        <li id="meritSC"><strong>South Carolina:</strong> Automatic OOS merit grid.</li>
-        <li id="meritUGA"><strong>UGA:</strong> HOPE/Zell Miller for Georgia residents.</li>
-        <li><strong>Auburn:</strong> Competitive (no published grid). Awards range $0-$6K/yr at this profile. Not predictable.</li>
-        <li><strong>FSU:</strong> Lowest OOS sticker price. Limited competitive OOS merit beyond that.</li>
-        <li><strong>Purdue/Ohio State/Virginia Tech/NC State/Texas A&amp;M:</strong> No published OOS merit grids. Don't bank on it.</li>
-        <li><strong>Penn State / Illinois / Wisconsin:</strong> Expensive OOS with minimal merit at these stats.</li>
-        <li><strong>UF:</strong> Essentially no OOS merit. Admission itself is a reach at 14% OOS acceptance.</li>
+        <li id="meritKentucky"><strong>Kentucky:</strong> &ldquo;Bluegrass Spirit&rdquo; automatic grid. Tops out at $12,500/yr (3.5 GPA + 30 ACT). Presidential and Singletary (full OOS tuition) are competitive, require separate scholarship-section application, and need ACT 31+/33+ respectively.</li>
+        <li id="meritTennessee"><strong>Tennessee:</strong> Out-of-State Volunteer Scholarship uses <em>UT Weighted Core GPA</em> (not unweighted). Grid: 3.8+ core + 28 ACT &rarr; $3K; 4.0+ core + 30&ndash;33 &rarr; $9K; 4.0+ core + 34&ndash;36 &rarr; $18K.</li>
+        <li id="meritUGA"><strong>UGA:</strong> HOPE/Zell Miller for Georgia residents. Zell threshold: 3.7 HOPE GPA <em>and</em> 26 ACT (Georgia raised it from 25 in 2023). HOPE threshold: 3.0 HOPE GPA.</li>
+        <li><strong>Auburn:</strong> Published OOS grid (Fall 2026). Automatic at 3.5 GPA: 29&ndash;30 ACT &rarr; $7K (Academic Charter), 31&ndash;32 &rarr; $11K (Heritage), 33&ndash;34 &rarr; $15K (Presidential), 35&ndash;36 &rarr; $17K. Deadline Dec 1, scores by Jan 12.</li>
+        <li><strong>Clemson:</strong> No automatic grid &mdash; holistic review. Realistic OOS award at this profile: $0&ndash;$6K/yr, clusters $2&ndash;$5K. Don't bank on it. National Scholars is separate full-ride competitive track.</li>
+        <li><strong>Purdue / Ohio State / Virginia Tech / NC State / Texas A&amp;M:</strong> No published OOS merit grids. All use holistic review with automatic consideration via the EA application; amounts not predictable. Don't bank on it.</li>
+        <li><strong>Wisconsin:</strong> Expensive OOS with minimal merit at these stats. Scholarships are through individual Schools/Colleges via WiSH (Feb 1 deadline); UW explicitly notes fewer scholarships available for non-Wisconsin residents.</li>
+        <li><strong>Cornell:</strong> Need-based aid only. No merit scholarships at any stat profile. Aid depends entirely on family financial need assessment; Cornell meets 100% of demonstrated need.</li>
       </ul>
       <p style="font-size:0.8rem;color:var(--text-light);margin-top:10px;"><strong>Note:</strong> Sticker COA = Tuition &amp; Fees + Room &amp; Board + Books/Supplies, sourced from each school's official 2025-26 Cost of Attendance page. Merit estimates are based on the student's current GPA/ACT profile and will shift if scores change.</p>
     </div>
@@ -4295,7 +4291,7 @@ function renderProfile() {
     if (hopeStatusEl) {
       const hg = data.hopeGPA || 0;
       const act = (data.actScores || {}).composite || 0;
-      if (hg >= 3.70 && act >= 25) hopeStatusEl.textContent = '(Zell Miller eligible)';
+      if (hg >= 3.70 && act >= 26) hopeStatusEl.textContent = '(Zell Miller eligible)';
       else if (hg >= 3.0) hopeStatusEl.textContent = '(HOPE eligible)';
       else hopeStatusEl.textContent = '';
     }
@@ -4314,8 +4310,8 @@ function renderProfile() {
       const hg = data.hopeGPA || 0;
       const act = (data.actScores || {}).composite || 0;
       let label = hg ? hg.toFixed(3) : '—';
-      if (hg >= 3.70 && act >= 25) label += ' (Zell Miller eligible)';
-      else if (hg >= 3.0) label += ' (HOPE eligible — needs 3.70 for Zell Miller)';
+      if (hg >= 3.70 && act >= 26) label += ' (Zell Miller eligible)';
+      else if (hg >= 3.0) label += ' (HOPE eligible — needs 3.70 HOPE GPA + 26 ACT for Zell Miller)';
       hopeInfoEl.textContent = label;
     }
   }
@@ -4330,12 +4326,10 @@ function renderProfile() {
   const ugaMerit = document.getElementById('meritUGA');
   if (ugaMerit) ugaMerit.innerHTML = getUGAMeritLabel();
   // Dynamic labels for other schools with published grids
+  // (Tennessee is the only non-KY/UGA focus school using the auto-merit label path;
+  // CSU/OK State/Miss State/SC were removed when their schools left the focus list.)
   const autoMeritSchools = [
     { id: 'meritTennessee', school: 'University of Tennessee' },
-    { id: 'meritCSU', school: 'Colorado State University' },
-    { id: 'meritOKState', school: 'Oklahoma State University' },
-    { id: 'meritMissState', school: 'Mississippi State University' },
-    { id: 'meritSC', school: 'University of South Carolina' },
   ];
   autoMeritSchools.forEach(({ id, school }) => {
     const el = document.getElementById(id);
@@ -4354,44 +4348,45 @@ function getSuffix(n) {
 function getKentuckyMerit() {
   const act = (data.actScores || {}).composite || 27;
   const gpa = data.gpa || 3.85;
-  // UK automatic merit tiers (OOS, approximate annual amounts)
-  if (act >= 33 && gpa >= 3.5) return 22000;
-  if (act >= 31 && gpa >= 3.5) return 20000;
-  if (act >= 29 && gpa >= 3.5) return 18000;
-  if (act >= 27 && gpa >= 3.5) return 16000;
-  if (act >= 25 && gpa >= 3.3) return 12000;
-  if (act >= 23 && gpa >= 3.0) return 8000;
-  return 4000;
+  // UK "Bluegrass Spirit" automatic OOS grid (Fall 2026, studentsuccess.uky.edu).
+  // Top automatic tier is $12,500/yr at 3.5 GPA + 30 ACT. Higher awards
+  // (Presidential / Singletary) are COMPETITIVE — require separate
+  // scholarship-section application and are not modeled here.
+  if (gpa >= 3.5 && act >= 30) return 12500;
+  if (gpa >= 3.5 && act >= 25) return 10000;
+  if (gpa >= 3.0 && act >= 25) return 8000;
+  if (gpa >= 3.0) return 5000; // test-optional tier
+  return 0;
 }
 
 function getKentuckyMeritLabel() {
   const act = (data.actScores || {}).composite || 27;
   const gpa = data.gpa || 3.85;
   const merit = getKentuckyMerit();
-  return '<strong>Kentucky:</strong> Automatic merit tiers based on GPA/ACT. ' + act + ' ACT + ' + gpa + ' GPA \u2192 ~$' + (merit / 1000) + 'K/year.';
+  return '<strong>Kentucky:</strong> &ldquo;Bluegrass Spirit&rdquo; automatic grid. ' + act + ' ACT + ' + gpa + ' GPA \u2192 ~$' + (merit/1000).toLocaleString() + 'K/year. Higher awards (Presidential, Singletary) are competitive and require a separate scholarship application.';
 }
 
-// ─── Dynamic Tennessee Volunteer Scholarship Based on ACT/GPA (OOS) ───
-// Grid starts at ACT 28. Below 28 = $0.
+// ─── Dynamic Tennessee Out-of-State Volunteer Scholarship (2025-26 grid) ───
+// Source: onestop.utk.edu/scholarships-financial-aid/scholarships/out-of-state-volunteer-scholarship
+// IMPORTANT: UT uses a "UT Weighted Core GPA" recalculated from core courses,
+// not unweighted. Only three tiers published:
+//   3.8+ weighted core + 28+ ACT            → $3,000/yr
+//   4.0+ weighted core + 30-33 ACT           → $9,000/yr
+//   4.0+ weighted core + 34-36 ACT           → $18,000/yr
+// We don't have access to the UT-recalculated weighted core, so we approximate
+// conservatively from unweighted GPA: unweighted 3.9+ treated as "4.0 weighted
+// core" tier; 3.6+ treated as "3.8 weighted core" tier. This is a proxy —
+// the UT recalc could differ either direction based on course rigor.
 function getTennesseeMerit() {
   const act = (data.actScores || {}).composite || 0;
   const gpa = data.gpa || 0;
   if (act < 28) return 0;
-  if (gpa >= 4.0) {
-    if (act >= 34) return 20000;
-    if (act >= 32) return 17000;
-    if (act >= 30) return 14000;
-    if (act >= 28) return 11000;
-  } else if (gpa >= 3.8) {
-    if (act >= 34) return 17000;
-    if (act >= 32) return 14000;
-    if (act >= 30) return 11000;
-    if (act >= 28) return 8000;
+  if (gpa >= 3.9) {
+    if (act >= 34) return 18000;
+    if (act >= 30) return 9000;
+    if (act >= 28) return 3000;
   } else if (gpa >= 3.6) {
-    if (act >= 34) return 14000;
-    if (act >= 32) return 11000;
-    if (act >= 30) return 8000;
-    if (act >= 28) return 5000;
+    if (act >= 28) return 3000;
   }
   return 0;
 }
@@ -4480,28 +4475,26 @@ function getAutoMeritLabel(school) {
   const act = (data.actScores || {}).composite || 0;
   const gpa = data.gpa || 0;
   const fns = {
-    'University of Tennessee': { fn: getTennesseeMerit, note: act < 28 ? 'ACT 28 minimum not met — ACT ' + act + '.' : '' },
-    'Colorado State University': { fn: getCSUMerit, note: 'GPA-driven.' },
-    'Oklahoma State University': { fn: getOKStateMerit, note: '' },
-    'Mississippi State University': { fn: getMissStateMerit, note: '' },
-    'University of South Carolina': { fn: getSCMerit, note: 'Uses weighted GPA (UW approximated).' },
+    'University of Tennessee': { fn: getTennesseeMerit, note: act < 28 ? 'ACT 28 minimum not met — ACT ' + act + '.' : 'Uses UT-recalculated weighted core GPA; unweighted ' + gpa + ' used here as a proxy.' },
   };
   const entry = fns[school];
   if (!entry) return null;
   const merit = entry.fn();
-  return '<strong>' + school.replace('University of ', 'U. ') + ':</strong> ' + (merit > 0 ? '~$' + (merit/1000) + 'K/year' : '$0') + ' automatic merit (' + gpa + ' GPA / ACT ' + act + '). ' + entry.note;
+  return '<strong>Tennessee:</strong> Out-of-State Volunteer Scholarship, ' + (merit > 0 ? '~$' + (merit/1000) + 'K/year' : '$0') + ' at ' + gpa + ' GPA / ACT ' + act + '. ' + entry.note;
 }
 
 // ─── Central merit dispatch — returns dynamic merit or falls back to hardcoded ───
+// Pruned April 2026 to only include focus-list schools with automatic grids.
+// Colorado State, Oklahoma State, Mississippi State, South Carolina were
+// removed from the focus list when the 8 schools were deleted; their
+// getXMerit functions remain defined below but are no longer dispatched from
+// here. Auburn has a published grid but its realistic $7K award is stored
+// statically in FIN_DATA (no dynamic function needed).
 function getAutoMeritForSchool(school, fallback) {
   const fns = {
     'University of Kentucky': getKentuckyMerit,
     'University of Georgia': getUGAMerit,
     'University of Tennessee': getTennesseeMerit,
-    'Colorado State University': getCSUMerit,
-    'Oklahoma State University': getOKStateMerit,
-    'Mississippi State University': getMissStateMerit,
-    'University of South Carolina': getSCMerit,
   };
   return fns[school] ? fns[school]() : fallback;
 }
@@ -4511,11 +4504,7 @@ function getAutoMeritForSchool(school, fallback) {
 const AUTO_MERIT_SCHOOLS = new Set([
   'University of Kentucky',
   'University of Tennessee',
-  'Oklahoma State University',
-  'Mississippi State University',
-  'University of South Carolina',
   'University of Georgia',
-  'Colorado State University',
 ]);
 
 function getGuaranteedMeritAnnual(school) {
@@ -4607,14 +4596,15 @@ function djb2Hash(str) {
 
 // ─── Dynamic UGA Merit Aid Based on HOPE GPA + ACT ───
 // UGA 2025-26: tuition = $10,034, mandatory fees = $1,458 (total $12,908 bundled as tuitionIn)
-// Zell Miller: HOPE GPA >= 3.70 AND ACT >= 25 → 100% of tuition only ($10,034)
+// Zell Miller: HOPE GPA >= 3.70 AND ACT >= 26 → 100% of tuition only ($10,034)
+//   (Georgia raised the ACT threshold from 25 to 26 in 2023.)
 // HOPE: HOPE GPA >= 3.0 → 90% of tuition only ($9,031)
 // Neither scholarship covers fees — student always pays $1,458 in fees
 function getUGAMerit() {
   const hopeGPA = data.hopeGPA || 0;
   const act = (data.actScores || {}).composite || 0;
   const ugaTuitionOnly = 10034; // tuition only, excluding $1,458 mandatory fees
-  if (hopeGPA >= 3.70 && act >= 25) return ugaTuitionOnly; // Zell Miller — 100% of tuition
+  if (hopeGPA >= 3.70 && act >= 26) return ugaTuitionOnly; // Zell Miller — 100% of tuition
   if (hopeGPA >= 3.0) return Math.round(ugaTuitionOnly * 0.90); // HOPE — 90% of tuition
   return 0;
 }
@@ -4623,12 +4613,12 @@ function getUGAMeritLabel() {
   const hopeGPA = data.hopeGPA || 0;
   const act = (data.actScores || {}).composite || 0;
   const merit = getUGAMerit();
-  if (hopeGPA >= 3.70 && act >= 25) {
-    return '<strong>UGA:</strong> Zell Miller Scholarship (100% of tuition, fees not covered). HOPE GPA ' + hopeGPA.toFixed(3) + ' + ACT ' + act + ' both meet thresholds (3.70 GPA, 25 ACT). ~$' + (merit / 1000).toFixed(1) + 'K/year.';
+  if (hopeGPA >= 3.70 && act >= 26) {
+    return '<strong>UGA:</strong> Zell Miller Scholarship (100% of tuition, fees not covered). HOPE GPA ' + hopeGPA.toFixed(3) + ' + ACT ' + act + ' both meet thresholds (3.70 GPA, 26 ACT). ~$' + (merit / 1000).toFixed(1) + 'K/year.';
   }
   if (hopeGPA >= 3.0) {
     const gap = (3.70 - hopeGPA).toFixed(3);
-    return '<strong>UGA:</strong> HOPE Scholarship (90% of tuition, fees not covered). HOPE GPA ' + hopeGPA.toFixed(3) + ' qualifies for HOPE (~$' + (merit / 1000).toFixed(1) + 'K/year) but is ' + gap + ' below the 3.70 Zell Miller threshold.' + (act < 25 ? ' Also needs ACT 25+ for Zell Miller.' : '');
+    return '<strong>UGA:</strong> HOPE Scholarship (90% of tuition, fees not covered). HOPE GPA ' + hopeGPA.toFixed(3) + ' qualifies for HOPE (~$' + (merit / 1000).toFixed(1) + 'K/year) but is ' + gap + ' below the 3.70 Zell Miller threshold.' + (act < 26 ? ' Also needs ACT 26+ for Zell Miller.' : '');
   }
   return '<strong>UGA:</strong> Neither HOPE nor Zell Miller eligible. HOPE GPA ' + hopeGPA.toFixed(3) + ' is below the 3.0 minimum.';
 }
@@ -7307,7 +7297,7 @@ const FIN_DATA = [
   { school:'Michigan State University', res:'OOS', tuition:44758, rb:12928, books:1420, merit:8000, costYear:'2025-26' },
   { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000, costYear:'2025-26' },
   { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000, costYear:'2025-26' },
-  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:4000, costYear:'2026-27' },
+  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:7000, costYear:'2026-27' },
   { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000, costYear:'2025-26' },
   { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000, costYear:'2025-26' },
   { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000, costYear:'2025-26 (2026-27 tuition confirmed frozen)' },
@@ -8766,7 +8756,7 @@ function initDefaultScholarships() {
     { id: uid(), section:'prevet', name:'Georgia VMA Foundation Scholarships', school:'Georgia', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'Contact GVMA directly; may be for enrolled vet students only', url:'https://www.gvma.net/' },
     // ── External & National ──
     { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools', url:'https://studentaid.gov/h/apply-for-aid/fafsa' },
-    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 25+. Avery\'s HOPE GPA (3.609) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
+    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 26+ (Georgia raised from 25 in 2023). Avery\'s HOPE GPA (3.609) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
     { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'90% of tuition at GA publics (~$9,031/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.609 HOPE GPA. Covers tuition only — fees ($1,458) not included.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
     { id: uid(), section:'external', name:'Coca-Cola Scholars Program', school:'National', amount:'$20,000 (150 awards)', deadline:'2026-09-30', essayReq:true, separateApp:true, status:'Not Started', notes:'Highly competitive national award; apply Aug-Sep of senior year', url:'https://www.coca-colascholarsfoundation.org/apply/' },
     { id: uid(), section:'external', name:'Elks Most Valuable Student', school:'National', amount:'$4,000-$30,000 over 4 years', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'500 awards nationwide; leadership and financial need', url:'https://www.elks.org/scholars/scholarships/mvs.cfm' },
@@ -9373,8 +9363,8 @@ function showScoreImpactModal(oldACT, newACT) {
   // 2. UGA HOPE/Zell Miller changes
   if (data.schools.find(s => s.name === 'University of Georgia')) {
     const hopeGPA = data.hopeGPA || 0;
-    const oldEligible = hopeGPA >= 3.70 && oldACT >= 25;
-    const newEligible = hopeGPA >= 3.70 && newACT >= 25;
+    const oldEligible = hopeGPA >= 3.70 && oldACT >= 26;
+    const newEligible = hopeGPA >= 3.70 && newACT >= 26;
     if (!oldEligible && newEligible) {
       impacts.push({ icon: '\uD83C\uDF1F', text: 'UGA Zell Miller \u2014 now eligible! ACT ' + newACT + ' + HOPE GPA ' + hopeGPA.toFixed(3) + ' meet both thresholds. Full tuition covered.', type: 'merit' });
     }
@@ -9390,12 +9380,10 @@ function showScoreImpactModal(oldACT, newACT) {
   }
 
   // 4. Auto-merit schools — check if ACT change moves to a higher tier
+  // (Focus list only; the other auto-merit schools left the list and their
+  // dispatch entries were pruned in the Merit Aid Notes cleanup.)
   const autoMeritFns = {
     'University of Tennessee': getTennesseeMerit,
-    'Colorado State University': getCSUMerit,
-    'Oklahoma State University': getOKStateMerit,
-    'Mississippi State University': getMissStateMerit,
-    'University of South Carolina': getSCMerit,
   };
   Object.entries(autoMeritFns).forEach(([school, fn]) => {
     if (!data.schools.find(s => s.name === school)) return;
@@ -9478,15 +9466,14 @@ function showScoreImpactModal(oldACT, newACT) {
   overlay.classList.add('open');
 }
 
-// Kentucky merit helper that accepts arbitrary ACT/GPA (for comparison)
+// Kentucky merit helper that accepts arbitrary ACT/GPA (for comparison).
+// Must stay in sync with getKentuckyMerit() above — same Bluegrass Spirit grid.
 function getKentuckyMeritForACT(act, gpa) {
-  if (act >= 33 && gpa >= 3.5) return 22000;
-  if (act >= 31 && gpa >= 3.5) return 20000;
-  if (act >= 29 && gpa >= 3.5) return 18000;
-  if (act >= 27 && gpa >= 3.5) return 16000;
-  if (act >= 25 && gpa >= 3.3) return 12000;
-  if (act >= 23 && gpa >= 3.0) return 8000;
-  return 4000;
+  if (gpa >= 3.5 && act >= 30) return 12500;
+  if (gpa >= 3.5 && act >= 25) return 10000;
+  if (gpa >= 3.0 && act >= 25) return 8000;
+  if (gpa >= 3.0) return 5000;
+  return 0;
 }
 
 // ─── ACT Score Editing (inline) ───
