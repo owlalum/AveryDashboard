@@ -7247,7 +7247,15 @@ function renderScenarios() {
 }
 
 // ─── Financial Analysis ───
-// UPDATE ANNUALLY — verify against school COA pages each August
+// UPDATE ANNUALLY — verify against school COA pages each August.
+// Mixed year state as of April 2026: Auburn / Ohio State / Virginia Tech are
+// on published 2026-27 rates; NC State has 2026-27 tuition+books but 2025-26
+// R&B (school now quotes housing and food separately and hasn't combined
+// them for 2026-27). Purdue tuition confirmed frozen at 2025-26 level.
+// Cornell CALS non-NY tuition confirmed unchanged. Remaining schools
+// (Kentucky, Tennessee, Clemson, Texas A&M, Wisconsin, UGA) haven't published
+// 2026-27 yet — check again June-August. UGA: USG Board approved a 1%
+// increase on 2026-04-14 but UGA's OSFA page is still 2025-26.
 // tuition = tuition+fees, rb = room & board, books = books/supplies — sticker computed as tuition + rb + books
 const FIN_DATA = [
   { group:'SAFETY SCHOOLS' },
@@ -7259,13 +7267,13 @@ const FIN_DATA = [
   { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000 },
   { group:'MATCH SCHOOLS' },
   { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000 },
-  { school:'Auburn University', res:'OOS', tuition:36022, rb:17210, books:1260, merit:4000 },
+  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:4000 },
   { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000 },
   { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000 },
   { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000 },
-  { school:'North Carolina State University', res:'OOS', tuition:33993, rb:14741, books:624, merit:4000 },
-  { school:'Virginia Tech', res:'OOS', tuition:38977, rb:16046, books:1120, merit:3000 },
-  { school:'Ohio State University', res:'OOS', tuition:37332, rb:15252, books:1020, merit:4000 },
+  { school:'North Carolina State University', res:'OOS', tuition:34961, rb:14741, books:642, merit:4000 },
+  { school:'Virginia Tech', res:'OOS', tuition:40206, rb:17708, books:1120, merit:3000 },
+  { school:'Ohio State University', res:'OOS', tuition:44122, rb:15630, books:1020, merit:4000 },
   { school:'Clemson University', res:'OOS', tuition:42378, rb:14224, books:1496, merit:6000 },
   { school:'University of Wisconsin-Madison', res:'OOS', tuition:44210, rb:14520, books:700, merit:2000 },
   { school:'University of Illinois', res:'OOS', tuition:38398, rb:15184, books:1200, merit:1000 },
