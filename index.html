@@ -8709,8 +8709,8 @@ function validateAIResponse(text, aiData) {
     /\bwould\s+likely\s+be\b/i,
     /\bwould\s+strengthen\b/i,
     /\bfavorable\s+scoir\s+read\b/i,
-    /\bstrengthen(?:s|ed|ing)?\s+(?:the|your)\s+\w+\s+tier\b/i,
-    /\bto\s+strengthen\s+(?:the|your)\s+\w+\s+tier\b/i,
+    /\bstrengthen(?:s|ed|ing)?\s+(?:the|your)\s+(?:\w+\s+){1,2}tier\b/i,
+    /\bto\s+strengthen\s+(?:the|your)\s+(?:\w+\s+){1,2}tier\b/i,
     /\bhelps?\s+strengthen\b/i,
     /\bwould\s+be\s+a\s+(?:very\s+likely|likely|target|reach)\b/i,
     /\bas\s+a\s+(?:very\s+likely|likely|target|reach)\s+option\b/i
