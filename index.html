@@ -8795,6 +8795,7 @@ function validateAIResponse(text, aiData) {
     'procrastination indicates',
     'execution challenges',
     'execution issues',
+    'execution concerns',
     'broader execution',
     'signals academic',
     'student struggles'
@@ -8901,7 +8902,7 @@ function validateAIResponse(text, aiData) {
   // Category F: manufactured_constraint — violation claims not backed by nonNegotiables.
   const statedNN = ((aiData && aiData.nonNegotiables) || []).map(n => (n || '').toLowerCase());
   const violationPatterns = [
-    /\bviolat(?:es|ed|ing|e)\s+(?:your|the)\s+non-negotiable\b/gi,
+    /\bviolat(?:es|ed|ing|e)\s+(?:your|the)\s+(?:\w+\s+){0,3}non-negotiable\b/gi,
     /\bagainst\s+your\s+stated\s+requirement\b/gi,
     /\bbreaks\s+your\s+[a-z\s]{2,30}?\s+requirement\b/gi,
     /\bviolation\s+of\s+(?:your|the)\s+non-negotiable\b/gi
