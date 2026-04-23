@@ -8760,15 +8760,27 @@ function validateAIResponse(text, aiData) {
   });
 
   // Category C: scoir_override — language suggesting Scoir labels should change.
+  // Two-layer detection:
+  //   (1) Specific-phrase patterns (original 8 + 3 new standalones).
+  //   (2) Concept-word proximity: a reassessment concept word within 80 chars
+  //       of a Scoir label reference (with smart-quote support). Broader net
+  //       for phrasings like "this label seems too pessimistic" near "Reach"
+  //       that the literal patterns miss.
   const overridePatterns = [
     /\breconsider\s+(?:the\s+)?(?:very\s+likely|likely|target|reach|far\s+reach|scoir)\b/gi,
     /\bscoir\s+label\s+seems\s+(?:wrong|miscalibrated|pessimistic|conservative|aggressive|off|too\s+\w+)\b/gi,
     /\bshould\s+be\s+a\s+(?:very\s+likely|likely|target|reach|far\s+reach)\b/gi,
     /\bif\s+[A-Z][A-Za-z&\s]{1,40}?\s+is\s+truly\s+a\b/g,
-    /\bthis\s+should\s+be\s+closer\s+to\s+(?:very\s+likely|likely|target|reach|far\s+reach)\b/gi,
+    // Smart-quote-widened: straight ' " plus curly \u201C \u201D \u2018 \u2019.
+    /\bthis\s+should\s+be\s+closer\s+to\s+["'\u201C\u201D\u2018\u2019]?(very\s+likely|likely|target|reach|far\s+reach)/gi,
     /\bthe\s+reach\s+label\s+suggests\b/gi,
     /\bthe\s+(?:very\s+likely|likely|target|reach|far\s+reach)\s+label\s+(?:may|seems)\s+be\b/gi,
-    /\bwhich\s+(?:very\s+likely|likely|target|reach|far\s+reach)\s+labels?\s+to\s+reconsider\b/gi
+    /\bwhich\s+(?:very\s+likely|likely|target|reach|far\s+reach)\s+labels?\s+to\s+reconsider\b/gi,
+    // New standalone patterns (don't require label-proximity check; phrasing
+    // is specific enough on its own).
+    /\bshould\s+likely\s+be\s+["'\u201C\u201D\u2018\u2019]?(very\s+likely|likely|target|reach|far\s+reach)/gi,
+    /\bbeing\s+labeled\s+as\s+["'\u201C\u201D\u2018\u2019]?\w+["'\u201C\u201D\u2018\u2019]?\s+when\s+they\s+appear/gi,
+    /\breflect\s+your\s+above-average\s+stats\b/gi
   ];
   overridePatterns.forEach(re => {
     let om;
@@ -8777,6 +8789,47 @@ function validateAIResponse(text, aiData) {
       const ctxEnd = Math.min(t.length, om.index + om[0].length + 40);
       pushFinding('scoir_override', 'high', ctxStart, ctxEnd,
         'Language suggests overriding or reconsidering Scoir\'s assessment. Scoir is authoritative — model should redirect user to Scoir rather than substitute judgment.');
+    }
+  });
+
+  // Concept-word proximity detection: reassessment concept words within 80
+  // chars of a Scoir label reference. Broader net for label-characterization
+  // phrasings that don't match the literal patterns above. Scoping to label
+  // proximity keeps false positives down — "conservative" describing a
+  // student's approach won't fire unless a label word is nearby.
+  const conceptWords = [
+    /\bpessimistic\b/i,
+    /\bconservative\b/i,
+    /\baggressive\b/i,
+    /\bgenerous\b/i,
+    /\boptimistic\b/i,
+    /\bmisalign(?:ed|ment|ments)?\b/i,
+    /\bmiscalibrated\b/i,
+    /\bdisconnected\b/i,
+    /\bworth\s+confirming\b/i,
+    /\bseems\s+too\s+\w+\b/i,
+    /\bseems\s+generous\b/i,
+    /\bseems\s+pessimistic\b/i,
+    /\bseems\s+optimistic\b/i,
+    /\bappears\s+disconnected\b/i
+  ];
+  const labelRefSrc = '["\u201C\u201D\u2018\u2019\']?\\b(?:very\\s+likely|likely|target|reach|far\\s+reach)\\b["\u201C\u201D\u2018\u2019\']?';
+  conceptWords.forEach(cre => {
+    const gre = new RegExp(cre.source, cre.flags.indexOf('g') === -1 ? cre.flags + 'g' : cre.flags);
+    let cm;
+    while ((cm = gre.exec(t)) !== null) {
+      const conceptStart = cm.index;
+      const conceptEnd = cm.index + cm[0].length;
+      const winStart = Math.max(0, conceptStart - 80);
+      const winEnd = Math.min(t.length, conceptEnd + 80);
+      const win = t.substring(winStart, winEnd);
+      const labelProbe = new RegExp(labelRefSrc, 'i');
+      if (labelProbe.test(win)) {
+        const ctxStart = Math.max(0, conceptStart - 40);
+        const ctxEnd = Math.min(t.length, conceptEnd + 40);
+        pushFinding('scoir_override', 'high', ctxStart, ctxEnd,
+          'Concept word "' + cm[0] + '" appears within 80 chars of a Scoir label reference. Language suggests the model is characterizing Scoir\'s assessment rather than reasoning from it.');
+      }
     }
   });
 
