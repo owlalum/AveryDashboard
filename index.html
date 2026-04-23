@@ -9048,11 +9048,20 @@ function renderStrategicContext() {
   const nn = document.getElementById('scNonNeg');
   const hh = document.getElementById('scHousehold');
   if (!q || !dec || !rec || !nn || !hh) return;
-  q.value = sc.userQuestionForThisRun || '';
-  dec.value = sc.currentDecisions || '';
-  rec.value = sc.recentChanges || '';
-  nn.value = (data.nonNegotiables || []).join('\n');
-  hh.value = data.householdContext || '';
+  // Focus-guard: this panel only saves on explicit Save click, so during
+  // typing the textarea value exists in the DOM but not in `data`. Any
+  // renderAll triggered while the user is mid-edit (e.g., onSnapshot firing
+  // from a stale cross-session write) would otherwise overwrite their
+  // in-progress text. Skip the overwrite for whichever textarea is currently
+  // focused; it'll pick up the latest saved value the next time the user
+  // clicks away and renderAll runs.
+  const active = document.activeElement;
+  const setIfNotFocused = (el, val) => { if (el !== active) el.value = val; };
+  setIfNotFocused(q,   sc.userQuestionForThisRun || '');
+  setIfNotFocused(dec, sc.currentDecisions || '');
+  setIfNotFocused(rec, sc.recentChanges || '');
+  setIfNotFocused(nn,  (data.nonNegotiables || []).join('\n'));
+  setIfNotFocused(hh,  data.householdContext || '');
 
   const decisionCount = (sc.currentDecisions || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).length;
   const nnCount = (data.nonNegotiables || []).filter(s => s && s.trim()).length;
@@ -9089,9 +9098,12 @@ function renderStudentPreferences() {
   const ex = document.getElementById('spExceptions');
   const im = document.getElementById('spImplications');
   if (!ct || !ex || !im) return;
-  ct.value = sp.campusType || '';
-  ex.value = sp.exceptions || '';
-  im.value = sp.implicationsForRecommendations || '';
+  // Focus-guard — see renderStrategicContext for rationale.
+  const active = document.activeElement;
+  const setIfNotFocused = (el, val) => { if (el !== active) el.value = val; };
+  setIfNotFocused(ct, sp.campusType || '');
+  setIfNotFocused(ex, sp.exceptions || '');
+  setIfNotFocused(im, sp.implicationsForRecommendations || '');
 
   const parts = [];
   if (sp.campusType && sp.campusType.trim()) parts.push('campus type set');
