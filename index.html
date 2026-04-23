@@ -4522,7 +4522,10 @@ function hasOnCampusVetSchool(name) {
   const db = schoolDB[name];
   if (!db) return false;
   const r = db.vetSchoolRank;
-  return !!r && r !== 'N/A' && r !== 'Not yet ranked';
+  // "Not yet ranked" is a valid on-campus CVM — e.g., Clemson's CVM opens
+  // Fall 2026 and will be operational before Fall 2027 enrollment. Only
+  // exclude truly absent programs (missing value or literal 'N/A').
+  return !!r && r !== 'N/A';
 }
 
 // wasVisited() is defined near getEvalForSchool — single source of truth.
@@ -8269,7 +8272,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v13';
+const PROMPT_VERSION = 'v13.1';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -8290,6 +8293,8 @@ const SYSTEM_PROMPT_V2 = [
   "The payload contains two authoritative categorization systems. Your job is to read them and reason about them, not to override them or generate your own.",
   "",
   "**Scoir label (admission probability).** Each school has a `scoirLabel` field: Very Likely / Likely / Target / Reach / Far Reach. This reflects Scoir's peer-benchmarked admission probability for this student's profile at this specific school, and it is the authoritative probability assessment. Use the Scoir label when discussing admission chances. Do not generate your own probability categorizations (do not assign safety/match/reach based on admit rate, do not reason that a school is \"really a target\" based on where the student sits in the school's ACT range). The Scoir label has already incorporated that analysis using a more sophisticated methodology than raw admit-rate thresholds.",
+  "",
+  "The student's residency status determines which admit rate applies for schools where that distinction matters. Use the `student.residency` field and each school's location to determine whether the in-state or out-of-state admit rate is the relevant reference point. For this student, Georgia public universities apply in-state rates; all others apply out-of-state rates.",
   "",
   "**Strategic Fit (strategic value).** Each school has a `strategicFit` object with a label (Priority Target / Strong Fit / Happy Landing) computed from four ratings: Program, Fit, Plan B, and Cost (weighted 20/30/30/20), with Fit also acting as a soft gate. This reflects how well the school serves the student's goals — independent of admission chances. The Strategic Fit label is authoritative for the strategic-value axis. Use it when discussing whether a school is worth pursuing. Do not generate your own composite judgments about school quality; reason from the label and its underlying ratings.",
   "",
