@@ -587,6 +587,68 @@
     margin-right: 6px;
   }
 
+  /* ── AI Analysis Validator (dev mode banner + highlights) ── */
+  .validator-banner {
+    background: #fff4db;
+    border: 1.5px solid #d4a843;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+    color: #7a5a00;
+  }
+  .validator-banner-summary {
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .validator-banner-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e8d68b;
+    display: none;
+  }
+  .validator-banner.open .validator-banner-details { display: block; }
+  .validator-finding {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0e4b8;
+    font-size: 0.82rem;
+  }
+  .validator-finding:last-child { border-bottom: none; }
+  .validator-finding-category {
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-right: 6px;
+  }
+  .validator-finding-high .validator-finding-category {
+    background: #ffd4d4; color: #a03030;
+  }
+  .validator-finding-medium .validator-finding-category {
+    background: #ffe4b3; color: #8a5a00;
+  }
+  .validator-finding-matched { font-style: italic; color: #5a4500; }
+  .validator-finding-explanation { margin-top: 4px; color: #7a5a00; font-size: 0.8rem; }
+  mark.validator-flag {
+    padding: 1px 3px;
+    border-radius: 3px;
+    cursor: help;
+  }
+  mark.validator-flag-high {
+    background: #ffd4d4;
+    border-bottom: 2px solid #a03030;
+  }
+  mark.validator-flag-medium {
+    background: #ffe4b3;
+    border-bottom: 2px solid #d4a843;
+  }
+
   /* ── Compare Modal ── */
   .compare-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10002;
@@ -3272,6 +3334,12 @@ let lastSyncedRemoteTs = 0;
 // ─── AI Analysis ───
 // Set this to your deployed Cloudflare Worker URL
 const AI_WORKER_URL = 'https://avery-ai-proxy.owlalum.workers.dev/api/analyze';
+
+// Validation layer mode.
+// 'dev'  — validator findings rendered with a banner and inline highlights, raw output always shown.
+// 'prod' — validator findings trigger silent auto-retry (max 2 retries), then fallback message.
+// Flip to 'prod' once detection rules are trusted.
+const VALIDATOR_MODE = 'dev';
 
 // ─── Data store ───
 const STORAGE_KEY = 'averyCollegePlanning';
@@ -8566,6 +8634,355 @@ function buildAIPrompt(aiData) {
   };
 }
 
+// ─── AI Analysis client-side validation layer ───
+// Detects known failure patterns in model responses. Returns
+// { findings, hasHighSeverity }. Findings are text-scoped (startIndex /
+// endIndex into the original response) so the dev-mode highlighter can wrap
+// them in <mark> tags without re-tokenizing.
+function validateAIResponse(text, aiData) {
+  const findings = [];
+  const t = text || '';
+  const tLower = t.toLowerCase();
+  const actualGPA = (aiData && aiData.student && typeof aiData.student.gpa === 'number') ? aiData.student.gpa : null;
+  const actualACT = (aiData && aiData.student && aiData.student.act && aiData.student.act.composite) ? aiData.student.act.composite : null;
+
+  const pushFinding = (category, severity, startIndex, endIndex, explanation) => {
+    findings.push({
+      category: category,
+      severity: severity,
+      matchedText: t.substring(startIndex, endIndex),
+      startIndex: startIndex,
+      endIndex: endIndex,
+      explanation: explanation
+    });
+  };
+
+  // Category A: data_fabrication — GPA and ACT values that disagree with payload.
+  if (actualGPA != null) {
+    const gpaNumRe = /\b([234]\.\d{1,2})\b/g;
+    let m;
+    while ((m = gpaNumRe.exec(t)) !== null) {
+      const val = parseFloat(m[1]);
+      if (isNaN(val) || val < 2.0 || val > 4.5) continue;
+      const before = t.substring(Math.max(0, m.index - 30), m.index);
+      const after = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
+      if (!/\bgpa\b/i.test(before) && !/\bgpa\b/i.test(after)) continue;
+      if (Math.abs(val - actualGPA) <= 0.01) continue;
+      const ctxStart = Math.max(0, m.index - 20);
+      const ctxEnd = Math.min(t.length, m.index + m[0].length + 20);
+      pushFinding('data_fabrication', 'high', ctxStart, ctxEnd,
+        'Mentions GPA of ' + val + ' but payload has ' + actualGPA + '.');
+    }
+  }
+  if (actualACT != null) {
+    const actNumRe = /\b(\d{2})\b/g;
+    let m;
+    while ((m = actNumRe.exec(t)) !== null) {
+      const val = parseInt(m[1], 10);
+      if (isNaN(val) || val < 18 || val > 36) continue;
+      const before = t.substring(Math.max(0, m.index - 20), m.index);
+      const after = t.substring(m.index + m[0].length, m.index + m[0].length + 20);
+      if (!/\bACT\b/i.test(before) && !/\bACT\b/i.test(after)) continue;
+      if (val === actualACT) continue;
+      const ctxStart = Math.max(0, m.index - 20);
+      const ctxEnd = Math.min(t.length, m.index + m[0].length + 20);
+      pushFinding('data_fabrication', 'high', ctxStart, ctxEnd,
+        'Mentions ACT of ' + val + ' but payload has ' + actualACT + '.');
+    }
+  }
+
+  // Category B: pool_categorization — Scoir/Strategic Fit labels applied to pool schools.
+  const pool = ((aiData && aiData.candidatePool) || []).map(c => c && c.name).filter(Boolean);
+  const catPhrases = [
+    /\bvery\s+likely\b/i,
+    /\blikely\s+option\b/i,
+    /\blikely\s+admit\b/i,
+    /\btarget[-\s]level\b/i,
+    /\btarget\s+tier\b/i,
+    /\breach\s+tier\b/i,
+    /\bfar\s+reach\b/i,
+    /\bpriority\s+target(?:-caliber)?\b/i,
+    /\btarget-caliber\b/i,
+    /\bstrong\s+fit\b/i,
+    /\bhappy\s+landing\b/i,
+    /\bwould\s+generate\b/i,
+    /\bwould\s+likely\s+be\b/i,
+    /\bwould\s+strengthen\b/i,
+    /\bfavorable\s+scoir\s+read\b/i
+  ];
+  pool.forEach(name => {
+    const nameRe = new RegExp('\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    let nm;
+    while ((nm = nameRe.exec(t)) !== null) {
+      const winStart = Math.max(0, nm.index - 150);
+      const winEnd = Math.min(t.length, nm.index + nm[0].length + 150);
+      const win = t.substring(winStart, winEnd);
+      for (let i = 0; i < catPhrases.length; i++) {
+        const phraseRe = new RegExp(catPhrases[i].source, catPhrases[i].flags.replace('g', ''));
+        const pMatch = phraseRe.exec(win);
+        if (pMatch) {
+          const absStart = winStart + pMatch.index;
+          const absEnd = absStart + pMatch[0].length;
+          pushFinding('pool_categorization', 'high', absStart, absEnd,
+            'Pool school ' + name + ' categorized with "' + pMatch[0] + '" — pool schools have no Scoir or Strategic Fit assignment.');
+          break;
+        }
+      }
+    }
+  });
+
+  // Category C: scoir_override — language suggesting Scoir labels should change.
+  const overridePatterns = [
+    /\breconsider\s+(?:the\s+)?(?:very\s+likely|likely|target|reach|far\s+reach|scoir)\b/gi,
+    /\bscoir\s+label\s+seems\s+(?:wrong|miscalibrated|pessimistic|conservative|aggressive|off|too\s+\w+)\b/gi,
+    /\bshould\s+be\s+a\s+(?:very\s+likely|likely|target|reach|far\s+reach)\b/gi,
+    /\bif\s+[A-Z][A-Za-z&\s]{1,40}?\s+is\s+truly\s+a\b/g,
+    /\bthis\s+should\s+be\s+closer\s+to\s+(?:very\s+likely|likely|target|reach|far\s+reach)\b/gi,
+    /\bthe\s+reach\s+label\s+suggests\b/gi,
+    /\bthe\s+(?:very\s+likely|likely|target|reach|far\s+reach)\s+label\s+(?:may|seems)\s+be\b/gi,
+    /\bwhich\s+(?:very\s+likely|likely|target|reach|far\s+reach)\s+labels?\s+to\s+reconsider\b/gi
+  ];
+  overridePatterns.forEach(re => {
+    let om;
+    while ((om = re.exec(t)) !== null) {
+      const ctxStart = Math.max(0, om.index - 20);
+      const ctxEnd = Math.min(t.length, om.index + om[0].length + 40);
+      pushFinding('scoir_override', 'high', ctxStart, ctxEnd,
+        'Language suggests overriding or reconsidering Scoir\'s assessment. Scoir is authoritative — model should redirect user to Scoir rather than substitute judgment.');
+    }
+  });
+
+  // Category D: character_judgment — language that characterizes the student negatively.
+  const charPhrases = [
+    'academic struggle',
+    'engagement issues',
+    'broader engagement',
+    'lack of discipline',
+    'lacks discipline',
+    'procrastination suggests',
+    'procrastination signals',
+    'signals academic',
+    'student struggles'
+  ];
+  charPhrases.forEach(phrase => {
+    let idx = 0;
+    while ((idx = tLower.indexOf(phrase, idx)) !== -1) {
+      const ctxStart = Math.max(0, idx - 20);
+      const ctxEnd = Math.min(t.length, idx + phrase.length + 30);
+      pushFinding('character_judgment', 'medium', ctxStart, ctxEnd,
+        'Language characterizes the student negatively rather than the decision. Avery reads this output — reframe as strategic observation.');
+      idx += phrase.length;
+    }
+  });
+  const modestRe = /\balready\s+modest\s+(\d\.\d{1,2}|\d{2})\b|\bmodest\s+(\d\.\d{1,2})\s+gpa\b/gi;
+  let mm;
+  while ((mm = modestRe.exec(t)) !== null) {
+    const ctxStart = Math.max(0, mm.index - 20);
+    const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 20);
+    pushFinding('character_judgment', 'medium', ctxStart, ctxEnd,
+      'Language characterizes the student negatively rather than the decision. Avery reads this output — reframe as strategic observation.');
+  }
+  const concernRe = /\bconcerning\s+pattern\b/gi;
+  while ((mm = concernRe.exec(t)) !== null) {
+    const winStart = Math.max(0, mm.index - 50);
+    const winEnd = Math.min(t.length, mm.index + mm[0].length + 50);
+    const win = t.substring(winStart, winEnd);
+    if (/\b(behavior|habits|approach|attitude)\b/i.test(win)) {
+      const ctxStart = Math.max(0, mm.index - 20);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 20);
+      pushFinding('character_judgment', 'medium', ctxStart, ctxEnd,
+        'Language characterizes the student negatively rather than the decision. Avery reads this output — reframe as strategic observation.');
+    }
+  }
+
+  // Category E: aggregate_count — tier counts and "thin" claims verified against schools array.
+  const scoirCounts = { 'very likely': 0, 'likely': 0, 'target': 0, 'reach': 0, 'far reach': 0 };
+  const fitCounts = { 'priority target': 0, 'strong fit': 0, 'happy landing': 0 };
+  const schoolsByTier = { 'very likely': [], 'likely': [], 'target': [], 'reach': [], 'far reach': [] };
+  ((aiData && aiData.schools) || []).forEach(s => {
+    const sc = (s.scoirLabel || '').toLowerCase();
+    if (sc in scoirCounts) { scoirCounts[sc]++; schoolsByTier[sc].push(s.name); }
+    const sf = (s.strategicFit && s.strategicFit.label) ? s.strategicFit.label.toLowerCase() : '';
+    if (sf in fitCounts) fitCounts[sf]++;
+  });
+  const tierWords = '(very likely|likely|target|reach|far reach|priority target|strong fit|happy landing)';
+  const onlyCountRe = new RegExp('\\bonly\\s+(\\d+)\\s+' + tierWords + '(?:\\s+schools?|\\s+tier)?\\b', 'gi');
+  while ((mm = onlyCountRe.exec(t)) !== null) {
+    const claimedN = parseInt(mm[1], 10);
+    const tier = mm[2].toLowerCase();
+    const actualN = (tier in scoirCounts) ? scoirCounts[tier] : (tier in fitCounts) ? fitCounts[tier] : null;
+    if (actualN !== null && actualN !== claimedN) {
+      const ctxStart = Math.max(0, mm.index - 20);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 20);
+      const schoolList = schoolsByTier[tier] ? schoolsByTier[tier].slice(0, 4).join(', ') : '';
+      pushFinding('aggregate_count', 'medium', ctxStart, ctxEnd,
+        'Response says "only ' + claimedN + ' ' + tier + '" but payload has ' + actualN +
+        (schoolList ? ' ' + tier + ' schools: ' + schoolList : '') + '.');
+    }
+  }
+  const thinRe = new RegExp('\\b(?:thin\\s+' + tierWords + '\\s+tier|' + tierWords + '\\s+tier\\s+is\\s+thin)\\b', 'gi');
+  while ((mm = thinRe.exec(t)) !== null) {
+    const tier = ((mm[1] || mm[2]) || '').toLowerCase();
+    const actualN = (tier in scoirCounts) ? scoirCounts[tier] : (tier in fitCounts) ? fitCounts[tier] : null;
+    if (actualN !== null && actualN >= 2) {
+      const ctxStart = Math.max(0, mm.index - 20);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 20);
+      pushFinding('aggregate_count', 'medium', ctxStart, ctxEnd,
+        'Claims "' + tier + '" tier is thin, but payload has ' + actualN + ' school' + (actualN === 1 ? '' : 's') +
+        ' in that tier. Name the actual dimension (cost, fit, geography, etc.) rather than count.');
+    }
+  }
+
+  // Category F: manufactured_constraint — violation claims not backed by nonNegotiables.
+  const statedNN = ((aiData && aiData.nonNegotiables) || []).map(n => (n || '').toLowerCase());
+  const violationPatterns = [
+    /\bviolates\s+(?:your|the)\s+non-negotiable\b/gi,
+    /\bagainst\s+your\s+stated\s+requirement\b/gi,
+    /\bbreaks\s+your\s+[a-z\s]{2,30}?\s+requirement\b/gi
+  ];
+  violationPatterns.forEach(re => {
+    while ((mm = re.exec(t)) !== null) {
+      const ctxStart = Math.max(0, mm.index - 40);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 60);
+      const ctx = t.substring(ctxStart, ctxEnd).toLowerCase();
+      let matches = false;
+      if (statedNN.length > 0) {
+        matches = statedNN.some(nn => {
+          const words = nn.split(/\s+/).filter(w => w.length > 3);
+          return words.length > 0 && words.some(w => ctx.includes(w));
+        });
+      }
+      if (!matches) {
+        pushFinding('manufactured_constraint', 'high', ctxStart, ctxEnd,
+          statedNN.length === 0
+            ? 'Response asserts a non-negotiable violation, but nonNegotiables array is empty. Model is inferring constraints from context.'
+            : 'Response asserts a non-negotiable violation, but nonNegotiables array does not contain this constraint. Model is inferring constraints from context.');
+      }
+    }
+  });
+
+  return { findings: findings, hasHighSeverity: findings.some(f => f.severity === 'high') };
+}
+
+// ─── Dev-mode renderers ───
+function renderValidatorBanner(findings) {
+  if (!findings || findings.length === 0) return '';
+  const catLabels = {
+    data_fabrication: 'data fabrication',
+    pool_categorization: 'pool categorization',
+    scoir_override: 'Scoir override',
+    character_judgment: 'character judgment',
+    aggregate_count: 'aggregate count',
+    manufactured_constraint: 'manufactured constraint'
+  };
+  const byCategory = {};
+  findings.forEach(f => { byCategory[f.category] = (byCategory[f.category] || 0) + 1; });
+  const summary = Object.keys(byCategory)
+    .map(cat => byCategory[cat] + ' ' + (catLabels[cat] || cat))
+    .join(', ');
+  const bannerId = 'validatorBanner_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  const findingsHTML = findings.map(f => {
+    return '<div class="validator-finding validator-finding-' + f.severity + '">' +
+      '<span class="validator-finding-category">' + esc(catLabels[f.category] || f.category) + '</span>' +
+      '<span class="validator-finding-matched">"' + esc(f.matchedText) + '"</span>' +
+      '<div class="validator-finding-explanation">' + esc(f.explanation) + '</div>' +
+      '</div>';
+  }).join('');
+  return '<div class="validator-banner" id="' + bannerId + '">' +
+    '<div class="validator-banner-summary" onclick="document.getElementById(\'' + bannerId + '\').classList.toggle(\'open\')">' +
+    '<span>\u26A0</span>' +
+    '<span>Validator flagged ' + findings.length + ' pattern' + (findings.length !== 1 ? 's' : '') + ': ' + esc(summary) + '.</span>' +
+    '<span style="margin-left:auto;font-size:0.75rem;color:#8a5a00;">click to expand</span>' +
+    '</div>' +
+    '<div class="validator-banner-details">' + findingsHTML + '</div>' +
+    '</div>';
+}
+
+function applyInlineHighlights(text, findings) {
+  // No findings → render paragraphs as before.
+  if (!findings || findings.length === 0) {
+    return text.split('\n\n').filter(function(p) { return p.trim(); })
+      .map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
+  }
+  // Merge overlapping/touching ranges so each stretch of flagged text is one <mark>.
+  const sorted = findings.slice().sort((a, b) => a.startIndex - b.startIndex);
+  const merged = [];
+  sorted.forEach(f => {
+    const last = merged[merged.length - 1];
+    if (last && f.startIndex <= last.endIndex) {
+      last.endIndex = Math.max(last.endIndex, f.endIndex);
+      last.severity = (last.severity === 'high' || f.severity === 'high') ? 'high' : 'medium';
+      last.explanations.push(f.explanation);
+    } else {
+      merged.push({ startIndex: f.startIndex, endIndex: f.endIndex, severity: f.severity, explanations: [f.explanation] });
+    }
+  });
+  // Walk the original text, emitting <mark> spans where merged ranges hit.
+  let out = '';
+  let cursor = 0;
+  merged.forEach(r => {
+    out += esc(text.substring(cursor, r.startIndex));
+    const title = r.explanations.join(' | ');
+    out += '<mark class="validator-flag validator-flag-' + r.severity + '" title="' + esc(title) + '">' +
+      esc(text.substring(r.startIndex, r.endIndex)) + '</mark>';
+    cursor = r.endIndex;
+  });
+  out += esc(text.substring(cursor));
+  // Split into paragraphs (esc preserves newlines; <mark> tags never contain \n\n).
+  return '<p>' + out.split('\n\n').filter(function(p) { return p.trim(); }).join('</p><p>') + '</p>';
+}
+
+// ─── Prod-mode auto-retry ───
+function buildRevisionInstruction(findings) {
+  const byCat = {};
+  findings.forEach(f => {
+    if (f.severity !== 'high') return;
+    byCat[f.category] = true;
+  });
+  const lines = [];
+  if (byCat.data_fabrication) {
+    lines.push('Your previous response contained a fabricated stat value (GPA or ACT that does not match the payload). Do not invent stat values when the user\'s question is ambiguous — use the payload\'s actual values or ask the user to specify.');
+  }
+  if (byCat.pool_categorization) {
+    lines.push('Your previous response assigned Scoir or Strategic Fit labels to candidate pool schools. Pool schools have no such assignments — do not predict what their labels would be. Frame pool suggestions as "worth adding to the list and getting a Scoir read on" instead.');
+  }
+  if (byCat.scoir_override) {
+    lines.push('Your previous response used language suggesting Scoir\'s assessment should be overridden or reconsidered. Scoir is authoritative for admission probability; reason from the label rather than substituting your own.');
+  }
+  if (byCat.manufactured_constraint) {
+    lines.push('Your previous response asserted a non-negotiable violation that is not present in the nonNegotiables array. Only cite constraints the family has explicitly stated. A school\'s presence on the list is evidence it does not violate the family\'s constraints.');
+  }
+  return lines.length === 0 ? '' : '\n\n## REVISION INSTRUCTIONS (do not repeat the previous response\'s errors)\n\n' + lines.join('\n');
+}
+
+async function callWorkerWithRevision(aiData, revisionInstruction) {
+  const payload = buildAIPrompt(aiData);
+  if (revisionInstruction) payload.system = payload.system + revisionInstruction;
+  const resp = await fetch(AI_WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error('API returned ' + resp.status + ': ' + errText);
+  }
+  const result = await resp.json();
+  return (result.content && result.content[0] && result.content[0].text) || 'No analysis returned.';
+}
+
+function showValidatorFallback(container) {
+  container.innerHTML = '<h3>AI Analysis</h3>' +
+    '<div class="ai-error" style="background:#fff4db;border-color:#d4a843;color:#7a5a00;">' +
+    '<strong>This analysis is taking a few tries to get right.</strong><br>' +
+    'Please regenerate, or try rephrasing your question.' +
+    '</div>' +
+    '<div class="modal-actions">' +
+    '<button class="btn" onclick="closeAIModal()">Close</button>' +
+    '<button class="btn btn-primary" onclick="openAIAnalysis(true)">Regenerate</button>' +
+    '</div>';
+}
+
 async function openAIAnalysis(forceRegenerate) {
   const overlay = document.getElementById('aiModalOverlay');
   const content = document.getElementById('aiModalContent');
@@ -8587,8 +9004,15 @@ async function openAIAnalysis(forceRegenerate) {
         const fingerprintMatches = parsed.fingerprint === fingerprint;
         const promptVersionMatches = parsed.promptVersion === PROMPT_VERSION;
         if (ageHours < 24 && fingerprintMatches && promptVersionMatches) {
-          showAIResult(content, parsed.text, parsed.timestamp, parsed.userQuestion);
-          return;
+          // Re-validate cached text against current aiData. In prod mode, if
+          // the cached response now trips a high-severity rule (validator
+          // rules may have evolved since cache write), fall through to
+          // regeneration instead of serving a stale bad response.
+          const cachedValidation = validateAIResponse(parsed.text, aiData);
+          if (VALIDATOR_MODE !== 'prod' || !cachedValidation.hasHighSeverity) {
+            showAIResult(content, parsed.text, parsed.timestamp, parsed.userQuestion, cachedValidation);
+            return;
+          }
         }
       } catch (e) { /* ignore bad cache */ }
     }
@@ -8598,31 +9022,45 @@ async function openAIAnalysis(forceRegenerate) {
   content.innerHTML = '<h3>AI Analysis</h3><div class="ai-loading"><div class="spinner"></div><p style="margin-top:14px">Analyzing your college list...</p></div>';
 
   try {
-    const payload = buildAIPrompt(aiData);
-    const resp = await fetch(AI_WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    // Initial attempt (no revision instruction).
+    let text = await callWorkerWithRevision(aiData, '');
+    let validation = validateAIResponse(text, aiData);
+    let retriesUsed = 0;
 
-    if (!resp.ok) {
-      const errText = await resp.text();
-      throw new Error('API returned ' + resp.status + ': ' + errText);
+    // Prod mode: auto-retry on high-severity findings (up to 2 retries).
+    if (VALIDATOR_MODE === 'prod' && validation.hasHighSeverity) {
+      for (let attempt = 1; attempt <= 2 && validation.hasHighSeverity; attempt++) {
+        retriesUsed = attempt;
+        let revision = buildRevisionInstruction(validation.findings);
+        if (attempt === 2) {
+          revision += '\n\nThis is your final revision attempt. The above patterns must not repeat.';
+        }
+        text = await callWorkerWithRevision(aiData, revision);
+        validation = validateAIResponse(text, aiData);
+      }
+      if (validation.hasHighSeverity) {
+        // Exhausted retries — show fallback, do not cache.
+        showValidatorFallback(content);
+        return;
+      }
     }
 
-    const result = await resp.json();
-    const text = (result.content && result.content[0] && result.content[0].text) || 'No analysis returned.';
+    // Cache only first-try successes. Responses that required retries are not
+    // cached (serving a retried response to future same-payload requests
+    // would mask a prompt/model imperfection). Medium-severity findings on
+    // first try are still cached — they're acceptable output in both modes.
+    if (retriesUsed === 0) {
+      const cacheEntry = {
+        text: text,
+        timestamp: Date.now(),
+        fingerprint: fingerprint,
+        promptVersion: PROMPT_VERSION,
+        userQuestion: aiData.strategicContext.userQuestionForThisRun || ''
+      };
+      localStorage.setItem('aiAnalysisCache', JSON.stringify(cacheEntry));
+    }
 
-    const cacheEntry = {
-      text: text,
-      timestamp: Date.now(),
-      fingerprint: fingerprint,
-      promptVersion: PROMPT_VERSION,
-      userQuestion: aiData.strategicContext.userQuestionForThisRun || ''
-    };
-    localStorage.setItem('aiAnalysisCache', JSON.stringify(cacheEntry));
-
-    showAIResult(content, text, cacheEntry.timestamp, cacheEntry.userQuestion);
+    showAIResult(content, text, Date.now(), aiData.strategicContext.userQuestionForThisRun || '', validation);
   } catch (err) {
     const isNetwork = err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('fetch');
     content.innerHTML = '<h3>AI Analysis</h3>' +
@@ -8638,16 +9076,27 @@ async function openAIAnalysis(forceRegenerate) {
   }
 }
 
-function showAIResult(container, text, timestamp, userQuestion) {
+function showAIResult(container, text, timestamp, userQuestion, validation) {
   const ageHours = Math.round((Date.now() - timestamp) / (1000 * 60 * 60) * 10) / 10;
   const ageLabel = ageHours < 0.1 ? 'Just generated' : ageHours < 1 ? Math.round(ageHours * 60) + 'm ago' : Math.round(ageHours) + 'h ago';
-  const paragraphs = text.split('\n\n').filter(function(p) { return p.trim(); }).map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
+  const findings = (validation && validation.findings) || [];
+  // Dev mode: show banner + inline highlights whenever there are findings.
+  // Prod mode: never show banner or highlights (high-severity findings would
+  // have been retried before reaching this function; medium-severity is
+  // accepted as acceptable-but-imperfect output).
+  const showValidatorUI = (VALIDATOR_MODE === 'dev') && findings.length > 0;
+  const bannerHTML = showValidatorUI ? renderValidatorBanner(findings) : '';
+  const body = showValidatorUI
+    ? applyInlineHighlights(text, findings)
+    : text.split('\n\n').filter(function(p) { return p.trim(); })
+        .map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
   const questionBlock = (userQuestion && userQuestion.trim())
     ? '<div class="ai-question-recap"><span class="ai-question-label">You asked:</span> ' + esc(userQuestion.trim()) + '</div>'
     : '';
   container.innerHTML = '<h3>AI Analysis <span class="ai-cached-badge">' + ageLabel + '</span></h3>' +
     questionBlock +
-    '<div class="ai-analysis-content">' + paragraphs + '</div>' +
+    bannerHTML +
+    '<div class="ai-analysis-content">' + body + '</div>' +
     '<div class="modal-actions">' +
     '<button class="btn" onclick="closeAIModal()">Close</button>' +
     '<button class="btn btn-ai" onclick="openAIAnalysis(true)">&#x1f504; Regenerate</button>' +
