@@ -8340,7 +8340,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v14a';
+const PROMPT_VERSION = 'v14a.1';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -8708,12 +8708,40 @@ function validateAIResponse(text, aiData) {
     /\bwould\s+generate\b/i,
     /\bwould\s+likely\s+be\b/i,
     /\bwould\s+strengthen\b/i,
-    /\bfavorable\s+scoir\s+read\b/i
+    /\bfavorable\s+scoir\s+read\b/i,
+    /\bstrengthen(?:s|ed|ing)?\s+(?:the|your)\s+\w+\s+tier\b/i,
+    /\bto\s+strengthen\s+(?:the|your)\s+\w+\s+tier\b/i,
+    /\bhelps?\s+strengthen\b/i,
+    /\bwould\s+be\s+a\s+(?:very\s+likely|likely|target|reach)\b/i,
+    /\bas\s+a\s+(?:very\s+likely|likely|target|reach)\s+option\b/i
   ];
+  // Build match forms per pool school: full name + stripped short form +
+  // app-wide SCENARIO_SHORT_NAMES entry if available. Models commonly write
+  // "Mississippi State" instead of "Mississippi State University"; without
+  // the short form the name regex finds no occurrences and the 150-char
+  // window never opens. Forms are sorted longest-first so alternation
+  // matches the longest available spelling (prevents "Mississippi State"
+  // from firing twice when "Mississippi State University" is present).
+  const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const deriveShortForm = n => {
+    let s = n;
+    if (s.startsWith('The ')) s = s.substring(4);
+    if (s.startsWith('University of ')) s = s.substring('University of '.length);
+    if (s.endsWith(' University')) s = s.substring(0, s.length - ' University'.length);
+    return s.trim();
+  };
   pool.forEach(name => {
-    const nameRe = new RegExp('\\b' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    const forms = [name];
+    const shortForm = deriveShortForm(name);
+    if (shortForm && shortForm !== name && !forms.includes(shortForm)) forms.push(shortForm);
+    const scenarioShort = (typeof SCENARIO_SHORT_NAMES !== 'undefined') ? SCENARIO_SHORT_NAMES[name] : null;
+    if (scenarioShort && !forms.includes(scenarioShort)) forms.push(scenarioShort);
+    forms.sort((a, b) => b.length - a.length);
+    const alternation = forms.map(reEsc).join('|');
+    const nameRe = new RegExp('\\b(?:' + alternation + ')\\b', 'gi');
     let nm;
     while ((nm = nameRe.exec(t)) !== null) {
+      const matchedForm = nm[0];
       const winStart = Math.max(0, nm.index - 150);
       const winEnd = Math.min(t.length, nm.index + nm[0].length + 150);
       const win = t.substring(winStart, winEnd);
@@ -8724,7 +8752,7 @@ function validateAIResponse(text, aiData) {
           const absStart = winStart + pMatch.index;
           const absEnd = absStart + pMatch[0].length;
           pushFinding('pool_categorization', 'high', absStart, absEnd,
-            'Pool school ' + name + ' categorized with "' + pMatch[0] + '" — pool schools have no Scoir or Strategic Fit assignment.');
+            'Pool school ' + name + ' (matched as "' + matchedForm + '") categorized with "' + pMatch[0] + '" — pool schools have no Scoir or Strategic Fit assignment.');
           break;
         }
       }
@@ -8761,6 +8789,13 @@ function validateAIResponse(text, aiData) {
     'lacks discipline',
     'procrastination suggests',
     'procrastination signals',
+    'procrastination pattern',
+    'procrastination is',
+    'procrastination reveals',
+    'procrastination indicates',
+    'execution challenges',
+    'execution issues',
+    'broader execution',
     'signals academic',
     'student struggles'
   ];
@@ -8832,13 +8867,44 @@ function validateAIResponse(text, aiData) {
         ' in that tier. Name the actual dimension (cost, fit, geography, etc.) rather than count.');
     }
   }
+  // "your [tier] tier is just [school]" — singleton assertion. Flag when the
+  // actual tier has 2+ schools (a singleton claim against a multi-school tier).
+  const justOneRe = new RegExp('\\byour\\s+' + tierWords + '\\s+tier\\s+is\\s+just\\s+\\w', 'gi');
+  while ((mm = justOneRe.exec(t)) !== null) {
+    const tier = (mm[1] || '').toLowerCase();
+    const actualN = (tier in scoirCounts) ? scoirCounts[tier] : (tier in fitCounts) ? fitCounts[tier] : null;
+    if (actualN !== null && actualN > 1) {
+      const ctxStart = Math.max(0, mm.index - 20);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 30);
+      const schoolList = schoolsByTier[tier] ? schoolsByTier[tier].slice(0, 4).join(', ') : '';
+      pushFinding('aggregate_count', 'medium', ctxStart, ctxEnd,
+        'Claims "' + tier + '" tier is just one school, but payload has ' + actualN +
+        (schoolList ? ': ' + schoolList : '') + '.');
+    }
+  }
+  // "your [tier] tier has [N]" / "your [tier] tier has just [N]" — count assertion.
+  const hasCountRe = new RegExp('\\byour\\s+' + tierWords + '\\s+tier\\s+has\\s+(?:just\\s+)?(\\d+)\\b', 'gi');
+  while ((mm = hasCountRe.exec(t)) !== null) {
+    const tier = (mm[1] || '').toLowerCase();
+    const claimedN = parseInt(mm[2], 10);
+    const actualN = (tier in scoirCounts) ? scoirCounts[tier] : (tier in fitCounts) ? fitCounts[tier] : null;
+    if (actualN !== null && actualN !== claimedN) {
+      const ctxStart = Math.max(0, mm.index - 20);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 20);
+      const schoolList = schoolsByTier[tier] ? schoolsByTier[tier].slice(0, 4).join(', ') : '';
+      pushFinding('aggregate_count', 'medium', ctxStart, ctxEnd,
+        'Claims your "' + tier + '" tier has ' + claimedN + ', but payload has ' + actualN +
+        (schoolList ? ' (' + schoolList + ')' : '') + '.');
+    }
+  }
 
   // Category F: manufactured_constraint — violation claims not backed by nonNegotiables.
   const statedNN = ((aiData && aiData.nonNegotiables) || []).map(n => (n || '').toLowerCase());
   const violationPatterns = [
-    /\bviolates\s+(?:your|the)\s+non-negotiable\b/gi,
+    /\bviolat(?:es|ed|ing|e)\s+(?:your|the)\s+non-negotiable\b/gi,
     /\bagainst\s+your\s+stated\s+requirement\b/gi,
-    /\bbreaks\s+your\s+[a-z\s]{2,30}?\s+requirement\b/gi
+    /\bbreaks\s+your\s+[a-z\s]{2,30}?\s+requirement\b/gi,
+    /\bviolation\s+of\s+(?:your|the)\s+non-negotiable\b/gi
   ];
   violationPatterns.forEach(re => {
     while ((mm = re.exec(t)) !== null) {
