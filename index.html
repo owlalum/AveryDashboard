@@ -8658,6 +8658,12 @@ function validateAIResponse(text, aiData) {
   };
 
   // Category A: data_fabrication — GPA and ACT values that disagree with payload.
+  // Suppression windows for threshold/hypothetical context. A number in one
+  // of these contexts is being used as a reference value (scholarship
+  // threshold, hypothetical "if she drops to X"), not asserted as the
+  // student's actual stat — so it shouldn't count as a fabrication.
+  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?)\b/i;
+  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below)\b/i;
   if (actualGPA != null) {
     const gpaNumRe = /\b([234]\.\d{1,2})\b/g;
     let m;
@@ -8668,6 +8674,11 @@ function validateAIResponse(text, aiData) {
       const after = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
       if (!/\bgpa\b/i.test(before) && !/\bgpa\b/i.test(after)) continue;
       if (Math.abs(val - actualGPA) <= 0.01) continue;
+      // Threshold/hypothetical suppression: 40-char before, 30-char after.
+      const suppressBefore = t.substring(Math.max(0, m.index - 40), m.index);
+      const suppressAfter = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
+      if (fabSuppressBefore.test(suppressBefore)) continue;
+      if (fabSuppressAfter.test(suppressAfter)) continue;
       const ctxStart = Math.max(0, m.index - 20);
       const ctxEnd = Math.min(t.length, m.index + m[0].length + 20);
       pushFinding('data_fabrication', 'high', ctxStart, ctxEnd,
@@ -8684,6 +8695,13 @@ function validateAIResponse(text, aiData) {
       const after = t.substring(m.index + m[0].length, m.index + m[0].length + 20);
       if (!/\bACT\b/i.test(before) && !/\bACT\b/i.test(after)) continue;
       if (val === actualACT) continue;
+      // Same threshold/hypothetical suppression as GPA — an ACT value
+      // discussed as a scholarship threshold or hypothetical score shouldn't
+      // be flagged as a fabricated student stat.
+      const suppressBefore = t.substring(Math.max(0, m.index - 40), m.index);
+      const suppressAfter = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
+      if (fabSuppressBefore.test(suppressBefore)) continue;
+      if (fabSuppressAfter.test(suppressAfter)) continue;
       const ctxStart = Math.max(0, m.index - 20);
       const ctxEnd = Math.min(t.length, m.index + m[0].length + 20);
       pushFinding('data_fabrication', 'high', ctxStart, ctxEnd,
@@ -8850,6 +8868,14 @@ function validateAIResponse(text, aiData) {
     'execution issues',
     'execution concerns',
     'broader execution',
+    'academic disengagement',
+    'disengagement signals',
+    'disengagement pattern',
+    'underlying disengagement',
+    'seems disengaged',
+    'appears disengaged',
+    'disengaged in class',
+    'predictive indicators',
     'signals academic',
     'student struggles'
   ];
@@ -8965,18 +8991,29 @@ function validateAIResponse(text, aiData) {
       const ctxStart = Math.max(0, mm.index - 40);
       const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 60);
       const ctx = t.substring(ctxStart, ctxEnd).toLowerCase();
-      let matches = false;
-      if (statedNN.length > 0) {
-        matches = statedNN.some(nn => {
-          const words = nn.split(/\s+/).filter(w => w.length > 3);
-          return words.length > 0 && words.some(w => ctx.includes(w));
-        });
+      // Empty / undefined nonNegotiables → always flag. Short-circuit here so
+      // the empty case is visibly bulletproof and doesn't depend on the
+      // gated branch below staying correct through refactors.
+      if (!statedNN || statedNN.length === 0) {
+        pushFinding('manufactured_constraint', 'high', ctxStart, ctxEnd,
+          'Response asserts a non-negotiable violation, but nonNegotiables array is empty. Model is inferring constraints from context.');
+        continue;
       }
+      // Non-empty case: suppress only when a context window *word* matches
+      // a word from a stated non-negotiable. Uses a word-boundary regex
+      // instead of substring .includes() to avoid spurious suppression
+      // (e.g., "cost" inside "costly", or "have" matching any prose).
+      const matches = statedNN.some(nn => {
+        const words = nn.split(/\s+/).filter(w => w.length > 3);
+        if (words.length === 0) return false;
+        return words.some(w => {
+          const wEsc = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          return new RegExp('\\b' + wEsc + '\\b', 'i').test(ctx);
+        });
+      });
       if (!matches) {
         pushFinding('manufactured_constraint', 'high', ctxStart, ctxEnd,
-          statedNN.length === 0
-            ? 'Response asserts a non-negotiable violation, but nonNegotiables array is empty. Model is inferring constraints from context.'
-            : 'Response asserts a non-negotiable violation, but nonNegotiables array does not contain this constraint. Model is inferring constraints from context.');
+          'Response asserts a non-negotiable violation, but nonNegotiables array does not contain this constraint. Model is inferring constraints from context.');
       }
     }
   });
