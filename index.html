@@ -8723,9 +8723,9 @@ function validateAIResponse(text, aiData) {
     /\btarget-caliber\b/i,
     /\bstrong\s+fit\b/i,
     /\bhappy\s+landing\b/i,
-    /\bwould\s+generate\b/i,
-    /\bwould\s+likely\s+be\b/i,
-    /\bwould\s+strengthen\b/i,
+    /\bwould\s+(?:\w+\s+){0,3}generate\b/i,
+    /\bwould\s+(?:\w+\s+){0,3}be\s+a\s+(?:very\s+likely|likely|target|reach)\b/i,
+    /\bwould\s+(?:\w+\s+){0,3}strengthen\b/i,
     /\bfavorable\s+scoir\s+read\b/i,
     /\bstrengthen(?:s|ed|ing)?\s+(?:the|your)\s+(?:\w+\s+){1,2}tier\b/i,
     /\bto\s+strengthen\s+(?:the|your)\s+(?:\w+\s+){1,2}tier\b/i,
@@ -8975,6 +8975,33 @@ function validateAIResponse(text, aiData) {
       pushFinding('aggregate_count', 'medium', ctxStart, ctxEnd,
         'Claims your "' + tier + '" tier has ' + claimedN + ', but payload has ' + actualN +
         (schoolList ? ' (' + schoolList + ')' : '') + '.');
+    }
+  }
+  // Bulleted distribution summary: "- **Very Likely**: 1 school (Auburn)".
+  // Catches three failure modes: (a) claimed count disagrees with payload,
+  // (b) parenthetical school list length disagrees with claimed count,
+  // (c) both. When both fire, a single finding lists both problems.
+  const bulletedRe = /(?:^|\n)\s*[-*\u2022]\s*\*?\*?(very\s+likely|likely|target|reach|far\s+reach|priority\s+target|strong\s+fit|happy\s+landing)\*?\*?\s*[:\u2014\u2013-]\s*(\d+)\s*schools?(?:\s*\(([^)]+)\))?/gim;
+  while ((mm = bulletedRe.exec(t)) !== null) {
+    const tier = (mm[1] || '').toLowerCase();
+    const claimedN = parseInt(mm[2], 10);
+    const parenList = mm[3] || null;
+    const parenCount = parenList ? parenList.split(',').map(s => s.trim()).filter(Boolean).length : null;
+    const actualN = (tier in scoirCounts) ? scoirCounts[tier] : (tier in fitCounts) ? fitCounts[tier] : null;
+    const schoolList = schoolsByTier[tier] ? schoolsByTier[tier].slice(0, 4).join(', ') : '';
+    const problems = [];
+    if (actualN !== null && actualN !== claimedN) {
+      problems.push('claimed ' + claimedN + ' but payload has ' + actualN +
+        (schoolList ? ' (' + schoolList + ')' : ''));
+    }
+    if (parenCount !== null && parenCount !== claimedN) {
+      problems.push('claimed ' + claimedN + ' but parenthetical lists ' + parenCount + ' school' + (parenCount === 1 ? '' : 's'));
+    }
+    if (problems.length > 0) {
+      const ctxStart = Math.max(0, mm.index);
+      const ctxEnd = Math.min(t.length, mm.index + mm[0].length);
+      pushFinding('aggregate_count', 'medium', ctxStart, ctxEnd,
+        'Bulleted "' + tier + '" distribution: ' + problems.join('; ') + '.');
     }
   }
 
