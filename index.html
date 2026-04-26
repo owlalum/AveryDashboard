@@ -3309,142 +3309,6 @@
 </div>
 
 <script>
-// TEMP DIAGNOSTIC — page-load state inspector. Remove after investigation.
-// Read-only: snapshots localStorage + in-memory `data` + Firestore doc + any
-// uncaught errors. Surfaces results in a visible banner at the top of the
-// page when `?diag=1` is in the URL. Does not write to localStorage,
-// Firestore, or `data`. Does not change app behavior when URL param absent.
-(function installRenderDiagnostic() {
-  if (typeof window === 'undefined') return;
-  window._diag = { errors: [], snapshot: null, firestoreSnap: null };
-  const diagOn = /[?&]diag=1\b/.test(window.location.search);
-
-  // 1. Capture any uncaught error during script execution.
-  window.addEventListener('error', function(ev) {
-    window._diag.errors.push({
-      when: new Date().toISOString(),
-      message: ev.message,
-      filename: (ev.filename || '').split('/').pop(),
-      line: ev.lineno,
-      col: ev.colno,
-      stack: ev.error && ev.error.stack ? ev.error.stack.split('\n').slice(0, 8).join('\n') : null
-    });
-    if (diagOn) try { renderDiagBanner(); } catch (_) {}
-  });
-
-  // 2. Render the visible diagnostic banner (idempotent; only when diagOn).
-  function renderDiagBanner() {
-    if (!diagOn) return;
-    let banner = document.getElementById('_diagBanner');
-    if (!banner) {
-      banner = document.createElement('div');
-      banner.id = '_diagBanner';
-      banner.style.cssText = 'background:#fff8e1;border:2px solid #d4a843;color:#5a4500;padding:12px 16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:0.74rem;white-space:pre-wrap;word-break:break-word;z-index:99999999;position:fixed;top:0;left:0;right:0;max-height:70vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
-      if (document.body) document.body.insertBefore(banner, document.body.firstChild);
-      else document.addEventListener('DOMContentLoaded', function() {
-        document.body.insertBefore(banner, document.body.firstChild);
-      });
-    }
-    const errBlock = window._diag.errors.length === 0
-      ? '(no uncaught errors during page load)'
-      : window._diag.errors.map(function(e) {
-          return '[' + e.filename + ':' + e.line + ':' + e.col + '] ' + e.message + (e.stack ? '\n' + e.stack : '');
-        }).join('\n---\n');
-    const snap = window._diag.snapshot;
-    const fs = window._diag.firestoreSnap;
-    const snapBlock = snap ? JSON.stringify(snap, null, 2) : '(snapshot pending — captures 3s after load)';
-    const fsBlock = fs ? JSON.stringify(fs, null, 2) : '(firestore fetch pending or skipped)';
-    banner.textContent =
-      '═══ DIAGNOSTIC ═══ (?diag=1 active — remove from URL to hide)\n' +
-      '\n[ERRORS DURING LOAD]\n' + errBlock +
-      '\n\n[STATE SNAPSHOT]\n' + snapBlock +
-      '\n\n[FIRESTORE DOC]\n' + fsBlock;
-  }
-
-  // 3. Snapshot state 3s after load (allows Firestore init to complete).
-  setTimeout(function() {
-    let memData;
-    try {
-      const d = data;
-      memData = (d && typeof d === 'object') ? {
-        gpa: d.gpa,
-        hopeGPA: d.hopeGPA,
-        actScores: d.actScores,
-        studentName: d.studentName,
-        schoolCount: (d.schools || []).length,
-        schoolsList: (d.schools || []).map(function(s) { return s.name; }),
-        lastModified: d.lastModified ? new Date(d.lastModified).toISOString() : null,
-        keys: Object.keys(d).sort()
-      } : '(data is null / not an object)';
-    } catch (e) {
-      memData = '(data inaccessible: ' + e.message + ' — likely TDZ from earlier throw)';
-    }
-    let lsData;
-    try {
-      const lsRaw = localStorage.getItem('averyCollegePlanning');
-      const ls = lsRaw ? JSON.parse(lsRaw) : null;
-      lsData = (ls === null) ? '(localStorage entry MISSING)' : {
-        gpa: ls.gpa,
-        hopeGPA: ls.hopeGPA,
-        actScores: ls.actScores,
-        studentName: ls.studentName,
-        schoolCount: (ls.schools || []).length,
-        schoolsList: (ls.schools || []).map(function(s) { return s.name; }),
-        lastModified: ls.lastModified ? new Date(ls.lastModified).toISOString() : null,
-        keys: Object.keys(ls).sort()
-      };
-    } catch (e) {
-      lsData = '(localStorage parse failed: ' + e.message + ')';
-    }
-    let fsInit, fsSync, lastBaseline;
-    try { fsInit = firestoreInitialized; } catch (e) { fsInit = '(TDZ)'; }
-    try { fsSync = firestoreSyncEnabled; } catch (e) { fsSync = '(TDZ)'; }
-    try { lastBaseline = lastSyncedRemoteTs; } catch (e) { lastBaseline = '(TDZ)'; }
-    window._diag.snapshot = {
-      when: new Date().toISOString(),
-      memory: memData,
-      localStorage: lsData,
-      firestoreInitialized: fsInit,
-      firestoreSyncEnabled: fsSync,
-      lastSyncedRemoteTs: lastBaseline
-    };
-    if (diagOn) try { renderDiagBanner(); } catch (_) {}
-
-    // 4. Read-only Firestore fetch.
-    try {
-      if (typeof docRef !== 'undefined' && docRef && typeof docRef.get === 'function') {
-        docRef.get().then(function(s) {
-          if (s.exists) {
-            const r = s.data();
-            window._diag.firestoreSnap = {
-              gpa: r.gpa,
-              hopeGPA: r.hopeGPA,
-              actScores: r.actScores,
-              studentName: r.studentName,
-              schoolCount: (r.schools || []).length,
-              schoolsList: (r.schools || []).map(function(x) { return x.name; }),
-              lastModified: r.lastModified ? new Date(r.lastModified).toISOString() : null
-            };
-          } else {
-            window._diag.firestoreSnap = '(firestore doc does not exist)';
-          }
-          if (diagOn) try { renderDiagBanner(); } catch (_) {}
-        }).catch(function(e) {
-          window._diag.firestoreSnap = '(firestore fetch failed: ' + e.message + ')';
-          if (diagOn) try { renderDiagBanner(); } catch (_) {}
-        });
-      } else {
-        window._diag.firestoreSnap = '(docRef not available at snapshot time)';
-        if (diagOn) try { renderDiagBanner(); } catch (_) {}
-      }
-    } catch (e) {
-      window._diag.firestoreSnap = '(firestore read setup failed: ' + e.message + ')';
-      if (diagOn) try { renderDiagBanner(); } catch (_) {}
-    }
-  }, 3000);
-})();
-// END TEMP DIAGNOSTIC
-
 // ─── Firebase ───
 const firebaseConfig = {
   apiKey: "AIzaSyBKMJI-lQhXcuHY6A551Wy-xcq9vQkP01M",
@@ -9162,33 +9026,15 @@ function validateAIResponse(text, aiData) {
     /\bbreaks\s+your\s+[a-z\s]{2,30}?\s+requirement\b/gi,
     /\bviolation\s+of\s+(?:your|the)\s+non-negotiable\b/gi
   ];
-  // TEMP DIAGNOSTIC (remove after investigation) — surface payload + response
-  // so user can inspect in browser console via window.__catF_lastAiData /
-  // window.__catF_lastResponse.
-  if (typeof window !== 'undefined') {
-    window.__catF_lastAiData = aiData;
-    window.__catF_lastResponse = t;
-    window.__catF_nonNegotiables_raw = aiData && aiData.nonNegotiables;
-    window.__catF_statedNN_lowered = statedNN;
-  }
-  console.log('[CatF DIAG] aiData.nonNegotiables =', aiData && aiData.nonNegotiables);
-  console.log('[CatF DIAG] statedNN =', statedNN, 'length =', statedNN.length);
-  console.log('[CatF DIAG] response text contains "violat" =', /violat/i.test(t));
-  console.log('[CatF DIAG] response text contains "non-negotiable" =', /non-negotiable/i.test(t));
-  violationPatterns.forEach((re, reIdx) => {
-    let matchCount = 0;
+  violationPatterns.forEach(re => {
     while ((mm = re.exec(t)) !== null) {
-      matchCount++;
       const ctxStart = Math.max(0, mm.index - 40);
       const ctxEnd = Math.min(t.length, mm.index + mm[0].length + 60);
       const ctx = t.substring(ctxStart, ctxEnd).toLowerCase();
-      console.log('[CatF DIAG] pattern #' + reIdx + ' matched:', JSON.stringify(mm[0]), 'at index', mm.index);
-      console.log('[CatF DIAG]   context window (lowered):', JSON.stringify(ctx));
       // Empty / undefined nonNegotiables → always flag. Short-circuit here so
       // the empty case is visibly bulletproof and doesn't depend on the
       // gated branch below staying correct through refactors.
       if (!statedNN || statedNN.length === 0) {
-        console.log('[CatF DIAG]   branch = EMPTY → FIRE');
         pushFinding('manufactured_constraint', 'high', ctxStart, ctxEnd,
           'Response asserts a non-negotiable violation, but nonNegotiables array is empty. Model is inferring constraints from context.');
         continue;
@@ -9197,28 +9043,18 @@ function validateAIResponse(text, aiData) {
       // a word from a stated non-negotiable. Uses a word-boundary regex
       // instead of substring .includes() to avoid spurious suppression
       // (e.g., "cost" inside "costly", or "have" matching any prose).
-      let matchingNN = null;
-      let matchingWord = null;
       const matches = statedNN.some(nn => {
         const words = nn.split(/\s+/).filter(w => w.length > 3);
         if (words.length === 0) return false;
         return words.some(w => {
           const wEsc = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          const hit = new RegExp('\\b' + wEsc + '\\b', 'i').test(ctx);
-          if (hit) { matchingNN = nn; matchingWord = w; }
-          return hit;
+          return new RegExp('\\b' + wEsc + '\\b', 'i').test(ctx);
         });
       });
-      console.log('[CatF DIAG]   branch = NON-EMPTY');
-      console.log('[CatF DIAG]     suppression match =', matches,
-        matches ? '(NN entry "' + matchingNN + '" via word "' + matchingWord + '") → SUPPRESS' : '→ FIRE');
       if (!matches) {
         pushFinding('manufactured_constraint', 'high', ctxStart, ctxEnd,
           'Response asserts a non-negotiable violation, but nonNegotiables array does not contain this constraint. Model is inferring constraints from context.');
       }
-    }
-    if (matchCount === 0) {
-      console.log('[CatF DIAG] pattern #' + reIdx + ' matched 0 times');
     }
   });
 
