@@ -3492,6 +3492,19 @@ function loadData() {
 let savePromiseResolve = null;
 
 function saveData() {
+  // Pre-init gate: the first synchronous renderAll() at the bottom of the
+  // script runs BEFORE initFromFirestore's `await docRef.get()` resolves.
+  // Inside that pass, syncChecklists / syncEssays / syncEssayStatusToChecklists
+  // unconditionally call saveData(). Stamping localStorage's lastModified to
+  // NOW during that pass makes local appear "newer" than whatever remote will
+  // arrive moments later — and the conflict resolver in initFromFirestore
+  // then keeps the corrupt local state and discards the good remote. Every
+  // page reload then pushes the corrupt local state back to Firestore via
+  // the second renderAll's saveData. Defer all writes until init has had a
+  // chance to decide which side wins.
+  if (!firestoreInitialized) {
+    return Promise.resolve({ synced: false, reason: 'pre-init' });
+  }
   data.lastModified = Date.now();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if (!firestoreSyncEnabled || !firestoreInitialized) {
