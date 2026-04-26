@@ -10663,6 +10663,20 @@ function getUnreadEntries() {
 function renderChangelog() {
   const body = document.getElementById('changelogBody');
   const badge = document.getElementById('changelogBadge');
+  // Null guard: the top-level call near the end of the inline script runs
+  // before the browser has parsed past the script-tag close to the changelog
+  // DOM elements. On initial parse `body` and `badge` are null; the
+  // unguarded `body.innerHTML = ...` below threw "Cannot set properties of
+  // null", halting subsequent script execution (autoShowChangelog, SW
+  // registration, etc.). Defer to DOMContentLoaded when called too early;
+  // subsequent calls (markChangelogRead, openChangelog) run fine after
+  // parsing.
+  if (!body || !badge) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderChangelog, { once: true });
+    }
+    return;
+  }
   const unread = getUnreadEntries();
 
   // Update badge
