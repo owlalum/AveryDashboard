@@ -8645,8 +8645,6 @@ function gatherAIData() {
       }
     }
   }
-  console.log('[TIER DIAG] tierDistribution:', JSON.stringify(tierDistribution, null, 2)); // TEMP DIAGNOSTIC — remove after verification
-  try { window.__lastTierDistribution = tierDistribution; } catch (e) {} // TEMP DIAGNOSTIC — for ?diag=tier banner
 
   const sc = data.strategicContext || { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
   const decisionsArr = (sc.currentDecisions || '')
@@ -10756,53 +10754,6 @@ if ('serviceWorker' in navigator) {
     }
   }).catch(() => {});
 }
-
-// TEMP DIAGNOSTIC — tier distribution visible banner. Activated by ?diag=tier
-// in the URL. Renders a fixed banner with a Capture button that calls
-// gatherAIData() and prints tierDistribution as JSON. Remove with the rest of
-// the [TIER DIAG] instrumentation after verification.
-(function tierDiagBanner() {
-  if (!/[?&]diag=tier\b/.test(location.search)) return;
-  function init() {
-    if (document.getElementById('__tierDiagBanner')) return;
-    const banner = document.createElement('div');
-    banner.id = '__tierDiagBanner';
-    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:70vh;overflow:auto;background:#fff;color:#000;border-top:3px solid #2c5364;padding:12px;z-index:99999;font-family:monospace;font-size:12px;box-shadow:0 -4px 12px rgba(0,0,0,.25)';
-    banner.innerHTML =
-      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">' +
-        '<strong style="color:#2c5364">[TIER DIAG]</strong>' +
-        '<button id="__tdCapture" style="background:#2c5364;color:#fff;border:none;padding:4px 12px;cursor:pointer;border-radius:4px;font-family:inherit">Capture tierDistribution</button>' +
-        '<button id="__tdCopy" style="background:#3b82f6;color:#fff;border:none;padding:4px 12px;cursor:pointer;border-radius:4px;font-family:inherit">Copy JSON</button>' +
-        '<button id="__tdClose" style="background:#888;color:#fff;border:none;padding:4px 12px;cursor:pointer;border-radius:4px;margin-left:auto;font-family:inherit">Close</button>' +
-      '</div>' +
-      '<pre id="__tdOut" style="white-space:pre-wrap;word-break:break-all;margin:0;background:#f6f8fa;padding:8px;border-radius:4px;max-height:55vh;overflow:auto">Click "Capture tierDistribution" to read the live field from gatherAIData().</pre>';
-    document.body.appendChild(banner);
-    let lastJson = '';
-    document.getElementById('__tdCapture').onclick = () => {
-      try {
-        const td = (typeof gatherAIData === 'function') ? gatherAIData().tierDistribution : (window.__lastTierDistribution || null);
-        if (!td) {
-          document.getElementById('__tdOut').textContent = 'tierDistribution unavailable. Try running AI Analysis once first.';
-          return;
-        }
-        lastJson = JSON.stringify(td, null, 2);
-        document.getElementById('__tdOut').textContent = lastJson;
-      } catch (e) {
-        document.getElementById('__tdOut').textContent = 'ERROR: ' + (e && e.message ? e.message : String(e));
-      }
-    };
-    document.getElementById('__tdCopy').onclick = () => {
-      if (!lastJson) return;
-      navigator.clipboard.writeText(lastJson).then(
-        () => { const b = document.getElementById('__tdCopy'); const t = b.textContent; b.textContent = 'Copied!'; setTimeout(() => b.textContent = t, 1200); },
-        () => { document.getElementById('__tdOut').textContent += '\n\n(clipboard write failed; copy manually from the box above)'; }
-      );
-    };
-    document.getElementById('__tdClose').onclick = () => banner.remove();
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
 </script>
 <!-- ═══════════ CHANGELOG PANEL ═══════════ -->
 <div class="changelog-overlay" id="changelogOverlay" onclick="toggleChangelog()"></div>
