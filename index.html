@@ -8687,8 +8687,8 @@ function validateAIResponse(text, aiData) {
   // of these contexts is being used as a reference value (scholarship
   // threshold, hypothetical "if she drops to X"), not asserted as the
   // student's actual stat — so it shouldn't count as a fabrication.
-  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at))\b/i;
-  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal)\b/i;
+  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old)\b/i;
+  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to)\b/i;
   if (actualGPA != null) {
     const gpaNumRe = /\b([234]\.\d{1,2})\b/g;
     let m;
@@ -8857,6 +8857,12 @@ function validateAIResponse(text, aiData) {
     /\bappears\s+disconnected\b/i
   ];
   const labelRefSrc = '["\u201C\u201D\u2018\u2019\']?\\b(?:very\\s+likely|likely|target|reach|far\\s+reach)\\b["\u201C\u201D\u2018\u2019\']?';
+  // Label-context narrowing: a tier word alone near a concept word is more
+  // likely reasoning about a school than about Scoir's labeling. Require an
+  // explicit label-discussion term in the same window before firing — an
+  // honest Scoir override discussion uses "the Reach label," "Scoir's
+  // assessment," "the categorization," etc.
+  const labelContextRe = /\b(?:labels?|assessment|classification|categorization|rating|designation|scoir[’']s)\b/i;
   conceptWords.forEach(cre => {
     const gre = new RegExp(cre.source, cre.flags.indexOf('g') === -1 ? cre.flags + 'g' : cre.flags);
     let cm;
@@ -8867,11 +8873,11 @@ function validateAIResponse(text, aiData) {
       const winEnd = Math.min(t.length, conceptEnd + 80);
       const win = t.substring(winStart, winEnd);
       const labelProbe = new RegExp(labelRefSrc, 'i');
-      if (labelProbe.test(win)) {
+      if (labelProbe.test(win) && labelContextRe.test(win)) {
         const ctxStart = Math.max(0, conceptStart - 40);
         const ctxEnd = Math.min(t.length, conceptEnd + 40);
         pushFinding('scoir_override', 'high', ctxStart, ctxEnd,
-          'Concept word "' + cm[0] + '" appears within 80 chars of a Scoir label reference. Language suggests the model is characterizing Scoir\'s assessment rather than reasoning from it.');
+          'Concept word "' + cm[0] + '" appears within 80 chars of a Scoir label reference and a label-context term. Language suggests the model is characterizing Scoir\'s assessment rather than reasoning from it.');
       }
     }
   });
