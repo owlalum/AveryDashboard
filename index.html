@@ -2991,11 +2991,11 @@
       <h4 style="margin-top:14px;margin-bottom:6px;color:var(--primary);">Program</h4>
       <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 6px;">Rank-driven from the most recent <em>US News Best Veterinary Medicine Programs</em> rankings. Schools without an accredited DVM on campus score 1; a brand-new CVM not yet ranked (e.g., Clemson&rsquo;s PCVM opening Fall 2026) scores 2.</p>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>US News rank #1&ndash;5 (e.g., Cornell, NC State, Texas A&amp;M)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>US News rank #6&ndash;10 (e.g., Wisconsin, Ohio State, UGA)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>US News rank #11&ndash;15 (e.g., Auburn, Purdue)</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>US News rank #16&ndash;20, OR new CVM not yet ranked (e.g., Virginia Tech, Clemson)</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>US News rank #21+, OR no vet school on campus (e.g., Tennessee, Kentucky)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:40px;">5</td><td>US News rank #1&ndash;10 (e.g., Cornell, NC State, Texas A&amp;M, Wisconsin, Ohio State, UGA)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>US News rank #11&ndash;20 (e.g., Auburn, Purdue, Virginia Tech)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>US News rank #21&ndash;30 (e.g., Tennessee, Oklahoma State, Mississippi State)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>US News rank #31+, OR new CVM not yet ranked (e.g., Clemson)</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>No vet school on campus (e.g., Kentucky, Penn State)</td></tr>
       </table>
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Fit</h4>
@@ -6829,25 +6829,25 @@ function getRankingForSchool(name) {
     // Pre-fill from spreadsheet data for known schools
     const presets = {
       // ── Top-13 schools from Executive Summary / Financial Analysis ──
-      'University of Georgia':           { vetProgram:4, costScore:5, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$9K/yr, 90% of tuition — fees not covered). Zell Miller requires 3.70 HOPE GPA (currently 3.609). 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat).' },
+      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$9K/yr, 90% of tuition — fees not covered). Zell Miller requires 3.70 HOPE GPA (currently 3.609). 3+1 EARLY ASSURANCE DVM PATHWAY (Animal Health major → guaranteed CVM seat).' },
       'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit.' },
-      'Purdue University':               { vetProgram:3, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
-      'Ohio State University':           { vetProgram:4, costScore:3, planB:5, meritAid:2, notes:'Massive resources. #9 in US News 2026 (down from #4).' },
+      'Purdue University':               { vetProgram:4, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
+      'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. #9 in US News 2026 (down from #4).' },
       'North Carolina State University': { vetProgram:5, costScore:3, planB:4, meritAid:2, notes:'Research Triangle biotech jobs. Guaranteed interview program.' },
-      'Auburn University':               { vetProgram:3, costScore:4, planB:3, meritAid:4, notes:'Close to home. Strong equine & small animal.' },
+      'Auburn University':               { vetProgram:4, costScore:4, planB:3, meritAid:4, notes:'Close to home. Strong equine & small animal.' },
       'University of Kentucky':          { vetProgram:1, costScore:5, planB:3, meritAid:5, notes:'Best OOS merit aid. Unmatched equine program.' },
-      'Virginia Tech':                   { vetProgram:2, costScore:3, planB:3, meritAid:2, notes:'VA-MD CVM on campus. Beautiful but isolated.' },
+      'Virginia Tech':                   { vetProgram:4, costScore:3, planB:3, meritAid:2, notes:'VA-MD CVM on campus. Beautiful but isolated.' },
       'Clemson University':              { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'New CVM opens Fall 2026 (not yet ranked). Close to home, good culture.' },
-      'University of Tennessee':         { vetProgram:1, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Solid SEC safety.' },
+      'University of Tennessee':         { vetProgram:3, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Solid SEC safety.' },
       'University of Florida':           { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Excellent program but hardest admission, limited merit.' },
-      'University of Wisconsin-Madison': { vetProgram:4, costScore:2, planB:4, meritAid:1, notes:'Great vet school. Very limited OOS merit.' },
+      'University of Wisconsin-Madison': { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Great vet school. Very limited OOS merit.' },
       // ── Other schools with vet schools ──
       'Colorado State University':       { vetProgram:5, costScore:3, planB:3, meritAid:3, notes:'Top-5 vet. Strong equine & large animal.' },
-      'Michigan State University':       { vetProgram:3, costScore:3, planB:4, meritAid:2, notes:'Large animal hospital.' },
-      'Oklahoma State University':       { vetProgram:1, costScore:4, planB:3, meritAid:3, notes:'Vet health sciences center. Hands-on early.' },
-      'Mississippi State University':    { vetProgram:1, costScore:4, planB:2, meritAid:3, notes:'Accredited CVM. Wildlife & aquatic specialties.' },
-      'University of Illinois':          { vetProgram:3, costScore:3, planB:4, meritAid:2, notes:'Accredited CVM. Strong companion animal.' },
-      'University of Missouri':          { vetProgram:2, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Guaranteed admission track.' },
+      'Michigan State University':       { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Large animal hospital.' },
+      'Oklahoma State University':       { vetProgram:3, costScore:4, planB:3, meritAid:3, notes:'Vet health sciences center. Hands-on early.' },
+      'Mississippi State University':    { vetProgram:3, costScore:4, planB:2, meritAid:3, notes:'Accredited CVM. Wildlife & aquatic specialties.' },
+      'University of Illinois':          { vetProgram:4, costScore:3, planB:4, meritAid:2, notes:'Accredited CVM. Strong companion animal.' },
+      'University of Missouri':          { vetProgram:4, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Guaranteed admission track.' },
       // ── Schools without vet schools ──
       'Penn State University':           { vetProgram:1, costScore:3, planB:5, meritAid:2, notes:'No vet school. Strong Animal Science advising.' },
       'University of Massachusetts Amherst': { vetProgram:1, costScore:3, planB:3, meritAid:2, notes:'No vet school. Pre-vet track available.' },
@@ -8711,7 +8711,7 @@ function gatherAIData() {
         'Far Reach': 'Very low admit probability for this profile (e.g., Cornell)'
       },
       ratingAnchors: {
-        vetProgram: 'Rank-driven from US News Best Veterinary Medicine Programs. 5 = #1-5; 4 = #6-10; 3 = #11-15; 2 = #16-20 or new CVM not yet ranked (Clemson); 1 = #21+ or no vet school on campus.',
+        vetProgram: 'Rank-driven from US News Best Veterinary Medicine Programs. 5 = #1-10; 4 = #11-20; 3 = #21-30; 2 = #31+ or new CVM not yet ranked (Clemson); 1 = no vet school on campus.',
         fit: '5 = strong fit; 3 = neutral; 1 = poor fit / effectively ruled out — manually set based on visits and cultural match',
         planB: '5 = strong across many majors if pre-vet doesn\'t work out; 1 = narrowly useful only for this path',
         cost: '5 = minimal out-of-pocket after merit; 1 = full sticker, no aid',
