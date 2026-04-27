@@ -8346,7 +8346,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v14c';
+const PROMPT_VERSION = 'v14d';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -8373,6 +8373,19 @@ const SYSTEM_PROMPT_V2 = [
   "**Strategic Fit (strategic value).** Each school has a `strategicFit` object with a label (Priority Target / Strong Fit / Happy Landing) computed from four ratings: Program, Fit, Plan B, and Cost (weighted 20/30/30/20), with Fit also acting as a soft gate. This reflects how well the school serves the student's goals — independent of admission chances. The Strategic Fit label is authoritative for the strategic-value axis. Use it when discussing whether a school is worth pursuing. Do not generate your own composite judgments about school quality; reason from the label and its underlying ratings.",
   "",
   "**The two axes are independent.** A Priority Target can be a Reach in Scoir (high-value pursuit with low odds — Cornell is an example). A Happy Landing can be Very Likely (safe outcome but not strategically optimal). Your job is to reason across both dimensions, not to collapse them into a single \"how good is this school\" judgment.",
+  "",
+  "## Tier counts and distribution",
+  "",
+  "The payload includes a `tierDistribution` field with pre-computed, authoritative counts and school lists for every Scoir tier and Strategic Fit tier. Use this field when making any count claim or distribution statement.",
+  "",
+  "Specifically:",
+  "- When stating how many schools are in a tier (e.g., 'Very Likely (2 schools)' or 'your Target tier has 4 schools'), the count comes from `tierDistribution`. Do not count the schools array yourself.",
+  "- When listing the schools in a tier (e.g., 'Auburn and Kentucky in Very Likely'), the list comes from `tierDistribution`. Do not assemble the list by scanning the schools array yourself.",
+  "- When describing the tier shape (e.g., 'Reach-heavy distribution' or 'thin Very Likely tier'), use the counts from `tierDistribution` to verify your characterization is accurate before making it.",
+  "",
+  "This field exists because precise counting from a list of 12 schools is exactly the kind of task language models tend to get wrong. The pre-computed counts remove that risk. Trust them.",
+  "",
+  "Do not contradict the `tierDistribution` field. If your prose says one thing and the field says another, the field is correct. Re-state the count to match the field.",
   "",
   "**When the family questions authoritative data, redirect rather than substitute.**",
   "",
@@ -8535,6 +8548,55 @@ function gatherAIData() {
     r.inTopFive = i < 5;
   });
 
+  // Pre-computed tier distribution: authoritative counts + school lists per
+  // tier, for both Scoir and Strategic Fit. The model gets these directly so
+  // it doesn't have to count by scanning the schools array (a task language
+  // models tend to get wrong).
+  const tierDistribution = {
+    scoir: {
+      veryLikely: { count: 0, schools: [] },
+      likely:     { count: 0, schools: [] },
+      target:     { count: 0, schools: [] },
+      reach:      { count: 0, schools: [] },
+      farReach:   { count: 0, schools: [] }
+    },
+    strategicFit: {
+      priorityTarget: { count: 0, schools: [] },
+      strongFit:      { count: 0, schools: [] },
+      happyLanding:   { count: 0, schools: [] }
+    }
+  };
+  for (const school of rows) {
+    const scoirKey = (school.scoirLabel || '').toLowerCase().replace(/\s+/g, '');
+    if (scoirKey === 'verylikely') {
+      tierDistribution.scoir.veryLikely.count++;
+      tierDistribution.scoir.veryLikely.schools.push(school.name);
+    } else if (scoirKey === 'likely') {
+      tierDistribution.scoir.likely.count++;
+      tierDistribution.scoir.likely.schools.push(school.name);
+    } else if (scoirKey === 'target') {
+      tierDistribution.scoir.target.count++;
+      tierDistribution.scoir.target.schools.push(school.name);
+    } else if (scoirKey === 'reach') {
+      tierDistribution.scoir.reach.count++;
+      tierDistribution.scoir.reach.schools.push(school.name);
+    } else if (scoirKey === 'farreach') {
+      tierDistribution.scoir.farReach.count++;
+      tierDistribution.scoir.farReach.schools.push(school.name);
+    }
+    const sfKey = ((school.strategicFit && school.strategicFit.label) || '').toLowerCase().replace(/\s+/g, '');
+    if (sfKey === 'prioritytarget') {
+      tierDistribution.strategicFit.priorityTarget.count++;
+      tierDistribution.strategicFit.priorityTarget.schools.push(school.name);
+    } else if (sfKey === 'strongfit') {
+      tierDistribution.strategicFit.strongFit.count++;
+      tierDistribution.strategicFit.strongFit.schools.push(school.name);
+    } else if (sfKey === 'happylanding') {
+      tierDistribution.strategicFit.happyLanding.count++;
+      tierDistribution.strategicFit.happyLanding.schools.push(school.name);
+    }
+  }
+
   const sc = data.strategicContext || { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
   const decisionsArr = (sc.currentDecisions || '')
     .split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
@@ -8582,6 +8644,7 @@ function gatherAIData() {
     },
     schools: rows,
     candidatePool: buildCandidatePool(),
+    tierDistribution: tierDistribution,
     rubrics: {
       // Strategic Fit v1 — composite label computed by the dashboard.
       // Admission probability is tracked separately in each school's scoirLabel.
