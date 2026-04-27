@@ -8441,13 +8441,6 @@ const SYSTEM_PROMPT_V2 = [
   "Do not restate the payload back to the family. They know their own data. Your value is analysis, not summarization."
 ].join('\n');
 
-// Format category as title case (Reach/Match/Safety) for the AI payload —
-// the in-app badges use uppercase but the rubric/spec uses title case.
-function formatCategory(c) {
-  if (!c) return 'Match';
-  return c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
-}
-
 function gatherAIData() {
   const act = getStudentACT();
   const gpa = getStudentGPA();
@@ -8628,7 +8621,6 @@ function aiCacheFingerprint(aiData) {
     vd: s.visitData,
     cs: s.combinedScore,
     ce: s.combinedScoreIsEstimated,
-    cat: s.category,
     sc: s.scoirLabel,
     sf: s.strategicFit && s.strategicFit.label,
     r: [s.ratings.vetProgram.score, s.ratings.fit.score, s.ratings.planB.score, s.ratings.cost.score, s.ratings.meritAid.score],
