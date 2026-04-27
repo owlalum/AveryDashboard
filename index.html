@@ -4025,6 +4025,22 @@ function runMigrations() {
     data.strategicFitV1MigrationApplied = true;
   }
 
+  // ── US News Vet 2026 rankings sync ──
+  // The Ag Program Rankings tab reads s.vetSchoolRank (cached on each saved
+  // school) before falling back to schoolDB.vetSchoolRank (the master). When
+  // schoolDB ranks change (e.g., the US News 2026 refresh: Cornell #1→#2,
+  // Ohio State #4→#9, etc.), saved schools display stale numbers until the
+  // cache is re-synced. Run once to align s.vetSchoolRank to the current
+  // schoolDB value for every school in the user's list. Inline edits made
+  // after this point still win (write to s.vetSchoolRank and persist).
+  if (!data.usNewsVet2026MigrationApplied) {
+    (data.schools || []).forEach(s => {
+      const db = schoolDB[s.name];
+      if (db && db.vetSchoolRank) s.vetSchoolRank = db.vetSchoolRank;
+    });
+    data.usNewsVet2026MigrationApplied = true;
+  }
+
   // ── Cost rubric v2 one-time migration ──
   // The Cost rubric was re-drafted in April 2026 to reflect 2026-27 tuition
   // inflation and shift framing from "affordability gate" to "value tier"
