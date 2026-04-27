@@ -8596,6 +8596,7 @@ function gatherAIData() {
       tierDistribution.strategicFit.happyLanding.schools.push(school.name);
     }
   }
+  console.log('[TIER DIAG] tierDistribution:', JSON.stringify(tierDistribution, null, 2)); // TEMP DIAGNOSTIC — remove after verification
 
   const sc = data.strategicContext || { currentDecisions: '', userQuestionForThisRun: '', recentChanges: '' };
   const decisionsArr = (sc.currentDecisions || '')
