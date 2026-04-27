@@ -8674,8 +8674,8 @@ function validateAIResponse(text, aiData) {
   // of these contexts is being used as a reference value (scholarship
   // threshold, hypothetical "if she drops to X"), not asserted as the
   // student's actual stat — so it shouldn't count as a fabrication.
-  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?)\b/i;
-  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below)\b/i;
+  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at))\b/i;
+  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal)\b/i;
   if (actualGPA != null) {
     const gpaNumRe = /\b([234]\.\d{1,2})\b/g;
     let m;
