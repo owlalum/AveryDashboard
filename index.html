@@ -8346,7 +8346,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v14d';
+const PROMPT_VERSION = 'v14e';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -8386,6 +8386,19 @@ const SYSTEM_PROMPT_V2 = [
   "This field exists because precise counting from a list of 12 schools is exactly the kind of task language models tend to get wrong. The pre-computed counts remove that risk. Trust them.",
   "",
   "Do not contradict the `tierDistribution` field. If your prose says one thing and the field says another, the field is correct. Re-state the count to match the field.",
+  "",
+  "### Cross-axis claims",
+  "",
+  "When making any claim that combines a Scoir tier and a Strategic Fit tier — for example, 'your Priority Targets that are Reaches' or 'the Happy Landings in your Likely tier' — use `tierDistribution.intersections` for both the count and the school list.",
+  "",
+  "The intersections field has pre-computed sets for every combination. Examples:",
+  "- `tierDistribution.intersections.reach_priorityTarget.schools` lists schools that are both Reach in Scoir AND Priority Target in Strategic Fit",
+  "- `tierDistribution.intersections.likely_happyLanding.schools` lists schools that are both Likely in Scoir AND Happy Landing in Strategic Fit",
+  "- `tierDistribution.intersections.veryLikely_strongFit.schools` lists schools that are both Very Likely in Scoir AND Strong Fit in Strategic Fit",
+  "",
+  "Do not assemble cross-axis intersections by mentally filtering the per-axis lists. Read the intersection field directly. The intersections are pre-computed precisely because cross-axis filtering is the kind of operation language models tend to get wrong.",
+  "",
+  "If a claim names schools as belonging to both an axis A tier and an axis B tier, every named school must appear in `tierDistribution.intersections[axisA_axisB].schools`. If a school you want to name is not in that intersection list, you have categorized it wrong — re-check before stating the claim.",
   "",
   "**When the family questions authoritative data, redirect rather than substitute.**",
   "",
@@ -8594,6 +8607,42 @@ function gatherAIData() {
     } else if (sfKey === 'happylanding') {
       tierDistribution.strategicFit.happyLanding.count++;
       tierDistribution.strategicFit.happyLanding.schools.push(school.name);
+    }
+  }
+  // Cross-axis intersections: pre-computed sets for every Scoir × Strategic Fit
+  // combination. Read directly when making cross-axis claims; cross-axis
+  // filtering from per-axis lists is the kind of operation language models
+  // tend to get wrong.
+  tierDistribution.intersections = {
+    veryLikely_priorityTarget: { count: 0, schools: [] },
+    veryLikely_strongFit:      { count: 0, schools: [] },
+    veryLikely_happyLanding:   { count: 0, schools: [] },
+    likely_priorityTarget:     { count: 0, schools: [] },
+    likely_strongFit:          { count: 0, schools: [] },
+    likely_happyLanding:       { count: 0, schools: [] },
+    target_priorityTarget:     { count: 0, schools: [] },
+    target_strongFit:          { count: 0, schools: [] },
+    target_happyLanding:       { count: 0, schools: [] },
+    reach_priorityTarget:      { count: 0, schools: [] },
+    reach_strongFit:           { count: 0, schools: [] },
+    reach_happyLanding:        { count: 0, schools: [] },
+    farReach_priorityTarget:   { count: 0, schools: [] },
+    farReach_strongFit:        { count: 0, schools: [] },
+    farReach_happyLanding:     { count: 0, schools: [] }
+  };
+  const scoirCamelMap = { verylikely: 'veryLikely', likely: 'likely', target: 'target', reach: 'reach', farreach: 'farReach' };
+  const sfCamelMap    = { prioritytarget: 'priorityTarget', strongfit: 'strongFit', happylanding: 'happyLanding' };
+  for (const school of rows) {
+    const scoirKey = (school.scoirLabel || '').toLowerCase().replace(/\s+/g, '');
+    const sfKey    = ((school.strategicFit && school.strategicFit.label) || '').toLowerCase().replace(/\s+/g, '');
+    const scoirCamel = scoirCamelMap[scoirKey];
+    const sfCamel    = sfCamelMap[sfKey];
+    if (scoirCamel && sfCamel) {
+      const ixKey = scoirCamel + '_' + sfCamel;
+      if (tierDistribution.intersections[ixKey]) {
+        tierDistribution.intersections[ixKey].count++;
+        tierDistribution.intersections[ixKey].schools.push(school.name);
+      }
     }
   }
   console.log('[TIER DIAG] tierDistribution:', JSON.stringify(tierDistribution, null, 2)); // TEMP DIAGNOSTIC — remove after verification
