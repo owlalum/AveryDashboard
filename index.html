@@ -2658,7 +2658,7 @@
             <div class="st-label">ACT Composite</div>
             <div class="st-value"><span class="act-edit" data-act="composite" contenteditable="true">27</span></div>
             <div class="st-foot" data-act="composite-pct">(87th %ile)</div>
-            <div class="st-foot" data-act="composite-recompute" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">w/ Sci 30.5 &middot; w/o Sci 29.67</div>
+            <div class="st-foot" data-act="composite-recompute" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">w/ Sci 31 &middot; w/o Sci 30</div>
           </div>
           <div class="stat-tile plum">
             <div class="st-label">Target ACT</div>
@@ -2948,8 +2948,8 @@
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Math</td><td data-act="math">28 (90th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Reading</td><td data-act="reading">30 (90th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Science</td><td data-act="science">33 (97th %ile)</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (with Science)</td><td data-act="composite-with-sci">30.5 &rarr; 31</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (without Science)</td><td data-act="composite-without-sci">29.67 &rarr; 30</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (with Science)</td><td data-act="composite-with-sci">31</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (without Science)</td><td data-act="composite-without-sci">30</td></tr>
         <tr><td colspan="2" style="padding:4px 12px;color:var(--muted);font-size:0.82rem;font-style:italic;">UGA and UTK use the higher of the two recomputed composites (Avery: 31). Other schools use the reported composite (30). Virginia Tech only evaluates English and Math sections.</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Target ACT</td><td>32 (97th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Residency</td><td>Georgia (OOS everywhere except UGA)</td></tr>
@@ -4427,8 +4427,8 @@ function renderProfile() {
     const perSchoolEl = document.getElementById('actPerSchool');
     const c = computeACTComposites(act);
     if (recomputeFootEl) {
-      if (c && c.withScienceAvg != null) {
-        recomputeFootEl.textContent = 'w/ Sci ' + c.withScienceAvg + ' · w/o Sci ' + c.withoutScienceAvg;
+      if (c && c.withScienceRounded != null) {
+        recomputeFootEl.textContent = 'w/ Sci ' + c.withScienceRounded + ' · w/o Sci ' + c.withoutScienceRounded;
       } else { recomputeFootEl.textContent = ''; }
     }
     if (perSchoolEl && c) {
@@ -4466,13 +4466,13 @@ function renderProfile() {
     const wSci  = it.querySelector('[data-act="composite-with-sci"]');
     const woSci = it.querySelector('[data-act="composite-without-sci"]');
     if (wSci) {
-      wSci.textContent = (itComp && itComp.withScienceAvg != null)
-        ? itComp.withScienceAvg + ' → ' + itComp.withScienceRounded
+      wSci.textContent = (itComp && itComp.withScienceRounded != null)
+        ? String(itComp.withScienceRounded)
         : '—';
     }
     if (woSci) {
-      woSci.textContent = (itComp && itComp.withoutScienceAvg != null)
-        ? itComp.withoutScienceAvg + ' → ' + itComp.withoutScienceRounded
+      woSci.textContent = (itComp && itComp.withoutScienceRounded != null)
+        ? String(itComp.withoutScienceRounded)
         : '—';
     }
     it.querySelector('[data-field="gpa"]').textContent = gpa || '—';
