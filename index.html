@@ -4052,6 +4052,24 @@ function runMigrations() {
     data.usNewsVet2026MigrationApplied = true;
   }
 
+  // ── Academic stats sync (May 2026) ──
+  // Same caching problem as vetSchoolRank: testReq, avgGPA, acceptRate, OOS
+  // accept rate, and US News overall/public ranks are all cached on each
+  // saved school via the original backfill. When schoolDB values change
+  // (e.g., UGA testReq 'ACT 32-35' → 'ACT 31-34', UGA avgGPA 4.22 → 4.27),
+  // the cached values mask the schoolDB updates on the School Comparison
+  // page. Run once to re-align the academic-stats fields with the master.
+  // Skips notes/lastVerified (preserves user edits / metadata).
+  if (!data.academicStatsSync2026MigrationApplied) {
+    const fieldsToSync = ['testReq', 'avgGPA', 'acceptRate', 'oosAcceptRate', 'usNewsOverall', 'usNewsPublic'];
+    (data.schools || []).forEach(s => {
+      const db = schoolDB[s.name];
+      if (!db) return;
+      fieldsToSync.forEach(f => { if (db[f]) s[f] = db[f]; });
+    });
+    data.academicStatsSync2026MigrationApplied = true;
+  }
+
   // ── Cost rubric v2 one-time migration ──
   // The Cost rubric was re-drafted in April 2026 to reflect 2026-27 tuition
   // inflation and shift framing from "affordability gate" to "value tier"
