@@ -2658,6 +2658,7 @@
             <div class="st-label">ACT Composite</div>
             <div class="st-value"><span class="act-edit" data-act="composite" contenteditable="true">27</span></div>
             <div class="st-foot" data-act="composite-pct">(87th %ile)</div>
+            <div class="st-foot" data-act="composite-recompute" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">w/ Sci 30.5 &middot; w/o Sci 29.67</div>
           </div>
           <div class="stat-tile plum">
             <div class="st-label">Target ACT</div>
@@ -2672,6 +2673,13 @@
           <span class="act-sub">Math <b><span class="act-edit" data-act="math" contenteditable="true">28</span></b><small data-act="math-pct">(90th)</small></span>
           <span class="act-sub">Read <b><span class="act-edit" data-act="reading" contenteditable="true">30</span></b><small data-act="reading-pct">(90th)</small></span>
           <span class="act-sub">Sci <b><span class="act-edit" data-act="science" contenteditable="true">33</span></b><small data-act="science-pct">(97th)</small></span>
+        </div>
+        <div class="act-breakdown" id="actPerSchool" style="margin-top:6px;">
+          <span class="act-title">Per-school composite &nearr;</span>
+          <span class="act-sub">UGA <b data-per-school="uga">31</b></span>
+          <span class="act-sub">UTK <b data-per-school="utk">31</b></span>
+          <span class="act-sub">VT <b data-per-school="vt">E+M only</b></span>
+          <span class="act-sub">Others <b data-per-school="others">30</b></span>
         </div>
       </div>
     </section>
@@ -2940,6 +2948,9 @@
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Math</td><td data-act="math">28 (90th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Reading</td><td data-act="reading">30 (90th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Science</td><td data-act="science">33 (97th %ile)</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (with Science)</td><td data-act="composite-with-sci">30.5 &rarr; 31</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (without Science)</td><td data-act="composite-without-sci">29.67 &rarr; 30</td></tr>
+        <tr><td colspan="2" style="padding:4px 12px;color:var(--muted);font-size:0.82rem;font-style:italic;">UGA and UTK use the higher of the two recomputed composites (Avery: 31). Other schools use the reported composite (30). Virginia Tech only evaluates English and Math sections.</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Target ACT</td><td>32 (97th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Residency</td><td>Georgia (OOS everywhere except UGA)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Intended Major</td><td>Pre-Veterinary / Animal Science</td></tr>
@@ -4340,6 +4351,42 @@ const ACT_PERCENTILES = {
   26:82,25:78,24:74,23:68,22:63,21:57,20:51,19:44,18:38,17:31,16:25
 };
 function actPercentile(score) { return ACT_PERCENTILES[score] || '—'; }
+
+// Compute alternative ACT composites and per-school effective composites from
+// subscores. UGA and UTK publish methodologies that recompute the composite
+// using a subset of sections; this helper surfaces those values for the
+// profile display so Avery always sees her per-school number.
+function computeACTComposites(act) {
+  const e = parseInt(act.english,  10);
+  const m = parseInt(act.math,     10);
+  const r = parseInt(act.reading,  10);
+  const s = parseInt(act.science,  10);
+  const reported = parseInt(act.composite, 10) || null;
+  if (!e || !m || !r) return null;
+  const withScienceAvg    = !isNaN(s) ? (e + m + r + s) / 4 : null;
+  const withoutScienceAvg = (e + m + r) / 3;
+  const round1 = (n) => n == null ? null : Math.round(n * 100) / 100;
+  const withScienceRounded    = withScienceAvg != null ? Math.round(withScienceAvg) : null;
+  const withoutScienceRounded = Math.round(withoutScienceAvg);
+  return {
+    reported: reported,
+    withScienceAvg:        round1(withScienceAvg),
+    withoutScienceAvg:     round1(withoutScienceAvg),
+    withScienceRounded:    withScienceRounded,
+    withoutScienceRounded: withoutScienceRounded,
+    // UGA: best of with/without composites (rounded). UTK: includes Science
+    // only if it raises the score (so same as max of with vs without).
+    ugaComposite: withScienceRounded != null
+      ? Math.max(withScienceRounded, withoutScienceRounded)
+      : withoutScienceRounded,
+    utkComposite: withScienceRounded != null
+      ? Math.max(withScienceRounded, withoutScienceRounded)
+      : withoutScienceRounded,
+    // Virginia Tech: only E + M evaluated (informational, not a true composite)
+    vtEnglish: e,
+    vtMath: m
+  };
+}
 function getStudentACT() { return data.actScores || { composite:0, english:0, math:0, reading:0, science:0 }; }
 function getStudentGPA() { return data.gpa || 0; }
 function getStudentName() { return data.studentName || ''; }
@@ -4375,6 +4422,25 @@ function renderProfile() {
     pc.querySelector('[data-act="reading-pct"]').textContent = act.reading ? '(' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)' : '';
     pc.querySelector('[data-act="science"]').textContent = act.science || '—';
     pc.querySelector('[data-act="science-pct"]').textContent = act.science ? '(' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '';
+    // Recomputed composites + per-school composite display
+    const recomputeFootEl = pc.querySelector('[data-act="composite-recompute"]');
+    const perSchoolEl = document.getElementById('actPerSchool');
+    const c = computeACTComposites(act);
+    if (recomputeFootEl) {
+      if (c && c.withScienceAvg != null) {
+        recomputeFootEl.textContent = 'w/ Sci ' + c.withScienceAvg + ' · w/o Sci ' + c.withoutScienceAvg;
+      } else { recomputeFootEl.textContent = ''; }
+    }
+    if (perSchoolEl && c) {
+      const ugaEl    = perSchoolEl.querySelector('[data-per-school="uga"]');
+      const utkEl    = perSchoolEl.querySelector('[data-per-school="utk"]');
+      const vtEl     = perSchoolEl.querySelector('[data-per-school="vt"]');
+      const othersEl = perSchoolEl.querySelector('[data-per-school="others"]');
+      if (ugaEl)    ugaEl.textContent    = c.ugaComposite != null ? String(c.ugaComposite) : '—';
+      if (utkEl)    utkEl.textContent    = c.utkComposite != null ? String(c.utkComposite) : '—';
+      if (vtEl)     vtEl.textContent     = (c.vtEnglish || '?') + '+' + (c.vtMath || '?');
+      if (othersEl) othersEl.textContent = c.reported != null ? String(c.reported) : '—';
+    }
     pc.querySelector('[data-field="gpa"]').textContent = gpa || '—';
     const hopeEl = pc.querySelector('[data-field="hopeGPA"]');
     if (hopeEl) hopeEl.textContent = data.hopeGPA || '—';
@@ -4395,6 +4461,20 @@ function renderProfile() {
     it.querySelector('[data-act="math"]').textContent = act.math ? act.math + ' (' + actPercentile(act.math) + getSuffix(actPercentile(act.math)) + ' %ile)' : '—';
     it.querySelector('[data-act="reading"]').textContent = act.reading ? act.reading + ' (' + actPercentile(act.reading) + getSuffix(actPercentile(act.reading)) + ' %ile)' : '—';
     it.querySelector('[data-act="science"]').textContent = act.science ? act.science + ' (' + actPercentile(act.science) + getSuffix(actPercentile(act.science)) + ' %ile)' : '—';
+    // Recomputed composite rows for the profile table
+    const itComp = computeACTComposites(act);
+    const wSci  = it.querySelector('[data-act="composite-with-sci"]');
+    const woSci = it.querySelector('[data-act="composite-without-sci"]');
+    if (wSci) {
+      wSci.textContent = (itComp && itComp.withScienceAvg != null)
+        ? itComp.withScienceAvg + ' → ' + itComp.withScienceRounded
+        : '—';
+    }
+    if (woSci) {
+      woSci.textContent = (itComp && itComp.withoutScienceAvg != null)
+        ? itComp.withoutScienceAvg + ' → ' + itComp.withoutScienceRounded
+        : '—';
+    }
     it.querySelector('[data-field="gpa"]').textContent = gpa || '—';
     const hopeInfoEl = it.querySelector('[data-field="hopeGPA-info"]');
     if (hopeInfoEl) {
