@@ -4054,6 +4054,26 @@ function runMigrations() {
     data.usNewsVet2026MigrationApplied = true;
   }
 
+  // ── Scoir label update June 2026 ──
+  // With Avery's new weighted GPA (3.8) entered in Scoir, two schools'
+  // admission-probability labels shifted upward. All others held steady.
+  // Sentinel on `data` so it travels via Firestore sync and runs once.
+  if (!data.scoirLabelJune2026MigrationApplied) {
+    const scoirUpdates = {
+      'Texas A&M University': 'Likely',  // was Target
+      'University of Georgia': 'Target'  // was Reach
+    };
+    (data.schools || []).forEach(s => {
+      if (scoirUpdates[s.name]) s.scoirLabel = scoirUpdates[s.name];
+    });
+    if (data.rankings) {
+      Object.keys(scoirUpdates).forEach(name => {
+        if (data.rankings[name]) data.rankings[name].scoirLabel = scoirUpdates[name];
+      });
+    }
+    data.scoirLabelJune2026MigrationApplied = true;
+  }
+
   // ── GPA update June 2026 ──
   // Avery's weighted GPA updated 3.74 → 3.8; unweighted GPA introduced at
   // 3.66 (new field, did not previously exist on the dashboard — HOPE GPA
