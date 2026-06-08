@@ -2648,6 +2648,7 @@
             <div class="st-label">Weighted GPA</div>
             <div class="st-value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></div>
             <div class="st-foot">current weighted</div>
+            <div class="st-foot" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">Unweighted: <span class="act-edit" data-field="unweightedGPA" contenteditable="true">3.66</span></div>
           </div>
           <div class="stat-tile coral">
             <div class="st-label">HOPE GPA</div>
@@ -2942,6 +2943,7 @@
       <p>All calculations use the student's current stats as inputs:</p>
       <table id="profileInfoTable" style="width:100%;margin-top:10px;font-size:0.88rem;">
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Weighted GPA</td><td data-field="gpa">3.85</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Unweighted GPA</td><td data-field="unweightedGPA-info">3.66</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">HOPE GPA</td><td data-field="hopeGPA-info">3.609</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite</td><td data-act="composite">27 (87th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">English</td><td data-act="english">23 (73rd %ile)</td></tr>
@@ -4460,6 +4462,8 @@ function renderProfile() {
       if (othersEl) othersEl.textContent = c.reported != null ? String(c.reported) : '—';
     }
     pc.querySelector('[data-field="gpa"]').textContent = gpa || '—';
+    const unwEl = pc.querySelector('[data-field="unweightedGPA"]');
+    if (unwEl) unwEl.textContent = data.unweightedGPA || '—';
     const hopeEl = pc.querySelector('[data-field="hopeGPA"]');
     if (hopeEl) hopeEl.textContent = data.hopeGPA || '—';
     const hopeStatusEl = pc.querySelector('[data-field="hopeGPA-status"]');
@@ -4494,6 +4498,8 @@ function renderProfile() {
         : '—';
     }
     it.querySelector('[data-field="gpa"]').textContent = gpa || '—';
+    const unwInfoEl = it.querySelector('[data-field="unweightedGPA-info"]');
+    if (unwInfoEl) unwInfoEl.textContent = data.unweightedGPA || '—';
     const hopeInfoEl = it.querySelector('[data-field="hopeGPA-info"]');
     if (hopeInfoEl) {
       const hg = data.hopeGPA || 0;
@@ -10463,6 +10469,12 @@ document.getElementById('profileCard').addEventListener('blur', function(e) {
     const val = parseFloat(el.textContent.trim());
     if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
     data.hopeGPA = val;
+    saveData();
+    onScoresChanged();
+  } else if (gpaField === 'unweightedGPA') {
+    const val = parseFloat(el.textContent.trim());
+    if (isNaN(val) || val < 0 || val > 5.0) { renderProfile(); return; }
+    data.unweightedGPA = val;
     saveData();
     onScoresChanged();
   }
