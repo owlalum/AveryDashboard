@@ -4054,6 +4054,17 @@ function runMigrations() {
     data.usNewsVet2026MigrationApplied = true;
   }
 
+  // ── GPA update June 2026 ──
+  // Avery's weighted GPA updated 3.74 → 3.8; unweighted GPA introduced at
+  // 3.66 (new field, did not previously exist on the dashboard — HOPE GPA
+  // is a Georgia-specific calculation, not a true unweighted GPA). Sentinel
+  // on `data` so it travels via Firestore sync and runs exactly once.
+  if (!data.gpaJune2026MigrationApplied) {
+    data.gpa = 3.8;
+    data.unweightedGPA = 3.66;
+    data.gpaJune2026MigrationApplied = true;
+  }
+
   // ── Academic stats sync (May 2026) ──
   // Same caching problem as vetSchoolRank: testReq, avgGPA, acceptRate, OOS
   // accept rate, and US News overall/public ranks are all cached on each
