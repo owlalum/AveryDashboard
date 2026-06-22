@@ -10565,6 +10565,11 @@ docRef.onSnapshot(
 );
 
 // ─── Changelog / What's New ───
+// MAINTENANCE: when shipping a user-facing change (cost/admit/ranking
+// updates, new features, corrections Avery would notice), add a new entry
+// at the TOP of this array — Avery-facing, plain English, outcome-focused
+// (not a technical commit log). Bump the version (newest-first). Skip
+// internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
   {
     version: '6.3',
