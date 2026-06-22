@@ -4215,17 +4215,28 @@ function runMigrations() {
     newFields.forEach(f => { if (!s[f] && dbEntry[f]) s[f] = dbEntry[f]; });
   });
 
-  // Sync notes from schoolDB (honors program info)
-  if (!localStorage.getItem('notesV2')) {
+  // NOTE: the four migrations below were originally gated on localStorage
+  // sentinels. That caused them to SKIP on the Firestore-loaded dataset:
+  // runMigrations() runs first on local data (setting the localStorage flag),
+  // then again after `data = remote` — where the flag is already set, so the
+  // remote dataset was never migrated. Converted to data-level sentinels
+  // (consistent with strategicFitV1/usNewsVet2026/etc.) so each runs once per
+  // dataset and the flag travels with the data across Firestore syncs. All
+  // four are reference-data syncs/backfills from schoolDB (the master), not
+  // user-authored content — safe to (re-)apply.
+
+  // Sync notes from schoolDB (honors program info, prose corrections).
+  // Re-running propagates schoolDB.notes fixes to the cached s.notes copies.
+  if (!data.notesSyncMigrationApplied) {
     data.schools.forEach(s => {
       const dbEntry = schoolDB[s.name];
       if (dbEntry && dbEntry.notes && dbEntry.notes !== s.notes) s.notes = dbEntry.notes;
     });
-    localStorage.setItem('notesV2', '1');
+    data.notesSyncMigrationApplied = true;
   }
 
-  // Backfill US News rankings
-  if (!localStorage.getItem('rankingsDataV2')) {
+  // Backfill US News rankings (conditional — fills missing fields only)
+  if (!data.rankingsBackfillMigrationApplied) {
     data.schools.forEach(s => {
       const dbEntry = schoolDB[s.name];
       if (!dbEntry) return;
@@ -4233,11 +4244,13 @@ function runMigrations() {
       if (!s.usNewsPublic && dbEntry.usNewsPublic) s.usNewsPublic = dbEntry.usNewsPublic;
       if (!s.vetSchoolRank && dbEntry.vetSchoolRank) s.vetSchoolRank = dbEntry.vetSchoolRank;
     });
-    localStorage.setItem('rankingsDataV2', '1');
+    data.rankingsBackfillMigrationApplied = true;
   }
 
-  // Migration: remove SAT from testReq, keep ACT only. Reset all to DB values.
-  if (!localStorage.getItem('actOnlyV2')) {
+  // Remove SAT from testReq, keep ACT only; reset to DB values. (For in-DB
+  // schools this overlaps academicStatsSync2026; the else-branch still handles
+  // SAT-strip for any custom school not in schoolDB.)
+  if (!data.actOnlyMigrationApplied) {
     data.schools.forEach(s => {
       const dbEntry = schoolDB[s.name];
       if (dbEntry) s.testReq = dbEntry.testReq;
@@ -4246,13 +4259,13 @@ function runMigrations() {
         if (m) s.testReq = m[0];
       }
     });
-    localStorage.setItem('actOnlyV2', '1');
+    data.actOnlyMigrationApplied = true;
   }
 
-  // One-time: set HOPE GPA default if not yet set by user
-  if (!localStorage.getItem('hopeGPAv1')) {
+  // Set HOPE GPA default if not yet set by user
+  if (!data.hopeGPADefaultMigrationApplied) {
     if (!data.hopeGPA || data.hopeGPA === 0) data.hopeGPA = 3.657;
-    localStorage.setItem('hopeGPAv1', '1');
+    data.hopeGPADefaultMigrationApplied = true;
   }
 
   // Save migrations to localStorage only (not Firestore)
