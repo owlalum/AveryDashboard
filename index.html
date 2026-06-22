@@ -2652,7 +2652,7 @@
           </div>
           <div class="stat-tile coral">
             <div class="st-label">HOPE GPA</div>
-            <div class="st-value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.609</span></div>
+            <div class="st-value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.657</span></div>
             <div class="st-foot" data-field="hopeGPA-status">&mdash;</div>
           </div>
           <div class="stat-tile sun">
@@ -2943,7 +2943,7 @@
       <table id="profileInfoTable" style="width:100%;margin-top:10px;font-size:0.88rem;">
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;width:200px;">Weighted GPA</td><td data-field="gpa">3.85</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Unweighted GPA</td><td data-field="unweightedGPA-info">3.66</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">HOPE GPA</td><td data-field="hopeGPA-info">3.609</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">HOPE GPA</td><td data-field="hopeGPA-info">3.657</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite</td><td data-act="composite">27 (87th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">English</td><td data-act="english">23 (73rd %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;padding-left:16px;font-weight:400;">Math</td><td data-act="math">28 (90th %ile)</td></tr>
@@ -4084,6 +4084,15 @@ function runMigrations() {
     data.gpaJune2026MigrationApplied = true;
   }
 
+  // ── HOPE GPA update (junior-year grades, 2026) ──
+  // Avery's HOPE GPA recalculated to 3.657 through junior year (was 3.609).
+  // Still HOPE-eligible (3.0+) but below the 3.70 Zell Miller threshold.
+  // Sentinel on `data` so it travels via Firestore sync and runs once.
+  if (!data.hopeGPAJuniorYearMigrationApplied) {
+    data.hopeGPA = 3.657;
+    data.hopeGPAJuniorYearMigrationApplied = true;
+  }
+
   // ── Academic stats sync (May 2026) ──
   // Same caching problem as vetSchoolRank: testReq, avgGPA, acceptRate, OOS
   // accept rate, and US News overall/public ranks are all cached on each
@@ -4139,7 +4148,7 @@ function runMigrations() {
   }
 
   if (!data.gpa) data.gpa = 0;
-  if (data.hopeGPA === undefined) data.hopeGPA = 3.609;
+  if (data.hopeGPA === undefined) data.hopeGPA = 3.657;
   if (!data.studentName) data.studentName = '';
   if (data.currentGrade === undefined) data.currentGrade = 'junior';
   // v9: split graduationYear into HS graduation + college enrollment (can diverge via gap year)
@@ -4224,7 +4233,7 @@ function runMigrations() {
 
   // One-time: set HOPE GPA default if not yet set by user
   if (!localStorage.getItem('hopeGPAv1')) {
-    if (!data.hopeGPA || data.hopeGPA === 0) data.hopeGPA = 3.609;
+    if (!data.hopeGPA || data.hopeGPA === 0) data.hopeGPA = 3.657;
     localStorage.setItem('hopeGPAv1', '1');
   }
 
@@ -6974,7 +6983,7 @@ function getRankingForSchool(name) {
     // Pre-fill from spreadsheet data for known schools
     const presets = {
       // ── Top-13 schools from Executive Summary / Financial Analysis ──
-      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$9K/yr, 90% of tuition — fees not covered). Zell Miller requires 3.70 HOPE GPA (currently 3.609). 3+1 accelerated DVM pathway (Animal Health major → apply to CVM after 3 yrs; accelerated track, not a guaranteed seat).' },
+      'University of Georgia':           { vetProgram:5, costScore:5, planB:4, meritAid:4, notes:'In-state HOPE Scholarship (~$9K/yr, 90% of tuition — fees not covered). Zell Miller requires 3.70 HOPE GPA (currently 3.657). 3+1 accelerated DVM pathway (Animal Health major → apply to CVM after 3 yrs; accelerated track, not a guaranteed seat).' },
       'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit — but a non-resident tuition WAIVER requires ≥$4K/yr in competitive TAMU scholarships, so merit is the lever for affordability. Scholarship priority deadline Dec 1 (no separate app). Freshman ANSC Honors wants 28 ACT AND top-10% rank — verify Avery\'s rank.' },
       'Purdue University':               { vetProgram:4, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
       'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. #9 in US News 2026 (down from #4).' },
@@ -9734,8 +9743,8 @@ function initDefaultScholarships() {
     { id: uid(), section:'prevet', name:'Georgia VMA Foundation Scholarships', school:'Georgia', amount:'Varies', deadline:'Varies', essayReq:true, separateApp:true, status:'Not Started', notes:'Contact GVMA directly; may be for enrolled vet students only', url:'https://www.gvma.net/' },
     // ── External & National ──
     { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools', url:'https://studentaid.gov/h/apply-for-aid/fafsa' },
-    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 26+ (Georgia raised from 25 in 2023). Avery\'s HOPE GPA (3.609) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
-    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'90% of tuition at GA publics (~$9,031/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.609 HOPE GPA. Covers tuition only — fees ($1,458) not included.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
+    { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 26+ (Georgia raised from 25 in 2023). Avery\'s HOPE GPA (3.657) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
+    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'90% of tuition at GA publics (~$9,031/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.657 HOPE GPA. Covers tuition only — fees ($1,458) not included.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
     { id: uid(), section:'external', name:'Coca-Cola Scholars Program', school:'National', amount:'$20,000 (150 awards)', deadline:'2026-09-30', essayReq:true, separateApp:true, status:'Not Started', notes:'Highly competitive national award; apply Aug-Sep of senior year', url:'https://www.coca-colascholarsfoundation.org/apply/' },
     { id: uid(), section:'external', name:'Elks Most Valuable Student', school:'National', amount:'$4,000-$30,000 over 4 years', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'500 awards nationwide; leadership and financial need', url:'https://www.elks.org/scholars/scholarships/mvs.cfm' },
     { id: uid(), section:'external', name:'National FFA Scholarship Program', school:'National', amount:'Up to $10,000', deadline:'2027-01-15', essayReq:true, separateApp:true, status:'Not Started', notes:'For FFA members; 100+ sponsors; ag/animal science focus', url:'https://www.ffa.org/participate/grants-and-scholarships/scholarships/' },
