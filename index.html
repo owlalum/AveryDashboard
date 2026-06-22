@@ -10630,8 +10630,9 @@ docRef.onSnapshot(
       // Either way (other than the guarded-return path above), this snapshot
       // confirms what's in remote right now. Advance our concurrency baseline
       // so the next save won't be flagged as a conflict against state we've
-      // already observed.
-      lastSyncedRemoteTs = remoteTs;
+      // already observed. Use Math.max so an out-of-order or cached snapshot
+      // delivering an older timestamp can't move the baseline backward.
+      lastSyncedRemoteTs = Math.max(lastSyncedRemoteTs, remoteTs);
     }
 
     firestoreSyncEnabled = true;
