@@ -10608,16 +10608,28 @@ docRef.onSnapshot(
       const remoteTs = remote.lastModified || 0;
       const localTs = data.lastModified || 0;
       if (remoteTs > localTs) {
-        // Guard: if a debounced local save is pending, accepting remote here
-        // would clobber the user's unpushed edit. Refuse the overwrite, show
-        // the conflict banner, and leave lastSyncedRemoteTs un-advanced so
-        // the upcoming transactional save will itself detect the conflict
-        // and refuse rather than pushing over another session's newer state.
-        if (saveDebounceTimer !== null) {
+        // Guard: don't overwrite the user's work mid-flight. Two cases:
+        //  (1) a debounced local save is pending (an unpushed edit sits in
+        //      `data`), or
+        //  (2) the user is actively focused in an editable field whose value
+        //      hasn't been saved yet — many fields commit on blur, so
+        //      saveDebounceTimer can be null while text is still in the box;
+        //      renderAll() would revert their typing.
+        // Previously only case (1) was guarded, and only the Strategic Context
+        // textareas had a focus-guard inside their renderer — so an active edit
+        // in a school note, ranking descriptor, or essay box could be silently
+        // reverted by a cross-session write. In either case, refuse the
+        // overwrite, show the conflict banner, and leave lastSyncedRemoteTs
+        // un-advanced so the upcoming save transaction also detects the
+        // conflict rather than pushing over newer remote state.
+        const ae = document.activeElement;
+        const userIsEditing = !!ae && (ae.isContentEditable || ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA');
+        if (saveDebounceTimer !== null || userIsEditing) {
           console.warn(
-            'onSnapshot: remote is newer but a local save is pending. ' +
-            'Skipping local overwrite to preserve unpushed edit. ' +
-            'Showing conflict banner so user can reload after redoing their change.'
+            'onSnapshot: remote is newer but a local edit is in flight (' +
+            (saveDebounceTimer !== null ? 'pending save' : 'active edit') +
+            '). Skipping local overwrite to preserve the unsaved change; ' +
+            'showing conflict banner so the user can reload after redoing it.'
           );
           showConflictBanner();
           updateSyncIndicator('error');
