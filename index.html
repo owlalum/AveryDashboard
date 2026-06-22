@@ -3529,10 +3529,41 @@ function restoreFromJSON(input) {
         alert('Invalid backup file — missing schools data.');
         return;
       }
+      // Shape sanity: collections, when present, must be the right type.
+      // Blocks a malformed file from overwriting good data through the
+      // (otherwise schools-only) check above.
+      const shapeBad =
+        (restored.rankings    !== undefined && (typeof restored.rankings    !== 'object' || Array.isArray(restored.rankings)))    ||
+        (restored.evaluations !== undefined && (typeof restored.evaluations !== 'object' || Array.isArray(restored.evaluations))) ||
+        (restored.essays      !== undefined && !Array.isArray(restored.essays))      ||
+        (restored.scholarships!== undefined && !Array.isArray(restored.scholarships));
+      if (shapeBad) {
+        alert('Invalid backup file — its data is malformed (rankings/evaluations/essays/scholarships have the wrong structure). Restore cancelled to protect your current data.');
+        return;
+      }
       const schoolCount = restored.schools.length;
       const version = parsed.version || 'unknown';
       const exportDate = parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleDateString() : 'unknown';
-      if (!confirm('Restore backup from ' + exportDate + ' (v' + version + ')?\n\nThis will replace all current data with ' + schoolCount + ' schools from the backup.\n\nCurrent data will be lost. Continue?')) {
+      // Before→after comparison so a stale or partial backup can't silently
+      // wipe good data. Count arrays by length, objects by key count; flag any
+      // collection where the backup has FEWER than the current data.
+      const cnt = (v) => Array.isArray(v) ? v.length : (v && typeof v === 'object' ? Object.keys(v).length : 0);
+      const cmpRows = [
+        ['Schools',      cnt(restored.schools),      cnt(data.schools)],
+        ['Rankings',     cnt(restored.rankings),     cnt(data.rankings)],
+        ['Evaluations',  cnt(restored.evaluations),  cnt(data.evaluations)],
+        ['Essays',       cnt(restored.essays),       cnt(data.essays)],
+        ['Scholarships', cnt(restored.scholarships), cnt(data.scholarships)],
+      ];
+      const cmpText = cmpRows
+        .map(([label, b, c]) => '  ' + (label + ':').padEnd(14) + ' backup ' + b + '  →  current ' + c + (b < c ? '   ⚠ fewer in backup' : ''))
+        .join('\n');
+      const anyShrink = cmpRows.some(([, b, c]) => b < c);
+      const msg = 'Restore backup from ' + exportDate + ' (v' + version + ')?\n\n' +
+        'This REPLACES all current data. Compare before continuing:\n\n' + cmpText + '\n\n' +
+        (anyShrink ? '⚠ Items marked above are SMALLER in the backup — restoring will lose those.\n\n' : '') +
+        'Continue?';
+      if (!confirm(msg)) {
         input.value = '';
         return;
       }
