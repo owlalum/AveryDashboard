@@ -4410,6 +4410,21 @@ function runPostInitMigrations() {
     changed = true;
   }
 
+  // ── essayRationalizeV1: drop the stale UGA supplemental essay. UGA dropped
+  // its supplemental for Fall 2027 (see v6.3), but the Essays tab still showed
+  // it: syncEssays() only ADDS template essays and never removes ones already
+  // in data.essays. Targeted removal — only UGA essays whose name mentions
+  // "supplemental"; preserves every other essay and its status/reviewer/notes.
+  // (The UGA Common App essay is the Shared one, so it's untouched.) The
+  // SCHOOL_ESSAYS template was also updated so it isn't re-seeded.
+  if (!data.essayRationalizeV1MigrationApplied) {
+    if (Array.isArray(data.essays)) {
+      data.essays = data.essays.filter(e => !(e.school === 'University of Georgia' && /supplemental/i.test(e.name)));
+    }
+    data.essayRationalizeV1MigrationApplied = true;
+    changed = true;
+  }
+
   // Persist locally. Firestore push intentionally not triggered here: the
   // mutation is idempotent and the sentinels will ride along on the next
   // natural saveData() call (or an immediate one, if the caller chooses).
@@ -8123,8 +8138,7 @@ const SCHOOL_ESSAYS = {
     { name: 'HONORS: Academy Essays', words: 500, prompt: 'Honors Academy portal essays (prompts vary yearly) — apply Aug 1 - Dec 15. Borderline: needs ACT 28+', required: false }
   ],
   'University of Georgia': [
-    { name: 'Common App Personal Statement', words: 650, prompt: 'Choose from 7 Common App prompts', required: true },
-    { name: 'UGA Supplemental Essay', words: 300, prompt: 'Prompt changes yearly — check when released Aug 2026', required: true }
+    { name: 'Common App Personal Statement', words: 650, prompt: 'No UGA supplemental essay for Fall 2027 — Common App essay only', required: true }
   ],
   'Colorado State University': [
     { name: 'Common App Personal Statement', words: 650, prompt: 'No supplemental essays — Common App essay only', required: true },
