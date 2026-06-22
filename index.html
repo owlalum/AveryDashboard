@@ -5964,6 +5964,14 @@ function addTestPrep() {
 }
 
 // ─── Verified school-specific checklists (researched per school) ───
+// MAINTENANCE: keep submission deliverables only (application/fee/deadline,
+// transcript, essays, recs, test scores, honors + scholarship requirements).
+// No FAFSA/CSS (family financial), no "research/explore" tasks, no testing-
+// method paragraphs — those belong in the school notes. This is SEPARATE from
+// SCHOOL_ESSAYS (Essays tab) and they do NOT auto-sync: when a school's essays
+// change, update BOTH. syncChecklists() only ADDS lists for new schools, so
+// rebuilding existing lists needs a one-time migration (see
+// checklistRationalizeV1MigrationApplied).
 const SCHOOL_CHECKLISTS = {
   'Texas A&M University': [
     { text: 'Apply by Oct 15 (Early Action) or Dec 1 (Regular Decision) — ApplyTexas or Common App, $75 fee', cat: 'deadline' },
@@ -8132,6 +8140,15 @@ function renderGreekLife() {
 }
 
 // ─── Essay Database (per-school essay requirements) ───
+// MAINTENANCE: this drives the Essays tab and is SEPARATE from
+// SCHOOL_CHECKLISTS (which drives the Applications/Checklists tab). They do
+// NOT auto-sync. When a school's essays/supplements change (added, dropped,
+// reworded, word-count), update BOTH this object AND the matching school in
+// SCHOOL_CHECKLISTS. Note: syncEssays() only ADDS template essays — it never
+// removes entries already saved in data.essays — so DROPPING an essay also
+// needs a one-time migration in runPostInitMigrations to delete the stale
+// entry from existing data (see essayRationalizeV1MigrationApplied for the
+// UGA-supplemental example).
 const SCHOOL_ESSAYS = {
   'Texas A&M University': [
     { name: 'Tell Us Your Story', words: 750, prompt: 'Share your story — what makes you unique and what experiences have shaped who you are', required: true },
