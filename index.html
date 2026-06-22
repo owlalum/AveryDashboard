@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Cache control: GitHub Pages serves this HTML with ~10-min CDN caching,
+     so plain refreshes after a deploy can show stale content. These nudge
+     browsers to revalidate on each load. (The CDN/Fastly header still applies,
+     so a fresh ?v=<n> query param remains the surest cache bust right after a
+     deploy — but this shrinks the staleness window for normal refreshes.) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>College Planning Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
 <link rel="manifest" href="manifest.json">
