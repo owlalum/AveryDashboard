@@ -3352,7 +3352,20 @@ const STORAGE_KEY = 'averyCollegePlanning';
 
 function loadData() {
   const d = localStorage.getItem(STORAGE_KEY);
-  if (d) return JSON.parse(d);
+  if (d) {
+    try {
+      return JSON.parse(d);
+    } catch (err) {
+      // Corrupt localStorage would otherwise throw here and abort the entire
+      // script before init — blank screen. Fall back to defaults so the app
+      // still loads; the good remote copy then wins in the init conflict
+      // resolver (local defaults carry lastModified 0). Stash the corrupt blob
+      // under a side key first so nothing is irrecoverably lost.
+      console.error('loadData: corrupt localStorage JSON — falling back to defaults.', err);
+      try { localStorage.setItem(STORAGE_KEY + '_corrupt', d); } catch (e) {}
+      return getDefaults();
+    }
+  }
   return getDefaults();
 }
 
