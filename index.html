@@ -4173,6 +4173,26 @@ function runMigrations() {
     data.costFieldsSync2026MigrationApplied = true;
   }
 
+  // ── Checklist rationalization (June 2026) ──
+  // The application checklists were rewritten to focus on actual submission
+  // deliverables only (incl. honors + scholarship consideration) — no FAFSA/
+  // CSS (family financial tasks), no "research/explore" program items, no
+  // testing-methodology paragraphs, no once-enrolled notes. syncChecklists()
+  // only ADDS lists for new schools; it never rebuilds existing ones, so this
+  // one-time migration regenerates each existing checklist's items from the
+  // updated SCHOOL_CHECKLISTS template. NOTE: this resets `done` checkmarks
+  // (user-approved — applications don't open until Aug 1, so there's nothing
+  // checked off yet). Only rebuilds schools that have a template entry.
+  if (!data.checklistRationalizeV1MigrationApplied) {
+    (data.checklists || []).forEach(cl => {
+      const tpl = SCHOOL_CHECKLISTS[cl.school];
+      if (tpl) {
+        cl.items = tpl.map(item => ({ id: uid(), text: item.text, cat: item.cat || 'app', done: false }));
+      }
+    });
+    data.checklistRationalizeV1MigrationApplied = true;
+  }
+
   // ── Cost rubric v2 one-time migration ──
   // The Cost rubric was re-drafted in April 2026 to reflect 2026-27 tuition
   // inflation and shift framing from "affordability gate" to "value tier"
@@ -5930,31 +5950,21 @@ function addTestPrep() {
 // ─── Verified school-specific checklists (researched per school) ───
 const SCHOOL_CHECKLISTS = {
   'Texas A&M University': [
-    { text: 'Apply by Oct 15 (Early Action) or Dec 1 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via ApplyTexas or Common App — $75 fee', cat: 'app' },
-    { text: 'Complete Self-Reported Transcript and Academic Record (STAR)', cat: 'app' },
-    { text: 'Write personal essay (ApplyTexas Topic A or Common App essay)', cat: 'app' },
-    { text: 'Complete 5 optional scholarship short-answer essays (strongly recommended for merit aid)', cat: 'scholarship' },
-    { text: 'TESTING: Test-optional (target ACT 25-31). Does NOT superscore — best single sitting only. Science: not confirmed. Honors wants ACT 28+ AND top-10% rank. Send best sitting only.', cat: 'test' },
-    { text: 'Letters of recommendation — OPTIONAL (first 2 received will be considered)', cat: 'app' },
-    { text: 'Complete FAFSA (priority deadline: Jan 15)', cat: 'financial' },
-    { text: 'Research College of Ag & Life Sciences pre-vet advising track & DVM pipeline', cat: 'program' },
-    { text: 'Explore Texas A&M CVM scholarships ($2.9M+ awarded annually)', cat: 'scholarship' },
-    { text: 'HONORS: Apply to Honors Academy via portal (Aug 1 - Dec 15) — essays required, ACT 28+ recommended. Note: Dept. honors in Animal Science also available once enrolled (3.5+ GPA, no separate app needed)', cat: 'honors' },
+    { text: 'Apply by Oct 15 (Early Action) or Dec 1 (Regular Decision) — ApplyTexas or Common App, $75 fee', cat: 'deadline' },
+    { text: 'Complete the Self-Reported Transcript and Academic Record (STAR)', cat: 'app' },
+    { text: 'Write the personal essay (ApplyTexas Topic A or Common App essay)', cat: 'app' },
+    { text: 'Letters of recommendation optional (first 2 received are considered)', cat: 'app' },
+    { text: 'Submit ACT scores (test-optional; recommended — Honors wants ACT 28+)', cat: 'test' },
+    { text: 'Scholarship: complete the 5 scholarship short-answer essays (for merit consideration)', cat: 'scholarship' },
+    { text: 'Honors: apply to the Honors Academy via the portal (Aug 1 – Dec 15) — essays required, ACT 28+ recommended', cat: 'honors' },
   ],
   'University of Georgia': [
-    { text: '\u2605 3+1 ACCELERATED DVM PATHWAY: Animal Health majors can apply to UGA CVM after 3 years of undergrad and earn the B.S.Ag. after vet-school year 1 \u2014 saves a year. (Accelerated application track, not a guaranteed seat.) A key strategic draw of choosing UGA.', cat: 'program' },
-    { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App or UGA portal — $70 fee', cat: 'app' },
+    { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision) — Common App or UGA portal, $70 fee', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (250-650 words)', cat: 'app' },
-    { text: 'No UGA supplemental essay for Fall 2027 — UGA dropped it; only the Common App personal essay is required', cat: 'app' },
-    { text: 'TESTING: Test-required (target ACT 31-34). Focuses on English & Math; computes the composite both with and without Science and uses the better — a strong Science helps you (your UGA composite counts as 31, not 30).', cat: 'test' },
-    { text: 'Counselor recommendation — REQUIRED; teacher recommendation optional', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (CSS required for UGA institutional need-based aid)', cat: 'financial' },
-    { text: 'Research UGA pre-vet program & CVM research opportunities', cat: 'program' },
-    { text: 'Explore CAES (College of Ag & Environmental Sciences) scholarships', cat: 'scholarship' },
-    { text: 'HONORS: Apply EA by Oct 15 for auto Morehead Honors review (no extra essays). If not auto-admitted, complete supplemental honors app by Jan 15', cat: 'honors' },
+    { text: 'Write the Common App personal essay (250-650 words) — no UGA supplemental essay for Fall 2027', cat: 'app' },
+    { text: 'Counselor recommendation required (teacher recommendation optional)', cat: 'app' },
+    { text: 'Submit ACT scores (required)', cat: 'test' },
+    { text: 'Honors: apply EA by Oct 15 for automatic Morehead Honors review (no extra essays); if not auto-admitted, submit the supplemental honors app by Jan 15', cat: 'honors' },
   ],
   'Colorado State University': [
     { text: 'Apply by Feb 1 (priority; rolling admissions)', cat: 'deadline' },
@@ -5980,30 +5990,22 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: Indicate Honors interest on UF Common App + write 400-word essay on three pillars (opportunity / community / challenge). Stretch but low effort to apply. Note: CALS Honors also available once enrolled (3.75+ upper-division GPA, thesis).', cat: 'honors' },
   ],
   'Ohio State University': [
-    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $60 fee', cat: 'app' },
+    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision) — Common App, $60 fee; select CFAES / Animal Sciences for pre-vet', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App personal essay (no additional supplemental essays required)', cat: 'app' },
-    { text: 'TESTING: Test-required (reinstated for Columbus). SUPERSCORES across multiple attempts. Science: not required (follows new 3-section composite). Send all scores. Honors: no minimum, holistic review.', cat: 'test' },
-    { text: 'Letters of recommendation — OPTIONAL (up to 2 via counselor)', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Complete ScholarshipUniverse profile for OSU scholarship matching', cat: 'scholarship' },
-    { text: 'Apply to CFAES (College of Food, Ag & Environmental Sciences) for pre-vet', cat: 'program' },
-    { text: 'Research OSU CVM veterinary teaching hospital & undergrad research', cat: 'program' },
-    { text: 'HONORS: Indicate Honors interest on Common App by Nov 1 — NO minimum GPA or test scores. Holistic review. Worth applying. Note: CFAES dept. honors also available — must apply by spring of freshman year (3.4+ GPA).', cat: 'honors' },
+    { text: 'Write the Common App personal essay (no supplemental essays required)', cat: 'app' },
+    { text: 'Letters of recommendation optional (up to 2 via counselor)', cat: 'app' },
+    { text: 'Submit ACT scores (required)', cat: 'test' },
+    { text: 'Scholarship: complete the ScholarshipUniverse profile for OSU scholarship matching', cat: 'scholarship' },
+    { text: 'Honors: indicate Honors interest on the Common App by Nov 1 (no minimum GPA or test scores; holistic review)', cat: 'honors' },
   ],
   'Purdue University': [
-    { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $60 fee', cat: 'app' },
+    { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision) — Common App, $60 fee; select College of Agriculture / Animal Sciences', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write 2 required short answers (100 words each) — why your major & why Purdue', cat: 'app' },
-    { text: 'Write 1 optional essay (250 words) — additional context about yourself (recommended)', cat: 'app' },
-    { text: 'TESTING: Test-required (target ACT 27-34). Accepts self-reported best section scores across dates. Science: recommended for STEM but not required. Honors: holistic, no minimum (avg admitted ~31).', cat: 'test' },
-    { text: 'Letters of recommendation — OPTIONAL', cat: 'app' },
-    { text: 'Complete FAFSA (note: Purdue has frozen tuition since 2012 — the "Purdue Pledge")', cat: 'financial' },
-    { text: 'Apply to College of Agriculture, Animal Sciences major for pre-vet', cat: 'program' },
-    { text: 'Note: Purdue\'s Veterinary Scholars early-DVM program is SUSPENDED — plan for traditional VMCAS DVM admission after undergrad', cat: 'program' },
-    { text: 'HONORS: MUST indicate Honors College interest by Nov 1 EA — cannot apply later! Two 500-word essays required. Stretch but worth trying.', cat: 'honors' },
+    { text: 'Write the 2 required short answers (100 words each: why your major, why Purdue)', cat: 'app' },
+    { text: 'Write the optional 250-word essay (recommended)', cat: 'app' },
+    { text: 'Letters of recommendation optional', cat: 'app' },
+    { text: 'Submit ACT scores (required)', cat: 'test' },
+    { text: 'Honors: MUST indicate Honors College interest by the Nov 1 EA deadline (you cannot apply later) — two 500-word essays required', cat: 'honors' },
   ],
   'Michigan State University': [
     { text: 'Apply by Nov 1 for maximum scholarship consideration (final deadline: Apr 1)', cat: 'deadline' },
@@ -6019,53 +6021,36 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: Automatic consideration upon MSU admission (no extra app). Typical admits: 32 ACT, 3.9+ GPA. Unlikely but zero effort.', cat: 'honors' },
   ],
   'Virginia Tech': [
-    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $60 fee', cat: 'app' },
+    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision) — Common App, $60 fee', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write 4 "Ut Prosim Profile" short answers (120 words each): community, inclusion, leadership, goals', cat: 'app' },
-    { text: 'TESTING: Test-optional (through Fall 2028). Superscores; disregards only the ACT Writing/essay section — your full composite (30), including your strong Reading (35) and Science (33), applies. Honors: same test-optional policy.', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED or considered', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research Virginia-Maryland CVM on-campus pre-vet pathway', cat: 'program' },
-    { text: 'Explore Animal & Poultry Sciences program & farm animal access', cat: 'program' },
-    { text: 'HONORS: Check Honors box on VT app (EA Nov 1) + write 500-word essay on engagement and authenticity. No minimums, holistic review. Worth applying. Note: Dept. honors (thesis + oral exam) available through VT Honors College once enrolled.', cat: 'honors' },
+    { text: 'Write the 4 Ut Prosim Profile short answers (120 words each: community, inclusion, leadership, goals)', cat: 'app' },
+    { text: 'Letters of recommendation not required', cat: 'app' },
+    { text: 'Submit ACT scores (optional through Fall 2028 — your full composite applies)', cat: 'test' },
+    { text: 'Honors: check the Honors box on the VT app by the Nov 1 EA deadline + write the 500-word engagement essay (holistic, no minimums)', cat: 'honors' },
   ],
   'North Carolina State University': [
-    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App or Coalition — $85 fee', cat: 'app' },
+    { text: 'Apply by Nov 1 (Early Action) or Jan 15 (Regular Decision) — Common App or Coalition, $85 fee', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write 2 short essays (~250 words each): why first-choice major + why second-choice major at NC State', cat: 'app' },
-    { text: 'TESTING: Test-optional if weighted GPA 2.8+ (scores only enhance). SUPERSCORES across all dates. Science: not confirmed. Send all scores (encouraged). Honors: same policy, essay-focused.', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED (except for Park Scholarship)', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Consider Park Scholarship application (full ride — separate essays, recs, interviews)', cat: 'scholarship' },
-    { text: 'NC State CVM uses holistic file review (no admissions interviews); use VetPAC pre-vet advising for prereq/experience planning', cat: 'program' },
-    { text: 'Explore teaching animal units on campus & hands-on opportunities', cat: 'program' },
-    { text: 'HONORS: Answer 600-word UHP essay on NC State app (EA Nov 1). No published minimums, holistic review. Worth applying.', cat: 'honors' },
+    { text: 'Write the 2 short essays (~250 words each: why your first-choice major, why your second-choice major)', cat: 'app' },
+    { text: 'Letters of recommendation not required for admission', cat: 'app' },
+    { text: 'Submit ACT scores (optional if weighted GPA 2.8+)', cat: 'test' },
+    { text: 'Honors: answer the 600-word University Honors Program essay on the NC State app (by the Nov 1 EA deadline)', cat: 'honors' },
+    { text: 'Scholarship: Park Scholarship (full ride) — separate application with essays, recommendations, and interviews, due Nov 1', cat: 'scholarship' },
   ],
   'University of Wisconsin-Madison': [
-    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App or UW System App — $80 fee', cat: 'app' },
+    { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision) — Common App or UW System App, $80 fee; select the "Animal & Veterinary Biosciences, BS" major', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write 1 supplemental essay (300-650 words) — why UW-Madison and why your major', cat: 'app' },
-    { text: 'TESTING: Test-optional through Spring 2027; Fall 2027 NOT YET CONFIRMED — plan to take tests. Does NOT superscore — best single sitting only. Science: not confirmed. Official scores only (no self-reporting).', cat: 'test' },
-    { text: '1 letter of recommendation REQUIRED (from teacher, counselor, or faculty)', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (NEW for 2026-27; CSS priority deadline Dec 1; $25 fee)', cat: 'financial' },
-    { text: 'Apply to the "Animal & Veterinary Biosciences, BS" major (legacy "Animal Sciences, BS" was discontinued) — the pre-vet science path; SVM is on campus', cat: 'program' },
-    { text: 'Explore undergrad research opportunities in veterinary medicine', cat: 'program' },
-    { text: 'HONORS: L&S Honors does NOT apply (Animal Science is in CALS). CALS Honors in Research is available — requires freshman-year commitment, 3.25+ GPA, 4-year research pathway with thesis. Apply during first year if interested.', cat: 'honors' },
+    { text: 'Write the supplemental essay (300-650 words: why UW-Madison and why your major)', cat: 'app' },
+    { text: '1 letter of recommendation required', cat: 'app' },
+    { text: 'Submit ACT scores (optional for Fall 2027)', cat: 'test' },
   ],
   'Auburn University': [
-    { text: 'EA I by Sep 15 → decision mid-Oct | EA II by Oct 15 → mid-Nov | EA III by Nov 15 → mid-Dec | EA IV by Dec 1 → early Feb. MUST be admitted EA for scholarship eligibility', cat: 'deadline' },
-    { text: 'Submit application via Common App or Auburn portal — $50 fee', cat: 'app' },
+    { text: 'Apply via an Early Action round (EA I Sep 15 / II Oct 15 / III Nov 15 / IV Dec 1) — must be admitted EA for scholarship eligibility; Common App or Auburn portal, $50 fee', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'No supplemental essays required (Honors College has separate essays)', cat: 'app' },
-    { text: 'TESTING: REQUIRED starting Fall 2027. SUPERSCORES (accepts ACT Superscore Report). Science: optional. Honors: higher bar (target ACT 29+). Applying without scores "significantly limits" Honors/scholarship chances.', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research Auburn CVM pre-vet track in Animal Sciences', cat: 'program' },
-    { text: 'Explore CVM teaching hospital, small animal & equine programs', cat: 'program' },
-    { text: 'HONORS: Separate app by Nov 15. Requires 3.85 GPA AND 29 ACT minimum. NOT ELIGIBLE with current 27 ACT — only apply if ACT reaches 29+. Note: Honors thesis (ANSC 4997) available through Auburn HC once enrolled.', cat: 'honors' },
+    { text: 'No supplemental essays for general admission (Honors has its own essays)', cat: 'app' },
+    { text: 'Letters of recommendation not required', cat: 'app' },
+    { text: 'Submit ACT scores (REQUIRED starting Fall 2027)', cat: 'test' },
+    { text: 'Honors: separate application by Nov 15 — two 600-word essays; ~3.85 GPA + ACT 29+ target (admitted students skew higher — a reach)', cat: 'honors' },
   ],
   'Oklahoma State University': [
     { text: 'Apply early for best scholarship consideration (opens July 1)', cat: 'deadline' },
@@ -6102,17 +6087,13 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Explore companion and food animal medicine programs', cat: 'program' },
   ],
   'University of Tennessee': [
-    { text: 'Apply by Nov 15 (priority) or Dec 15 (Regular Decision)', cat: 'deadline' },
-    { text: 'Submit application via Common App — $75 fee', cat: 'app' },
+    { text: 'Apply by Nov 15 (priority) or Dec 15 (Regular Decision) — Common App, $75 fee', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'No supplemental essays required for general admission', cat: 'app' },
-    { text: 'Write optional CASNR scholarship essay if applying as Animal Science major (recommended)', cat: 'scholarship' },
-    { text: 'TESTING: Test-required (self-report by Jan 15). SUPERSCORES across all dates. Science: optional — included if it helps, ignored if not. Honors (CHP): same superscore, auto-considered.', cat: 'test' },
-    { text: 'Letters of recommendation — OPTIONAL', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research UT CVM pre-vet track & large teaching hospital', cat: 'program' },
-    { text: 'Explore equine and farm animal program strengths', cat: 'program' },
-    { text: 'HONORS: Chancellor\'s Honors Program (CHP). Deadline Nov 19. Three essays (300 + 300 + 400 words) on academic journey, community need, and leadership. Requires 4.0 weighted core GPA to be invited to apply — check if Avery qualifies. Note: Dept. honors (Pre-Vet Medicine Concentration) available once enrolled.', cat: 'honors' },
+    { text: 'No supplemental essays for general admission', cat: 'app' },
+    { text: 'Letters of recommendation optional', cat: 'app' },
+    { text: 'Submit ACT scores (required; self-report by Jan 15)', cat: 'test' },
+    { text: 'Scholarship: write the optional CASNR scholarship essay (recommended, applying as Animal Science)', cat: 'scholarship' },
+    { text: 'Honors: Chancellor\'s Honors Program by Nov 19 — three essays (300 + 300 + 400 words); invitation requires a 4.0 weighted core GPA (check eligibility)', cat: 'honors' },
   ],
   'University of Missouri': [
     { text: 'Apply by Nov 1 (Early Action) or Feb 1 (Regular Decision)', cat: 'deadline' },
@@ -6126,17 +6107,12 @@ const SCHOOL_CHECKLISTS = {
     { text: 'Explore strong food animal and equine programs', cat: 'program' },
   ],
   'Clemson University': [
-    { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision & scholarship deadline)', cat: 'deadline' },
-    { text: 'Submit application via Common App, Coalition, or Clemson Direct — $70 fee', cat: 'app' },
-    { text: 'Complete STARS (Self-Reported Transcript); official transcript required only upon enrollment', cat: 'app' },
-    { text: 'No supplemental essays required (optional personal statement via portal)', cat: 'app' },
-    { text: 'TESTING: Test-optional (can toggle until Jan 10). SUPERSCORES English, Reading, Math across all dates. Science: not used in superscore. Must submit via testing agency. Honors: same test-optional policy.', cat: 'test' },
-    { text: 'Letters of recommendation — NOT REQUIRED (Honors College requires 2)', cat: 'app' },
-    { text: 'Complete FAFSA', cat: 'financial' },
-    { text: 'Research pre-vet track through Animal & Veterinary Sciences', cat: 'program' },
-    { text: 'Explore articulation agreements with regional vet schools', cat: 'program' },
-    { text: 'HONORS: Calhoun Honors College. Priority deadline Oct 22. Two 650-word essays. Test-optional but typical target ACT 32+. Stretch. Note: Dept. honors in Animal & Vet Sciences available through Calhoun once enrolled (3.4+ GPA, thesis).', cat: 'honors' },
-    { text: 'HONORS: Obtain 2 letters of recommendation (required for Calhoun Honors — regular app does NOT require recs)', cat: 'honors' },
+    { text: 'Apply by Oct 15 (Early Action) or Jan 1 (Regular Decision & scholarship deadline) — Common App, Coalition, or Clemson Direct, $70 fee', cat: 'deadline' },
+    { text: 'Complete STARS (self-reported transcript) — official transcript only upon enrollment', cat: 'app' },
+    { text: 'No supplemental essays for general admission (optional personal statement via the portal)', cat: 'app' },
+    { text: 'Letters of recommendation not required for admission', cat: 'app' },
+    { text: 'Submit ACT scores (optional)', cat: 'test' },
+    { text: 'Honors: Calhoun Honors College by the Oct 22 priority deadline — two 650-word essays + 2 letters of recommendation (target ACT 32+ — a stretch)', cat: 'honors' },
   ],
   'Penn State University': [
     { text: 'Apply by Nov 1 (Early Action) or Jan 1 (Regular Decision)', cat: 'deadline' },
@@ -6152,18 +6128,13 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: Obtain 2 letters of recommendation (required for Schreyer — regular app does NOT require recs)', cat: 'honors' },
   ],
   'University of Kentucky': [
-    { text: 'Apply by Dec 1 for scholarship consideration (Regular Decision: Feb 15)', cat: 'deadline' },
-    { text: 'Submit application via Common App or UK portal — $50 fee', cat: 'app' },
+    { text: 'Apply by Dec 1 for scholarship + honors consideration (Regular Decision: Feb 15) — Common App or UK portal, $50 fee', cat: 'deadline' },
     { text: 'Request official high school transcript (6+ semesters)', cat: 'app' },
-    { text: 'Write Common App personal essay', cat: 'app' },
-    { text: 'TESTING: Test-optional (through 2028-29; higher scores unlock bigger merit). Does NOT superscore — best single sitting only. Science: not required. "No harm" policy. Lewis Honors: does NOT review test scores.', cat: 'test' },
-    { text: 'Letter of recommendation — OPTIONAL (considered in holistic review but not required)', cat: 'app' },
-    { text: 'Complete competitive scholarship section of application (for Presidential/Singletary awards)', cat: 'scholarship' },
-    { text: 'Write Lewis Honors College essay — 500 words, "common good" prompt (due Dec 1 for priority)', cat: 'scholarship' },
-    { text: 'Complete FAFSA — not required for merit aid but strongly recommended for need-based aid', cat: 'financial' },
-    { text: 'Research UK equine program opportunities (unmatched equine program)', cat: 'program' },
-    { text: 'Research UK pre-vet track & vet school pipeline options', cat: 'program' },
-    { text: 'HONORS: Lewis Honors College by Dec 1. Two essays (300 + 500 words on "common good"). Test scores NOT reviewed — STRONG FIT.', cat: 'honors' },
+    { text: 'Write the Common App personal essay', cat: 'app' },
+    { text: 'Letter of recommendation optional', cat: 'app' },
+    { text: 'Submit ACT scores (optional through 2028-29 — higher scores unlock larger automatic merit)', cat: 'test' },
+    { text: 'Scholarship: complete the competitive-scholarship section of the application (Presidential / Singletary)', cat: 'scholarship' },
+    { text: 'Honors: Lewis Honors College by Dec 1 — two essays (300 + 500 words, "common good"); test scores not reviewed', cat: 'honors' },
   ],
   'Florida State University': [
     { text: 'Apply by Oct 15 (Early Action — FL residents only) or Dec 1 (Regular Decision)', cat: 'deadline' },
@@ -6194,17 +6165,11 @@ const SCHOOL_CHECKLISTS = {
     { text: 'HONORS: South Carolina Honors College (top-ranked public honors college). Apply by Nov 15 — select "Yes" on university app, then complete SCHC app within 48 hrs. Requires 2 additional essays + 1 letter of recommendation. Middle 50%: ACT 32-34. Stretch target but worth applying — scores are optional for SCHC.', cat: 'honors' },
   ],
   'Cornell University': [
-    { text: 'Early Decision by Nov 1 (binding) → decision mid-Dec | Regular Decision by Jan 2 → decision late Mar. Supplemental materials due 2 weeks after app.', cat: 'deadline' },
-    { text: 'Submit application via Common App — $85 fee (fee waiver available)', cat: 'app' },
+    { text: 'Early Decision by Nov 1 (binding) or Regular Decision by Jan 2 — Common App, $85 fee (waiver available); supplemental materials due ~2 weeks after the app', cat: 'deadline' },
     { text: 'Request official high school transcript', cat: 'app' },
-    { text: 'Write Common App essay + CALS supplemental essay (Why CALS? ~650 words)', cat: 'app' },
-    { text: 'TESTING: REQUIRED for Fall 2027. Superscores accepted. Middle 50% ACT: 33-35. Submit by last Oct test date (ED) or Dec test date (RD).', cat: 'test' },
-    { text: 'Letters of recommendation — 2 teacher recs + 1 counselor rec required', cat: 'app' },
-    { text: 'Complete FAFSA + CSS Profile (CSS required — due Oct 1 for ED, Feb 15 for RD). Cornell meets 100% of demonstrated financial need.', cat: 'financial' },
-    { text: 'Research Animal Science major with Pre-Veterinary Medicine concentration in CALS', cat: 'program' },
-    { text: '7-YEAR BS/DVM ACCELERATED PATHWAY: internal program for enrolled CALS students — apply fall of sophomore year (~3.7 GPA + ~400 vet hours). Not an application-stage early assurance. Highly competitive.', cat: 'program' },
-    { text: 'Explore Cornell Pre-Vet Society and undergraduate research in CVM labs', cat: 'program' },
-    { text: 'CALS is a NY State contract college — tuition is $49.8K (NY residents) or $73.9K (OOS). No merit scholarships; need-based aid only.', cat: 'scholarship' },
+    { text: 'Write the Common App personal essay + Cornell\'s CALS supplemental essay (~500 words for Fall 2027)', cat: 'app' },
+    { text: '2 teacher recommendations + 1 counselor recommendation required', cat: 'app' },
+    { text: 'Submit ACT scores (required for Fall 2027; middle 50% 33-35)', cat: 'test' },
   ],
 };
 
@@ -10663,6 +10628,17 @@ docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '6.6',
+    date: '2026-06-22',
+    title: 'Application Checklists Streamlined',
+    items: [
+      'Your per-school checklists are now a true "what I actually have to submit" list — application, transcript, essays, recommendations, test scores, plus honors and scholarship requirements',
+      'Removed the clutter: research/"explore" tasks, long testing-policy explanations, and program background now live in the school notes, not your to-do list',
+      'FAFSA and CSS Profile are off your checklists — those are a parent task, not yours',
+      'Each list is roughly half as long and every line is a real action item',
+    ]
+  },
   {
     version: '6.5',
     date: '2026-06-22',
