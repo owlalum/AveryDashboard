@@ -7801,6 +7801,12 @@ function deleteTourItem(section, itemId) {
 // ─── Admission Strategy ───
 // Advantage levels: 'verified' = published official data, 'structural' = direct-admit system favors Ag,
 // 'likely' = university-wide but Ag is historically less competitive, 'minimal' = high overall rate, little difference
+// MAINTENANCE: the admit-rate column now DERIVES live from schoolDB.acceptRate
+// (see renderStrategy), so it auto-syncs — the `overall` field below is just a
+// fallback and need not be hand-updated. The other fields (major, track,
+// backup, type, advantage, advDetail) are static strategy advice: keep them
+// current when a school's pre-vet major/pathway changes (e.g., Wisconsin's
+// "Animal & Veterinary Biosciences"). This is the Admission Strategy tab.
 const STRATEGY_DATA = [
   { school:'Purdue University', type:'Direct to College & Major', overall:'~50%', advantage:'verified', advDetail:'Ag: 55.8% vs 50% overall', major:'Animal Sciences', track:'Pre-Vet Medicine Concentration', backup:'Biology or Biochemistry (2nd choice required)' },
   { school:'Texas A&M University', type:'University-Wide', overall:'~57%', advantage:'likely', advDetail:'Ag college data in ABPA dashboard (not public)', major:'Animal Science (Science Option)', track:'Pre-vet advising via CVM', backup:'Biology (required 2nd choice)' },
@@ -7844,10 +7850,15 @@ function renderStrategy() {
   };
 
   tbody.innerHTML = activeStrategy.map(s => {
+    // Admit rate derives LIVE from schoolDB so it stays in sync with the rest
+    // of the dashboard (the static STRATEGY_DATA.overall is only a fallback for
+    // a school somehow missing from schoolDB).
+    const db = schoolDB[s.school] || {};
+    const overallRate = db.acceptRate ? '~' + db.acceptRate : esc(s.overall);
     return `<tr>
       <td style="font-weight:600;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.school, 22)} ${esc(s.school)}</span></td>
       <td class="compact" style="font-size:0.78rem">${esc(s.type)}</td>
-      <td class="compact">${s.overall}</td>
+      <td class="compact">${overallRate}</td>
       <td style="font-size:0.78rem;min-width:160px;max-width:220px">${advBadge(s.advantage)}<div style="font-size:0.72rem;color:var(--text-light);margin-top:2px;line-height:1.3">${esc(s.advDetail)}</div></td>
       <td style="font-size:0.82rem;font-weight:600">${esc(s.major)}</td>
       <td style="font-size:0.78rem">${esc(s.track)}</td>
@@ -10677,6 +10688,14 @@ docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '6.7',
+    date: '2026-06-22',
+    title: 'Admission Strategy Rates Synced',
+    items: [
+      'The admit-rate column on the Admission Strategy tab now pulls the same numbers as the rest of the dashboard, so it stays accurate automatically (Purdue had drifted to ~50% — now ~43%, with a few others nudged 1-2 points)',
+    ]
+  },
   {
     version: '6.6',
     date: '2026-06-22',
