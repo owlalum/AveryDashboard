@@ -4173,26 +4173,6 @@ function runMigrations() {
     data.costFieldsSync2026MigrationApplied = true;
   }
 
-  // ── Checklist rationalization (June 2026) ──
-  // The application checklists were rewritten to focus on actual submission
-  // deliverables only (incl. honors + scholarship consideration) — no FAFSA/
-  // CSS (family financial tasks), no "research/explore" program items, no
-  // testing-methodology paragraphs, no once-enrolled notes. syncChecklists()
-  // only ADDS lists for new schools; it never rebuilds existing ones, so this
-  // one-time migration regenerates each existing checklist's items from the
-  // updated SCHOOL_CHECKLISTS template. NOTE: this resets `done` checkmarks
-  // (user-approved — applications don't open until Aug 1, so there's nothing
-  // checked off yet). Only rebuilds schools that have a template entry.
-  if (!data.checklistRationalizeV1MigrationApplied) {
-    (data.checklists || []).forEach(cl => {
-      const tpl = SCHOOL_CHECKLISTS[cl.school];
-      if (tpl) {
-        cl.items = tpl.map(item => ({ id: uid(), text: item.text, cat: item.cat || 'app', done: false }));
-      }
-    });
-    data.checklistRationalizeV1MigrationApplied = true;
-  }
-
   // ── Cost rubric v2 one-time migration ──
   // The Cost rubric was re-drafted in April 2026 to reflect 2026-27 tuition
   // inflation and shift framing from "affordability gate" to "value tier"
@@ -4407,6 +4387,27 @@ function runPostInitMigrations() {
       localStorage.setItem('essaysV2', 'true');
       changed = true;
     }
+  }
+
+  // ── checklistRationalizeV1: rebuild existing checklists from the rationalized
+  // template (submission deliverables only; no FAFSA/CSS, no research/explore,
+  // no testing-method paragraphs). syncChecklists() only ADDS lists for new
+  // schools — it never rebuilds existing ones — so regenerate each existing
+  // checklist's items from the updated SCHOOL_CHECKLISTS template. Resets
+  // `done` checkmarks (user-approved — apps don't open until Aug 1).
+  // MUST live here, not in runMigrations(): runMigrations() runs synchronously
+  // before the init await, while SCHOOL_CHECKLISTS (declared later in the file)
+  // is still in its temporal dead zone — referencing it there throws. By the
+  // time runPostInitMigrations() runs (post-await), SCHOOL_CHECKLISTS exists.
+  if (!data.checklistRationalizeV1MigrationApplied) {
+    (data.checklists || []).forEach(cl => {
+      const tpl = SCHOOL_CHECKLISTS[cl.school];
+      if (tpl) {
+        cl.items = tpl.map(item => ({ id: uid(), text: item.text, cat: item.cat || 'app', done: false }));
+      }
+    });
+    data.checklistRationalizeV1MigrationApplied = true;
+    changed = true;
   }
 
   // Persist locally. Firestore push intentionally not triggered here: the
