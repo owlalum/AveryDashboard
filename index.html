@@ -8397,6 +8397,15 @@ function syncEssays() {
   // Remove essays for schools no longer in list
   data.essays = data.essays.filter(e => e.school === 'Shared' || schoolNames.includes(e.school));
 
+  // Self-heal: UGA dropped its supplemental essay for Fall 2027, but older
+  // saved data still carries it. The one-time essayRationalizeV1 migration can
+  // be defeated by init/sync timing (its sentinel gets set on a dataset that
+  // didn't contain the essay, then the real data loads with the flag already
+  // true). Stripping it here — on every sync, independent of any flag —
+  // guarantees it can't reappear. The UGA Common App essay is the Shared one,
+  // so it is untouched.
+  data.essays = data.essays.filter(e => !(e.school === 'University of Georgia' && /supplemental/i.test(e.name)));
+
   // Ensure shared Common App essay exists if any school uses Common App
   const hasCommonApp = data.schools.length > 0;
   if (hasCommonApp && !data.essays.find(e => e.school === 'Shared' && e.name === 'Common App Personal Statement')) {
