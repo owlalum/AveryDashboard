@@ -3617,18 +3617,18 @@ function getDefaults() {
         name: 'Texas A&M University',
         domain: 'tamu.edu',
         location: 'College Station, TX',
-        notes: 'Top-ranked College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program',
-        tuitionIn: '$11,892',
-        tuitionOut: '$40,526',
+        notes: 'Top-5 College of Veterinary Medicine; strong pre-vet advising track with direct pipeline to their DVM program',
+        tuitionIn: '$12,995',
+        tuitionOut: '$40,124',
         deadline: 'December 1',
-        earlyDecision: 'October 15',
-        testReq: 'ACT 26-32',
-        acceptRate: '63%',
-        oosAcceptRate: '47%',
-        avgGPA: '3.68',
+        earlyDecision: 'N/A',
+        testReq: 'ACT 25-31',
+        acceptRate: '57%',
+        oosAcceptRate: '49%',
+        avgGPA: '3.78',
         usNewsOverall: '#51',
         usNewsPublic: '#21',
-        vetSchoolRank: '#5',
+        vetSchoolRank: '#4',
         status: 'researching'
       },
       {
@@ -3637,17 +3637,17 @@ function getDefaults() {
         domain: 'uga.edu',
         location: 'Athens, GA',
         notes: 'Excellent pre-vet program with research opportunities; accredited College of Veterinary Medicine on campus',
-        tuitionIn: '$12,080',
-        tuitionOut: '$31,120',
+        tuitionIn: '$10,134',
+        tuitionOut: '$31,804',
         deadline: 'January 1',
         earlyDecision: 'October 15',
-        testReq: 'ACT 28-33',
-        acceptRate: '43%',
-        oosAcceptRate: '18%',
-        avgGPA: '4.0',
+        testReq: 'ACT 31-34',
+        acceptRate: '33%',
+        oosAcceptRate: '9%',
+        avgGPA: '4.27',
         usNewsOverall: '#46',
         usNewsPublic: '#19',
-        vetSchoolRank: '#8',
+        vetSchoolRank: '#9',
         status: 'researching'
       }
     ],
@@ -4650,8 +4650,8 @@ function getSuffix(n) {
 
 // ─── Dynamic Kentucky Merit Aid Based on ACT/GPA ───
 function getKentuckyMerit() {
-  const act = (data.actScores || {}).composite || 27;
-  const gpa = data.gpa || 3.85;
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
   // UK "Bluegrass Spirit" automatic OOS grid (Fall 2026, studentsuccess.uky.edu).
   // Top automatic tier is $12,500/yr at 3.5 GPA + 30 ACT. Higher awards
   // (Presidential / Singletary) are COMPETITIVE — require separate
@@ -4664,8 +4664,8 @@ function getKentuckyMerit() {
 }
 
 function getKentuckyMeritLabel() {
-  const act = (data.actScores || {}).composite || 27;
-  const gpa = data.gpa || 3.85;
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
   const merit = getKentuckyMerit();
   return '<strong>Kentucky:</strong> &ldquo;Bluegrass Spirit&rdquo; automatic grid. ' + act + ' ACT + ' + gpa + ' GPA \u2192 ~$' + (merit/1000).toLocaleString() + 'K/year. Higher awards (Presidential, Singletary) are competitive and require a separate scholarship application.';
 }
@@ -4932,8 +4932,8 @@ function getUGAMeritLabel() {
 
 // ─── Update Honors Eligibility Text in Checklists ───
 function updateHonorsEligibility() {
-  const act = (data.actScores || {}).composite || 27;
-  const gpa = data.gpa || 3.85;
+  const act = (data.actScores || {}).composite || 0;
+  const gpa = data.gpa || 0;
   let changed = false;
 
   data.checklists.forEach(cl => {
@@ -7375,7 +7375,7 @@ function getSummaryCost(schoolName) {
   if (finEntry) {
     const merit = getAutoMeritForSchool(schoolName, finEntry.merit);
     const sticker = finEntry.sticker || ((finEntry.tuition||0) + (finEntry.rb||0) + (finEntry.books||0));
-    const realistic = sticker - merit;
+    const realistic = Math.max(0, sticker - merit);
     const fourYr = realistic * 4;
     return { cost: '$' + Math.round(fourYr / 1000) + 'K', fourYr };
   }
@@ -7649,7 +7649,7 @@ function renderFinancials() {
   const finRows = cleanedFin.filter(r => !r.group).map(row => {
     const merit = getAutoMeritForSchool(row.school, row.merit);
     const sticker = (row.tuition || 0) + (row.rb || 0) + (row.books || 0);
-    const realistic = sticker - merit;
+    const realistic = Math.max(0, sticker - merit);
     return { ...row, sticker, merit, realistic, fourYrSticker: sticker * 4, fourYrRealistic: realistic * 4 };
   });
 
