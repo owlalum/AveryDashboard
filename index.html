@@ -8817,7 +8817,13 @@ const SYSTEM_PROMPT_V2 = [
   "",
   "## Output format",
   "",
-  "Answer the specific question asked. Use clear structure (school names in bold, brief reasoning for each). End with 2-4 sentences of \"other observations\" that surface strategic issues the family should discuss but that weren't directly part of their question.",
+  "Answer the specific question asked. If no question was provided this run, deliver the standing list critique — and start straight into the analysis. Do not comment on the absence of a question, empty fields, or what the payload did or didn't include.",
+  "",
+  "**Write for the family, never in the payload's vocabulary.** The JSON field names and keys in the payload (onFinalList, vetProgram, scoirLabel, userQuestionForThisRun, intersection keys like reach_priorityTarget, and the like) are internal plumbing — never quote or reference them in your output, in backticks or otherwise. Translate everything to plain English: say \"schools that are both Reaches and Priority Targets,\" not \"reach_priorityTarget\"; say \"the family's vet-program rating of 2,\" not \"vetProgram: 2\"; say \"no visit rating yet,\" not \"visit score is null.\" If a sentence you're about to write contains a camelCase or snake_case token, rewrite it.",
+  "",
+  "**Markdown formatting:** put a blank line before every list, and give each bullet or numbered item its own line. Never run list items together inside a paragraph. School names in bold with brief reasoning for each.",
+  "",
+  "**Length and pacing:** aim for roughly 600-750 words. Your output has a hard ceiling, so budget to land a complete ending — a few focused sections, then close with 2-4 sentences of \"other observations\" that surface strategic issues the family should discuss but that weren't directly part of their question. Never end mid-sentence or mid-section; if you're running long, cut a section, not the conclusion.",
   "",
   "Do not restate the payload back to the family. They know their own data. Your value is analysis, not summarization."
 ].join('\n');
@@ -9116,7 +9122,10 @@ function buildAIPrompt(aiData) {
     // reasoning. The worker allowlists both Opus 4.8 and Sonnet 5, so
     // switching between them is a dashboard-only change — no redeploy.
     model: 'claude-opus-4-8',
-    max_tokens: 1536,
+    // 2048 is the worker-side cap — raising further needs a worker redeploy.
+    // The prompt asks for ~600-750 words (~1000 tokens), so this leaves real
+    // headroom to land a complete ending instead of truncating mid-sentence.
+    max_tokens: 2048,
     // Keep thinking off: the whole 1536-token budget goes to the visible
     // analysis, and response shape stays a single leading text block.
     thinking: { type: 'disabled' },
