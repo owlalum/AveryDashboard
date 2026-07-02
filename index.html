@@ -9110,8 +9110,15 @@ function buildAIPrompt(aiData) {
   // User message just hands over the JSON payload — no inline restating of
   // structure rules, since those belong in the system prompt.
   return {
-    model: 'claude-sonnet-4-20250514',
+    // claude-sonnet-4-20250514 was retired 2026-06-15 (Anthropic returns
+    // "model: not_found"); claude-sonnet-5 is the documented replacement.
+    model: 'claude-sonnet-5',
     max_tokens: 1536,
+    // Sonnet 5 runs adaptive thinking by default when this field is omitted,
+    // which would spend part of max_tokens on (invisible) reasoning and put
+    // a thinking block first in content. Disable to keep the old behavior
+    // and budget for this short structured analysis.
+    thinking: { type: 'disabled' },
     system: SYSTEM_PROMPT_V2,
     messages: [{
       role: 'user',
@@ -9701,7 +9708,10 @@ async function callWorkerWithRevision(aiData, revisionInstruction) {
     throw new Error('API returned ' + resp.status + ': ' + errText);
   }
   const result = await resp.json();
-  return (result.content && result.content[0] && result.content[0].text) || 'No analysis returned.';
+  // Find the first text block rather than assuming content[0] — models can
+  // return thinking or other block types ahead of the text.
+  const textBlock = (result.content || []).find(b => b && b.type === 'text' && b.text);
+  return (textBlock && textBlock.text) || 'No analysis returned.';
 }
 
 function showValidatorFallback(container) {
