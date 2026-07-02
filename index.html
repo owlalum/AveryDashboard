@@ -9110,14 +9110,15 @@ function buildAIPrompt(aiData) {
   // User message just hands over the JSON payload — no inline restating of
   // structure rules, since those belong in the system prompt.
   return {
-    // claude-sonnet-4-20250514 was retired 2026-06-15 (Anthropic returns
-    // "model: not_found"); claude-sonnet-5 is the documented replacement.
-    model: 'claude-sonnet-5',
+    // Opus 4.8: the strongest generally-priced tier. At this dashboard's
+    // volume (a few cached analyses a week) the cost difference vs Sonnet
+    // is negligible, and this feature is exactly quality-sensitive strategy
+    // reasoning. The worker allowlists both Opus 4.8 and Sonnet 5, so
+    // switching between them is a dashboard-only change — no redeploy.
+    model: 'claude-opus-4-8',
     max_tokens: 1536,
-    // Sonnet 5 runs adaptive thinking by default when this field is omitted,
-    // which would spend part of max_tokens on (invisible) reasoning and put
-    // a thinking block first in content. Disable to keep the old behavior
-    // and budget for this short structured analysis.
+    // Keep thinking off: the whole 1536-token budget goes to the visible
+    // analysis, and response shape stays a single leading text block.
     thinking: { type: 'disabled' },
     system: SYSTEM_PROMPT_V2,
     messages: [{
