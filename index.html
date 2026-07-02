@@ -4105,6 +4105,22 @@ function runMigrations() {
     data.usNewsVet2026MigrationApplied = true;
   }
 
+  // ── Weekly refresh scan sync (2026-06-28) ──
+  // Push the 2026-06-28 weekly-scan updates (vet ranks + notes prose) into the
+  // cached per-school copies so they actually display; the tabs read s.* before
+  // falling back to schoolDB. Reference data from the master (schoolDB), not
+  // user-authored content — safe to (re-)apply. Bump the sentinel whenever a
+  // future weekly scan changes cached schoolDB fields so the sync re-runs.
+  if (!data.weeklyScan20260628SyncApplied) {
+    (data.schools || []).forEach(s => {
+      const db = schoolDB[s.name];
+      if (!db) return;
+      if (db.vetSchoolRank) s.vetSchoolRank = db.vetSchoolRank;
+      if (db.notes) s.notes = db.notes;
+    });
+    data.weeklyScan20260628SyncApplied = true;
+  }
+
   // ── Scoir label update June 2026 ──
   // With Avery's new weighted GPA (3.8) entered in Scoir, two schools'
   // admission-probability labels shifted upward. All others held steady.
@@ -10688,6 +10704,18 @@ docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '6.8',
+    date: '2026-07-02',
+    title: 'Weekly Research Refresh — Vet Ranks, Costs & Program News',
+    items: [
+      'US News vet-school ranks updated: NC State #4→#3, Ohio State #9→#5, UGA #9→#7',
+      'NC State\'s 2026-27 out-of-state tuition is now finalized (dropped the "legislature vote pending" note)',
+      'Wisconsin test-optional flag: its window may end at the Summer 2027 term, so Fall 2027 (Avery\'s cycle) is not guaranteed test-optional — verify before relying on it, as she may need to submit her ACT',
+      'Kentucky: added the new $1M "Pathfinder" equine pre-veterinary support fund (May 2026)',
+      'Auburn out-of-state merit is now shown as a tiered grid ($7K–$17K by ACT) instead of a flat $7K',
+    ]
+  },
   {
     version: '6.7',
     date: '2026-06-22',
