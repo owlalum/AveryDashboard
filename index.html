@@ -2588,6 +2588,7 @@
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -3335,6 +3336,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const docRef = db.collection('dashboards').doc('main');
+
+// Anonymous sign-in so Firestore security rules can require request.auth
+// (see SECURITY_SETUP.md). Best-effort: if Anonymous auth isn't enabled in
+// the Firebase console yet, sign-in fails and we proceed unauthenticated —
+// identical to today's behavior under the current open rules. Firestore
+// reads/writes wait on this promise so that once rules are tightened, the
+// first read never races the sign-in.
+const authReady = firebase.auth().signInAnonymously()
+  .then(() => { console.log('Firebase: anonymous auth OK'); })
+  .catch(err => {
+    console.warn('Firebase: anonymous auth unavailable (' + err.code + '). ' +
+      'Proceeding unauthenticated — enable Anonymous auth in the console ' +
+      'before tightening Firestore rules.');
+  });
 let firestoreSyncEnabled = false;
 let firestoreInitialized = false;
 let syncStatus = 'connecting';
@@ -4463,6 +4478,7 @@ function runPostInitMigrations() {
   runMigrations();
 
   try {
+    await authReady;
     const snap = await docRef.get();
     if (snap.exists) {
       const remote = snap.data();
@@ -5042,6 +5058,9 @@ function onScoresChanged() {
   updateHonorsEligibility();
   renderChecklists();
   renderEssays();
+  // Scholarships shows dynamic merit amounts (Kentucky/Tennessee/etc. grids
+  // keyed off ACT/GPA) — without this it kept stale dollars until reload.
+  renderScholarships();
 }
 
 function renderAppStatus() {
@@ -5463,10 +5482,11 @@ function openCompareModal() {
     const vet = getSummaryVetStatus(name);
     const vetClass = vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
     const costInfo = getSummaryCost(name);
-    const ev = data.evaluations[name];
-    const visitScore = ev ? calcWeightedTotal(ev) : 0;
-    const maxTotal = calcMaxWeightedTotal();
-    const visitDisplay = visitScore > 0 ? visitScore + ' / ' + maxTotal : 'Not visited';
+    // v20 visit score (overallFit/campusVibe/academicFit). The old
+    // calcWeightedTotal sums legacy category objects that post-v20 records
+    // no longer carry, so it reported every school as "Not visited".
+    const visitInfo = getVisitScoreInfo(name);
+    const visitDisplay = visitInfo.hasData ? visitInfo.score + ' / 5' : 'Not visited';
     const rk = getRankingForSchool(name);
     const status = statusLabels[s.status] || s.status;
     const statusClass = 's-' + (s.status || 'researching');
@@ -5521,7 +5541,9 @@ function openCompareModal() {
     if (cells.length < 2) return;
     const nums = cells.map(c => {
       const txt = c.querySelector('.cr-value').textContent.trim();
-      const n = parseFloat(txt.replace(/[$K,%\/\s]/g, ''));
+      // Keep the '/' so parseFloat stops before the '/5' denominator —
+      // stripping it would turn "3 / 5" into 35 while "4.2 / 5" became 4.25.
+      const n = parseFloat(txt.replace(/[$K,%\s]/g, ''));
       return isNaN(n) ? null : n;
     });
     const valid = nums.filter(n => n !== null);
@@ -5650,13 +5672,16 @@ function renderTestPrep() {
   if (data.testprep.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  const sorted = [...data.testprep].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sorted = [...data.testprep].sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
 
   const typeColors = { milestone: 'var(--primary)', practice: 'var(--warn)', test: 'var(--accent)' };
   const typeLabels = { milestone: 'Milestone', practice: 'Practice Test', test: 'Official Test' };
 
   container.innerHTML = sorted.map(t => {
-    const isPast = new Date(t.date) < new Date();
+    // Local-midnight comparison: only style as past when the date is
+    // strictly before today (UTC parsing marked items "past" a day early,
+    // and same-day items shouldn't grey out mid-day).
+    const isPast = parseLocalDate(t.date) < new Date(new Date().setHours(0, 0, 0, 0));
     return `
     <div class="card milestone-card ${isPast ? 'past' : ''}" data-id="${t.id}" style="border-left-color:${typeColors[t.type] || 'var(--primary)'}">
       <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
@@ -5779,7 +5804,7 @@ function renderChecklists() {
         <div class="checklist-section-label">
           Honors College
           <span class="honors-toggle">
-            <select onchange="toggleHonorsOptOut('${cl.school}', this.value === 'no')">
+            <select onchange="toggleHonorsOptOut('${esc(escJS(cl.school))}', this.value === 'no')">
               <option value="yes"${!honorsDisabled ? ' selected' : ''}>Applying</option>
               <option value="no"${honorsDisabled ? ' selected' : ''}>Not applying</option>
             </select>
@@ -6598,7 +6623,7 @@ function renderVisitRowBody(s, ev) {
   const name = s.name;
   const visited = !!ev.visited;
   const ratingButtons = (field, val) => [1,2,3,4,5].map(n =>
-    `<button type="button" class="${(val === n) ? 'active' : ''}" onclick="setVisitRating('${esc(name)}','${field}',${n})">${n}</button>`
+    `<button type="button" class="${(val === n) ? 'active' : ''}" onclick="setVisitRating('${esc(escJS(name))}','${field}',${n})">${n}</button>`
   ).join('');
 
   const notVisitedNote = !visited
@@ -6620,25 +6645,25 @@ function renderVisitRowBody(s, ev) {
     </div>
     <div class="vrb-field">
       <label class="vrb-label">One thing you loved <span class="vrb-hint">(optional, ~200 char)</span></label>
-      <textarea class="vrb-text" rows="2" maxlength="220" oninput="updateVisitCharCount(this)" onblur="setVisitField('${esc(name)}','loved',this.value)">${esc(ev.loved || '')}</textarea>
+      <textarea class="vrb-text" rows="2" maxlength="220" oninput="updateVisitCharCount(this)" onblur="setVisitField('${esc(escJS(name))}','loved',this.value)">${esc(ev.loved || '')}</textarea>
       <div class="vrb-charcount" data-max="200">${(ev.loved || '').length}/200</div>
     </div>
     <div class="vrb-field">
       <label class="vrb-label">One thing that concerned you <span class="vrb-hint">(optional, ~200 char)</span></label>
-      <textarea class="vrb-text" rows="2" maxlength="220" oninput="updateVisitCharCount(this)" onblur="setVisitField('${esc(name)}','concerned',this.value)">${esc(ev.concerned || '')}</textarea>
+      <textarea class="vrb-text" rows="2" maxlength="220" oninput="updateVisitCharCount(this)" onblur="setVisitField('${esc(escJS(name))}','concerned',this.value)">${esc(ev.concerned || '')}</textarea>
       <div class="vrb-charcount" data-max="200">${(ev.concerned || '').length}/200</div>
     </div>
   ` : '';
 
   const hasLegacy = !!ev.legacyVisitData;
   const legacyButton = hasLegacy
-    ? `<button type="button" class="vrb-restore-btn" onclick="restoreVisitFromLegacy('${esc(name)}')" title="Re-apply the migration mapping from the original pre-v20 visit data">&#8634; Restore from legacy</button>`
+    ? `<button type="button" class="vrb-restore-btn" onclick="restoreVisitFromLegacy('${esc(escJS(name))}')" title="Re-apply the migration mapping from the original pre-v20 visit data">&#8634; Restore from legacy</button>`
     : '';
 
   return `
     <div class="vrb-toggle-row">
       <label>
-        <input type="checkbox" ${visited ? 'checked' : ''} onchange="setVisitVisited('${esc(name)}', this.checked)">
+        <input type="checkbox" ${visited ? 'checked' : ''} onchange="setVisitVisited('${esc(escJS(name))}', this.checked)">
         Mark as visited
       </label>
       ${legacyButton}
@@ -7146,13 +7171,13 @@ function renderRankings() {
   const sortedRows = rankingsSort.field ? sortRows(rows, rankingsSort, RANKING_COLUMNS) : rows;
 
   function ratingSelect(school, field, val) {
-    return `<select onchange="setRankingField('${esc(school)}','${field}',parseInt(this.value))">
+    return `<select onchange="setRankingField('${esc(escJS(school))}','${field}',parseInt(this.value))">
       ${[1,2,3,4,5].map(n => `<option value="${n}" ${val===n?'selected':''}>${n}</option>`).join('')}
     </select>`;
   }
   function scoirSelect(school, val) {
     const opts = ['', 'Very Likely', 'Likely', 'Target', 'Reach', 'Far Reach'];
-    return `<select onchange="setRankingField('${esc(school)}','scoirLabel',this.value)">
+    return `<select onchange="setRankingField('${esc(escJS(school))}','scoirLabel',this.value)">
       ${opts.map(o => `<option value="${esc(o)}" ${val===o?'selected':''}>${o || '\u2014'}</option>`).join('')}
     </select>`;
   }
@@ -7170,7 +7195,7 @@ function renderRankings() {
       <td>${ratingSelect(r.name,'meritAid',r.meritAid)}</td>
       <td style="font-weight:700">${r.combined}</td>
       <td>${scoirSelect(r.name, r.scoirLabel)}</td>
-      <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(r.name)}','notes',this.value)"></td>
+      <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(escJS(r.name))}','notes',this.value)"></td>
     </tr>`;
   }).join('');
 
@@ -7884,11 +7909,45 @@ function renderStrategy() {
 }
 
 // ─── Escape HTML ───
+// Escapes quotes as well as &/</> so the result is safe inside HTML
+// attribute values (value="...", title="...", data-*="..."), not just text
+// nodes. (The old textContent→innerHTML trick left quotes intact, so a
+// quote in user text could break out of an attribute.)
 function esc(str) {
   if (!str) return '';
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// For interpolating user text into a JS string literal inside an inline
+// handler, e.g. onclick="fn('${esc(escJS(name))}')". The HTML parser decodes
+// esc()'s entities before the JS engine sees the code, so HTML-escaping alone
+// can't protect the JS string context — quotes/backslashes must also be
+// backslash-escaped. Always compose as esc(escJS(x)), never escJS alone.
+function escJS(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}
+
+// ─── Parse a YYYY-MM-DD date-input string as LOCAL time ───
+// new Date('2026-09-12') parses as UTC midnight, so .getDate()/.toLocale*
+// render it as Sep 11 in any US timezone. Appending T00:00:00 makes the
+// spec parse it as local time instead. Anything that isn't a plain
+// YYYY-MM-DD string falls through to the normal Date constructor.
+function parseLocalDate(str) {
+  if (typeof str === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return new Date(str + 'T00:00:00');
+  }
+  return new Date(str);
 }
 
 function schoolLogoHTML(name, size) {
@@ -8315,8 +8374,11 @@ function getDeadlineEvents() {
     } else if (earlyDecision && earlyDecision !== 'N/A') {
       const d = parseDeadline(earlyDecision, 2026);
       if (d) {
-        const edLabel = db.earlyType === 'ED' ? 'Early Decision (binding)' : 'Early Action';
-        events.push({ date: d, school: name, type: 'ea', label: edLabel, desc: earlyDecision });
+        const isED = db.earlyType === 'ED';
+        const edLabel = isED ? 'Early Decision (binding)' : 'Early Action';
+        // type 'ed' so the timeline's "Early Decision" filter actually
+        // matches — these were all typed 'ea', leaving that filter empty.
+        events.push({ date: d, school: name, type: isED ? 'ed' : 'ea', label: edLabel, desc: earlyDecision });
       }
     }
 
@@ -8358,7 +8420,7 @@ function getDeadlineEvents() {
   // Add test dates
   for (const tp of (data.testprep || [])) {
     if (tp.type === 'test' && tp.date) {
-      deduped.push({ date: new Date(tp.date), school: 'All Schools', type: 'test', label: tp.title || 'Test Date', desc: tp.scoreGoal ? 'Target: ' + tp.scoreGoal : '' });
+      deduped.push({ date: parseLocalDate(tp.date), school: 'All Schools', type: 'test', label: tp.title || 'Test Date', desc: tp.scoreGoal ? 'Target: ' + tp.scoreGoal : '' });
     }
   }
 
@@ -9088,6 +9150,20 @@ function validateAIResponse(text, aiData) {
   // student's actual stat — so it shouldn't count as a fabrication.
   const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore)\b/i;
   const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|superscore|with[\s-]science|without[\s-]science)\b/i;
+  // School-statistic context: the system prompt explicitly asks the model to
+  // compare the student's stats to each school's mid-50% ranges and admitted
+  // averages, so numbers in that context are school data, not fabricated
+  // student stats. Without this, every compliant response ("Auburn's mid-50%
+  // is 26-31") was flagged high-severity, and in prod mode the auto-retry
+  // deterministically re-triggered it — 3 API calls per click, then fallback.
+  const fabSchoolStatRe = /\b(?:mid[-\s]?50|middle\s+50|mid[-\s]?range|range|averag(?:e|es|ed|ing)|avg|median|typical|admit(?:ted|s)?|admissions?|percentile|class\s+profile|incoming\s+class|enrolled|test[-\s]req)\b/i;
+  // A number that is one endpoint of a printed range ("26-31", "3.5–4.0")
+  // is by construction not an assertion of the student's single stat.
+  const isRangeEndpoint = (idx, len) => {
+    const b = t.substring(Math.max(0, idx - 8), idx);
+    const a = t.substring(idx + len, idx + len + 8);
+    return /\d\s*[-–—]\s*$/.test(b) || /^\s*[-–—]\s*\d/.test(a);
+  };
   if (actualGPA != null) {
     const gpaNumRe = /\b([234]\.\d{1,2})\b/g;
     let m;
@@ -9098,11 +9174,13 @@ function validateAIResponse(text, aiData) {
       const after = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
       if (!/\bgpa\b/i.test(before) && !/\bgpa\b/i.test(after)) continue;
       if (Math.abs(val - actualGPA) <= 0.01) continue;
+      if (isRangeEndpoint(m.index, m[0].length)) continue;
       // Threshold/hypothetical suppression: 40-char before, 30-char after.
       const suppressBefore = t.substring(Math.max(0, m.index - 40), m.index);
       const suppressAfter = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
       if (fabSuppressBefore.test(suppressBefore)) continue;
       if (fabSuppressAfter.test(suppressAfter)) continue;
+      if (fabSchoolStatRe.test(suppressBefore) || fabSchoolStatRe.test(suppressAfter)) continue;
       const ctxStart = Math.max(0, m.index - 20);
       const ctxEnd = Math.min(t.length, m.index + m[0].length + 20);
       pushFinding('data_fabrication', 'high', ctxStart, ctxEnd,
@@ -9119,6 +9197,7 @@ function validateAIResponse(text, aiData) {
       const after = t.substring(m.index + m[0].length, m.index + m[0].length + 20);
       if (!/\bACT\b/i.test(before) && !/\bACT\b/i.test(after)) continue;
       if (val === actualACT) continue;
+      if (isRangeEndpoint(m.index, m[0].length)) continue;
       // Same threshold/hypothetical suppression as GPA — an ACT value
       // discussed as a scholarship threshold or hypothetical score shouldn't
       // be flagged as a fabricated student stat.
@@ -9126,6 +9205,7 @@ function validateAIResponse(text, aiData) {
       const suppressAfter = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
       if (fabSuppressBefore.test(suppressBefore)) continue;
       if (fabSuppressAfter.test(suppressAfter)) continue;
+      if (fabSchoolStatRe.test(suppressBefore) || fabSchoolStatRe.test(suppressAfter)) continue;
       const ctxStart = Math.max(0, m.index - 20);
       const ctxEnd = Math.min(t.length, m.index + m[0].length + 20);
       pushFinding('data_fabrication', 'high', ctxStart, ctxEnd,
@@ -9874,8 +9954,13 @@ function initDefaultScholarships() {
 
 function getMeritScholarships() {
   const visibleNames = getVisibleSchools().map(s => s.name);
-  return FIN_DATA.filter(f => f.school && f.merit > 0 && visibleNames.includes(f.school)).map(f => {
+  // Gate on the DYNAMIC amount, not the static FIN_DATA merit: the row
+  // displays the dynamic grid value, so gating on the static one produced
+  // "$0K/year — Awarded" rows when the current ACT/GPA missed every tier
+  // (and would hide a school whose grid pays out despite a static 0).
+  return FIN_DATA.filter(f => f.school && visibleNames.includes(f.school)).map(f => {
     const amt = getAutoMeritForSchool(f.school, f.merit);
+    if (!amt || amt <= 0) return null;
     return {
       id: 'merit_' + f.school.replace(/\s/g, '_'),
       section: 'merit',
@@ -9891,7 +9976,7 @@ function getMeritScholarships() {
       readOnly: true,
       url: schoolDB[f.school] ? 'https://' + schoolDB[f.school].domain + '/admissions' : ''
     };
-  });
+  }).filter(Boolean);
 }
 
 function renderScholarships() {
@@ -10639,7 +10724,9 @@ document.getElementById('profileCard').addEventListener('keydown', function(e) {
 }, true);
 
 // ─── Firestore real-time sync ───
-docRef.onSnapshot(
+// Subscribe only after the anonymous sign-in settles: once security rules
+// require auth, an unauthenticated listener would error out permanently.
+authReady.then(() => docRef.onSnapshot(
   snap => {
     if (snap.metadata.hasPendingWrites) return;
     if (!firestoreInitialized) return;
@@ -10695,7 +10782,7 @@ docRef.onSnapshot(
     console.error('Firestore snapshot error:', err);
     updateSyncIndicator('error');
   }
-);
+));
 
 // ─── Changelog / What's New ───
 // MAINTENANCE: when shipping a user-facing change (cost/admit/ranking
@@ -10704,6 +10791,19 @@ docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '6.9',
+    date: '2026-07-02',
+    title: 'Fixes: Compare Scores, Deadlines & More',
+    items: [
+      'Side-by-side Compare now shows your real visit scores (it was stuck on "Not visited" for every school)',
+      'The "Early Decision" filter on the Deadline Timeline actually shows ED deadlines now (Cornell\'s Nov 1)',
+      'Test dates no longer display one day early',
+      'The Scholarships tab updates its merit-aid dollar amounts immediately when your ACT/GPA changes, and no longer shows $0 awards',
+      'AI Analysis is more reliable — it was wrongly rejecting its own correct answers about school ACT/GPA ranges',
+      'Behind the scenes: tightened security on the AI feature and database access',
+    ]
+  },
   {
     version: '6.8',
     date: '2026-07-02',
@@ -11107,7 +11207,7 @@ function renderChangelog() {
     <div class="changelog-entry">
       <div class="changelog-entry-header">
         <span class="changelog-version">v${entry.version}${isNew ? '<span class="changelog-new-badge">new</span>' : ''}</span>
-        <span class="changelog-date">${new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        <span class="changelog-date">${parseLocalDate(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
       </div>
       <div class="changelog-title">${entry.title}</div>
       <ul class="changelog-items">
