@@ -13,7 +13,9 @@ const ALLOWED_ORIGINS = [
 // Server-side clamps: the client's model/max_tokens are request data, not
 // policy — enforce both here so a crafted request can't run an expensive
 // model or huge completion on the family's key.
-const ALLOWED_MODELS = ['claude-sonnet-5'];
+// Both current-generation tiers are allowed so the dashboard can switch
+// models without a worker redeploy; the dashboard picks which one to use.
+const ALLOWED_MODELS = ['claude-opus-4-8', 'claude-sonnet-5'];
 const MAX_TOKENS_CAP = 2048;
 
 function corsHeaders(origin) {
