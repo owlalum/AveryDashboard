@@ -576,6 +576,14 @@
   .ai-analysis-content ul, .ai-analysis-content ol { margin: 0 0 14px 0; padding-left: 22px; }
   .ai-analysis-content li { margin-bottom: 6px; line-height: 1.6; font-size: 0.92rem; }
   .ai-analysis-content code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+  /* ── School research-notes expander (School Comparison) ── */
+  .notes-toggle-btn { background: none; border: none; cursor: pointer; font-size: 0.95rem; color: var(--primary); padding: 0 2px; line-height: 1; opacity: 0.65; }
+  .notes-toggle-btn:hover { opacity: 1; }
+  .notes-toggle-btn.open { opacity: 1; color: var(--primary-dark); }
+  .school-notes-row td { background: #fbf8f1; border-bottom: 2px solid var(--border); padding: 10px 16px 12px; }
+  .school-notes-body { max-width: 900px; font-size: 0.84rem; line-height: 1.55; color: var(--text); white-space: normal; }
+  .school-notes-body p { margin: 0 0 8px; }
+  .school-notes-body .note-flag { margin: 0 0 6px; padding-left: 4px; }
   .ai-loading { text-align: center; padding: 40px 20px; color: var(--text-light); }
   .ai-loading .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: aispin 0.8s linear infinite; }
   @keyframes aispin { to { transform: rotate(360deg); } }
@@ -5346,6 +5354,37 @@ function updateFinalListUI() {
 
 // ─── School Comparison ───
 let schoolSort = { field: null, dir: 'asc' };
+
+// Which schools have their research-notes row expanded (survives re-renders).
+const openSchoolNotes = new Set();
+
+function toggleSchoolNotes(id) {
+  const row = document.querySelector('.school-notes-row[data-notes-for="' + id + '"]');
+  const btn = document.querySelector('.notes-toggle-btn[onclick*="' + id + '"]');
+  if (openSchoolNotes.has(id)) {
+    openSchoolNotes.delete(id);
+    if (row) row.style.display = 'none';
+    if (btn) btn.classList.remove('open');
+  } else {
+    openSchoolNotes.add(id);
+    if (row) row.style.display = '';
+    if (btn) btn.classList.add('open');
+  }
+}
+
+// Render a school's research notes for display: the leading text becomes a
+// paragraph, and each ★-flagged item gets its own line so the pathway/policy
+// callouts read as a list instead of a wall of text.
+function schoolNotesHTML(txt) {
+  txt = String(txt || '').trim();
+  if (!txt) return '<em>No notes yet.</em>';
+  const startsWithFlag = txt.indexOf('★') === 0;
+  const parts = txt.split('★').map(t => t.trim()).filter(Boolean);
+  if (!parts.length) return '<em>No notes yet.</em>';
+  const head = startsWithFlag ? null : parts.shift();
+  return (head ? '<p>' + esc(head) + '</p>' : '') +
+    parts.map(p => '<div class="note-flag">★ ' + esc(p) + '</div>').join('');
+}
 let compareSelected = []; // array of school names, max 4
 
 function getSuperscoreStatus(schoolName) {
@@ -5731,7 +5770,7 @@ function renderSchools() {
     return `
     <tr data-id="${s.id}">
       <td class="compact sticky-col" style="width:34px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
-      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name)} <span contenteditable="true" data-field="name">${esc(s.name)}</span></span></td>
+      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name)} <span contenteditable="true" data-field="name">${esc(s.name)}</span>${(s.notes || (dbEntry && dbEntry.notes)) ? `<button class="notes-toggle-btn${openSchoolNotes.has(s.id) ? ' open' : ''}" onclick="toggleSchoolNotes('${s.id}')" title="Show/hide research notes">&#9432;</button>` : ''}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span>${ssBadge}</td>
@@ -5748,6 +5787,9 @@ function renderSchools() {
         </select>
       </td>
       <td><button class="btn-icon" title="Remove school" onclick="deleteSchool('${s.id}')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></td>
+    </tr>
+    <tr class="school-notes-row" data-notes-for="${s.id}" style="display:${openSchoolNotes.has(s.id) ? '' : 'none'}">
+      <td colspan="${SCHOOL_COLUMNS.length}"><div class="school-notes-body">${schoolNotesHTML(s.notes || (dbEntry && dbEntry.notes) || '')}</div></td>
     </tr>`;
   }).join('');
 
@@ -5781,7 +5823,8 @@ function renderSchools() {
     for (let i = 0; i < stickyCount && i < ths.length; i++) {
       ths[i].style.left = left + 'px';
       const w = ths[i].offsetWidth;
-      tbody.querySelectorAll('tr').forEach(tr => { tr.children[i].style.left = left + 'px'; });
+      // Skip notes rows: they have a single colspan cell, no sticky columns.
+      tbody.querySelectorAll('tr:not(.school-notes-row)').forEach(tr => { if (tr.children[i]) tr.children[i].style.left = left + 'px'; });
       left += w;
     }
   }
@@ -10991,6 +11034,15 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '7.1',
+    date: '2026-07-03',
+    title: 'Research Notes Now Visible',
+    items: [
+      'New ⓘ button next to each school\'s name in School Comparison — click it to expand that school\'s full research notes (vet pathways, test policies, merit details, ★ flagged updates) right in the table',
+      'Until now those notes only fed the AI Analysis and exports — all the pathway research from v7.0 is now readable on screen',
+    ]
+  },
   {
     version: '7.0',
     date: '2026-07-03',
