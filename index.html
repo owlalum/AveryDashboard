@@ -570,6 +570,12 @@
   .btn-ai:hover { background: #5e9a70; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(122,174,142,0.3); }
   .ai-analysis-content p { margin-bottom: 14px; line-height: 1.65; font-size: 0.92rem; }
   .ai-analysis-content p:last-child { margin-bottom: 0; }
+  .ai-analysis-content h4 { margin: 18px 0 8px; font-size: 1.02rem; color: var(--primary-dark); }
+  .ai-analysis-content h5 { margin: 14px 0 6px; font-size: 0.94rem; color: var(--primary-dark); }
+  .ai-analysis-content h4:first-child, .ai-analysis-content h5:first-child { margin-top: 0; }
+  .ai-analysis-content ul, .ai-analysis-content ol { margin: 0 0 14px 0; padding-left: 22px; }
+  .ai-analysis-content li { margin-bottom: 6px; line-height: 1.6; font-size: 0.92rem; }
+  .ai-analysis-content code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
   .ai-loading { text-align: center; padding: 40px 20px; color: var(--text-light); }
   .ai-loading .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: aispin 0.8s linear infinite; }
   @keyframes aispin { to { transform: rotate(360deg); } }
@@ -9768,11 +9774,61 @@ function renderValidatorBanner(findings) {
     '</div>';
 }
 
+// ─── Render the AI's markdown to HTML ───
+// The model writes markdown (## headings, **bold**, - bullets), but the old
+// renderer only split on blank lines into <p> tags — so headings and bold
+// showed as literal ##/** and bullet lines collapsed into run-on paragraphs.
+// This renders the small markdown subset the prompt asks for. Everything is
+// esc()'d before any tags are added, so model output can't inject HTML.
+function renderAIMarkdown(text) {
+  function inline(s) {
+    return esc(s)
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+  }
+  const blocks = String(text || '').split(/\n{2,}/);
+  return blocks.map(function(block) {
+    block = block.trim();
+    if (!block) return '';
+    // Heading block: "## Title" (### → smaller). Only when single-line.
+    const h = block.match(/^(#{2,4})\s+(.+)$/);
+    if (h && block.indexOf('\n') === -1) {
+      const level = Math.min(h[1].length + 2, 6); // ## → h4, ### → h5
+      return '<h' + level + '>' + inline(h[2]) + '</h' + level + '>';
+    }
+    // Line-by-line: group consecutive bullet/numbered lines into lists,
+    // everything else into paragraphs. Handles pure-list blocks and blocks
+    // where a lead-in sentence is followed by items on their own lines.
+    const lines = block.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+    let html = '';
+    let items = [];
+    let listTag = null;
+    function flushList() {
+      if (items.length) { html += '<' + listTag + '>' + items.join('') + '</' + listTag + '>'; items = []; }
+      listTag = null;
+    }
+    lines.forEach(function(l) {
+      const ul = l.match(/^[-*]\s+(.*)$/);
+      const ol = l.match(/^\d+[.)]\s+(.*)$/);
+      if (ul || ol) {
+        const tag = ul ? 'ul' : 'ol';
+        if (listTag && listTag !== tag) flushList();
+        listTag = tag;
+        items.push('<li>' + inline((ul || ol)[1]) + '</li>');
+      } else {
+        flushList();
+        html += '<p>' + inline(l) + '</p>';
+      }
+    });
+    flushList();
+    return html;
+  }).join('');
+}
+
 function applyInlineHighlights(text, findings) {
-  // No findings → render paragraphs as before.
+  // No findings → normal markdown rendering.
   if (!findings || findings.length === 0) {
-    return text.split('\n\n').filter(function(p) { return p.trim(); })
-      .map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
+    return renderAIMarkdown(text);
   }
   // Merge overlapping/touching ranges so each stretch of flagged text is one <mark>.
   const sorted = findings.slice().sort((a, b) => a.startIndex - b.startIndex);
@@ -9961,8 +10017,7 @@ function showAIResult(container, text, timestamp, userQuestion, validation) {
   const bannerHTML = showValidatorUI ? renderValidatorBanner(findings) : '';
   const body = showValidatorUI
     ? applyInlineHighlights(text, findings)
-    : text.split('\n\n').filter(function(p) { return p.trim(); })
-        .map(function(p) { return '<p>' + esc(p.trim()) + '</p>'; }).join('');
+    : renderAIMarkdown(text);
   const questionBlock = (userQuestion && userQuestion.trim())
     ? '<div class="ai-question-recap"><span class="ai-question-label">You asked:</span> ' + esc(userQuestion.trim()) + '</div>'
     : '';
