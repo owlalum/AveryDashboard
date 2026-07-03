@@ -3397,6 +3397,39 @@ function loadData() {
 // with { synced: false, reason: 'superseded' } so awaiters don't hang.
 let savePromiseResolve = null;
 
+// Distinguishes hand-made edits from the automatic sync writes that fire
+// during the first render pass (syncChecklists/syncEssays call saveData()
+// unconditionally). Only real user input sets this — nothing the user did
+// can predate their first pointer/key event.
+let userHasInteracted = false;
+['pointerdown', 'keydown'].forEach(evt =>
+  document.addEventListener(evt, () => { userHasInteracted = true; }, { capture: true, passive: true })
+);
+// Set when a user-made edit hit the pre-init save gate; initFromFirestore
+// resolves it (persist if local survived init, notify if remote replaced it).
+let preInitEditPending = false;
+
+// Small self-dismissing notice for sync events that deserve the user's
+// attention but not a blocking alert().
+function showTransientNotice(msg) {
+  const div = document.createElement('div');
+  div.setAttribute('role', 'alert');
+  div.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:10000;' +
+    'max-width:min(560px,90vw);background:#fff4db;border:1px solid #d4a843;color:#7a5a00;' +
+    'padding:12px 40px 12px 16px;border-radius:8px;font-size:0.88rem;line-height:1.5;' +
+    'box-shadow:0 4px 16px rgba(0,0,0,0.18);';
+  div.textContent = msg;
+  const x = document.createElement('button');
+  x.textContent = '×';
+  x.setAttribute('aria-label', 'Dismiss');
+  x.style.cssText = 'position:absolute;top:6px;right:10px;background:none;border:none;' +
+    'font-size:1.1rem;cursor:pointer;color:inherit;padding:2px;';
+  x.onclick = () => div.remove();
+  div.appendChild(x);
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 12000);
+}
+
 function saveData() {
   // Pre-init gate: the first synchronous renderAll() at the bottom of the
   // script runs BEFORE initFromFirestore's `await docRef.get()` resolves.
@@ -3409,6 +3442,11 @@ function saveData() {
   // the second renderAll's saveData. Defer all writes until init has had a
   // chance to decide which side wins.
   if (!firestoreInitialized) {
+    // Automatic first-render sync calls stay strict no-ops (stamping here
+    // poisons conflict resolution — see above). But an edit the user made
+    // by hand deserves better than silent loss: flag it so init can either
+    // persist it (local survived) or tell the user it couldn't be kept.
+    if (userHasInteracted) preInitEditPending = true;
     return Promise.resolve({ synced: false, reason: 'pre-init' });
   }
   data.lastModified = Date.now();
@@ -3592,14 +3630,33 @@ function restoreFromJSON(input) {
       }
       data = restored;
       data.lastModified = Date.now();
+      // A backup carries the user's own authored content, and a backup made
+      // before a one-time overwrite migration shipped won't carry that
+      // migration's sentinel — so the migration would re-fire and replace
+      // the very fields the restore exists to bring back. Pre-set sentinels
+      // for the migrations that overwrite USER content when the backup
+      // actually contains that content. Fact-refresh migrations (schoolDB
+      // syncs, GPA/Scoir updates) still run and bring the backup forward.
+      if (data.householdContext !== undefined) {
+        data.householdContextV5ResetApplied = true;
+      }
+      const restoredHasCheckmarks = (data.checklists || [])
+        .some(cl => (cl.items || []).some(it => it && it.done));
+      if (restoredHasCheckmarks) {
+        // checklistRationalizeV1 rebuilds every checklist with done:false.
+        // Never erase checkmarks the user just restored; backups without
+        // any checkmarks still get the rationalized template.
+        data.checklistRationalizeV1MigrationApplied = true;
+      }
       // Ensure structural migrations run against the restored data before the
       // UI tries to render it. Without this, an old backup missing fields
       // (e.g. data.rankings, data.essays, Strategic Fit sentinels) would
-      // render through partially-initialized state. runPostInitMigrations is
-      // intentionally NOT called here — its wipe-style migrations shouldn't
-      // fire on restored data that already has its own sentinels or populated
-      // collections; they will run on the next page reload if needed.
+      // render through partially-initialized state.
       runMigrations();
+      // Run post-init migrations NOW (with the protections above in place)
+      // instead of deferring to the next reload — a deferred wipe-style
+      // migration firing days later looked like spontaneous data loss.
+      runPostInitMigrations();
       // Render immediately so the user sees the restored state right away.
       // The local restore has already completed (data + localStorage);
       // awaiting the Firestore push only gates which alert to show.
@@ -3996,6 +4053,15 @@ let data = loadData();
 
 // ─── Run structural migrations (no Firestore writes) ───
 function runMigrations() {
+  // Core arrays first: renderers and sync functions (.filter/.length) assume
+  // these exist. A dataset arriving from an older app version, a restored
+  // backup, or a cross-session snapshot may lack any of them.
+  if (!Array.isArray(data.schools)) data.schools = [];
+  if (!Array.isArray(data.visits)) data.visits = [];
+  if (!Array.isArray(data.testprep)) data.testprep = [];
+  if (!Array.isArray(data.checklists)) data.checklists = [];
+  if (!Array.isArray(data.essays)) data.essays = [];
+  if (!data.honorsOptOut) data.honorsOptOut = {};
   if (!data.evaluations) data.evaluations = {};
   if (!data.visitNotes) data.visitNotes = {};
   if (!data.rankings) data.rankings = {};
@@ -4477,6 +4543,9 @@ function runPostInitMigrations() {
   // Run migrations on local data first for immediate render
   runMigrations();
 
+  let localWon = false;      // local beat remote in conflict resolution
+  let remoteAdopted = false; // remote replaced the local dataset
+
   try {
     await authReady;
     const snap = await docRef.get();
@@ -4490,8 +4559,10 @@ function runPostInitMigrations() {
       // app in a new browser would clobber Firestore with empty defaults.
       const localWins = localTs > 0 && localTs > remoteTs;
       if (localWins) {
-        console.log('Local data is newer than remote, will sync on next save (localTs:', localTs, '> remoteTs:', remoteTs, ')');
+        localWon = true;
+        console.log('Local data is newer than remote (localTs:', localTs, '> remoteTs:', remoteTs, ') — pushing after init.');
       } else {
+        remoteAdopted = true;
         data = remote;
         runMigrations();
         console.log('Initialized from Firestore (remoteTs:', remoteTs, ', localTs:', localTs, ')');
@@ -4518,6 +4589,31 @@ function runPostInitMigrations() {
   // comment for why these live here rather than at top-level script scope.
   runPostInitMigrations();
   renderAll();
+
+  // Local won the conflict resolution: push it NOW rather than waiting for
+  // the user's next edit. Until this push lands, the local-only edits exist
+  // nowhere else — and a write from any other session would look "newer" to
+  // onSnapshot and silently overwrite them (the offline-edit clobber bug).
+  if (localWon) {
+    saveData();
+  }
+
+  // The user managed to edit something during the init window and remote
+  // data replaced the dataset that held the edit. The edit is gone — say so
+  // rather than letting the change silently revert on screen.
+  if (preInitEditPending) {
+    preInitEditPending = false;
+    if (remoteAdopted) {
+      showTransientNotice(
+        'A change made while the dashboard was still connecting could not ' +
+        'be kept — the latest saved data was loaded instead. Please redo that change.'
+      );
+    } else {
+      // Local dataset survived init, so the early edit is still in it —
+      // persist it now that saving is allowed.
+      saveData();
+    }
+  }
 
   // First-use welcome: prompt for student name if not set
   if (!data.studentName) {
@@ -5182,6 +5278,24 @@ function toggleFinalList(school) {
   if (s) { s.finalList = !s.finalList; saveData(); renderSchools(); renderSummary(); updateFinalListUI(); }
 }
 
+// Everything that hangs off a school — visit evaluations, rankings, national
+// and ag rankings, honors opt-outs, visit notes, checklists, essays, visits —
+// is keyed by the school's display name. When the user edits a name (e.g.
+// fixing a typo), migrate the keyed data instead of orphaning it. Skips a
+// target key that's already occupied rather than overwriting it.
+function renameSchoolKeys(oldName, newName) {
+  [data.evaluations, data.rankings, data.nationalRankings, data.agRankings,
+   data.honorsOptOut, data.visitNotes].forEach(map => {
+    if (map && map[oldName] !== undefined && map[newName] === undefined) {
+      map[newName] = map[oldName];
+      delete map[oldName];
+    }
+  });
+  (data.checklists || []).forEach(cl => { if (cl.school === oldName) cl.school = newName; });
+  (data.essays || []).forEach(e => { if (e.school === oldName) e.school = newName; });
+  (data.visits || []).forEach(v => { if (v.school === oldName) v.school = newName; });
+}
+
 function setFinalListFilter(on) {
   finalListOnly = on;
   sessionStorage.setItem('finalListOnly', on ? 'true' : 'false');
@@ -5620,7 +5734,14 @@ function renderSchools() {
       const row = el.closest('tr');
       const school = data.schools.find(s => s.id === row.dataset.id);
       if (school) {
-        school[el.dataset.field] = el.textContent.trim();
+        const field = el.dataset.field;
+        const newVal = el.textContent.trim();
+        if (field === 'name' && newVal && newVal !== school.name) {
+          // Evaluations, rankings, checklists etc. are keyed by name —
+          // carry them to the new name or they silently detach.
+          renameSchoolKeys(school.name, newVal);
+        }
+        school[field] = newVal;
         saveData();
       }
     });
@@ -8000,73 +8121,52 @@ function exportToExcel() {
 
 // ─── Export Evaluations to Excel (SheetJS) ───
 function exportEvaluationsToExcel() {
+  // v20 visit schema: visited + three 1-5 ratings + loved/concerned text.
+  // (The old export summed the pre-v20 31-item categories, which no longer
+  // exist on current records — every school exported as zeros.)
   const wb = XLSX.utils.book_new();
 
-  // Sheet 1: Evaluation Summary
-  const summaryRows = data.schools.map(s => {
+  const rows = data.schools.map(s => {
     const ev = getEvalForSchool(s.name);
-    const wt = calcWeightedTotal(ev);
+    const score = calcNewVisitScore(ev);
     return {
       'School': s.name,
-      'Gut Check': calcCategorySubtotal(ev, 'gutCheck'),
-      'Campus & Facilities': calcCategorySubtotal(ev, 'campus'),
-      'Academic & Pre-Vet': calcCategorySubtotal(ev, 'academic'),
-      'Student Life & Vibe': calcCategorySubtotal(ev, 'studentLife'),
-      'Practical Factors': calcCategorySubtotal(ev, 'practical'),
-      'Weighted Total': wt,
-      'Letter Grade': ev.letterGrade || '',
-      'Visit Date': ev.visitDate || '',
-      'Weather': ev.weather || '',
-      'Tour Guide': ev.tourGuide || ''
+      'On Final List': s.finalList ? 'Yes' : '',
+      'Visited': ev.visited ? 'Yes' : 'No',
+      'Overall Fit (1-5)': ev.overallFit != null ? ev.overallFit : '',
+      'Campus Vibe (1-5)': ev.campusVibe != null ? ev.campusVibe : '',
+      'Academic Fit (1-5)': ev.academicFit != null ? ev.academicFit : '',
+      'Visit Score (of 5)': score != null ? score : '',
+      'What I Loved': ev.loved || '',
+      'What Concerned Me': ev.concerned || ''
     };
   });
-  summaryRows.sort((a, b) => b['Weighted Total'] - a['Weighted Total']);
-  summaryRows.forEach((r, i) => r['Rank'] = i + 1);
-  const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
-  wsSummary['!cols'] = Object.keys(summaryRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 12) }));
-  XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+  rows.sort((a, b) => (b['Visit Score (of 5)'] || 0) - (a['Visit Score (of 5)'] || 0));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{ wch: 30 }, { wch: 12 }, { wch: 8 }, { wch: 16 }, { wch: 16 }, { wch: 17 }, { wch: 16 }, { wch: 44 }, { wch: 44 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Visit Evaluations');
 
-  // Sheet 2: Detailed Ratings (every item for every school)
-  const detailRows = [];
-  data.schools.forEach(s => {
-    const ev = getEvalForSchool(s.name);
-    for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
-      cat.items.forEach(it => {
-        detailRows.push({
-          'School': s.name,
-          'Category': cat.label,
-          'Weight': cat.weight + 'x',
-          'Item': it.label,
-          'Rating (1-5)': ev[catKey] && ev[catKey][it.key] ? ev[catKey][it.key] : 0
-        });
-      });
-    }
-  });
-  const wsDetail = XLSX.utils.json_to_sheet(detailRows);
-  wsDetail['!cols'] = [{ wch: 30 }, { wch: 22 }, { wch: 8 }, { wch: 40 }, { wch: 12 }];
-  XLSX.utils.book_append_sheet(wb, wsDetail, 'Detailed Ratings');
-
-  // Sheet 3: Visit Notes & Intangibles
-  const notesRows = data.schools.map(s => {
+  // Legacy pre-v20 notes, when a school still carries them from migration —
+  // exported so nothing the family wrote is stranded in old fields.
+  const legacyRows = data.schools.map(s => {
     const ev = getEvalForSchool(s.name);
     const vn = data.visitNotes[s.name] || {};
-    const intang = ev.intangibles || {};
+    const intang = (ev.legacyVisitData && ev.legacyVisitData.intangibles) || ev.intangibles || {};
     return {
       'School': s.name,
       'Best Thing': intang.bestThing || '',
       'Biggest Concern': intang.biggestConcern || '',
-      'What Surprised You': intang.surprised || '',
       'Vibe in 3 Words': intang.vibeWords || '',
-      'What I Loved': vn.loved || '',
-      'What Concerned Me': vn.concerned || '',
       'Questions Answered': vn.answered || '',
       'Questions Still Open': vn.openQuestions || '',
       'Would I Be Happy Here?': vn.happyHere || ''
     };
-  });
-  const wsNotes = XLSX.utils.json_to_sheet(notesRows);
-  wsNotes['!cols'] = Object.keys(notesRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 20) }));
-  XLSX.utils.book_append_sheet(wb, wsNotes, 'Notes & Intangibles');
+  }).filter(r => Object.keys(r).some(k => k !== 'School' && r[k]));
+  if (legacyRows.length) {
+    const wsLegacy = XLSX.utils.json_to_sheet(legacyRows);
+    wsLegacy['!cols'] = Object.keys(legacyRows[0]).map(k => ({ wch: Math.max(k.length + 2, 20) }));
+    XLSX.utils.book_append_sheet(wb, wsLegacy, 'Legacy Notes');
+  }
 
   const evalName = (data.studentName || 'Student').split(' ')[0];
   XLSX.writeFile(wb, evalName + '_Visit_Evaluations.xlsx');
@@ -8094,26 +8194,19 @@ function exportToCSV(type) {
   } else {
     const rows = data.schools.map(s => {
       const ev = getEvalForSchool(s.name);
-      const vn = data.visitNotes[s.name] || {};
-      const intang = ev.intangibles || {};
+      const score = calcNewVisitScore(ev);
       return {
         'School': s.name,
-        'Gut Check': calcCategorySubtotal(ev, 'gutCheck'),
-        'Campus': calcCategorySubtotal(ev, 'campus'),
-        'Academic': calcCategorySubtotal(ev, 'academic'),
-        'Student Life': calcCategorySubtotal(ev, 'studentLife'),
-        'Practical': calcCategorySubtotal(ev, 'practical'),
-        'Weighted Total': calcWeightedTotal(ev),
-        'Grade': ev.letterGrade || '',
-        'Visit Date': ev.visitDate || '',
-        'Best Thing': intang.bestThing || '',
-        'Biggest Concern': intang.biggestConcern || '',
-        'Vibe Words': intang.vibeWords || '',
-        'What I Loved': vn.loved || '',
-        'What Concerned Me': vn.concerned || ''
+        'Visited': ev.visited ? 'Yes' : 'No',
+        'Overall Fit (1-5)': ev.overallFit != null ? ev.overallFit : '',
+        'Campus Vibe (1-5)': ev.campusVibe != null ? ev.campusVibe : '',
+        'Academic Fit (1-5)': ev.academicFit != null ? ev.academicFit : '',
+        'Visit Score (of 5)': score != null ? score : '',
+        'What I Loved': ev.loved || '',
+        'What Concerned Me': ev.concerned || ''
       };
     });
-    rows.sort((a, b) => b['Weighted Total'] - a['Weighted Total']);
+    rows.sort((a, b) => (b['Visit Score (of 5)'] || 0) - (a['Visit Score (of 5)'] || 0));
     ws = XLSX.utils.json_to_sheet(rows);
     filename = (data.studentName || 'Student').split(' ')[0] + '_Visit_Evaluations.csv';
   }
@@ -10784,6 +10877,11 @@ authReady.then(() => docRef.onSnapshot(
           return;
         }
         data = remote;
+        // The writing session may be running an older cached app version
+        // whose data lacks newer structural fields — migrate before
+        // rendering, exactly as the init path does (runMigrations also
+        // persists to localStorage).
+        runMigrations();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         renderAll();
       }
