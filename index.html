@@ -4242,7 +4242,10 @@ function runMigrations() {
   //                 corroborated; University of Tennessee FY2027 tuition vote
   //                 confirmed approved). Notes-only changes, so this rev bump is
   //                 the sync path (successor to the dated weeklyScan* sentinels).
-  const NOTES_SYNC_REV = 2;
+  //             3 = 2026-07-22 ACT-34 score-prose refresh (UGA recompute now 34
+  //                 at top of mid-50%, Auburn honors/merit verdicts, Virginia
+  //                 Tech composite, Missouri Scholars margin).
+  const NOTES_SYNC_REV = 3;
   if ((data.schoolNotesSyncRev || 0) < NOTES_SYNC_REV) {
     (data.schools || []).forEach(s => {
       const db = schoolDB[s.name];
@@ -4576,6 +4579,51 @@ function runPostInitMigrations() {
       data.essays = data.essays.filter(e => !(e.school === 'University of Georgia' && /supplemental/i.test(e.name)));
     }
     data.essayRationalizeV1MigrationApplied = true;
+    changed = true;
+  }
+
+  // ── act34ScoreNotesSync: refresh persisted score-verdict prose for the July
+  // 2026 ACT (34 composite, E34/M32/R35/S33). The stretch/reach verdicts and
+  // merit-tier callouts below were written for the April composite of 30 and
+  // live in persisted copies that code edits alone don't reach: checklist item
+  // text (matched by stable prefix — preserves ids and done state), the Clemson
+  // honors essay prompt, and two rankings notes. schoolDB notes ride the
+  // NOTES_SYNC_REV bump instead. Reference data, not user-authored — safe to
+  // overwrite. Lives here (not runMigrations) because SCHOOL_CHECKLISTS /
+  // SCHOOL_ESSAYS are still in their temporal dead zone when runMigrations runs.
+  if (!data.act34ScoreNotesSyncApplied) {
+    const act34RefreshRe = {
+      'University of Florida': /^TESTING: Test-required; also accepts CLT/,
+      'Michigan State University': /^HONORS: Automatic consideration upon MSU admission/,
+      'Auburn University': /^Honors: separate application by Nov 15/,
+      'Clemson University': /^Honors: Calhoun Honors College/,
+      'University of South Carolina': /^HONORS: South Carolina Honors College/
+    };
+    (data.checklists || []).forEach(cl => {
+      const re = act34RefreshRe[cl.school];
+      const tpl = SCHOOL_CHECKLISTS[cl.school];
+      if (!re || !tpl) return;
+      const master = tpl.find(i => re.test(i.text));
+      if (!master) return;
+      (cl.items || []).forEach(it => {
+        if (re.test(it.text)) { it.text = master.text; it.cat = master.cat || it.cat; }
+      });
+    });
+    if (Array.isArray(data.essays)) {
+      const clemsonDef = (SCHOOL_ESSAYS['Clemson University'] || []).find(d => d.name === 'HONORS: Academic Goals Essay');
+      const clemsonEssay = clemsonDef && data.essays.find(e => e.school === 'Clemson University' && e.name === clemsonDef.name);
+      if (clemsonEssay) clemsonEssay.prompt = clemsonDef.prompt;
+    }
+    if (data.rankings) {
+      const act34RankingNotes = {
+        'University of Kentucky': 'Best OOS merit aid: Avery (3.66 UW + ACT 34) clears the top automatic OOS tier — Bluegrass Spirit $12,500/yr — and her 34 now meets the ACT bar for the competitive Singletary (full OOS tuition, ACT 33+; separate scholarship-section app). Apply by Dec 1 (EA) to keep honors + scholarship eligibility. Unmatched equine program.',
+        'University of Tennessee': 'Accredited CVM. Solid SEC safety. Volunteer Scholarship is auto by recalculated WEIGHTED CORE GPA (not reported 3.8) + ACT — with ACT 34 the tier hinges entirely on that recalc: 4.0+ core → $18K/yr, 3.8-3.99 → $3K/yr. Apply by Dec 15. Test REQUIRED.'
+      };
+      Object.keys(act34RankingNotes).forEach(name => {
+        if (data.rankings[name]) data.rankings[name].notes = act34RankingNotes[name];
+      });
+    }
+    data.act34ScoreNotesSyncApplied = true;
     changed = true;
   }
 
@@ -5013,8 +5061,9 @@ function getAutoMeritLabel(school) {
 // Colorado State, Oklahoma State, Mississippi State, South Carolina were
 // removed from the focus list when the 8 schools were deleted; their
 // getXMerit functions remain defined below but are no longer dispatched from
-// here. Auburn has a published grid but its realistic $7K award is stored
-// statically in FIN_DATA (no dynamic function needed).
+// here. Auburn has a published grid but its award is stored statically in
+// FIN_DATA ($15K — Presidential band at ACT 34; update FIN_DATA if scores
+// or the Fall 2027 grid change).
 function getAutoMeritForSchool(school, fallback) {
   const fns = {
     'University of Kentucky': getKentuckyMerit,
@@ -7845,13 +7894,16 @@ const FIN_DATA = [
   // these static `merit` values are NOT used for those three schools. Kept
   // roughly representative for readability only.
   { school:'University of Kentucky', res:'OOS', tuition:35846, rb:16696, books:1200, merit:12500, costYear:'2026-27' },
-  { school:'Colorado State University', res:'OOS', tuition:36407, rb:17508, books:1200, merit:9000, costYear:'2025-26' },
-  { school:'Oklahoma State University', res:'OOS', tuition:29440, rb:11780, books:1400, merit:9000, costYear:'2025-26' },
-  { school:'Mississippi State University', res:'OOS', tuition:28736, rb:13514, books:1200, merit:11000, costYear:'2025-26' },
+  // CSU/OK State/Miss State/South Carolina are off the focus list but their
+  // static merit is kept aligned with their in-file grid functions at the
+  // current stats (ACT 34 / 3.85W) in case any school returns to the list.
+  { school:'Colorado State University', res:'OOS', tuition:36407, rb:17508, books:1200, merit:8000, costYear:'2025-26' },
+  { school:'Oklahoma State University', res:'OOS', tuition:29440, rb:11780, books:1400, merit:18000, costYear:'2025-26' },
+  { school:'Mississippi State University', res:'OOS', tuition:28736, rb:13514, books:1200, merit:18000, costYear:'2025-26' },
   { school:'Michigan State University', res:'OOS', tuition:44758, rb:12928, books:1420, merit:8000, costYear:'2025-26' },
   { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000, costYear:'2025-26' },
-  { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:7000, costYear:'2025-26' },
-  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:7000, costYear:'2026-27' },
+  { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:14000, costYear:'2025-26' },
+  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:15000, costYear:'2026-27' }, // Presidential band ($15-17K, ACT 33-36) on the published Fall 2026 grid at ACT 34; conservative end. Fall 2027 grid unpublished.
   { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000, costYear:'2025-26' },
   { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000, costYear:'2025-26' },
   { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000, costYear:'2025-26 (2026-27 tuition confirmed frozen)' },
@@ -11053,6 +11105,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '7.9',
+    date: '2026-07-22',
+    title: 'Financial Analysis Merit Caught Up to the 34',
+    items: [
+      'Auburn\'s merit in the Financial Analysis tab was still showing the old $7K Charter award — it now shows $15K (the Presidential band, ACT 33-36, on Auburn\'s published Fall 2026 grid), dropping its 4-yr realistic cost by about $32K to ~$169K',
+      'Kentucky, UGA, and Tennessee were already computing merit live from your scores, so their rows were correct',
+      'Also made sure the v7.8 score-note updates actually display on your devices — the strategy notes, checklist items, and the Clemson honors essay prompt are saved copies that needed a one-time refresh',
+      'Note: Auburn\'s Fall 2027 (your cycle) merit grid isn\'t published yet — the $15K is the current published grid and will be re-checked when the new grid posts in September',
+    ]
+  },
   {
     version: '7.8',
     date: '2026-07-22',
