@@ -1316,7 +1316,7 @@
   /* Stat tiles (sticker-style) */
   .stat-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
     margin-top: 26px;
   }
@@ -1333,13 +1333,11 @@
   .stat-tile:nth-child(1) { animation-delay: 0.05s; }
   .stat-tile:nth-child(2) { animation-delay: 0.12s; }
   .stat-tile:nth-child(3) { animation-delay: 0.19s; }
-  .stat-tile:nth-child(4) { animation-delay: 0.26s; }
   @keyframes tileIn { from { opacity: 0; transform: translateY(16px) rotate(-1deg); } to { opacity: 1; transform: none; } }
   .stat-tile:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
   .stat-tile.pink  { background: var(--hot-soft); }
   .stat-tile.coral { background: var(--coral-soft); }
   .stat-tile.sun   { background: var(--sun-soft); }
-  .stat-tile.plum  { background: var(--plum-soft); }
   .stat-tile .st-label {
     font-size: 0.66rem;
     font-weight: 800;
@@ -1673,6 +1671,8 @@
   /* ── Mobile (tablet + large phone) ── */
   @media (max-width: 820px) {
     .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    /* Three tiles: let the ACT tile take the full bottom row */
+    .stat-tile:nth-child(3) { grid-column: 1 / -1; }
     .hero-name { font-size: clamp(2.3rem, 9vw, 3.4rem); }
     .act-breakdown { gap: 12px 18px; padding: 12px 14px; }
     .brand-title { font-size: 1.4rem; }
@@ -2684,11 +2684,6 @@
             <div class="st-foot" data-act="composite-pct">(87th %ile)</div>
             <div class="st-foot" data-act="composite-recompute" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">w/ Sci 31 &middot; w/o Sci 30</div>
           </div>
-          <div class="stat-tile plum">
-            <div class="st-label">Target ACT</div>
-            <div class="st-value">32</div>
-            <div class="st-foot">97th %ile &middot; next sitting goal</div>
-          </div>
         </div>
 
         <div class="act-breakdown">
@@ -2975,7 +2970,6 @@
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (with Science)</td><td data-act="composite-with-sci">31</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">ACT Composite (without Science)</td><td data-act="composite-without-sci">30</td></tr>
         <tr><td colspan="2" style="padding:4px 12px;color:var(--muted);font-size:0.82rem;font-style:italic;">UGA and UTK use the higher of the two recomputed composites (Avery: 31). Other schools use the reported composite (30).</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Target ACT</td><td>32 (97th %ile)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Residency</td><td>Georgia (OOS everywhere except UGA)</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Intended Major</td><td>Pre-Veterinary / Animal Science</td></tr>
         <tr><td style="padding:4px 12px 4px 0;font-weight:600;">Target Career</td><td>Veterinarian (DVM)</td></tr>
@@ -11059,6 +11053,15 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '7.7',
+    date: '2026-07-22',
+    title: 'Target ACT Retired — Goal Reached!',
+    items: [
+      'With your new 34 composite in the books, the "Target ACT" tile is gone from your profile — you blew past the 32 goal, so there’s nothing left to chase',
+      'The profile now shows three stat tiles: Weighted GPA, HOPE GPA, and ACT Composite',
+    ]
+  },
   {
     version: '7.6',
     date: '2026-07-19',
