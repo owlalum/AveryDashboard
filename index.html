@@ -8529,7 +8529,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v14g';
+const PROMPT_VERSION = 'v14h';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -8555,7 +8555,7 @@ const SYSTEM_PROMPT_V2 = [
   "",
   "**Strategic Fit (strategic value).** Each school has a `strategicFit` object with a label (Priority Target / Strong Fit / Happy Landing) computed from four ratings: Program, Fit, Plan B, and Cost (weighted 20/30/30/20), with Fit also acting as a soft gate. This reflects how well the school serves the student's goals — independent of admission chances. The Strategic Fit label is authoritative for the strategic-value axis. Use it when discussing whether a school is worth pursuing. Do not generate your own composite judgments about school quality; reason from the label and its underlying ratings.",
   "",
-  "**The two axes are independent.** A Priority Target can be a Reach in Scoir (high-value pursuit with low odds — Cornell is an example). A Happy Landing can be Very Likely (safe outcome but not strategically optimal). Your job is to reason across both dimensions, not to collapse them into a single \"how good is this school\" judgment.",
+  "**The two axes are independent.** A Priority Target can be a Reach in Scoir (a high-value pursuit with low odds). A Happy Landing can be Very Likely (safe outcome but not strategically optimal). Your job is to reason across both dimensions, not to collapse them into a single \"how good is this school\" judgment.",
   "",
   "## Tier counts and distribution",
   "",
@@ -8591,7 +8591,7 @@ const SYSTEM_PROMPT_V2 = [
   "",
   "- **University of Tennessee, Knoxville**: superscores ACT and includes the Science section only if it improves the superscore. Avery's July sitting is her best in every section, and with or without Science the result rounds to 34. **Avery's UTK-specific superscore composite is 34.**",
   "",
-  "For all other schools on the list (Auburn, Clemson, Cornell, Kentucky, NC State, Ohio State, Purdue, Texas A&M, Virginia Tech, Wisconsin), use the standard reported composite of 34 when comparing to their ACT mid-50% ranges. Do not apply UGA/UTK methodology to other schools. (Note: Virginia Tech disregards only the ACT Writing/essay section, which is not part of the composite anyway — so Avery's full composite of 34 applies at VT.)",
+  "For every other school — the rest of the active list and all candidate-pool schools — use the standard reported composite of 34 when comparing to their ACT mid-50% ranges. Do not apply UGA/UTK methodology to other schools. (Note: Virginia Tech disregards only the ACT Writing/essay section, which is not part of the composite anyway — so Avery's full composite of 34 applies at VT.)",
   "",
   "Since the reported composite and both school-specific recomputes all equal 34, simply cite 'Avery's ACT 34' everywhere. If her scores ever change, re-derive the UGA/UTK lenses before assuming they still match the reported composite.",
   "",
@@ -8924,7 +8924,7 @@ function gatherAIData() {
         'Likely': 'Strong admit probability, no concerns',
         'Target': 'Balanced odds — realistic admit at current stats',
         'Reach': 'Admit possible but not expected at current stats',
-        'Far Reach': 'Very low admit probability for this profile (e.g., Cornell)'
+        'Far Reach': 'Very low admit probability for this profile'
       },
       ratingAnchors: {
         vetProgram: 'Rank-driven from US News Best Veterinary Medicine Programs. 5 = #1-10; 4 = #11-20; 3 = #21-30; 2 = #31+ or new CVM not yet ranked (Clemson); 1 = no vet school on campus.',
@@ -9031,8 +9031,8 @@ function validateAIResponse(text, aiData) {
   // of these contexts is being used as a reference value (scholarship
   // threshold, hypothetical "if she drops to X"), not asserted as the
   // student's actual stat — so it shouldn't count as a fabrication.
-  const fabSuppressBefore = /\b(?:requir\w*|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore|needs?|short\s+of|away\s+from|recalc\w*|Zell(?:\s+Miller)?)\b/i;
-  const fabSuppressAfter = /\b(?:threshold|minimum|requir\w*|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|superscore|with[\s-]science|without[\s-]science|core|Zell(?:\s+Miller)?|recalc\w*)\b/i;
+  const fabSuppressBefore = /\b(?:requir\w*|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|(?:her|his|their|the)\s+old|old\s+(?:ACT|GPA|score|composite)|prior|sitting|april|july|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore|needs?|short\s+of|away\s+from|recalc\w*|Zell(?:\s+Miller)?)\b/i;
+  const fabSuppressAfter = /\b(?:threshold|minimum|requir\w*|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|sitting|april|july|prior|old|superscore|with[\s-]science|without[\s-]science|core|Zell(?:\s+Miller)?|recalc\w*)\b/i;
   // School-statistic context: the system prompt explicitly asks the model to
   // compare the student's stats to each school's mid-50% ranges and admitted
   // averages, so numbers in that context are school data, not fabricated
