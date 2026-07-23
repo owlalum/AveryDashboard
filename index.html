@@ -8979,6 +8979,10 @@ function buildAIPrompt(aiData) {
     // reasoning. The worker allowlists both Opus 4.8 and Sonnet 5, so
     // switching between them is a dashboard-only change — no redeploy.
     model: 'claude-opus-4-8',
+    // Stream the response. Non-streamed Opus runs regularly exceeded
+    // Cloudflare's ~100s silent-response window and died as timeouts; with
+    // SSE the first tokens arrive in seconds and the connection never idles.
+    stream: true,
     // 2048 is the worker-side cap — raising further needs a worker redeploy.
     // The prompt asks for ~600-750 words (~1000 tokens), so this leaves real
     // headroom to land a complete ending instead of truncating mid-sentence.
@@ -9619,6 +9623,54 @@ function buildRevisionInstruction(findings) {
 // localStorage only.
 function getStoredProxyKey() { return localStorage.getItem('aiProxyKey') || ''; }
 
+// Parse complete SSE events out of a buffered chunk string. Returns the
+// text extracted from content_block_delta events, any error event, and the
+// unconsumed tail (a partial event awaiting more bytes). Pure function so
+// it can be tested without a live stream.
+function parseSSEEvents(buffer) {
+  const events = buffer.split('\n\n');
+  const rest = events.pop(); // last piece may be incomplete — keep for next chunk
+  let text = '';
+  let error = null;
+  for (const evt of events) {
+    for (const line of evt.split('\n')) {
+      if (!line.startsWith('data: ')) continue;
+      let parsed;
+      try { parsed = JSON.parse(line.slice(6)); } catch (e) { continue; }
+      if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.type === 'text_delta') {
+        text += parsed.delta.text || '';
+      } else if (parsed.type === 'error') {
+        error = (parsed.error && parsed.error.message) || 'stream error';
+      }
+    }
+  }
+  return { text, error, rest };
+}
+
+// Read an SSE response body to completion, accumulating text deltas and
+// mirroring progress into the modal's live preview if it's on screen.
+async function readSSEStream(resp) {
+  const reader = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let fullText = '';
+  const preview = () => document.getElementById('aiStreamPreview');
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const { text, error, rest } = parseSSEEvents(buffer);
+    buffer = rest;
+    if (error) throw new Error('Stream error: ' + error);
+    if (text) {
+      fullText += text;
+      const el = preview();
+      if (el) { el.hidden = false; el.textContent = fullText; el.scrollTop = el.scrollHeight; }
+    }
+  }
+  return fullText;
+}
+
 async function callWorkerWithRevision(aiData, revisionInstruction) {
   const payload = buildAIPrompt(aiData);
   if (revisionInstruction) payload.system = payload.system + revisionInstruction;
@@ -9643,11 +9695,26 @@ async function callWorkerWithRevision(aiData, revisionInstruction) {
     if (resp.status === 401) localStorage.removeItem('aiProxyKey'); // wrong passphrase — re-prompt next run
     throw new Error('API returned ' + resp.status + ': ' + errText);
   }
-  const result = await resp.json();
-  // Find the first text block rather than assuming content[0] — models can
-  // return thinking or other block types ahead of the text.
-  const textBlock = (result.content || []).find(b => b && b.type === 'text' && b.text);
-  return (textBlock && textBlock.text) || 'No analysis returned.';
+  const ctype = resp.headers.get('Content-Type') || '';
+  if (ctype.includes('text/event-stream')) {
+    const streamed = await readSSEStream(resp);
+    return streamed || 'No analysis returned.';
+  }
+  // Non-streamed fallback (error bodies, or a worker still buffering).
+  const raw = await resp.text();
+  try {
+    const result = JSON.parse(raw);
+    // Find the first text block rather than assuming content[0] — models can
+    // return thinking or other block types ahead of the text.
+    const textBlock = (result.content || []).find(b => b && b.type === 'text' && b.text);
+    return (textBlock && textBlock.text) || 'No analysis returned.';
+  } catch (e) {
+    // A pre-streaming worker buffers the SSE transcript but labels it JSON —
+    // salvage the text deltas so the feature still works mid-upgrade.
+    const salvaged = parseSSEEvents(raw + '\n\n');
+    if (salvaged.text) return salvaged.text;
+    throw new Error('Unrecognized AI proxy response');
+  }
 }
 
 function showValidatorFallback(container) {
@@ -9698,7 +9765,8 @@ async function openAIAnalysis(forceRegenerate) {
   }
 
   // Loading state
-  content.innerHTML = '<h3>AI Analysis</h3><div class="ai-loading"><div class="spinner"></div><p style="margin-top:14px">Analyzing your college list...</p></div>';
+  content.innerHTML = '<h3>AI Analysis</h3><div class="ai-loading"><div class="spinner"></div><p style="margin-top:14px">Analyzing your college list...</p>' +
+    '<div id="aiStreamPreview" style="text-align:left;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-top:14px;font-size:0.82rem;color:var(--text-light);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;" hidden></div></div>';
 
   try {
     // Initial attempt (no revision instruction).
@@ -10746,6 +10814,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.3',
+    date: '2026-07-23',
+    title: 'AI Analysis No Longer Times Out',
+    items: [
+      'The analysis now streams in live — you\'ll see it being written in the loading window within a few seconds instead of staring at a spinner for two minutes',
+      'This fixes the frequent timeouts: the old setup sent the entire answer in one silent response, and long runs got cut off at ~100 seconds by the hosting layer. Streaming keeps the connection alive no matter how long the model thinks',
+      'Same model (Claude Opus 4.8), same quality — just delivered as it\'s written',
+    ]
+  },
   {
     version: '8.2',
     date: '2026-07-23',

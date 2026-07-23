@@ -98,10 +98,18 @@ export default {
         },
         body: JSON.stringify(body),
       });
-      const data = await resp.text();
-      return new Response(data, {
+      // Pipe the body through instead of buffering (`await resp.text()`).
+      // Buffering meant zero bytes reached the browser until the model
+      // finished — long Opus generations sat silent past Cloudflare's
+      // ~100s idle window and died as timeouts. Piping streams tokens as
+      // they're generated (SSE when the client asks for stream:true), so
+      // the connection never idles. Works for non-streamed replies too.
+      return new Response(resp.body, {
         status: resp.status,
-        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
+        headers: {
+          ...corsHeaders(origin),
+          'Content-Type': resp.headers.get('Content-Type') || 'application/json',
+        },
       });
     } catch (err) {
       return jsonResponse({ error: 'Proxy error', detail: err.message }, 500, origin);
