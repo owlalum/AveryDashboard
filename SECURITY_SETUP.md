@@ -4,17 +4,36 @@ The dashboard code now supports locked-down access, but two switches live in
 consoles that only you can flip. Until you do, everything keeps working
 exactly as before — these steps just close the doors.
 
-## 1. Redeploy the AI proxy worker
+## 1. Set the AI passphrase and redeploy the worker
 
-The worker now only answers requests coming from the dashboard itself
-(`https://owlalum.github.io`), only allows the model the dashboard actually
-uses, and caps response size. To activate:
+The worker's origin check only stops *browsers* — a script with `curl` can
+fake the Origin header, and the worker URL is visible in the page source, so
+until this step anyone could quietly spend the Anthropic key. The July 2026
+update adds a **family passphrase**: the worker refuses requests without it,
+and the passphrase is never in the page source — each family device is
+prompted once and remembers it.
+
+Pick a passphrase (anything memorable — it's shared by the family, not per
+person), then in the `AveryDashboard` folder:
+
+```
+wrangler secret put PROXY_SHARED_SECRET
+```
+
+(paste the passphrase when prompted)
 
 ```
 wrangler deploy
 ```
 
-That's it — the API key secret you already set is unchanged.
+Then open the dashboard, run an AI Analysis, and enter the passphrase when
+asked — once per device (yours, your spouse's, Avery's). The worker also now
+caps request size (400 KB) alongside the existing model allowlist and
+response cap, so even a leaked passphrase bounds the damage per request.
+
+**Optional extra:** in the Cloudflare dashboard (Workers → avery-ai-proxy →
+Settings), you can add a rate-limiting rule (e.g. 10 requests/minute) as a
+final backstop. Not required — the passphrase is the real gate.
 
 If the dashboard ever moves to a different address, add that address to
 `ALLOWED_ORIGINS` at the top of `worker.js` and redeploy.

@@ -9950,16 +9950,35 @@ function buildRevisionInstruction(findings) {
   return lines.length === 0 ? '' : '\n\n## REVISION INSTRUCTIONS (do not repeat the previous response\'s errors)\n\n' + lines.join('\n');
 }
 
+// Family AI passphrase — checked by the worker (PROXY_SHARED_SECRET) so the
+// public worker URL can't be used as a free LLM endpoint by strangers. The
+// passphrase is deliberately NOT in this page's source: each device enters
+// it once (prompted on the first 401) and it lives in that device's
+// localStorage only.
+function getStoredProxyKey() { return localStorage.getItem('aiProxyKey') || ''; }
+
 async function callWorkerWithRevision(aiData, revisionInstruction) {
   const payload = buildAIPrompt(aiData);
   if (revisionInstruction) payload.system = payload.system + revisionInstruction;
-  const resp = await fetch(AI_WORKER_URL, {
+  const doFetch = () => fetch(AI_WORKER_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Proxy-Key': getStoredProxyKey() },
     body: JSON.stringify(payload),
   });
+  let resp = await doFetch();
+  if (resp.status === 401) {
+    const entered = window.prompt(
+      'Enter the family AI passphrase to run the analysis.\n' +
+      '(Set once per device — it\'s the passphrase configured for the AI proxy.)'
+    );
+    if (entered && entered.trim()) {
+      localStorage.setItem('aiProxyKey', entered.trim());
+      resp = await doFetch();
+    }
+  }
   if (!resp.ok) {
     const errText = await resp.text();
+    if (resp.status === 401) localStorage.removeItem('aiProxyKey'); // wrong passphrase — re-prompt next run
     throw new Error('API returned ' + resp.status + ': ' + errText);
   }
   const result = await resp.json();

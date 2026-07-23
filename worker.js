@@ -1,28 +1,37 @@
 // Cloudflare Worker — Anthropic API proxy for Avery Dashboard
 // Deploy: wrangler deploy
-// Set secret: wrangler secret put ANTHROPIC_API_KEY
+// Set secrets: wrangler secret put ANTHROPIC_API_KEY
+//              wrangler secret put PROXY_SHARED_SECRET   (family AI passphrase)
 
-// Only the dashboard itself may use this proxy. Requests from any other
-// origin (or with no Origin header, i.e. curl/scripts) are rejected so the
-// API key can't be spent by third parties who find this URL in the page
-// source. Add an origin here if the dashboard ever moves.
+// Defense layers, outermost first:
+// 1. PROXY_SHARED_SECRET — the real gate. The Origin check below only
+//    constrains browsers (curl/scripts can fake the header), so any script
+//    that finds this URL in the public page source could otherwise use the
+//    family's Anthropic key as a free LLM endpoint. The passphrase is NOT
+//    embedded in the page: each family device enters it once (the dashboard
+//    prompts on first 401 and stores it in that device's localStorage).
+//    Until the secret is set in Cloudflare, the check is skipped so the
+//    dashboard keeps working — set it to activate the gate.
+// 2. Origin allowlist — stops casual cross-site browser use.
+// 3. Model allowlist + max_tokens clamp + body-size cap — bounds worst-case
+//    spend per request even for a caller who has the passphrase.
 const ALLOWED_ORIGINS = [
   'https://owlalum.github.io',
 ];
 
-// Server-side clamps: the client's model/max_tokens are request data, not
-// policy — enforce both here so a crafted request can't run an expensive
-// model or huge completion on the family's key.
 // Both current-generation tiers are allowed so the dashboard can switch
 // models without a worker redeploy; the dashboard picks which one to use.
 const ALLOWED_MODELS = ['claude-opus-4-8', 'claude-sonnet-5'];
 const MAX_TOKENS_CAP = 2048;
+// The AI payload (school data + system prompt) runs ~50-150KB; 400KB leaves
+// generous headroom while capping input-token cost per request.
+const MAX_BODY_BYTES = 400_000;
 
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Proxy-Key',
     'Vary': 'Origin',
   };
 }
@@ -53,10 +62,22 @@ export default {
       return jsonResponse({ error: 'Not found' }, 404, origin);
     }
 
+    // Passphrase gate (active once PROXY_SHARED_SECRET is set in Cloudflare).
+    if (env.PROXY_SHARED_SECRET) {
+      const provided = request.headers.get('X-Proxy-Key') || '';
+      if (provided !== env.PROXY_SHARED_SECRET) {
+        return jsonResponse({ error: 'Passphrase required' }, 401, origin);
+      }
+    }
+
     try {
+      const raw = await request.text();
+      if (raw.length > MAX_BODY_BYTES) {
+        return jsonResponse({ error: 'Request too large' }, 413, origin);
+      }
       let body;
       try {
-        body = await request.json();
+        body = JSON.parse(raw);
       } catch (e) {
         return jsonResponse({ error: 'Invalid JSON body' }, 400, origin);
       }
