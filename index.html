@@ -312,6 +312,8 @@
   td.notes-cell span { display: block; max-height: 3.6em; overflow: hidden; text-overflow: ellipsis; }
   td.notes-cell span:focus { max-height: none; overflow: visible; position: relative; z-index: 1; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); border-radius: 6px; padding: 8px; }
   td.compact { white-space: nowrap; text-align: center; }
+  /* Early DL reads as prose dates — left-align the column (cells are inline-styled) */
+  #schoolHead th[data-field="earlyDecision"] { text-align: left; }
 
   /* ── Editable cells ── */
   [contenteditable] {
@@ -5790,7 +5792,7 @@ function renderSchools() {
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span>${ssBadge}</td>
       <td class="compact">${esc(admit.rate)} ${admitTag}</td>
       <td class="compact"><span contenteditable="true" data-field="usNewsOverall">${esc(s.usNewsOverall || (dbEntry && dbEntry.usNewsOverall) || '')}</span></td>
-      <td class="compact"><span contenteditable="true" data-field="earlyDecision">${esc(s.earlyDecision)}</span></td>
+      <td class="compact" style="text-align:left"><span contenteditable="true" data-field="earlyDecision">${esc(s.earlyDecision)}</span></td>
       <td>
         <select class="status-sel s-${s.status}" onchange="updateSchoolStatus('${s.id}', this)">
           <option value="researching" ${s.status==='researching'?'selected':''}>Researching</option>
@@ -10999,6 +11001,7 @@ const CHANGELOG = [
       'The National Rankings tab is gone — WSJ, Forbes, and Niche each re-rank on shifting methodologies every year and none of them drove decisions. US News (the scale counselors and Scoir actually reference) is now a sortable column right in School Comparison',
       'To make room, the regular-decision Deadline column came off the Comparison table — you\'re applying early everywhere, so Early DL is the date that matters (full deadline detail still lives on the Deadline Timeline)',
       'Your saved WSJ/Forbes/Niche numbers weren\'t deleted — they\'re preserved invisibly in your data and old backups still restore cleanly',
+      'Early DL column is now left-aligned so the multi-round dates (like Auburn\'s EA I-IV) read cleanly',
     ]
   },
   {
