@@ -4,7 +4,11 @@ The dashboard code now supports locked-down access, but two switches live in
 consoles that only you can flip. Until you do, everything keeps working
 exactly as before — these steps just close the doors.
 
-## 1. Set the AI passphrase and redeploy the worker
+## 1. Set the AI passphrase and redeploy the worker — ✅ DONE (verified 2026-07-23)
+
+PROXY_SHARED_SECRET set and worker deployed; a spoofed-origin probe without
+the passphrase now returns 401. Steps kept for reference (e.g. to rotate
+the passphrase: re-run `wrangler secret put PROXY_SHARED_SECRET`, redeploy).
 
 The worker's origin check only stops *browsers* — a script with `curl` can
 fake the Origin header, and the worker URL is visible in the page source, so
