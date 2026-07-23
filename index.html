@@ -3573,7 +3573,7 @@ function backupToJSON() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = ((data.studentName || 'student').split(' ')[0].toLowerCase()) + '-dashboard-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = ((data.studentName || 'student').split(' ')[0].toLowerCase()) + '-dashboard-backup-' + new Date().toLocaleDateString('en-CA') + '.json'; // local YYYY-MM-DD (toISOString is UTC — wrong date after ~8pm ET)
   a.click();
   URL.revokeObjectURL(url);
   localStorage.setItem('lastBackupDate', Date.now().toString());
@@ -3650,6 +3650,12 @@ function restoreFromJSON(input) {
         // any checkmarks still get the rationalized template.
         data.checklistRationalizeV1MigrationApplied = true;
       }
+      // act34ScoreNotesSync overwrites the Kentucky/Tennessee rankings notes
+      // and the Clemson honors essay prompt — fields the user can edit in the
+      // UI. A restored backup may carry the user's own versions; don't let a
+      // re-run replace them with hardcoded prose. (The additive
+      // nationalBuckeye seed stays unset — it has its own duplicate guard.)
+      data.act34ScoreNotesSyncApplied = true;
       // Ensure structural migrations run against the restored data before the
       // UI tries to render it. Without this, an old backup missing fields
       // (e.g. data.rankings, data.essays, Strategic Fit sentinels) would
@@ -3831,7 +3837,7 @@ const schoolDB = {
   'Oklahoma State University':      { domain:'okstate.edu', color:'#FF6600', location:'Stillwater, OK', conference:'Big 12', notes:'Center for Veterinary Health Sciences; pre-vet track in Animal Science; hands-on from freshman year. Animal Science honors supplemental courses + Undergraduate Research Scholars Program for faculty-mentored research', tuitionIn:'$10,110', tuitionOut:'$25,630', fees:'$3,810', roomBoard:'$11,780', booksSupplies:'$1,400', deadline:'Rolling', earlyDecision:'November 1', testReq:'ACT 20-27', acceptRate:'75%', oosAcceptRate:'67%', avgGPA:'3.59', usNewsOverall:'#198', usNewsPublic:'#109', vetSchoolRank:'#23', lastVerified:'2026-03-27' },
   'Mississippi State University':   { domain:'msstate.edu', color:'#660000', location:'Starkville, MS', conference:'SEC', notes:'Accredited CVM; pre-vet in Animal & Dairy Sciences; wildlife and aquatic medicine specialties', tuitionIn:'$10,604', tuitionOut:'$28,736', fees:'incl.', roomBoard:'$13,514', booksSupplies:'$1,200', deadline:'January 5', earlyDecision:'October 1', testReq:'ACT 21-29', acceptRate:'76%', oosAcceptRate:'63%', avgGPA:'3.46', usNewsOverall:'#208', usNewsPublic:'#115', vetSchoolRank:'#24', lastVerified:'2026-03-27' },
   'University of Illinois':         { domain:'illinois.edu', color:'#E84A27', location:'Champaign, IL', conference:'Big Ten', notes:'Accredited CVM; pre-vet in Animal Sciences; strong companion animal and food animal medicine programs. Guaranteed tuition: rate locked at entry for 4 years', tuitionIn:'$18,046', tuitionOut:'$38,398', fees:'incl.', roomBoard:'$15,184', booksSupplies:'$1,200', deadline:'January 5', earlyDecision:'November 1', testReq:'ACT 30-34', acceptRate:'42%', oosAcceptRate:'37%', avgGPA:'3.85', usNewsOverall:'#36', usNewsPublic:'#12', vetSchoolRank:'#15', lastVerified:'2026-03-27' },
-  'University of Tennessee':        { domain:'utk.edu', color:'#FF8200', location:'Knoxville, TN', conference:'SEC', notes:'Accredited CVM; pre-vet in Animal Science; large teaching hospital; equine and farm animal strengths. Fall 2026 cycle was UTK\'s most competitive applicant pool in history; OOS-specific ACT mid-50% 29-32 (vs broader 27-32 cohort). Class of 2030: 66,654 apps / 27,864 admits (~41.8% overall). 2026-27 budget APPROVED by the UT Board of Trustees June 30, 2026: OOS tuition +5.1%, mandatory fees +$174; in-state tuition held flat (+$148 fees). (Exact new published OOS cost-of-attendance dollar figure still to be confirmed on an official UTK page — FIN_DATA left at the 2025-26 number for now.) ★ NEW (same June 30 vote): UTK is adding a per-credit DIFFERENTIAL TUITION on high-cost courses — $175/credit hour for undergraduate natural-science courses, $252/credit hour for engineering — which raises the sticker cost of a science-heavy pre-vet load (widely corroborated across TN news outlets + UT System releases; UTK\'s own pages are blocked from this scanner, so confirm the exact start term and covered-course list on onestop.utk.edu before relying). ★ ACT methodology: UTK superscores; includes Science only if it improves the score. For Avery (E25/M29/R35/S33), S33 raises the average so it\'s kept → UTK-specific composite = 31. ★ DVM pathway reality: no UTK-undergrad preference or early assurance, but ~30 of ~100 UTCVM seats go out-of-state (among the friendlier OOS ratios on the list) and undergrads can work at the on-campus UT Veterinary Medical Center. ★ GPA CLIMATE: gentlest on the list — over half of UTK undergrads made the Fall 2025 dean\'s list (3.5+; documented grade inflation), grade replacement on up to 3 lower-division courses, and drop-with-W runs essentially to the end of classes. Two catches: W\'s are rationed to 6 per undergrad career, and there is zero public grade data for section-shopping. UT CVM\'s out-of-state applicant GPA floor is 3.2.', tuitionIn:'$14,148', tuitionOut:'$34,589', fees:'incl.', roomBoard:'$14,738', booksSupplies:'$1,598', deadline:'December 15', earlyDecision:'November 1', testReq:'ACT 27-32', acceptRate:'38%', oosAcceptRate:'31%', avgGPA:'3.65', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#21', lastVerified:'2026-07-19' },
+  'University of Tennessee':        { domain:'utk.edu', color:'#FF8200', location:'Knoxville, TN', conference:'SEC', notes:'Accredited CVM; pre-vet in Animal Science; large teaching hospital; equine and farm animal strengths. Fall 2026 cycle was UTK\'s most competitive applicant pool in history; OOS-specific ACT mid-50% 29-32 (vs broader 27-32 cohort). Class of 2030: 66,654 apps / 27,864 admits (~41.8% overall). 2026-27 budget APPROVED by the UT Board of Trustees June 30, 2026: OOS tuition +5.1%, mandatory fees +$174; in-state tuition held flat (+$148 fees). (Exact new published OOS cost-of-attendance dollar figure still to be confirmed on an official UTK page — FIN_DATA left at the 2025-26 number for now.) ★ NEW (same June 30 vote): UTK is adding a per-credit DIFFERENTIAL TUITION on high-cost courses — $175/credit hour for undergraduate natural-science courses, $252/credit hour for engineering — which raises the sticker cost of a science-heavy pre-vet load (widely corroborated across TN news outlets + UT System releases; UTK\'s own pages are blocked from this scanner, so confirm the exact start term and covered-course list on onestop.utk.edu before relying). ★ ACT methodology: UTK superscores; includes Science only if it improves the score. For Avery (E34/M32/R35/S33), the July sitting is her best in every section and the superscore rounds to 34 with or without Science → UTK-specific composite = 34. ★ DVM pathway reality: no UTK-undergrad preference or early assurance, but ~30 of ~100 UTCVM seats go out-of-state (among the friendlier OOS ratios on the list) and undergrads can work at the on-campus UT Veterinary Medical Center. ★ GPA CLIMATE: gentlest on the list — over half of UTK undergrads made the Fall 2025 dean\'s list (3.5+; documented grade inflation), grade replacement on up to 3 lower-division courses, and drop-with-W runs essentially to the end of classes. Two catches: W\'s are rationed to 6 per undergrad career, and there is zero public grade data for section-shopping. UT CVM\'s out-of-state applicant GPA floor is 3.2.', tuitionIn:'$14,148', tuitionOut:'$34,589', fees:'incl.', roomBoard:'$14,738', booksSupplies:'$1,598', deadline:'December 15', earlyDecision:'November 1', testReq:'ACT 27-32', acceptRate:'38%', oosAcceptRate:'31%', avgGPA:'3.65', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#21', lastVerified:'2026-07-19' },
   'University of Missouri':         { domain:'missouri.edu', color:'#F1B82D', location:'Columbia, MO', conference:'SEC', notes:'Accredited CVM; pre-vet in Animal Sciences; strong food animal and equine programs. ★ Pre-Veterinary Medical Scholars: CONFIRMED — FAMILY-VERIFIED 2026-07-03 against the actual application (cvmweb.missouri.edu/docs/shortterm/PrevetScholarApp.pdf). Early assurance to Mizzou CVM, open to non-residents. Requires ACT COMPOSITE 30 or higher — Avery\'s 34 clears it with room to spare. Apply as a HIGH SCHOOL SENIOR by MARCH 15, 2027 (or as an incoming MU freshman); then maintain 3.5 GPA over 3 years at Mizzou for the assured CVM seat. This is the only guaranteed-seat vet pathway on the list Avery already fully qualifies for from high school — if Mizzou makes the final list, this application goes on the calendar. Tiered tuition by major ★ GPA CLIMATE: friendliest institutional safety net on the list — an official per-course grade tool (MU Grade Distribution: check every CHEM 1320/2100 instructor\'s history), a late W window, and the most generous repeat policy anywhere here: up to 15 credit hours of GPA replacement, triggered even by a C-. (Vet applications still count all attempts — a W remains the only clean exit.) Pre-vets take mainline CHEM 1320; no gentle chem lane.', tuitionIn:'$15,548', tuitionOut:'$37,820', fees:'$1,250', roomBoard:'$15,234', booksSupplies:'$918', deadline:'Rolling', earlyDecision:'November 15', testReq:'ACT 23-29', acceptRate:'78%', oosAcceptRate:'68%', avgGPA:'3.55', usNewsOverall:'#102', usNewsPublic:'#49', vetSchoolRank:'#20', lastVerified:'2026-07-03' },
   'Clemson University':             { domain:'clemson.edu', color:'#F56600', location:'Clemson, SC', conference:'ACC', notes:'New $230M College of Veterinary Medicine opening Fall 2026 — SC\'s first vet school; pre-vet through Animal & Veterinary Sciences; ground-floor research and faculty access. PCVM received AVMA COE Letter of Reasonable Assurance Oct 8, 2025; construction on track for Fall 2026 opening. Inaugural Class of 2030 (Fall 2026 entry) used independent application; Class of 2031 onwards apply via VMCAS starting January 2026. ★ DVM pathway reality: the new CVM uses a distributive clinical model — NO teaching hospital for undergrads to work in (farm-based prep only: dairy, beef, swine, poultry, equine center); 60 of 80 seats reserved for SC residents; no undergrad pathway or Clemson-undergrad preference announced. ★ GPA CLIMATE: average-to-harsh chem chain with no escape lane (the lighter CH 1050 is barred from feeding organic), but Clemson publishes official per-section, per-instructor grade counts back to 2013 (open.clemson.edu/gdr) — shop CH 1010/2230 sections by actual history. W\'s until ~week 10; academic forgiveness covers only 2-3 D/F courses (cached sources conflict on the cap — verify) and does not help the vet-school GPA. Algebra-based physics is accepted for the AVS pre-vet concentration.', tuitionIn:'$14,038', tuitionOut:'$40,562', fees:'$1,816', roomBoard:'$14,224', booksSupplies:'$1,496', deadline:'January 1', earlyDecision:'October 15', testReq:'ACT 28-32', acceptRate:'42%', oosAcceptRate:'30%', avgGPA:'3.75', usNewsOverall:'#75', usNewsPublic:'#36', vetSchoolRank:'Not yet ranked', lastVerified:'2026-07-03' },
   'Penn State University':          { domain:'psu.edu', color:'#041E42', location:'University Park, PA', conference:'Big Ten', notes:'Pre-vet through Animal Science; veterinary and biomedical sciences emphasis; strong advising for vet school apps', tuitionIn:'$20,468', tuitionOut:'$42,860', fees:'incl.', roomBoard:'$15,346', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'57%', oosAcceptRate:'42%', avgGPA:'3.84', usNewsOverall:'#59', usNewsPublic:'#26', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
@@ -4212,7 +4218,9 @@ function runMigrations() {
   //                 Tech composite, Missouri Scholars margin).
   //             4 = 2026-07-22 Ohio State ★ MERIT line added (National Buckeye
   //                 verified on undergrad.osu.edu).
-  const NOTES_SYNC_REV = 4;
+  //             5 = 2026-07-23 code-review fix: UTK note's per-school composite
+  //                 updated to the July scores (was still E25/M29… → 31).
+  const NOTES_SYNC_REV = 5;
   if ((data.schoolNotesSyncRev || 0) < NOTES_SYNC_REV) {
     (data.schools || []).forEach(s => {
       const db = schoolDB[s.name];
@@ -4945,9 +4953,12 @@ function getKentuckyMeritLabel() {
 // conservatively from unweighted GPA: unweighted 3.9+ treated as "4.0 weighted
 // core" tier; 3.6+ treated as "3.8 weighted core" tier. This is a proxy —
 // the UT recalc could differ either direction based on course rigor.
+// NOTE: must read data.unweightedGPA (3.66), NOT data.gpa (the weighted 3.85).
+// Feeding the weighted GPA into these unweighted thresholds silently
+// overstates the award once weighted crosses 3.9 ($3K → $18K/yr at ACT 34).
 function getTennesseeMerit() {
   const act = (data.actScores || {}).composite || 0;
-  const gpa = data.gpa || 0;
+  const gpa = data.unweightedGPA || data.gpa || 0;
   if (act < 28) return 0;
   if (gpa >= 3.9) {
     if (act >= 34) return 18000;
@@ -5015,7 +5026,7 @@ function getMissStateMerit() {
   return 0;
 }
 
-// ─── Dynamic South Carolina Automatic Merit (OOS, uses weighted GPA — approximate with UW) ───
+// ─── Dynamic South Carolina Automatic Merit (OOS; SC's grid uses WEIGHTED GPA, so data.gpa is the right input) ───
 function getSCMerit() {
   const act = (data.actScores || {}).composite || 0;
   const gpa = data.gpa || 0;
@@ -5041,14 +5052,15 @@ function getSCMerit() {
 // ─── Automatic Merit Labels ───
 function getAutoMeritLabel(school) {
   const act = (data.actScores || {}).composite || 0;
-  const gpa = data.gpa || 0;
+  // Match getTennesseeMerit's input: the unweighted GPA drives the proxy.
+  const ugpa = data.unweightedGPA || data.gpa || 0;
   const fns = {
-    'University of Tennessee': { fn: getTennesseeMerit, note: act < 28 ? 'ACT 28 minimum not met — ACT ' + act + '.' : 'Uses UT-recalculated weighted core GPA; unweighted ' + gpa + ' used here as a proxy.' },
+    'University of Tennessee': { fn: getTennesseeMerit, note: act < 28 ? 'ACT 28 minimum not met — ACT ' + act + '.' : 'Uses UT-recalculated weighted core GPA; unweighted ' + ugpa + ' used here as a conservative proxy (a 4.0+ UT core recalc would raise the tier).' },
   };
   const entry = fns[school];
   if (!entry) return null;
   const merit = entry.fn();
-  return '<strong>Tennessee:</strong> Out-of-State Volunteer Scholarship, ' + (merit > 0 ? '~$' + (merit/1000) + 'K/year' : '$0') + ' at ' + gpa + ' GPA / ACT ' + act + '. ' + entry.note;
+  return '<strong>Tennessee:</strong> Out-of-State Volunteer Scholarship, ' + (merit > 0 ? '~$' + (merit/1000) + 'K/year' : '$0') + ' at ' + ugpa + ' unweighted GPA / ACT ' + act + '. ' + entry.note;
 }
 
 // ─── Central merit dispatch — returns dynamic merit or falls back to hardcoded ───
@@ -5387,6 +5399,9 @@ function renameSchoolKeys(oldName, newName) {
   (data.checklists || []).forEach(cl => { if (cl.school === oldName) cl.school = newName; });
   (data.essays || []).forEach(e => { if (e.school === oldName) e.school = newName; });
   (data.visits || []).forEach(v => { if (v.school === oldName) v.school = newName; });
+  // Scholarships are keyed by school-name string too — without this, renaming
+  // a school hid its tracked scholarship rows (filtered out as "not visible").
+  (data.scholarships || []).forEach(sc => { if (sc.school === oldName) sc.school = newName; });
 }
 
 function setFinalListFilter(on) {
@@ -5503,7 +5518,8 @@ function parseSortValue(val, sortType) {
   }
   if (sortType === 'date') {
     if (!s || s === 'N/A' || s.toLowerCase() === 'rolling') return Infinity;
-    const months = { january:1, february:2, march:3, april:4, may:5, june:6, july:7, august:8, september:9, october:10, november:11, december:12 };
+    const months = { january:1, february:2, march:3, april:4, may:5, june:6, july:7, august:8, september:9, october:10, november:11, december:12,
+                     jan:1, feb:2, mar:3, apr:4, jun:6, jul:7, aug:8, sep:9, sept:9, oct:10, nov:11, dec:12 }; // abbreviated forms: multi-round strings like "Sep 15 / Oct 15 / …" sort by first round
     const m = s.match(/^(\w+)\s+(\d+)/);
     if (m) {
       const mo = months[m[1].toLowerCase()] || 0;
@@ -7836,7 +7852,7 @@ const FIN_DATA = [
   { school:'Michigan State University', res:'OOS', tuition:44758, rb:12928, books:1420, merit:8000, costYear:'2025-26' },
   { school:'University of Missouri', res:'OOS', tuition:39070, rb:15234, books:918, merit:5000, costYear:'2025-26' },
   { school:'University of South Carolina', res:'OOS', tuition:39374, rb:16376, books:1480, merit:14000, costYear:'2025-26' },
-  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1200, merit:15000, costYear:'2026-27' }, // Presidential band ($15-17K, ACT 33-36) on the published Fall 2026 grid at ACT 34; conservative end. Fall 2027 grid unpublished.
+  { school:'Auburn University', res:'OOS', tuition:37596, rb:18424, books:1260, merit:15000, costYear:'2026-27' }, // Presidential band ($15-17K, ACT 33-36) on the published Fall 2026 grid at ACT 34; conservative end. Fall 2027 grid unpublished.
   { school:'University of Tennessee', res:'OOS', tuition:34589, rb:14738, books:1598, merit:12000, costYear:'2025-26' },
   { school:'Texas A&M University', res:'OOS', tuition:40124, rb:13008, books:1104, merit:2000, costYear:'2025-26' },
   { school:'Purdue University', res:'OOS', tuition:28794, rb:13720, books:1090, merit:3000, costYear:'2025-26 (2026-27 tuition confirmed frozen)' },
@@ -10133,7 +10149,7 @@ function renderNextUp() {
 
   // 1. Next upcoming deadline
   const today = new Date();
-  const events = getDeadlineEvents().filter(e => e.date > today);
+  const events = getDeadlineEvents().filter(e => e.date >= today); // >= so a deadline stays visible on its due date
   if (events.length > 0) {
     const next = events[0];
     const days = Math.ceil((next.date - today) / 86400000);
@@ -10228,7 +10244,7 @@ function initDefaultScholarships() {
     // ── External & National ──
     { id: uid(), section:'external', name:'FAFSA (Federal Aid)', school:'Federal', amount:'Varies', deadline:'2026-10-01', essayReq:false, separateApp:true, status:'Not Started', notes:'Complete ASAP after Oct 1 — REQUIRED for all schools', url:'https://studentaid.gov/h/apply-for-aid/fafsa' },
     { id: uid(), section:'external', name:'Zell Miller Scholarship', school:'Georgia (state)', amount:'Full tuition at GA publics', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; requires HOPE GPA 3.70+ AND ACT 26+ (Georgia raised from 25 in 2023). Avery\'s HOPE GPA (3.657) is currently below the 3.70 threshold.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/zell-miller-scholarship/' },
-    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'90% of tuition at GA publics (~$9,031/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.657 HOPE GPA. Covers tuition only — fees ($1,458) not included.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
+    { id: uid(), section:'external', name:'HOPE Scholarship', school:'Georgia (state)', amount:'90% of tuition at GA publics (~$9,121/yr at UGA)', deadline:'Automatic', essayReq:false, separateApp:false, status:'Not Started', notes:'GA residents; automatic with HOPE GPA 3.0+. Avery qualifies with 3.657 HOPE GPA. Covers tuition only — fees ($1,494) not included.', url:'https://www.gafutures.org/hope-state-aid-programs/hope-zell-miller-scholarships/hope-scholarship/' },
     { id: uid(), section:'external', name:'Coca-Cola Scholars Program', school:'National', amount:'$20,000 (150 awards)', deadline:'2026-09-30', essayReq:true, separateApp:true, status:'Not Started', notes:'Highly competitive national award; apply Aug-Sep of senior year', url:'https://www.coca-colascholarsfoundation.org/apply/' },
     { id: uid(), section:'external', name:'Elks Most Valuable Student', school:'National', amount:'$4,000-$30,000 over 4 years', deadline:'2026-11-01', essayReq:true, separateApp:true, status:'Not Started', notes:'500 awards nationwide; leadership and financial need', url:'https://www.elks.org/scholars/scholarships/mvs.cfm' },
     { id: uid(), section:'external', name:'National FFA Scholarship Program', school:'National', amount:'Up to $10,000', deadline:'2027-01-15', essayReq:true, separateApp:true, status:'Not Started', notes:'For FFA members; 100+ sponsors; ag/animal science focus', url:'https://www.ffa.org/participate/grants-and-scholarships/scholarships/' },
@@ -10250,7 +10266,7 @@ function getMeritScholarships() {
       section: 'merit',
       name: 'Automatic Merit Aid',
       school: f.school,
-      amount: '$' + (amt / 1000) + 'K/year',
+      amount: '$' + amt.toLocaleString() + '/year',
       amountNum: amt,
       deadline: 'With admission',
       essayReq: false,
@@ -10283,10 +10299,13 @@ function renderScholarships() {
   };
   const visibleSchols = allSchols.filter(filterByVisible);
 
-  // Summary stats
+  // Summary stats. Auto-merit rows (section 'merit') are reference-only and
+  // hardcoded status 'Awarded' — excluding them keeps the Applied/Awarded
+  // stats about actual applications, not projected eligibility.
   const tracked = visibleSchols.length;
-  const applied = visibleSchols.filter(s => s.status === 'Applied' || s.status === 'Awarded').length;
-  const potentialAmount = visibleSchols
+  const statSchols = visibleSchols.filter(s => s.section !== 'merit');
+  const applied = statSchols.filter(s => s.status === 'Applied' || s.status === 'Awarded').length;
+  const potentialAmount = statSchols
     .filter(s => s.status === 'Applied' || s.status === 'Awarded')
     .reduce((sum, s) => {
       const num = s.amountNum || parseAmount(s.amount);
@@ -10895,10 +10914,12 @@ function showScoreImpactModal(oldACT, newACT) {
     if (!m) return;
     const low = parseInt(m[1]);
     const high = parseInt(m[2]);
-    if (oldACT < low && newACT >= low) {
-      impacts.push({ icon: '\uD83D\uDCC8', text: esc(s.name) + ' \u2014 now at or above 25th percentile (ACT ' + low + '+)', type: 'positioning' });
-    } else if (oldACT < high && newACT >= high) {
+    // Independent ifs: a jump crossing BOTH bounds at once should report the
+    // stronger 75th-percentile milestone, not just the 25th (else-if hid it).
+    if (oldACT < high && newACT >= high) {
       impacts.push({ icon: '\u2B50', text: esc(s.name) + ' \u2014 now at 75th percentile (ACT ' + high + '+)', type: 'positioning' });
+    } else if (oldACT < low && newACT >= low) {
+      impacts.push({ icon: '\uD83D\uDCC8', text: esc(s.name) + ' \u2014 now at or above 25th percentile (ACT ' + low + '+)', type: 'positioning' });
     }
   });
 
@@ -11079,6 +11100,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.2',
+    date: '2026-07-23',
+    title: 'Full Code Review — Fixes Across the Board',
+    items: [
+      'A top-to-bottom code review found and fixed a batch of bugs. Most visible: the last stale score note (UTK\'s research note still showed the old composite 31 — now 34), HOPE dollar figures corrected to $9,121/yr with $1,494 fees, and the Scholarships summary no longer counts automatic-merit eligibility as "Awarded" money before any admission exists',
+      'Tennessee merit now reads the correct (unweighted) GPA for its conservative tier proxy — the dollar amount is unchanged today, but this prevents a silent $60K overstatement if the weighted GPA crosses 3.9 senior year',
+      'Deadlines now stay in the "Next Up" strip on their due date instead of vanishing at midnight, multi-round early deadlines like Auburn\'s sort correctly, and renaming a school no longer hides its scholarship rows',
+      'Behind the scenes: fixed a sync flaw where just opening the dashboard could overwrite another device\'s recent edits (and two open tabs would write-loop), closed a security hole in scholarship links, and added a family passphrase to the AI feature so strangers can\'t run up the bill',
+    ]
+  },
   {
     version: '8.1',
     date: '2026-07-22',
