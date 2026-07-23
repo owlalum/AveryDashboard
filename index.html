@@ -3334,6 +3334,7 @@ let firestoreSyncEnabled = false;
 let firestoreInitialized = false;
 let syncStatus = 'connecting';
 let saveDebounceTimer = null;
+let pendingSaveFn = null; // the scheduled debounce body, so pagehide can flush it early
 // Baseline timestamp of the remote state our local `data` is derived from.
 // Used for optimistic-concurrency checks in saveData's transaction: if the
 // actual remote is newer than this baseline when we go to write, another
@@ -3439,6 +3440,7 @@ function saveData() {
   if (saveDebounceTimer !== null) {
     clearTimeout(saveDebounceTimer);
     saveDebounceTimer = null;
+    pendingSaveFn = null;
     if (savePromiseResolve) {
       savePromiseResolve({ synced: false, reason: 'superseded' });
       savePromiseResolve = null;
@@ -3446,10 +3448,12 @@ function saveData() {
   }
   return new Promise((resolve) => {
     savePromiseResolve = resolve;
-    saveDebounceTimer = setTimeout(async () => {
+    const performSave = async () => {
       saveDebounceTimer = null;
+      pendingSaveFn = null;
       const myResolve = savePromiseResolve;
       savePromiseResolve = null;
+      if (!myResolve) return; // already superseded or flushed
 
       // Fast-fail sanity check (kept as belt-and-braces alongside the
       // transaction): if remote has a meaningfully populated schools list
@@ -3501,6 +3505,7 @@ function saveData() {
         });
         // Success: our write is the new remote baseline.
         lastSyncedRemoteTs = data.lastModified;
+        localStorage.removeItem(STORAGE_KEY + ':conflictPending');
         updateSyncIndicator('synced');
         myResolve({ synced: true });
       } catch (err) {
@@ -3512,6 +3517,9 @@ function saveData() {
             '. Showing reload banner so user can pick up the latest.'
           );
           updateSyncIndicator('error');
+          // Mark the refusal so the promised reload actually adopts remote
+          // instead of letting this stamped-but-refused edit win init.
+          localStorage.setItem(STORAGE_KEY + ':conflictPending', '1');
           showConflictBanner();
           myResolve({ synced: false, reason: 'conflict', remoteTs: err._conflictRemoteTs, baseline: err._baseline });
         } else {
@@ -3520,9 +3528,23 @@ function saveData() {
           myResolve({ synced: false, reason: 'error', error: err });
         }
       }
-    }, 1500);
+    };
+    pendingSaveFn = performSave;
+    saveDebounceTimer = setTimeout(performSave, 1500);
   });
 }
+
+// Flush a pending debounced save when the tab closes or backgrounds.
+// Best-effort: the async Firestore write may not complete before teardown,
+// but localStorage already holds the edit either way — this narrows the
+// "edit then immediately close the tab" window where the push never fires.
+window.addEventListener('pagehide', () => {
+  if (saveDebounceTimer !== null) {
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = null;
+    if (pendingSaveFn) { const fn = pendingSaveFn; fn(); }
+  }
+});
 
 function updateSyncIndicator(status) {
   syncStatus = status;
@@ -4614,7 +4636,20 @@ function runPostInitMigrations() {
       // saved something locally (localTs > 0). A fresh getDefaults() load has
       // localTs === 0 and must always lose to remote — otherwise opening the
       // app in a new browser would clobber Firestore with empty defaults.
-      const localWins = localTs > 0 && localTs > remoteTs;
+      // A previous session's save was refused as a conflict (banner shown,
+      // promising "reload to see the latest — you'll need to redo your last
+      // change"). Honor that promise: the refused edit must NOT win the
+      // reload merely because saveData had already stamped it into
+      // localStorage with a fresh lastModified — that would wholesale-clobber
+      // the other session's write, the exact outcome the transaction refused.
+      // Stash the refused doc for manual recovery, then let remote win.
+      const conflictPending = localStorage.getItem(STORAGE_KEY + ':conflictPending') === '1';
+      if (conflictPending) {
+        try { localStorage.setItem(STORAGE_KEY + ':conflictStash', JSON.stringify(data)); } catch (e) { /* stash is best-effort */ }
+        localStorage.removeItem(STORAGE_KEY + ':conflictPending');
+        console.warn('Conflict reload: adopting remote per the banner promise. The refused local edit was stashed at', STORAGE_KEY + ':conflictStash');
+      }
+      const localWins = !conflictPending && localTs > 0 && localTs > remoteTs;
       if (localWins) {
         localWon = true;
         console.log('Local data is newer than remote (localTs:', localTs, '> remoteTs:', remoteTs, ') — pushing after init.');
@@ -6529,8 +6564,17 @@ function buildChecklistItems(school) {
 
 function syncChecklists() {
   const schoolNameList = data.schools.map(s => s.name);
+  // Only persist when this sync actually mutated data. An unconditional
+  // saveData() here ran on every renderAll() — including page load and
+  // Firestore snapshot adoption — stamping lastModified on a passive open.
+  // That turned "when the user last edited" into "when any device last
+  // rendered", corrupting conflict resolution and letting two open tabs
+  // write-loop each other. (Same pattern as syncEssayStatusToChecklists.)
+  let changed = false;
   // Remove checklists for schools that no longer exist
+  const beforeRemoval = data.checklists.length;
   data.checklists = data.checklists.filter(cl => schoolNameList.includes(cl.school));
+  if (data.checklists.length !== beforeRemoval) changed = true;
   // Add checklists for new schools
   for (const s of data.schools) {
     if (!data.checklists.find(cl => cl.school === s.name)) {
@@ -6539,9 +6583,10 @@ function syncChecklists() {
         school: s.name,
         items: buildChecklistItems(s)
       });
+      changed = true;
     }
   }
-  saveData();
+  if (changed) saveData();
   renderChecklists();
 }
 
@@ -8607,6 +8652,11 @@ function renderTimeline() {
 function syncEssays() {
   if (!data.essays) data.essays = [];
   const schoolNames = data.schools.map(s => s.name);
+  // Changed-flag: only saveData() when this sync mutated data — see the
+  // matching comment in syncChecklists for why an unconditional save here
+  // (it runs on every renderAll) breaks conflict resolution.
+  let changed = false;
+  const beforeRemoval = data.essays.length;
 
   // Remove essays for schools no longer in list
   data.essays = data.essays.filter(e => e.school === 'Shared' || schoolNames.includes(e.school));
@@ -8619,6 +8669,7 @@ function syncEssays() {
   // guarantees it can't reappear. The UGA Common App essay is the Shared one,
   // so it is untouched.
   data.essays = data.essays.filter(e => !(e.school === 'University of Georgia' && /supplemental/i.test(e.name)));
+  if (data.essays.length !== beforeRemoval) changed = true;
 
   // Ensure shared Common App essay exists if any school uses Common App
   const hasCommonApp = data.schools.length > 0;
@@ -8628,6 +8679,7 @@ function syncEssays() {
       words: 650, prompt: 'Choose from 7 prompts — focus on passion for veterinary medicine',
       required: true, status: 'not-started', reviewer: '', notes: ''
     });
+    changed = true;
   }
 
   // Add essays for each school
@@ -8643,11 +8695,12 @@ function syncEssays() {
           words: def.words, prompt: def.prompt,
           required: def.required, status: 'not-started', reviewer: '', notes: ''
         });
+        changed = true;
       }
     }
   }
 
-  saveData();
+  if (changed) saveData();
 }
 
 function renderEssays() {
