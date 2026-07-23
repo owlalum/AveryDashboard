@@ -8866,6 +8866,11 @@ function gatherAIData() {
     student: {
       name,
       gpa,
+      // Structured truth for the other GPAs the notes discuss constantly —
+      // also what the validator whitelists against, so truthful mentions of
+      // the unweighted/HOPE numbers aren't flagged as fabrications.
+      unweightedGPA: data.unweightedGPA || null,
+      hopeGPA: data.hopeGPA || null,
       act: {
         composite: act.composite || 0,
         subscores: {
@@ -9026,8 +9031,8 @@ function validateAIResponse(text, aiData) {
   // of these contexts is being used as a reference value (scholarship
   // threshold, hypothetical "if she drops to X"), not asserted as the
   // student's actual stat — so it shouldn't count as a fabrication.
-  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore)\b/i;
-  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|superscore|with[\s-]science|without[\s-]science)\b/i;
+  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore|needs?|short\s+of|away\s+from|recalc\w*|Zell(?:\s+Miller)?)\b/i;
+  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|superscore|with[\s-]science|without[\s-]science|core|Zell(?:\s+Miller)?|recalc\w*)\b/i;
   // School-statistic context: the system prompt explicitly asks the model to
   // compare the student's stats to each school's mid-50% ranges and admitted
   // averages, so numbers in that context are school data, not fabricated
@@ -9043,6 +9048,15 @@ function validateAIResponse(text, aiData) {
     return /\d\s*[-–—]\s*$/.test(b) || /^\s*[-–—]\s*\d/.test(a);
   };
   if (actualGPA != null) {
+    // All legitimate student GPAs — weighted, unweighted, HOPE — plus their
+    // 2-decimal roundings (models round 3.657 to 3.66). The July 2026 score
+    // updates made the unweighted/HOPE/core numbers central to every merit
+    // and honors discussion; validating each GPA mention against the
+    // weighted value alone flagged truthful answers as fabrications and
+    // deterministically burned all prod retries.
+    const knownGPAs = [actualGPA, aiData.student.unweightedGPA, aiData.student.hopeGPA]
+      .filter(v => typeof v === 'number')
+      .flatMap(v => [v, Math.round(v * 100) / 100]);
     const gpaNumRe = /\b([234]\.\d{1,2})\b/g;
     let m;
     while ((m = gpaNumRe.exec(t)) !== null) {
@@ -9051,7 +9065,7 @@ function validateAIResponse(text, aiData) {
       const before = t.substring(Math.max(0, m.index - 30), m.index);
       const after = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
       if (!/\bgpa\b/i.test(before) && !/\bgpa\b/i.test(after)) continue;
-      if (Math.abs(val - actualGPA) <= 0.01) continue;
+      if (knownGPAs.some(k => Math.abs(val - k) <= 0.01)) continue;
       if (isRangeEndpoint(m.index, m[0].length)) continue;
       // Threshold/hypothetical suppression: 40-char before, 30-char after.
       const suppressBefore = t.substring(Math.max(0, m.index - 40), m.index);
@@ -9717,11 +9731,17 @@ async function callWorkerWithRevision(aiData, revisionInstruction) {
   }
 }
 
-function showValidatorFallback(container) {
+function showValidatorFallback(container, findings) {
+  const findingsHTML = (findings && findings.length)
+    ? '<details style="margin-top:10px;font-size:0.8rem;text-align:left;"><summary style="cursor:pointer;color:var(--text-light);">What tripped the checker (' + findings.length + ')</summary><ul style="margin:8px 0 0 18px;color:var(--text-light);">' +
+      findings.map(f => '<li><strong>' + esc(f.category) + ':</strong> &ldquo;&hellip;' + esc(f.matchedText) + '&hellip;&rdquo; &mdash; ' + esc(f.explanation) + '</li>').join('') +
+      '</ul></details>'
+    : '';
   container.innerHTML = '<h3>AI Analysis</h3>' +
     '<div class="ai-error" style="background:#fff4db;border-color:#d4a843;color:#7a5a00;">' +
     '<strong>This analysis is taking a few tries to get right.</strong><br>' +
     'Please regenerate, or try rephrasing your question.' +
+    findingsHTML +
     '</div>' +
     '<div class="modal-actions">' +
     '<button class="btn" onclick="closeAIModal()">Close</button>' +
@@ -9776,6 +9796,7 @@ async function openAIAnalysis(forceRegenerate) {
 
     // Prod mode: auto-retry on high-severity findings (up to 2 retries).
     if (VALIDATOR_MODE === 'prod' && validation.hasHighSeverity) {
+      console.warn('AI validation failed (attempt 1):', validation.findings.map(f => f.category + ': "' + f.matchedText + '" — ' + f.explanation));
       for (let attempt = 1; attempt <= 2 && validation.hasHighSeverity; attempt++) {
         retriesUsed = attempt;
         let revision = buildRevisionInstruction(validation.findings);
@@ -9784,10 +9805,13 @@ async function openAIAnalysis(forceRegenerate) {
         }
         text = await callWorkerWithRevision(aiData, revision);
         validation = validateAIResponse(text, aiData);
+        if (validation.hasHighSeverity) {
+          console.warn('AI validation failed (attempt ' + (attempt + 1) + '):', validation.findings.map(f => f.category + ': "' + f.matchedText + '" — ' + f.explanation));
+        }
       }
       if (validation.hasHighSeverity) {
-        // Exhausted retries — show fallback, do not cache.
-        showValidatorFallback(content);
+        // Exhausted retries — show fallback (with why) and do not cache.
+        showValidatorFallback(content, validation.findings);
         return;
       }
     }
@@ -10814,6 +10838,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.4',
+    date: '2026-07-23',
+    title: 'AI Analysis Fact-Checker Un-Stuck',
+    items: [
+      'The "taking a few tries to get right" dead-end is fixed. The built-in fact-checker only knew about your weighted GPA (3.85), so whenever the AI truthfully discussed the numbers that now matter most — the 3.66 unweighted, the 3.70 Zell Miller line, Tennessee\'s 4.0 core-GPA gate — it was flagged as making numbers up, retried, and gave up',
+      'The checker now knows all three GPAs (and their roundings), and phrases like "needs a 4.0 core GPA" or "0.043 away from the Zell threshold" are recognized as thresholds, not errors. Real errors (a wrong GPA or ACT asserted as hers) still get caught — that protection is unchanged',
+      'If the checker ever does give up again, the message now shows exactly what tripped it, so it\'s fixable instead of a mystery',
+    ]
+  },
   {
     version: '8.3',
     date: '2026-07-23',
