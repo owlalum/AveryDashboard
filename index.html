@@ -673,40 +673,7 @@
     border-bottom: 2px solid #d4a843;
   }
 
-  /* ── Compare Modal ── */
-  .compare-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10002;
-    display: flex; align-items: center; justify-content: center; padding: 24px;
-  }
-  .compare-modal {
-    background: var(--bg); border-radius: 16px; width: 100%; max-width: 1200px;
-    max-height: 90vh; overflow-y: auto; padding: 28px; position: relative;
-  }
-  .compare-modal h2 { font-size: 1.2rem; color: var(--primary-dark); margin-bottom: 20px; }
-  .compare-close {
-    position: absolute; top: 16px; right: 20px; background: none; border: none;
-    font-size: 1.6rem; cursor: pointer; color: var(--text-light); line-height: 1;
-  }
-  .compare-close:hover { color: var(--text); }
-  .compare-grid {
-    display: grid; gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-  .compare-card {
-    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 20px; display: flex; flex-direction: column; gap: 12px;
-  }
-  .compare-card-header {
-    display: flex; align-items: center; gap: 10px;
-    padding-bottom: 12px; border-bottom: 2px solid var(--border);
-  }
-  .compare-card-header h3 { font-size: 0.95rem; color: var(--primary-dark); margin: 0; }
-  .compare-row {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 0.85rem; padding: 4px 0;
-  }
-  .compare-row .cr-label { color: var(--text-light); font-weight: 500; }
-  .compare-row .cr-value { font-weight: 700; color: var(--text); text-align: right; }
+  /* Generic cancel button (used by the add/edit modals) */
   .btn-cancel { background: #eee; color: var(--text); }
   .btn-cancel:hover { background: #ddd; }
 
@@ -754,32 +721,6 @@
   .empty-state svg { width: 56px; height: 56px; opacity: 0.3; margin-bottom: 12px; }
   .empty-state p { font-size: 0.95rem; }
 
-  /* ── Visit Evaluation ── */
-  .eval-school-picker { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
-  .eval-school-picker select { padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.92rem; font-family: inherit; min-width: 240px; }
-  .eval-section { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
-  .eval-section-header { background: var(--primary-light); padding: 12px 18px; font-weight: 700; font-size: 0.95rem; color: var(--primary-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; gap: 8px; }
-  .eval-section-header .eval-chevron { font-size: 0.7rem; transition: transform 0.2s; color: var(--text-light); }
-  .eval-section.eval-collapsed .eval-section-body { display: none; }
-  .eval-section.eval-collapsed .eval-chevron { transform: rotate(0deg); }
-  .eval-section:not(.eval-collapsed) .eval-chevron { transform: rotate(90deg); }
-  .eval-section-header .weight-badge { font-size: 0.75rem; font-weight: 600; padding: 2px 10px; border-radius: 20px; background: var(--primary); color: #fff; }
-  .eval-section-header .subtotal { font-size: 0.85rem; font-weight: 600; color: var(--accent); }
-  .eval-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; border-bottom: 1px solid #f0f3f5; }
-  .eval-row:last-child { border-bottom: none; }
-  .eval-row label { flex: 1; font-size: 0.88rem; }
-  .eval-stars { display: flex; gap: 4px; }
-  .eval-stars button { background: none; border: 1px solid var(--border); border-radius: 6px; width: 34px; height: 34px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.15s; color: var(--text-light); }
-  .eval-stars button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-  .eval-stars button:hover { border-color: var(--primary); color: var(--primary); }
-  .eval-stars button.active:hover { background: var(--primary-dark); }
-  .eval-text textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.88rem; resize: vertical; min-height: 60px; }
-  .eval-text { padding: 10px 18px; }
-  .eval-text label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-light); margin-bottom: 6px; }
-  .eval-total-bar { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .eval-total-bar .total-score { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); }
-  .eval-total-bar .total-label { font-size: 0.85rem; color: var(--text-light); }
-  .eval-grade-picker select { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.92rem; font-weight: 600; font-family: inherit; }
 
   /* ── Sticky school-name columns ── */
   .table-wrap table th.sticky-col,
@@ -1976,8 +1917,6 @@
   #greekBody td:first-child,
   #agRankHead th:first-child,
   #agRankBody td:first-child,
-  #evalSummaryWrap thead th:first-child,
-  #evalSummaryBody td:first-child,
   #strategy table thead th:first-child,
   #strategyBody td:first-child {
     position: sticky;
@@ -1990,7 +1929,6 @@
   #finHead th:first-child,
   #greekHead th:first-child,
   #agRankHead th:first-child,
-  #evalSummaryWrap thead th:first-child,
   #strategy table thead th:first-child {
     z-index: 3;
     background: var(--primary-light);
@@ -1999,7 +1937,6 @@
   #finBody tr:hover td:first-child,
   #greekBody tr:hover td:first-child,
   #agRankBody tr:hover td:first-child,
-  #evalSummaryBody tr:hover td:first-child,
   #strategyBody tr:hover td:first-child {
     background: #fafcfd;
   }
@@ -5462,7 +5399,6 @@ function schoolNotesHTML(txt) {
   return (head ? '<p>' + esc(head) + '</p>' : '') +
     parts.map(p => '<div class="note-flag">★ ' + esc(p) + '</div>').join('');
 }
-let compareSelected = []; // array of school names, max 4
 
 function getSuperscoreStatus(schoolName) {
   const items = SCHOOL_CHECKLISTS[schoolName];
@@ -5669,133 +5605,6 @@ function sortRows(rows, sortState, columns) {
       cmp = (va < vb ? -1 : va > vb ? 1 : 0);
     }
     return sortState.dir === 'desc' ? -cmp : cmp;
-  });
-}
-
-function toggleCompare(cb) {
-  const name = cb.dataset.school;
-  if (cb.checked) {
-    if (!compareSelected.includes(name)) {
-      if (compareSelected.length >= 4) {
-        // Remove oldest, uncheck its checkbox
-        const removed = compareSelected.shift();
-        const oldCb = document.querySelector(`.compare-cb[data-school="${CSS.escape(removed)}"]`);
-        if (oldCb) oldCb.checked = false;
-      }
-      compareSelected.push(name);
-    }
-  } else {
-    compareSelected = compareSelected.filter(n => n !== name);
-  }
-  updateCompareBtn();
-}
-
-function updateCompareBtn() {
-  const btn = document.getElementById('compareBtn');
-  if (!btn) return;
-  if (compareSelected.length >= 2) {
-    btn.style.display = '';
-    btn.textContent = 'Compare ' + compareSelected.length + ' Schools';
-  } else {
-    btn.style.display = 'none';
-  }
-}
-
-function openCompareModal() {
-  if (compareSelected.length < 2) return;
-  let overlay = document.getElementById('compareOverlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'compareOverlay';
-    overlay.className = 'compare-overlay';
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-    document.body.appendChild(overlay);
-  }
-
-  const statusLabels = { researching:'Researching', applying:'Applying', accepted:'Accepted', rejected:'Rejected', waitlisted:'Waitlisted' };
-  const cards = compareSelected.map(name => {
-    const s = data.schools.find(sc => sc.name === name);
-    if (!s) return '';
-    const db = schoolDB[name] || {};
-    const sf = computeStrategicFit(name);
-    const fitClass = strategicFitBadgeClass(sf.label);
-    const rkForBadges = getRankingForSchool(name);
-    const scoirText = rkForBadges.scoirLabel || '—';
-    const scoirClass = scoirBadgeClass(rkForBadges.scoirLabel);
-    const vet = getSummaryVetStatus(name);
-    const vetClass = vet.startsWith('Yes') ? 'badge-vet-yes' : 'badge-vet-no';
-    const costInfo = getSummaryCost(name);
-    // v20 visit score (overallFit/campusVibe/academicFit). The old
-    // calcWeightedTotal sums legacy category objects that post-v20 records
-    // no longer carry, so it reported every school as "Not visited".
-    const visitInfo = getVisitScoreInfo(name);
-    const visitDisplay = visitInfo.hasData ? visitInfo.score + ' / 5' : 'Not visited';
-    const rk = getRankingForSchool(name);
-    const status = statusLabels[s.status] || s.status;
-    const statusClass = 's-' + (s.status || 'researching');
-    const dist = getDistanceFromAtlanta(s.location);
-
-    return `
-    <div class="compare-card">
-      <div class="compare-card-header">
-        ${schoolLogoHTML(name, 32)}
-        <h3>${esc(name)}</h3>
-      </div>
-      <div class="compare-row"><span class="cr-label">Strategic Fit</span><span class="cr-value"><span class="badge ${fitClass}">${sf.label}</span></span></div>
-      <div class="compare-row"><span class="cr-label">Scoir</span><span class="cr-value"><span class="badge ${scoirClass}">${esc(scoirText)}</span></span></div>
-      <div class="compare-row"><span class="cr-label">Visit Score</span><span class="cr-value">${visitDisplay}</span></div>
-      <div class="compare-row"><span class="cr-label">4-Year Cost</span><span class="cr-value">${costInfo.cost}</span></div>
-      <div class="compare-row"><span class="cr-label">Vet School</span><span class="cr-value"><span class="badge ${vetClass}">${esc(vet)}</span></span></div>
-      <div class="compare-row"><span class="cr-label">Vet Program</span><span class="cr-value">${rk.vetProgram || '—'}/5</span></div>
-      <div class="compare-row"><span class="cr-label">Cost Score</span><span class="cr-value">${rk.costScore || '—'}/5</span></div>
-      <div class="compare-row"><span class="cr-label">Merit Aid</span><span class="cr-value">${rk.meritAid || '—'}/5</span></div>
-      <div class="compare-row"><span class="cr-label">Distance</span><span class="cr-value">${dist != null ? dist + ' mi' : '—'}</span></div>
-      <div class="compare-row"><span class="cr-label">Status</span><span class="cr-value"><span class="status-sel ${statusClass}" style="padding:3px 8px;border-radius:4px;font-size:0.78rem;">${status}</span></span></div>
-      ${rk.notes ? `<div style="font-size:0.8rem;color:var(--text-light);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">${esc(rk.notes)}</div>` : ''}
-    </div>`;
-  }).join('');
-
-  overlay.innerHTML = `
-    <div class="compare-modal">
-      <button class="compare-close" onclick="document.getElementById('compareOverlay').remove()">&times;</button>
-      <h2>Side-by-Side Comparison</h2>
-      <div class="compare-grid">${cards}</div>
-    </div>`;
-
-  document.body.appendChild(overlay);
-
-  // ── Best-in-category highlighting ──
-  const bestHighlight = 'rgba(46,139,87,0.25)';
-  const highlightFields = [
-    { label: 'Visit Score', lower: false },
-    { label: '4-Year Cost', lower: true },
-    { label: 'Vet Program', lower: false },
-    { label: 'Merit Aid', lower: false },
-  ];
-  const cardEls = overlay.querySelectorAll('.compare-card');
-  highlightFields.forEach(({ label, lower }) => {
-    const cells = [];
-    cardEls.forEach(card => {
-      card.querySelectorAll('.compare-row').forEach(row => {
-        const lbl = row.querySelector('.cr-label');
-        if (lbl && lbl.textContent.trim() === label) cells.push(row);
-      });
-    });
-    if (cells.length < 2) return;
-    const nums = cells.map(c => {
-      const txt = c.querySelector('.cr-value').textContent.trim();
-      // Keep the '/' so parseFloat stops before the '/5' denominator —
-      // stripping it would turn "3 / 5" into 35 while "4.2 / 5" became 4.25.
-      const n = parseFloat(txt.replace(/[$K,%\s]/g, ''));
-      return isNaN(n) ? null : n;
-    });
-    const valid = nums.filter(n => n !== null);
-    if (valid.length < 2) return;
-    if (valid.every(v => v === valid[0])) return;
-    const best = lower ? Math.min(...valid) : Math.max(...valid);
-    cells.forEach((cell, i) => {
-      if (nums[i] === best) cell.style.background = bestHighlight;
-    });
   });
 }
 
@@ -6607,65 +6416,6 @@ function syncChecklists() {
 }
 
 // ─── Visit Evaluation ───
-const EVAL_CATEGORIES = {
-  gutCheck: {
-    label: 'Gut Check', weight: 0, note: 'Complete immediately after visit',
-    items: [
-      { key: 'seeMyself', label: 'Could see myself here 4 years?' },
-      { key: 'comfortable', label: 'Felt comfortable walking around?' },
-      { key: 'myPeople', label: "Students seemed like 'my people'?" }
-    ]
-  },
-  campus: {
-    label: 'Campus & Facilities', weight: 1.0,
-    items: [
-      { key: 'beauty', label: 'Overall campus beauty/aesthetics' },
-      { key: 'sizeFeels', label: 'Campus size feels right' },
-      { key: 'buildings', label: 'Building & classroom quality' },
-      { key: 'agFacilities', label: 'Animal science / ag facilities' },
-      { key: 'dorms', label: 'Dorms & residential areas' },
-      { key: 'dining', label: 'Dining options' },
-      { key: 'fitness', label: 'Fitness / recreation facilities' },
-      { key: 'library', label: 'Library & study spaces' },
-      { key: 'upkeep', label: 'General upkeep & cleanliness' }
-    ]
-  },
-  academic: {
-    label: 'Academic & Pre-Vet', weight: 1.5,
-    items: [
-      { key: 'tourGuideKnowledge', label: 'Tour guide knowledge of pre-vet' },
-      { key: 'animalAccess', label: 'Access to animals / hands-on opps' },
-      { key: 'research', label: 'Research opportunities mentioned' },
-      { key: 'vetConnection', label: 'Vet school connection (if applicable)' },
-      { key: 'classSizes', label: 'Class sizes seem manageable' },
-      { key: 'academicSupport', label: 'Academic support resources' },
-      { key: 'facultyAccess', label: 'Faculty accessibility' }
-    ]
-  },
-  studentLife: {
-    label: 'Student Life & Vibe', weight: 1.25,
-    items: [
-      { key: 'happy', label: 'Students seemed happy/engaged' },
-      { key: 'friendly', label: 'Friendliness of students' },
-      { key: 'diversity', label: 'Diversity of student body' },
-      { key: 'clubs', label: 'Club & activity options' },
-      { key: 'spirit', label: 'School spirit / community' },
-      { key: 'social', label: 'Social scene feels right' },
-      { key: 'town', label: 'Town / surrounding area appeal' },
-      { key: 'safety', label: 'Safety — felt comfortable' }
-    ]
-  },
-  practical: {
-    label: 'Practical Factors', weight: 0.75,
-    items: [
-      { key: 'distance', label: 'Distance from home manageable' },
-      { key: 'climate', label: 'Weather/climate seems livable' },
-      { key: 'gettingAround', label: 'Ease of getting around campus' },
-      { key: 'transportation', label: 'Transportation options' }
-    ]
-  }
-};
-
 function getEvalForSchool(name) {
   if (!data.evaluations[name]) {
     // Fresh shape: simplified 5-field visit form + back-compat containers for
@@ -6729,37 +6479,6 @@ function wasVisited(name) {
     }
   }
   return false;
-}
-
-function getVisitNotesForSchool(name) {
-  if (!data.visitNotes[name]) {
-    data.visitNotes[name] = { loved: '', concerned: '', answered: '', openQuestions: '', happyHere: '' };
-  }
-  return data.visitNotes[name];
-}
-
-function calcCategorySubtotal(evalData, catKey) {
-  const cat = EVAL_CATEGORIES[catKey];
-  if (!cat || !evalData[catKey]) return 0;
-  return cat.items.reduce((sum, it) => sum + (evalData[catKey][it.key] || 0), 0);
-}
-
-function calcWeightedTotal(evalData) {
-  let total = 0;
-  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
-    if (cat.weight === 0) continue;
-    total += calcCategorySubtotal(evalData, catKey) * cat.weight;
-  }
-  return Math.round(total * 10) / 10;
-}
-
-function calcMaxWeightedTotal() {
-  let max = 0;
-  for (const [catKey, cat] of Object.entries(EVAL_CATEGORIES)) {
-    if (cat.weight === 0) continue;
-    max += cat.items.length * 5 * cat.weight;
-  }
-  return max;
 }
 
 // ─── Visit Score (v20) — Phase 2 ───
@@ -7273,79 +6992,6 @@ function maybeTriggerVisitMigration() {
   // Defer slightly so the dashboard has rendered and the user sees the modal
   // land on top of a fully-populated UI rather than a blank page.
   setTimeout(showVisitMigrationModal, 600);
-}
-
-function toggleEvalSection(header) {
-  header.closest('.eval-section').classList.toggle('eval-collapsed');
-}
-
-function expandAllEvalSections() {
-  document.querySelectorAll('.eval-section.eval-collapsed').forEach(s => s.classList.remove('eval-collapsed'));
-}
-
-function collapseAllEvalSections() {
-  document.querySelectorAll('.eval-section[data-evalcat]').forEach(s => s.classList.add('eval-collapsed'));
-}
-
-function setEvalRating(school, catKey, itemKey, val) {
-  const ev = getEvalForSchool(school);
-  ev[catKey][itemKey] = (ev[catKey][itemKey] === val) ? 0 : val;
-  saveData();
-  renderEvaluation();
-  renderRankings();
-  renderSummary();
-}
-
-function setEvalField(school, field, val) {
-  const ev = getEvalForSchool(school);
-  ev[field] = val;
-  saveData();
-}
-
-function setEvalIntangible(school, field, val) {
-  const ev = getEvalForSchool(school);
-  if (!ev.intangibles) ev.intangibles = {};
-  ev.intangibles[field] = val;
-  saveData();
-}
-
-function setVisitNote(school, field, val) {
-  const vn = getVisitNotesForSchool(school);
-  vn[field] = val;
-  saveData();
-}
-
-function renderEvalSummary() {
-  const tbody = document.getElementById('evalSummaryBody');
-  if (data.schools.length === 0) { tbody.innerHTML = ''; return; }
-
-  const rows = getVisibleSchools().map(s => {
-    const ev = getEvalForSchool(s.name);
-    return {
-      name: s.name,
-      campus: calcCategorySubtotal(ev, 'campus'),
-      academic: calcCategorySubtotal(ev, 'academic'),
-      life: calcCategorySubtotal(ev, 'studentLife'),
-      practical: calcCategorySubtotal(ev, 'practical'),
-      total: calcWeightedTotal(ev),
-      grade: ev.letterGrade || '—'
-    };
-  });
-
-  rows.sort((a, b) => b.total - a.total);
-  rows.forEach((r, i) => r.rank = i + 1);
-
-  tbody.innerHTML = rows.map(r => `
-    <tr>
-      <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
-      <td>${r.campus}</td>
-      <td>${r.academic}</td>
-      <td>${r.life}</td>
-      <td>${r.practical}</td>
-      <td style="font-weight:700">${r.total}</td>
-      <td>${r.grade}</td>
-      <td class="rank-cell">#${r.rank}</td>
-    </tr>`).join('');
 }
 
 // ─── Final Rankings ───
