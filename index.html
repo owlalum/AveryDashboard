@@ -1972,8 +1972,6 @@
   #finBody td:first-child,
   #greekHead th:first-child,
   #greekBody td:first-child,
-  #natRankHead th:first-child,
-  #natRankBody td:first-child,
   #agRankHead th:first-child,
   #agRankBody td:first-child,
   #evalSummaryWrap thead th:first-child,
@@ -1989,7 +1987,6 @@
   }
   #finHead th:first-child,
   #greekHead th:first-child,
-  #natRankHead th:first-child,
   #agRankHead th:first-child,
   #evalSummaryWrap thead th:first-child,
   #strategy table thead th:first-child {
@@ -1999,7 +1996,6 @@
   /* Hover row: keep sticky cell background matching */
   #finBody tr:hover td:first-child,
   #greekBody tr:hover td:first-child,
-  #natRankBody tr:hover td:first-child,
   #agRankBody tr:hover td:first-child,
   #evalSummaryBody tr:hover td:first-child,
   #strategyBody tr:hover td:first-child {
@@ -2008,7 +2004,6 @@
   /* Even-row striping for summary table sticky cells */
   #finBody tr:nth-child(even) td:first-child,
   #greekBody tr:nth-child(even) td:first-child,
-  #natRankBody tr:nth-child(even) td:first-child,
   #agRankBody tr:nth-child(even) td:first-child {
     background: var(--cream);
   }
@@ -2788,7 +2783,6 @@
     <button class="subtab-btn" data-subtab="rankings">Rankings</button>
     <button class="subtab-btn" data-subtab="financial">Financial Analysis</button>
     <button class="subtab-btn" data-subtab="greeklife">Greek Life</button>
-    <button class="subtab-btn" data-subtab="nationalRankings">National Rankings</button>
     <button class="subtab-btn" data-subtab="agRankings">Ag Program Rankings</button>
     <button class="subtab-btn" data-subtab="methodology">How Rankings Work</button>
   </nav>
@@ -2806,6 +2800,7 @@
         <tbody id="schoolBody"></tbody>
       </table>
     </div>
+    <p style="font-size:0.78rem;color:var(--text-light);margin-top:8px;">US&nbsp;News = overall National Universities rank (<a href="https://www.usnews.com/best-colleges/rankings/national-universities" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">US News 2026</a>, editable). Regular-decision deadlines live on the Deadline Timeline; Early&nbsp;DL is the operative date since Avery applies early everywhere.</p>
   </div>
 
   <!-- Rankings sub-panel -->
@@ -2892,31 +2887,6 @@
           <th>Vibe</th>
         </tr></thead>
         <tbody id="greekBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- National Rankings sub-panel -->
-  <div id="nationalRankings" class="sub-panel">
-    <div class="section-head">
-      <h2>National Rankings</h2>
-      <p>Published ranks from US News, WSJ/College Pulse, and Forbes for each school in your comparison list.</p>
-    </div>
-    <div style="padding:10px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">
-      <strong>Sources (all editable — click any cell to update):</strong>
-      <a href="https://www.usnews.com/best-colleges/rankings/national-universities" target="_blank" rel="noopener">US News 2026 National Universities</a> &nbsp;·&nbsp;
-      <a href="https://www.wsj.com/rankings/college-rankings/best-colleges-2025" target="_blank" rel="noopener">WSJ/College Pulse 2025 Best Colleges</a> &nbsp;·&nbsp;
-      <a href="https://www.forbes.com/top-colleges/" target="_blank" rel="noopener">Forbes America's Top Colleges 2025</a> &nbsp;·&nbsp;
-      <a href="https://www.niche.com/colleges/search/best-colleges/" target="_blank" rel="noopener">Niche Best Colleges in America 2025</a>
-      <div style="margin-top:6px;font-size:0.78rem;">Each publication uses a different methodology &mdash; lower rank is better, but a school's position can vary widely across them. Verify against the source before any major decision.</div>
-    </div>
-    <div id="natRankEmpty" class="empty-state" style="display:none;">
-      <p>Add schools in the <strong>School Comparison</strong> tab to see their national rankings.</p>
-    </div>
-    <div class="table-wrap" style="max-height:none;">
-      <table class="rank-table">
-        <thead id="natRankHead"><tr><th>School</th><th>US News</th><th>WSJ</th><th>Forbes</th><th>Niche</th><th>Avg Rank</th></tr></thead>
-        <tbody id="natRankBody"></tbody>
       </table>
     </div>
   </div>
@@ -3847,35 +3817,6 @@ const schoolDB = {
   'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', conference:'ACC', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', fees:'incl.', roomBoard:'$14,020', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 29-32', acceptRate:'19%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
   'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', conference:'SEC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,388', fees:'$1,986', roomBoard:'$16,376', booksSupplies:'$1,480', deadline:'December 1', earlyDecision:'Oct 15 / Nov 15 / Dec 1', earlyActionRounds:[{name:'Early Action',deadline:'October 15',notification:'Mid-December',credentialsDue:'November 1'},{name:'Honors/Top Scholars',deadline:'November 15',notification:'Mid-February',credentialsDue:'December 1'},{name:'Regular Decision',deadline:'December 1',notification:'Mid-March',credentialsDue:'January 15'}], testReq:'ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-04-07' },
 };
-// ── National rankings (WSJ/College Pulse 2025, Forbes 2025, Niche 2025) ──
-// US News ranks are pulled from schoolDB.usNewsOverall — these are for the others.
-// Values are approximations pulled from published lists; verify against source links
-// in the National Rankings tab. All cells are editable.
-const NATIONAL_RANK_PRESETS = {
-  'Cornell University':              { wsj:'#14',  forbes:'#15',  niche:'#11'  },
-  'University of Florida':           { wsj:'#94',  forbes:'#56',  niche:'#39'  },
-  'University of Wisconsin-Madison': { wsj:'#59',  forbes:'#60',  niche:'#37'  },
-  'University of Illinois':          { wsj:'#68',  forbes:'#58',  niche:'#39'  },
-  'Ohio State University':           { wsj:'#138', forbes:'#85',  niche:'#42'  },
-  'University of Georgia':           { wsj:'#112', forbes:'#84',  niche:'#34'  },
-  'Purdue University':               { wsj:'#139', forbes:'#62',  niche:'#46'  },
-  'Texas A&M University':            { wsj:'#170', forbes:'#88',  niche:'#69'  },
-  'Virginia Tech':                   { wsj:'#189', forbes:'#114', niche:'#86'  },
-  'Florida State University':        { wsj:'#193', forbes:'#131', niche:'#92'  },
-  'Penn State University':           { wsj:'#151', forbes:'#99',  niche:'#67'  },
-  'Michigan State University':       { wsj:'#229', forbes:'#127', niche:'#107' },
-  'North Carolina State University': { wsj:'#161', forbes:'#107', niche:'#73'  },
-  'Clemson University':              { wsj:'#214', forbes:'#118', niche:'#90'  },
-  'Auburn University':               { wsj:'#240', forbes:'#142', niche:'#80'  },
-  'University of Tennessee':         { wsj:'#232', forbes:'#157', niche:'#101' },
-  'University of Missouri':          { wsj:'#217', forbes:'#158', niche:'#143' },
-  'University of South Carolina':    { wsj:'#282', forbes:'#172', niche:'#114' },
-  'University of Kentucky':          { wsj:'#300', forbes:'#174', niche:'#147' },
-  'Colorado State University':       { wsj:'#268', forbes:'#183', niche:'#118' },
-  'Oklahoma State University':       { wsj:'#288', forbes:'#225', niche:'#180' },
-  'Mississippi State University':    { wsj:'#358', forbes:'#262', niche:'#192' },
-};
-
 // ── Ag program rankings (Niche, QS Agriculture & Forestry, CollegeFactual) ──
 // US News column pulls from schoolDB.vetSchoolRank (Best Graduate Vet Schools).
 // All values are approximations; verify against source links in the Ag Rankings tab.
@@ -5356,7 +5297,7 @@ function showSubtab(event, name) {
 // holds one of these from a prior session, restoreTab() should fall through
 // to the default active subtab in the group rather than activating an
 // orphaned panel.
-const ARCHIVED_SUBTABS = new Set(['tourchk', 'roadtrip']);
+const ARCHIVED_SUBTABS = new Set(['tourchk', 'roadtrip', 'nationalRankings']);
 
 // ─── Restore active tab on refresh ───
 (function restoreTab() {
@@ -5489,7 +5430,7 @@ const SCHOOL_COLUMNS = [
   { field: 'avgGPA',          label: 'GPA',            sortType: 'numeric' },
   { field: 'testReq',         label: 'ACT',            sortType: 'text' },
   { field: '_admitRate',      label: 'Admit\u00a0%',   sortType: 'percent' },
-  { field: 'deadline',        label: 'Deadline',       sortType: 'date' },
+  { field: 'usNewsOverall',   label: 'US\u00a0News',   sortType: 'rank' },
   { field: 'earlyDecision',   label: 'Early\u00a0DL',  sortType: 'date' },
   { field: 'status',          label: 'Status',         sortType: 'status' },
   { field: null,              label: '',               sortType: null },
@@ -5575,17 +5516,6 @@ const rankingsSort = { field: null, dir: 'asc' };
 const financialSort = { field: null, dir: 'asc' };
 const greekSort = { field: null, dir: 'asc' };
 const summarySort = { field: null, dir: 'asc' };
-const natRankSort = { field: 'sortAvg', dir: 'asc' };
-
-const NATIONAL_RANK_COLUMNS = [
-  { field: 'name',     label: 'School',   sortType: 'text' },
-  { field: 'usNews',   label: 'US News',  sortType: 'rank' },
-  { field: 'wsj',      label: 'WSJ',      sortType: 'rank' },
-  { field: 'forbes',   label: 'Forbes',   sortType: 'rank' },
-  { field: 'niche',    label: 'Niche',    sortType: 'rank' },
-  { field: 'sortAvg',  label: 'Avg Rank', sortType: 'numeric' },
-];
-
 const agRankSort = { field: 'sortAvg', dir: 'asc' };
 const AG_RANK_COLUMNS = [
   { field: 'name',     label: 'School',             sortType: 'text' },
@@ -5859,7 +5789,7 @@ function renderSchools() {
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span>${ssBadge}</td>
       <td class="compact">${esc(admit.rate)} ${admitTag}</td>
-      <td class="compact"><span contenteditable="true" data-field="deadline">${esc(s.deadline)}</span></td>
+      <td class="compact"><span contenteditable="true" data-field="usNewsOverall">${esc(s.usNewsOverall || (dbEntry && dbEntry.usNewsOverall) || '')}</span></td>
       <td class="compact"><span contenteditable="true" data-field="earlyDecision">${esc(s.earlyDecision)}</span></td>
       <td>
         <select class="status-sel s-${s.status}" onchange="updateSchoolStatus('${s.id}', this)">
@@ -7483,58 +7413,11 @@ function setRankingField(school, field, val) {
   if (typeof renderSummary === 'function') renderSummary();
 }
 
-// ─── National Rankings (US News / WSJ / Forbes) ───
-function getNationalRanking(name) {
-  const preset = NATIONAL_RANK_PRESETS[name] || {};
-  if (!data.nationalRankings[name]) {
-    data.nationalRankings[name] = { wsj: preset.wsj || '', forbes: preset.forbes || '', niche: preset.niche || '' };
-  } else if (data.nationalRankings[name].niche === undefined) {
-    data.nationalRankings[name].niche = preset.niche || '';
-  }
-  return data.nationalRankings[name];
-}
-
+// Shared rank-string parser ("#12" / "12" → 12) — used by Ag Rankings and sorting.
 function rankNum(s) {
   if (!s) return null;
   const m = String(s).match(/#?(\d+)/);
   return m ? parseInt(m[1], 10) : null;
-}
-
-function renderNationalRankings() {
-  const tbody = document.getElementById('natRankBody');
-  const empty = document.getElementById('natRankEmpty');
-  if (!tbody) return;
-  const schools = getVisibleSchools();
-  if (schools.length === 0) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
-  if (empty) empty.style.display = 'none';
-
-  const rows = schools.map(s => {
-    const db = schoolDB[s.name] || {};
-    const nr = getNationalRanking(s.name);
-    const usNews = s.usNewsOverall || db.usNewsOverall || '';
-    const nums = [rankNum(usNews), rankNum(nr.wsj), rankNum(nr.forbes), rankNum(nr.niche)].filter(n => n != null);
-    const avgRank = nums.length ? Math.round(nums.reduce((a,b) => a+b, 0) / nums.length) : null;
-    return { name: s.name, usNews, wsj: nr.wsj || '', forbes: nr.forbes || '', niche: nr.niche || '', avgRank, sortAvg: avgRank != null ? avgRank : 99999 };
-  });
-
-  const sorted = sortRows(rows, natRankSort, NATIONAL_RANK_COLUMNS);
-
-  tbody.innerHTML = sorted.map(r => `
-    <tr>
-      <td style="white-space:nowrap;text-align:left"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
-      <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="usNews">${esc(r.usNews || '—')}</span></td>
-      <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="wsj">${esc(r.wsj || '—')}</span></td>
-      <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="forbes">${esc(r.forbes || '—')}</span></td>
-      <td><span contenteditable="true" data-nr-school="${esc(r.name)}" data-nr-field="niche">${esc(r.niche || '—')}</span></td>
-      <td style="font-weight:700">${r.avgRank != null ? '#' + r.avgRank : '—'}</td>
-    </tr>`).join('');
-
-  tbody.querySelectorAll('[data-nr-school]').forEach(el => {
-    el.addEventListener('blur', () => setNationalRanking(el.dataset.nrSchool, el.dataset.nrField, el.textContent.trim()));
-    el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
-  });
-
-  setupSortableHeaders('natRankHead', NATIONAL_RANK_COLUMNS, natRankSort, renderNationalRankings);
 }
 
 // ─── Ag Program Rankings (Niche / US News Vet / QS / CollegeFactual) ───
@@ -7595,20 +7478,6 @@ function setAgRanking(school, field, raw) {
   }
   saveData();
   renderAgRankings();
-}
-
-function setNationalRanking(school, field, raw) {
-  let val = (raw || '').replace(/—/g, '').trim();
-  if (val && !val.startsWith('#') && /^\d+$/.test(val)) val = '#' + val;
-  if (field === 'usNews') {
-    const s = data.schools.find(x => x.name === school);
-    if (s) s.usNewsOverall = val;
-  } else {
-    const nr = getNationalRanking(school);
-    nr[field] = val;
-  }
-  saveData();
-  renderNationalRankings();
 }
 
 // ─── Executive Summary Rankings ───
@@ -10667,7 +10536,6 @@ function renderAll() {
   renderTourChecklist();
   renderEvaluation();
   renderRankings();
-  renderNationalRankings();
   renderAgRankings();
   renderStrategy();
   syncChecklists();
@@ -11123,6 +10991,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.1',
+    date: '2026-07-22',
+    title: 'Simpler Rankings — One Scale, Front and Center',
+    items: [
+      'The National Rankings tab is gone — WSJ, Forbes, and Niche each re-rank on shifting methodologies every year and none of them drove decisions. US News (the scale counselors and Scoir actually reference) is now a sortable column right in School Comparison',
+      'To make room, the regular-decision Deadline column came off the Comparison table — you\'re applying early everywhere, so Early DL is the date that matters (full deadline detail still lives on the Deadline Timeline)',
+      'Your saved WSJ/Forbes/Niche numbers weren\'t deleted — they\'re preserved invisibly in your data and old backups still restore cleanly',
+    ]
+  },
   {
     version: '8.0',
     date: '2026-07-22',
