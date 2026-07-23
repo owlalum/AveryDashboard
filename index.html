@@ -9031,8 +9031,8 @@ function validateAIResponse(text, aiData) {
   // of these contexts is being used as a reference value (scholarship
   // threshold, hypothetical "if she drops to X"), not asserted as the
   // student's actual stat — so it shouldn't count as a fabrication.
-  const fabSuppressBefore = /\b(?:requires?|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore|needs?|short\s+of|away\s+from|recalc\w*|Zell(?:\s+Miller)?)\b/i;
-  const fabSuppressAfter = /\b(?:threshold|minimum|requirement|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|superscore|with[\s-]science|without[\s-]science|core|Zell(?:\s+Miller)?|recalc\w*)\b/i;
+  const fabSuppressBefore = /\b(?:requir\w*|threshold(?:\s+of)?|minimum(?:\s+of)?|to\s+maintain|maintenance|to,\s*say|say,|drops?\s+to|dropp(?:ed|ing)\s+to|slide\s+(?:to|from\s+\d\.?\d*\s+to)|dipp?(?:ed|s)?\s+to|hypothetically|if\s+it|if\s+her\s+gpa|what\s+if|scenario(?:\s+of)?|targeting\s+(?:ACT|a)|target\s+(?:ACT|score|of)|her\s+target|retake\s+targeting|the\s+planned|planned\s+retake|goal\s+(?:of|score)|aiming\s+(?:for|at)|from\s+\d{1,2}\s+to|(?:moved|movement|improved|increased|rose|went)\s+from|compared\s+to|vs|versus|previous(?:ly)?|before\s+the\s+(?:retake|test|sitting)|earlier\s+(?:ACT|GPA)|her\s+old|superscore|with[\s-]science|without[\s-]science|(?:UGA|UTK)[\s-]specific|effective\s+composite|effective\s+(?:UGA|UTK)\s+superscore|needs?|short\s+of|away\s+from|recalc\w*|Zell(?:\s+Miller)?)\b/i;
+  const fabSuppressAfter = /\b(?:threshold|minimum|requir\w*|or\s+higher|or\s+above|or\s+below|retake|improvement|target|goal|previously|earlier|before|vs|versus|compared\s+to|superscore|with[\s-]science|without[\s-]science|core|Zell(?:\s+Miller)?|recalc\w*)\b/i;
   // School-statistic context: the system prompt explicitly asks the model to
   // compare the student's stats to each school's mid-50% ranges and admitted
   // averages, so numbers in that context are school data, not fabricated
@@ -9047,6 +9047,9 @@ function validateAIResponse(text, aiData) {
     const a = t.substring(idx + len, idx + len + 8);
     return /\d\s*[-–—]\s*$/.test(b) || /^\s*[-–—]\s*\d/.test(a);
   };
+  // A trailing plus ("ACT 30+", "3.5+ GPA") marks the number as a floor —
+  // threshold notation, never an assertion of the student's exact stat.
+  const isPlusSuffixed = (idx, len) => /^\s?\+/.test(t.substring(idx + len, idx + len + 2));
   if (actualGPA != null) {
     // All legitimate student GPAs — weighted, unweighted, HOPE — plus their
     // 2-decimal roundings (models round 3.657 to 3.66). The July 2026 score
@@ -9067,6 +9070,7 @@ function validateAIResponse(text, aiData) {
       if (!/\bgpa\b/i.test(before) && !/\bgpa\b/i.test(after)) continue;
       if (knownGPAs.some(k => Math.abs(val - k) <= 0.01)) continue;
       if (isRangeEndpoint(m.index, m[0].length)) continue;
+      if (isPlusSuffixed(m.index, m[0].length)) continue;
       // Threshold/hypothetical suppression: 40-char before, 30-char after.
       const suppressBefore = t.substring(Math.max(0, m.index - 40), m.index);
       const suppressAfter = t.substring(m.index + m[0].length, m.index + m[0].length + 30);
@@ -9090,6 +9094,7 @@ function validateAIResponse(text, aiData) {
       if (!/\bACT\b/i.test(before) && !/\bACT\b/i.test(after)) continue;
       if (val === actualACT) continue;
       if (isRangeEndpoint(m.index, m[0].length)) continue;
+      if (isPlusSuffixed(m.index, m[0].length)) continue;
       // Same threshold/hypothetical suppression as GPA — an ACT value
       // discussed as a scholarship threshold or hypothetical score shouldn't
       // be flagged as a fabricated student stat.
