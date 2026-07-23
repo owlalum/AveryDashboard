@@ -38,10 +38,15 @@ final backstop. Not required — the passphrase is the real gate.
 If the dashboard ever moves to a different address, add that address to
 `ALLOWED_ORIGINS` at the top of `worker.js` and redeploy.
 
-## 2. Lock the Firebase database
+## 2. Lock the Firebase database — ✅ DONE (verified 2026-07-23)
 
-Today the database accepts reads/writes from anyone because the dashboard
-has no login. The dashboard now signs in **anonymously** (invisible to you
+Rules requiring a signed-in visitor were published 2026-07-02 and Anonymous
+sign-in is enabled; an unauthenticated read probe returns PERMISSION_DENIED.
+Nothing to do here — the steps below are kept for reference (e.g. if the
+project is ever recreated).
+
+Originally: the database accepted reads/writes from anyone because the
+dashboard has no login. The dashboard now signs in **anonymously** (invisible to you
 and Avery — no accounts, no passwords), which lets the database require a
 signed-in visitor. Two clicks in the Firebase console:
 

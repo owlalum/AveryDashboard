@@ -3254,12 +3254,12 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const docRef = db.collection('dashboards').doc('main');
 
-// Anonymous sign-in so Firestore security rules can require request.auth
-// (see SECURITY_SETUP.md). Best-effort: if Anonymous auth isn't enabled in
-// the Firebase console yet, sign-in fails and we proceed unauthenticated —
-// identical to today's behavior under the current open rules. Firestore
-// reads/writes wait on this promise so that once rules are tightened, the
-// first read never races the sign-in.
+// Anonymous sign-in — REQUIRED for sync: the Firestore rules published
+// 2026-07-02 (verified live 2026-07-23: unauthenticated REST reads return
+// PERMISSION_DENIED) allow read/write only when request.auth != null.
+// If sign-in fails (e.g. file:// testing), Firestore denies everything and
+// the app falls back to device-local storage. Reads/writes wait on this
+// promise so the first read never races the sign-in.
 const authReady = firebase.auth().signInAnonymously()
   .then(() => { console.log('Firebase: anonymous auth OK'); })
   .catch(err => {
