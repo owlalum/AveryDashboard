@@ -4186,6 +4186,28 @@ function runMigrations() {
     data.scoirLabelJune2026MigrationApplied = true;
   }
 
+  // ── Scoir label update July 2026 ──
+  // Owner-reported Scoir refresh (2026-07-24): Virginia Tech and Purdue
+  // moved up to Likely; Texas A&M moved back down to Target. All others
+  // held steady. Sentinel on `data` so it travels via Firestore sync and
+  // runs once (after the June migration above, which it partly supersedes).
+  if (!data.scoirLabelJuly2026MigrationApplied) {
+    const scoirUpdates = {
+      'Texas A&M University': 'Target',  // was Likely
+      'Virginia Tech': 'Likely',         // was Target
+      'Purdue University': 'Likely'      // was Target
+    };
+    (data.schools || []).forEach(s => {
+      if (scoirUpdates[s.name]) s.scoirLabel = scoirUpdates[s.name];
+    });
+    if (data.rankings) {
+      Object.keys(scoirUpdates).forEach(name => {
+        if (data.rankings[name]) data.rankings[name].scoirLabel = scoirUpdates[name];
+      });
+    }
+    data.scoirLabelJuly2026MigrationApplied = true;
+  }
+
   // ── GPA update June 2026 ──
   // Avery's weighted GPA updated 3.74 → 3.8; unweighted GPA introduced at
   // 3.66 (new field, did not previously exist on the dashboard — HOPE GPA
@@ -10838,6 +10860,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.5',
+    date: '2026-07-24',
+    title: 'Scoir Admission Odds Refreshed',
+    items: [
+      '⭐ Virginia Tech and Purdue both moved up from Target to Likely in Scoir',
+      'Texas A&M moved from Likely back to Target',
+      'All other schools\' Scoir labels held steady',
+    ]
+  },
   {
     version: '8.4',
     date: '2026-07-23',
