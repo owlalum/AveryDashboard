@@ -4208,6 +4208,39 @@ function runMigrations() {
     data.scoirLabelJuly2026MigrationApplied = true;
   }
 
+  // ── Scoir full re-rate July 2026 (new ACT) ──
+  // Owner-provided Scoir screenshot (2026-07-26): with the new ACT (34)
+  // entered in Scoir, every followed school was re-rated. Full label set
+  // from the screenshot below (supersedes the two updates above). Kentucky
+  // and Cornell did not appear in the re-rate and hold their prior labels
+  // (Very Likely / Far Reach). University of Florida appeared in Scoir; the
+  // name-keyed update makes it a no-op unless Florida is on the active list.
+  // Sentinel on `data` so it travels via Firestore sync and runs once.
+  if (!data.scoirRerateJuly2026MigrationApplied) {
+    const scoirUpdates = {
+      'Auburn University': 'Very Likely',
+      'University of Tennessee': 'Very Likely',      // was Likely
+      'Clemson University': 'Very Likely',           // was Likely
+      'Virginia Tech': 'Likely',
+      'University of Georgia': 'Likely',             // was Target
+      'Ohio State University': 'Likely',             // was Target
+      'Texas A&M University': 'Likely',              // was Target
+      'Purdue University': 'Likely',
+      'University of Wisconsin-Madison': 'Target',   // was Reach
+      'University of Florida': 'Reach',
+      'North Carolina State University': 'Reach'
+    };
+    (data.schools || []).forEach(s => {
+      if (scoirUpdates[s.name]) s.scoirLabel = scoirUpdates[s.name];
+    });
+    if (data.rankings) {
+      Object.keys(scoirUpdates).forEach(name => {
+        if (data.rankings[name]) data.rankings[name].scoirLabel = scoirUpdates[name];
+      });
+    }
+    data.scoirRerateJuly2026MigrationApplied = true;
+  }
+
   // ── GPA update June 2026 ──
   // Avery's weighted GPA updated 3.74 → 3.8; unweighted GPA introduced at
   // 3.66 (new field, did not previously exist on the dashboard — HOPE GPA
@@ -10860,6 +10893,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.6',
+    date: '2026-07-26',
+    title: 'Scoir Re-Rated Everything With Your New ACT',
+    items: [
+      '⭐ With the 34 now in Scoir, six schools moved up: Tennessee and Clemson are Very Likely; Texas A&M, Ohio State, and UGA are Likely; Wisconsin improved from Reach to Target',
+      'Texas A&M is back to Likely — the brief move to Target (v8.5) was before the new ACT was factored in',
+      'Virginia Tech and Purdue hold at Likely; Auburn holds at Very Likely; NC State stays a Reach',
+      'Kentucky and Cornell were not part of this re-rate and keep their prior labels (Very Likely / Far Reach)',
+    ]
+  },
   {
     version: '8.5',
     date: '2026-07-24',
