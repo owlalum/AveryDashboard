@@ -5489,6 +5489,11 @@ function getSmartAdmitRate(school) {
 }
 
 function parseSortValue(val, sortType) {
+  if (sortType === 'scoir') {
+    // Admission-probability tiers sort best→worst; unset labels sink to the bottom.
+    const order = { 'very likely': 1, 'likely': 2, 'target': 3, 'reach': 4, 'far reach': 5 };
+    return order[String(val || '').trim().toLowerCase()] || 99;
+  }
   if (val == null || val === '') return -Infinity;
   const s = String(val).trim();
   if (sortType === 'percent') {
@@ -5579,7 +5584,7 @@ const RANKING_COLUMNS = [
   { field: 'costScore',  label: 'Cost',       sortType: 'numeric' },
   { field: 'meritAid',   label: 'Merit (ref)',sortType: 'numeric' },
   { field: 'combined',   label: 'Combined',   sortType: 'numeric' },
-  { field: 'scoirLabel', label: 'Scoir',      sortType: 'text' },
+  { field: 'scoirLabel', label: 'Scoir',      sortType: 'scoir' },
   { field: 'notes',      label: 'Notes',      sortType: null },
 ];
 
@@ -5613,7 +5618,7 @@ const SUMMARY_COLUMNS = [
   { field: 'rank',         label: 'Rank',          sortType: 'numeric' },
   { field: 'name',         label: 'School',        sortType: 'text' },
   { field: 'strategicFit', label: 'Strategic Fit', sortType: 'text' },
-  { field: 'scoirLabel',   label: 'Scoir',         sortType: 'text' },
+  { field: 'scoirLabel',   label: 'Scoir',         sortType: 'scoir' },
   { field: 'cost',         label: '4-Yr Cost',     sortType: 'currency' },
   { field: 'combined',     label: 'Score',         sortType: 'numeric' },
   { field: 'notes',        label: 'Key Notes',     sortType: null },
@@ -10893,6 +10898,15 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '8.7',
+    date: '2026-07-26',
+    title: 'Scoir Column Sorts by Odds, Not Alphabet',
+    items: [
+      'Clicking the Scoir column header (Rankings and Summary tables) now sorts by admission probability — Very Likely → Likely → Target → Reach → Far Reach — instead of alphabetically',
+      'Click again to flip the order (longest shots first); schools without a Scoir label sort to the bottom',
+    ]
+  },
   {
     version: '8.6',
     date: '2026-07-26',
