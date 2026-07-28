@@ -2753,6 +2753,7 @@
     <button class="subtab-btn" data-subtab="financial">Financial Analysis</button>
     <button class="subtab-btn" data-subtab="greeklife">Greek Life</button>
     <button class="subtab-btn" data-subtab="agRankings">Ag Program Rankings</button>
+    <button class="subtab-btn" data-subtab="vetSchools">US Vet Schools</button>
     <button class="subtab-btn" data-subtab="methodology">How Rankings Work</button>
   </nav>
   <div id="schools" class="sub-panel active">
@@ -2884,6 +2885,22 @@
         <tbody id="agRankBody"></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- US Vet Schools sub-panel -->
+  <div id="vetSchools" class="sub-panel">
+    <div class="section-head">
+      <h2>US Vet Schools</h2>
+      <p>Every AVMA-accredited DVM program in the country, plus the ones opening &mdash; reference, not a ranking.</p>
+    </div>
+    <div style="padding:12px 16px;margin-bottom:16px;background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;font-size:0.85rem;line-height:1.6;">
+      <strong>Why this is here:</strong> when acceptances arrive, it helps to see the whole national picture rather than just the schools on your list. Highlighted rows are schools where you'd be an undergrad &mdash; useful because some vet schools favor their own state's residents, and a few give their undergrads access to hospital jobs or reserved-seat programs.
+      <div style="margin-top:8px;">
+        <strong>On the statuses:</strong> <em>Provisional</em> is a normal early stage for a new program, not a warning &mdash; its graduates are eligible for licensure just like anyone else's. <em>Probation</em> is the one to look twice at: an established program with deficiencies the AVMA is tracking. <em>Letter of Reasonable Assurance</em> means a school may start enrolling before full accreditation.
+      </div>
+      <div style="margin-top:8px;">Good news for your cycle: Rowan, Utah State, Clemson, and Arkansas State are adding several hundred seats nationally right as you apply, easing a bottleneck that has been brutal for years. Source: <a href="https://www.avma.org/education/center-for-veterinary-accreditation/accredited-veterinary-colleges" target="_blank" rel="noopener">AVMA Council on Education</a>.</div>
+    </div>
+    <div id="vetSchoolsBody"></div>
   </div>
 
   <!-- Methodology sub-panel -->
@@ -3873,6 +3890,66 @@ const AG_RANK_PRESETS = {
   'Florida State University':        { niche:'',    qs:'',     cf:''    }, // no ag program
   'University of South Carolina':    { niche:'',    qs:'',     cf:''    }, // no ag program
 };
+
+// ─── US Vet Schools (AVMA Council on Education, verified 2026-07-28) ───
+// Reference data, not a ranking. `undergrad` links a vet school to the name
+// used for that campus on Avery's comparison list, so rows can be flagged
+// where she would already be an undergrad (the names differ in one case:
+// the Virginia-Maryland CVM sits at Virginia Tech).
+const US_VET_SCHOOLS = [
+  // Fully accredited
+  { name:'Auburn University',                state:'AL', status:'accredited',  undergrad:'Auburn University' },
+  { name:'Tuskegee University',              state:'AL', status:'probation' },
+  { name:'Midwestern University',            state:'AZ', status:'accredited' },
+  { name:'University of Arizona',            state:'AZ', status:'accredited' },
+  { name:'UC Davis',                         state:'CA', status:'accredited',  undergrad:'University of California, Davis' },
+  { name:'Western University of Health Sciences', state:'CA', status:'accredited' },
+  { name:'Colorado State University',        state:'CO', status:'accredited',  undergrad:'Colorado State University' },
+  { name:'University of Florida',            state:'FL', status:'accredited',  undergrad:'University of Florida' },
+  { name:'University of Georgia',            state:'GA', status:'accredited',  undergrad:'University of Georgia' },
+  { name:'University of Illinois',           state:'IL', status:'accredited',  undergrad:'University of Illinois' },
+  { name:'Purdue University',                state:'IN', status:'accredited',  undergrad:'Purdue University' },
+  { name:'Iowa State University',            state:'IA', status:'accredited' },
+  { name:'Kansas State University',          state:'KS', status:'accredited' },
+  { name:'Louisiana State University',       state:'LA', status:'accredited' },
+  { name:'Tufts University',                 state:'MA', status:'accredited' },
+  { name:'Michigan State University',        state:'MI', status:'accredited',  undergrad:'Michigan State University' },
+  { name:'University of Minnesota',          state:'MN', status:'accredited' },
+  { name:'Mississippi State University',     state:'MS', status:'accredited',  undergrad:'Mississippi State University' },
+  { name:'University of Missouri',           state:'MO', status:'accredited',  undergrad:'University of Missouri' },
+  { name:'Cornell University',               state:'NY', status:'accredited',  undergrad:'Cornell University' },
+  { name:'North Carolina State University',  state:'NC', status:'accredited',  undergrad:'North Carolina State University' },
+  { name:'The Ohio State University',        state:'OH', status:'accredited',  undergrad:'Ohio State University' },
+  { name:'Oklahoma State University',        state:'OK', status:'accredited',  undergrad:'Oklahoma State University' },
+  { name:'Oregon State University',          state:'OR', status:'accredited' },
+  { name:'University of Pennsylvania',       state:'PA', status:'accredited' },
+  { name:'University of Tennessee',          state:'TN', status:'accredited',  undergrad:'University of Tennessee' },
+  { name:'Lincoln Memorial University',      state:'TN', status:'probation' },
+  { name:'Texas A&M University',             state:'TX', status:'accredited',  undergrad:'Texas A&M University' },
+  { name:'Texas Tech University',            state:'TX', status:'accredited' },
+  { name:'Virginia-Maryland CVM',            state:'VA', status:'accredited',  undergrad:'Virginia Tech', note:'Located at Virginia Tech' },
+  { name:'Washington State University',      state:'WA', status:'accredited' },
+  { name:'University of Wisconsin-Madison',  state:'WI', status:'accredited',  undergrad:'University of Wisconsin-Madison' },
+  // Provisionally accredited — enrolling students, working toward full accreditation
+  { name:'Rowan University',                 state:'NJ', status:'provisional', note:"Opened October 2025 — New Jersey's first" },
+  { name:'Utah State University',            state:'UT', status:'provisional', note:'Now a standalone 4-year DVM (was a 2+2 with Washington State)' },
+  { name:'Long Island University',           state:'NY', status:'provisional' },
+  { name:'Lincoln Memorial University — Orange Park', state:'FL', status:'provisional', note:"LMU's Florida campus" },
+  { name:'Universidad Ana G. Méndez',        state:'PR', status:'provisional' },
+  // Letter of Reasonable Assurance — may enroll ahead of full accreditation
+  { name:'Clemson University',               state:'SC', status:'lora',        undergrad:'Clemson University', note:'First class of 80 started August 2026' },
+  { name:'Arkansas State University',        state:'AR', status:'lora' },
+  // Earlier in the pipeline
+  { name:'Roseman University',               state:'NV', status:'developing',  note:'First class not expected before 2028' },
+];
+
+const VET_STATUS_GROUPS = [
+  { key:'accredited',  label:'Fully accredited',            blurb:'Established programs in good standing.' },
+  { key:'probation',   label:'Accredited — on probation',   blurb:'Still accredited, but with deficiencies the AVMA is actively tracking.' },
+  { key:'provisional', label:'Provisionally accredited',    blurb:'Newer programs already enrolling students. Graduates are eligible for licensure the same as from any accredited school.' },
+  { key:'lora',        label:'Opening — Letter of Reasonable Assurance', blurb:'Cleared to enroll students; full accreditation follows once a class is taught.' },
+  { key:'developing',  label:'In development',              blurb:'Announced but not yet enrolling.' },
+];
 
 // Bump when AG_RANK_PRESETS values change meaning or content. getAgRanking
 // caches presets per school in saved data, so without this the 2026 rebuild
@@ -5810,11 +5887,35 @@ function setupSortableHeaders(theadId, columns, sortState, renderFn) {
   });
 }
 
-function sortRows(rows, sortState, columns) {
+// "No value" is not a low value. For position/quantity columns, anything
+// without a digit in it — '', '—', 'N/A', 'Not yet ranked' — means the school
+// has no rank, which is different from ranking last.
+function isMissingSortValue(val, sortType) {
+  if (val == null) return true;
+  const s = String(val).trim();
+  if (s === '' || s === '—') return true;
+  if (sortType === 'rank' || sortType === 'numeric' || sortType === 'percent' || sortType === 'currency') {
+    return !/\d/.test(s);
+  }
+  return false;
+}
+
+// opts.blanksLast pins rows with no value to the bottom in BOTH directions,
+// instead of letting them flip to the top when the sort reverses.
+function sortRows(rows, sortState, columns, opts) {
   if (!sortState.field) return rows;
   const col = columns.find(c => c.field === sortState.field);
   if (!col) return rows;
+  const blanksLast = !!(opts && opts.blanksLast);
   return [...rows].sort((a, b) => {
+    if (blanksLast) {
+      const missingA = isMissingSortValue(a[sortState.field], col.sortType);
+      const missingB = isMissingSortValue(b[sortState.field], col.sortType);
+      // Returned before the direction flip below, so these never invert.
+      if (missingA && missingB) return 0;
+      if (missingA) return 1;
+      if (missingB) return -1;
+    }
     let va = a[sortState.field], vb = b[sortState.field];
     va = parseSortValue(va, col.sortType);
     vb = parseSortValue(vb, col.sortType);
@@ -7362,6 +7463,49 @@ function getAgRanking(name) {
   return data.agRankings[name];
 }
 
+function renderVetSchools() {
+  const host = document.getElementById('vetSchoolsBody');
+  if (!host) return;
+  // Match against her list by name so the highlight follows what she adds or
+  // removes rather than being hard-coded.
+  const onList = new Set((data.schools || []).map(s => s.name));
+  const total = US_VET_SCHOOLS.length;
+  const enrolling = US_VET_SCHOOLS.filter(v => v.status !== 'developing').length;
+  const hers = US_VET_SCHOOLS.filter(v => v.undergrad && onList.has(v.undergrad)).length;
+
+  host.innerHTML = `
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:14px;">
+      ${total} programs nationally &middot; ${enrolling} currently enrolling &middot;
+      <strong style="color:var(--accent)">${hers}</strong> at schools on your list
+    </p>` +
+    VET_STATUS_GROUPS.map(g => {
+      const rows = US_VET_SCHOOLS.filter(v => v.status === g.key);
+      if (!rows.length) return '';
+      return `
+      <div style="margin-bottom:22px;">
+        <h3 style="font-size:0.98rem;color:var(--primary-dark);margin-bottom:2px;">${esc(g.label)} <span style="font-weight:400;color:var(--text-light);">(${rows.length})</span></h3>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:8px;">${esc(g.blurb)}</p>
+        <div class="table-wrap" style="max-height:none;">
+          <table class="rank-table" style="min-width:0;">
+            <tbody>
+              ${rows.map(v => {
+                const mine = v.undergrad && onList.has(v.undergrad);
+                return `<tr${mine ? ' style="background:var(--accent-light)"' : ''}>
+                  <td style="width:52px;color:var(--text-light);font-size:0.8rem;">${esc(v.state)}</td>
+                  <td style="text-align:left;white-space:normal;">
+                    <strong>${esc(v.name)}</strong>
+                    ${mine ? ' <span class="ss-tag" title="You would be an undergrad here">ON YOUR LIST</span>' : ''}
+                    ${v.note ? `<div style="font-size:0.76rem;color:var(--text-light);margin-top:2px;">${esc(v.note)}</div>` : ''}
+                  </td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    }).join('');
+}
+
 function renderAgRankings() {
   const tbody = document.getElementById('agRankBody');
   const empty = document.getElementById('agRankEmpty');
@@ -7381,7 +7525,8 @@ function renderAgRankings() {
     return { name: s.name, niche: ag.niche || '', cf: ag.cf || '', qs: ag.qs || '', usNews };
   });
 
-  const sorted = sortRows(rows, agRankSort, AG_RANK_COLUMNS);
+  // blanksLast: an unranked school sinks whichever way the column is sorted.
+  const sorted = sortRows(rows, agRankSort, AG_RANK_COLUMNS, { blanksLast: true });
 
   tbody.innerHTML = sorted.map(r => `
     <tr>
@@ -10608,6 +10753,7 @@ function renderAll() {
   renderEvaluation();
   renderRankings();
   renderAgRankings();
+  renderVetSchools();
   renderStrategy();
   syncChecklists();
   renderTestPrep();
@@ -11064,6 +11210,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.8',
+    date: '2026-07-28',
+    title: 'US Vet Schools List Added',
+    items: [
+      'New "US Vet Schools" tab under Schools: every AVMA-accredited vet program in the country plus the ones opening, grouped by accreditation status. Schools where you would be an undergrad are highlighted',
+      'Worth knowing: provisional accreditation is a normal stage for a new program, not a warning — its graduates get licensed just like everyone else. Probation is the one to look twice at, and only two schools are on it',
+      'Rowan, Utah State, Clemson, and Arkansas State are adding several hundred seats nationally right as you apply — the vet school bottleneck is easing at a good moment for you',
+      'On the Ag Program Rankings tab, schools without a rank now always sort to the bottom, whether you sort the column up or down',
+    ]
+  },
   {
     version: '9.7',
     date: '2026-07-28',
