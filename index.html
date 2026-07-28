@@ -5493,27 +5493,6 @@ function toggleFinalList(school) {
   if (s) { s.finalList = !s.finalList; saveData(); renderSchools(); renderSummary(); updateFinalListUI(); }
 }
 
-// Everything that hangs off a school — visit evaluations, rankings, national
-// and ag rankings, honors opt-outs, visit notes, checklists, essays, visits —
-// is keyed by the school's display name. When the user edits a name (e.g.
-// fixing a typo), migrate the keyed data instead of orphaning it. Skips a
-// target key that's already occupied rather than overwriting it.
-function renameSchoolKeys(oldName, newName) {
-  [data.evaluations, data.rankings, data.nationalRankings, data.agRankings,
-   data.honorsOptOut, data.visitNotes].forEach(map => {
-    if (map && map[oldName] !== undefined && map[newName] === undefined) {
-      map[newName] = map[oldName];
-      delete map[oldName];
-    }
-  });
-  (data.checklists || []).forEach(cl => { if (cl.school === oldName) cl.school = newName; });
-  (data.essays || []).forEach(e => { if (e.school === oldName) e.school = newName; });
-  (data.visits || []).forEach(v => { if (v.school === oldName) v.school = newName; });
-  // Scholarships are keyed by school-name string too — without this, renaming
-  // a school hid its tracked scholarship rows (filtered out as "not visible").
-  (data.scholarships || []).forEach(sc => { if (sc.school === oldName) sc.school = newName; });
-}
-
 function setFinalListFilter(on) {
   finalListOnly = on;
   sessionStorage.setItem('finalListOnly', on ? 'true' : 'false');
@@ -5829,7 +5808,7 @@ function renderSchools() {
     return `
     <tr data-id="${s.id}">
       <td class="compact sticky-col" style="width:34px;"><button onclick="toggleFinalList('${s.id}')" title="${s.finalList ? 'Remove from Final List' : 'Add to Final List'}" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;line-height:1;">${s.finalList ? '\u2B50' : '\u2606'}</button></td>
-      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name)} <span contenteditable="true" data-field="name">${esc(s.name)}</span>${(s.notes || (dbEntry && dbEntry.notes)) ? `<button class="notes-toggle-btn${openSchoolNotes.has(s.id) ? ' open' : ''}" onclick="toggleSchoolNotes('${s.id}')" title="Show/hide research notes">&#9432;</button>` : ''}</span></td>
+      <td class="sticky-col sticky-col-last" style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(s.name)} <span>${esc(s.name)}</span>${(s.notes || (dbEntry && dbEntry.notes)) ? `<button class="notes-toggle-btn${openSchoolNotes.has(s.id) ? ' open' : ''}" onclick="toggleSchoolNotes('${s.id}')" title="Show/hide research notes">&#9432;</button>` : ''}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="location">${esc(s.location)}</span></td>
       <td class="compact"><span contenteditable="true" data-field="avgGPA">${esc(s.avgGPA)}</span></td>
       <td style="white-space:nowrap"><span contenteditable="true" data-field="testReq">${esc(s.testReq)}</span>${ssBadge}</td>
@@ -5852,20 +5831,17 @@ function renderSchools() {
     </tr>`;
   }).join('');
 
-  // Bind inline edits
+  // Bind inline edits. The school name is deliberately NOT editable here: it
+  // is the join key for schoolDB (logo, colors, research notes), FIN_DATA
+  // (costs), and the evaluations/rankings/checklists/essays/visits/
+  // scholarships maps. Editing it in place silently detached the row from its
+  // reference data. To correct a misnamed custom school, delete and re-add it.
   tbody.querySelectorAll('[contenteditable]').forEach(el => {
     el.addEventListener('blur', () => {
       const row = el.closest('tr');
       const school = data.schools.find(s => s.id === row.dataset.id);
       if (school) {
-        const field = el.dataset.field;
-        const newVal = el.textContent.trim();
-        if (field === 'name' && newVal && newVal !== school.name) {
-          // Evaluations, rankings, checklists etc. are keyed by name —
-          // carry them to the new name or they silently detach.
-          renameSchoolKeys(school.name, newVal);
-        }
-        school[field] = newVal;
+        school[el.dataset.field] = el.textContent.trim();
         saveData();
       }
     });
@@ -11022,6 +10998,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.5',
+    date: '2026-07-28',
+    title: 'School Names Locked',
+    items: [
+      'School names on the Comparison tab are no longer editable by tapping them. Everything about a school — its logo, costs, research notes, checklists, essays, visit ratings, and scholarships — is filed under its name, so an accidental edit (easy to do on a phone) quietly disconnected the row from all of it',
+      'Every other column still edits the same way: location, GPA, ACT, US News, and Early DL',
+      'If you ever add a school with a misspelled name, remove it and add it again',
+    ]
+  },
   {
     version: '9.4',
     date: '2026-07-28',
