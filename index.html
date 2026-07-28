@@ -2872,7 +2872,6 @@
       <div style="margin-top:8px;line-height:1.6;">
         <a href="https://www.niche.com/colleges/search/best-colleges-for-agricultural-sciences/" target="_blank" rel="noopener"><strong>Niche Ag Science</strong></a> &mdash; US undergrad, agriculture-wide. (Niche's separate "Best Colleges <em>with</em> Animal Sciences Degrees" list is <em>not</em> used: it only re-sorts schools by their overall national rank.)<br>
         <a href="https://www.collegefactual.com/majors/agriculture-ag-operations/animal-science/rankings/top-ranked/" target="_blank" rel="noopener"><strong>CF Animal Science</strong></a> &mdash; US undergrad, animal-science-specific: the closest published match to Avery's major. Top 50 published, so a few schools show &mdash;.<br>
-        <a href="https://www.topuniversities.com/university-subject-rankings/agriculture-forestry" target="_blank" rel="noopener"><strong>QS Ag &amp; Forestry (US)</strong></a> &mdash; research strength, shown as a US rank derived from the global table. A dash means not yet verified, not unranked.<br>
         <a href="https://www.usnews.com/best-graduate-schools/top-health-schools/veterinarian-rankings" target="_blank" rel="noopener"><strong>US News Vet (Grad)</strong></a> &mdash; the school's <em>graduate</em> vet school, not its undergrad program. Only schools with a vet school have one.
       </div>
     </div>
@@ -2881,7 +2880,7 @@
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table class="rank-table">
-        <thead id="agRankHead"><tr><th>School</th><th>Niche Ag Science</th><th>CF Animal Science</th><th>QS Ag &amp; Forestry (US)</th><th>US News Vet (Grad)</th></tr></thead>
+        <thead id="agRankHead"><tr><th>School</th><th>Niche Ag Science</th><th>CF Animal Science</th><th>US News Vet (Grad)</th></tr></thead>
         <tbody id="agRankBody"></tbody>
       </table>
     </div>
@@ -3833,14 +3832,11 @@ const schoolDB = {
   'Florida State University':       { domain:'fsu.edu', color:'#782F40', location:'Tallahassee, FL', conference:'ACC', notes:'No vet school; pre-vet advising through Health Professions Advising Office; Biological Science major with pre-professional track; proximity to UF\'s CVM for shadowing/research opportunities', tuitionIn:'$6,517', tuitionOut:'$21,683', fees:'incl.', roomBoard:'$14,020', booksSupplies:'$1,200', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 29-32', acceptRate:'19%', oosAcceptRate:'19%', avgGPA:'4.26', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'N/A', lastVerified:'2026-03-27' },
   'University of South Carolina':   { domain:'sc.edu', color:'#73000A', location:'Columbia, SC', conference:'SEC', notes:'No vet school; pre-vet advising through Office of Pre-Professional Advising; Biology major with vet-school prereq planning; top-ranked South Carolina Honors College; proximity to Clemson CVM (opening 2026) for clinical exposure', tuitionIn:'$12,688', tuitionOut:'$37,388', fees:'$1,986', roomBoard:'$16,376', booksSupplies:'$1,480', deadline:'December 1', earlyDecision:'Oct 15 / Nov 15 / Dec 1', earlyActionRounds:[{name:'Early Action',deadline:'October 15',notification:'Mid-December',credentialsDue:'November 1'},{name:'Honors/Top Scholars',deadline:'November 15',notification:'Mid-February',credentialsDue:'December 1'},{name:'Regular Decision',deadline:'December 1',notification:'Mid-March',credentialsDue:'January 15'}], testReq:'ACT 26-32', acceptRate:'60%', oosAcceptRate:'55%', avgGPA:'3.69', usNewsOverall:'#127', usNewsPublic:'#63', vetSchoolRank:'N/A', lastVerified:'2026-04-07' },
 };
-// ── Ag program rankings (Niche, QS Agriculture & Forestry, CollegeFactual) ──
-// US News column pulls from schoolDB.vetSchoolRank (Best Graduate Vet Schools).
-// All values are approximations; verify against source links in the Ag Rankings tab.
-// Three independent measures, deliberately NOT averaged — each answers a
-// different question, so a blended number would hide exactly the disagreement
-// that is worth reading. (US News vet rank rides alongside from
-// schoolDB.vetSchoolRank; it is a graduate rank and belongs with these even
-// less.)
+// ── Ag program rankings (Niche Ag Science + CollegeFactual Animal Science) ──
+// US News vet rank rides alongside from schoolDB.vetSchoolRank.
+// Two independent measures, deliberately NOT averaged — each answers a
+// slightly different question, so a blended number would hide exactly the
+// disagreement that is worth reading.
 //   niche = Niche "Best Colleges FOR Agricultural Sciences" (US undergrad,
 //           agriculture-wide). Note this is Niche's major-specific list, NOT
 //           "Best Colleges WITH <major> Degrees", which is only a filter over
@@ -3853,42 +3849,38 @@ const schoolDB = {
 //           published). Deliberately the animal-science list, not their
 //           agriculture list — that one ranks Harvard #11 and Sacred Heart #9
 //           and does not measure ag program strength.
-//   qs    = QS Agriculture & Forestry 2026, expressed as a US rank derived by
-//           filtering the global table to US institutions (QS publishes no
-//           US-only subject ranking). CAUTION: these are derived, not printed
-//           on the QS page, so they cannot be spot-checked against the source
-//           — a US rank is only correct if EVERY US institution ranked above
-//           it is known. Verified only for schools inside the global top 50,
-//           which is as far as the accessible table goes; the blanks below are
-//           unverified, NOT confirmed-unranked (QS does rank past 50 — e.g.
-//           Georgia at 52 and Virginia Tech at 88 globally).
+// QS Agriculture & Forestry was dropped 2026-07-28: it measures global
+// research output rather than undergraduate teaching, its ~475-institution
+// ceiling systematically under-covers exactly the regional US animal-science
+// programs on this list, and a US rank had to be derived (never printed on
+// the QS page), so it could not be spot-checked against the source.
 const AG_RANK_PRESETS = {
-  //                                    Niche Ag     QS Ag (US)  CF Animal Sci
-  'Cornell University':              { niche:'#1',  qs:'#2',   cf:'#7'  },
-  'Texas A&M University':            { niche:'#4',  qs:'#5',   cf:'#5'  },
-  'University of Wisconsin-Madison': { niche:'#5',  qs:'#9',   cf:'#10' },
-  'Purdue University':               { niche:'#6',  qs:'#3',   cf:'#1'  },
-  'University of Florida':           { niche:'#7',  qs:'#7',   cf:'#12' },
-  'University of Illinois':          { niche:'#9',  qs:'#9',   cf:'#16' },
-  'University of Georgia':           { niche:'#10', qs:'',     cf:'#23' },
-  'Penn State University':           { niche:'#14', qs:'#15',  cf:'#2'  },
-  'Ohio State University':           { niche:'#15', qs:'#13',  cf:'#35' },
-  'Michigan State University':       { niche:'#16', qs:'#6',   cf:'#21' },
-  'North Carolina State University': { niche:'#18', qs:'#11',  cf:'#18' },
-  'Virginia Tech':                   { niche:'#20', qs:'',     cf:'#28' },
-  'Auburn University':               { niche:'#22', qs:'',     cf:'#13' },
-  'Colorado State University':       { niche:'#25', qs:'',     cf:'#34' },
-  'University of Missouri':          { niche:'#28', qs:'',     cf:'#15' },
-  'Clemson University':              { niche:'#29', qs:'',     cf:'#50' },
-  'University of Tennessee':         { niche:'#30', qs:'',     cf:''    }, // outside CF's published top 50
-  'Oklahoma State University':       { niche:'#32', qs:'',     cf:'#33' },
-  'University of Kentucky':          { niche:'#34', qs:'',     cf:''    }, // outside CF's published top 50
-  'Mississippi State University':    { niche:'#38', qs:'',     cf:'#24' },
+  //                                    Niche Ag     CF Animal Sci
+  'Cornell University':              { niche:'#1',  cf:'#7'  },
+  'Texas A&M University':            { niche:'#4',  cf:'#5'  },
+  'University of Wisconsin-Madison': { niche:'#5',  cf:'#10' },
+  'Purdue University':               { niche:'#6',  cf:'#1'  },
+  'University of Florida':           { niche:'#7',  cf:'#12' },
+  'University of Illinois':          { niche:'#9',  cf:'#16' },
+  'University of Georgia':           { niche:'#10', cf:'#23' },
+  'Penn State University':           { niche:'#14', cf:'#2'  },
+  'Ohio State University':           { niche:'#15', cf:'#35' },
+  'Michigan State University':       { niche:'#16', cf:'#21' },
+  'North Carolina State University': { niche:'#18', cf:'#18' },
+  'Virginia Tech':                   { niche:'#20', cf:'#28' },
+  'Auburn University':               { niche:'#22', cf:'#13' },
+  'Colorado State University':       { niche:'#25', cf:'#34' },
+  'University of Missouri':          { niche:'#28', cf:'#15' },
+  'Clemson University':              { niche:'#29', cf:'#50' },
+  'University of Tennessee':         { niche:'#30', cf:''    }, // outside CF's published top 50
+  'Oklahoma State University':       { niche:'#32', cf:'#33' },
+  'University of Kentucky':          { niche:'#34', cf:''    }, // outside CF's published top 50
+  'Mississippi State University':    { niche:'#38', cf:'#24' },
   // Niche #7 could not be verified (see note above) and currently ties Florida
   // at #7, so one of the two is stale — flagged for a manual Niche check.
-  'University of California, Davis': { niche:'#7',  qs:'#1',   cf:'#9'  },
-  'Florida State University':        { niche:'',    qs:'',     cf:''    }, // no ag program
-  'University of South Carolina':    { niche:'',    qs:'',     cf:''    }, // no ag program
+  'University of California, Davis': { niche:'#7',  cf:'#9'  },
+  'Florida State University':        { niche:'',    cf:''    }, // no ag program
+  'University of South Carolina':    { niche:'',    cf:''    }, // no ag program
 };
 
 // ─── US Vet Schools (AVMA Council on Education, verified 2026-07-28) ───
@@ -3957,7 +3949,8 @@ const VET_STATUS_GROUPS = [
 // would never reach an existing dataset. Same lesson as NOTES_SYNC_REV.
 // Rev history: 1 = 2026-07-28 rebuild — no average, CF = animal science,
 //              QS = US-derived rank, banded schools blanked.
-const AG_RANK_REV = 1;
+//              2 = 2026-07-28 QS column dropped entirely (see note above).
+const AG_RANK_REV = 2;
 
 const schoolNames = Object.keys(schoolDB);
 // Aliases so common abbreviations also match
@@ -4384,7 +4377,9 @@ function runMigrations() {
     (data.schools || []).forEach(s => {
       const preset = AG_RANK_PRESETS[s.name];
       if (!preset) return;
-      data.agRankings[s.name] = { niche: preset.niche || '', qs: preset.qs || '', cf: preset.cf || '' };
+      // Rebuilt wholesale, so a dropped field (qs, rev 2) disappears rather
+      // than lingering in saved data after its column is gone.
+      data.agRankings[s.name] = { niche: preset.niche || '', cf: preset.cf || '' };
     });
     data.agRankSyncRev = AG_RANK_REV;
   }
@@ -5808,7 +5803,6 @@ const AG_RANK_COLUMNS = [
   { field: 'name',     label: 'School',                  sortType: 'text' },
   { field: 'niche',    label: 'Niche Ag Science',        sortType: 'rank' },
   { field: 'cf',       label: 'CF Animal Science',       sortType: 'rank' },
-  { field: 'qs',       label: 'QS Ag & Forestry (US)',   sortType: 'rank' },
   { field: 'usNews',   label: 'US News Vet (Grad)',      sortType: 'rank' },
 ];
 
@@ -7451,14 +7445,14 @@ function rankNum(s) {
 function getAgRanking(name) {
   const preset = AG_RANK_PRESETS[name] || {};
   if (!data.agRankings[name]) {
-    data.agRankings[name] = { niche: preset.niche || '', qs: preset.qs || '', cf: preset.cf || '' };
+    data.agRankings[name] = { niche: preset.niche || '', cf: preset.cf || '' };
   } else {
     // A school added before its ranks were researched cached blank values here,
     // and that cache would otherwise mask later preset updates (this is how
     // UC Davis sat empty). Fill blanks from the preset; never overwrite a value
     // the user typed in, and stay idempotent so no sentinel is needed.
     const cached = data.agRankings[name];
-    ['niche', 'qs', 'cf'].forEach(f => { if (!cached[f] && preset[f]) cached[f] = preset[f]; });
+    ['niche', 'cf'].forEach(f => { if (!cached[f] && preset[f]) cached[f] = preset[f]; });
   }
   return data.agRankings[name];
 }
@@ -7522,7 +7516,7 @@ function renderAgRankings() {
     const db = schoolDB[s.name] || {};
     const ag = getAgRanking(s.name);
     const usNews = s.vetSchoolRank || db.vetSchoolRank || '';
-    return { name: s.name, niche: ag.niche || '', cf: ag.cf || '', qs: ag.qs || '', usNews };
+    return { name: s.name, niche: ag.niche || '', cf: ag.cf || '', usNews };
   });
 
   // blanksLast: an unranked school sinks whichever way the column is sorted.
@@ -7533,7 +7527,6 @@ function renderAgRankings() {
       <td style="white-space:nowrap;text-align:left"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
       <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="niche">${esc(r.niche || '—')}</span></td>
       <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="cf">${esc(r.cf || '—')}</span></td>
-      <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="qs">${esc(r.qs || '—')}</span></td>
       <td><span contenteditable="true" data-ag-school="${esc(r.name)}" data-ag-field="usNews">${esc(r.usNews || '—')}</span></td>
     </tr>`).join('');
 
@@ -11210,6 +11203,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.9',
+    date: '2026-07-28',
+    title: 'QS Column Removed',
+    items: [
+      'Dropped the QS column from Ag Program Rankings. It measured global research output — faculty publications, not undergraduate teaching — which is a different question from the one you are asking',
+      'It also worked against your list: QS ranks only about 475 universities worldwide, so strong regional animal-science programs like Auburn, Missouri, Tennessee, and Kentucky were missing entirely and looked worse than they are',
+      'What is left is what you actually want: Niche Ag Science and CollegeFactual Animal Science, which broadly agree with each other, plus the vet school rank for context',
+    ]
+  },
   {
     version: '9.8',
     date: '2026-07-28',
