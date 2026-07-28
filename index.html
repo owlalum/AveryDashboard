@@ -47,6 +47,11 @@
      font size well past the authored size. Lock it to 100%. */
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
+  /* The page never scrolls sideways, so a fast horizontal swipe that
+     escapes a scrollable table must hard-stop instead of rubber-banding
+     the whole layout. */
+  html, body { overscroll-behavior-x: none; }
+
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
@@ -97,6 +102,7 @@
     padding: 8px 24px 0;
     border-bottom: 2px solid var(--border);
     overflow-x: auto;
+    overscroll-behavior-x: contain;
   }
   .tab-btn {
     padding: 11px 22px;
@@ -283,6 +289,9 @@
     overflow: auto;
     max-height: calc(100vh - 180px);
     -webkit-overflow-scrolling: touch;
+    /* Swipe momentum dies at the table's edge instead of chaining to the
+       page and bumping the whole layout sideways. */
+    overscroll-behavior-x: contain;
   }
   table { width: 100%; border-collapse: collapse; min-width: 1100px; }
   th {
@@ -11008,6 +11017,14 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.3',
+    date: '2026-07-28',
+    title: 'No More Sideways Bump',
+    items: [
+      'A quick sideways swipe on the School Comparison table (or the tab bar) no longer bumps the whole page left or right — the swipe now stops cleanly at the edge of the table',
+    ]
+  },
   {
     version: '9.2',
     date: '2026-07-28',
