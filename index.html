@@ -2871,7 +2871,7 @@
       <a href="https://www.niche.com/colleges/search/best-colleges-for-agricultural-sciences/" target="_blank" rel="noopener">Niche &mdash; Best Colleges for Agricultural Sciences</a> &nbsp;·&nbsp;
       <a href="https://www.usnews.com/best-graduate-schools/top-health-schools/veterinarian-rankings" target="_blank" rel="noopener">US News &mdash; Best Graduate Vet Schools</a> &nbsp;·&nbsp;
       <a href="https://www.topuniversities.com/university-subject-rankings/agriculture-forestry" target="_blank" rel="noopener">QS &mdash; Agriculture &amp; Forestry (Global)</a> &nbsp;·&nbsp;
-      <a href="https://www.collegefactual.com/majors/agriculture-agriculture-operations-and-related-sciences/rankings/top-ranked/" target="_blank" rel="noopener">CollegeFactual &mdash; Best Schools for Agriculture</a>
+      <a href="https://www.collegefactual.com/majors/agriculture-ag-operations/rankings/top-ranked/" target="_blank" rel="noopener">CollegeFactual &mdash; Best Schools for Agriculture</a>
       <div style="margin-top:6px;font-size:0.78rem;">US News column = grad-school vet rank (no US News undergrad ag list exists). QS values are <em>global</em> ranks. Verify against source links before relying on a specific value.</div>
     </div>
     <div id="agRankEmpty" class="empty-state" style="display:none;">
@@ -3839,7 +3839,13 @@ const AG_RANK_PRESETS = {
   'Oklahoma State University':       { niche:'#32', qs:'#201', cf:'#48' },
   'University of Kentucky':          { niche:'#34', qs:'#151', cf:'#45' },
   'Mississippi State University':    { niche:'#38', qs:'#251', cf:'#55' },
-  'University of California, Davis': { niche:'',    qs:'',     cf:''    }, // added 2026-07-26; ag-rank sources not yet verified (QS #1 US is for Veterinary Science, not Ag & Forestry)
+  // Verified 2026-07-28 against the 2026 editions: Niche #7 of 157; QS Ag &
+  // Forestry #2 in the world / #1 in the US (ucdavis.edu — Davis is separately
+  // #2 in Veterinary Science, so the two subjects are not being conflated);
+  // CollegeFactual #13 of 1003. NOTE: the rows above predate the 2026 editions
+  // (e.g. Niche now has Texas A&M at #2, not #4), so this row is currently the
+  // only one on the current cycle.
+  'University of California, Davis': { niche:'#7',  qs:'#2',   cf:'#13' },
   'Florida State University':        { niche:'',    qs:'',     cf:''    }, // no ag program
   'University of South Carolina':    { niche:'',    qs:'',     cf:''    }, // no ag program
 };
@@ -7293,6 +7299,13 @@ function getAgRanking(name) {
   const preset = AG_RANK_PRESETS[name] || {};
   if (!data.agRankings[name]) {
     data.agRankings[name] = { niche: preset.niche || '', qs: preset.qs || '', cf: preset.cf || '' };
+  } else {
+    // A school added before its ranks were researched cached blank values here,
+    // and that cache would otherwise mask later preset updates (this is how
+    // UC Davis sat empty). Fill blanks from the preset; never overwrite a value
+    // the user typed in, and stay idempotent so no sentinel is needed.
+    const cached = data.agRankings[name];
+    ['niche', 'qs', 'cf'].forEach(f => { if (!cached[f] && preset[f]) cached[f] = preset[f]; });
   }
   return data.agRankings[name];
 }
@@ -10998,6 +11011,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.6',
+    date: '2026-07-28',
+    title: 'UC Davis Ag Rankings Filled In',
+    items: [
+      'UC Davis was showing dashes on the Ag Program Rankings tab. Now filled in from the 2026 rankings: Niche #7 (of 157), QS Agriculture & Forestry #2 in the world (#1 in the US), and CollegeFactual #13 (of 1003)',
+      'Worth knowing: UC Davis is separately #2 in the world for Veterinary Science — those are two different subject rankings, and both are genuinely its own',
+      'Heads-up on reading that table: the QS column is a world rank while the others are US ranks, so schools strong internationally (like UC Davis) score better on the Avg Rank column than schools that are strong mainly in the US',
+      'Fixed the CollegeFactual source link at the top of that tab — it led to a dead page',
+    ]
+  },
   {
     version: '9.5',
     date: '2026-07-28',
