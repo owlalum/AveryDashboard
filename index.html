@@ -1650,6 +1650,12 @@
     }
     .next-up-strip { padding: 8px 14px; gap: 8px; }
     .content { padding: 22px 16px 40px; }
+    /* School Comparison table: kill the inner vertical scrollbox on mobile.
+       Nested scroll areas make the sticky header row float and lag over the
+       rows during touch scrolling; with the page as the only vertical
+       scroller the headers scroll naturally with the table. (Horizontal
+       scrolling for the wide table is unaffected.) */
+    #schools .table-wrap { max-height: none; }
     /* Info (research-notes) rows in the School Comparison table: the cell
        spans the full 800px+ table, so pin the text block to the visible
        edge of the scrollport and cap it to the screen width — otherwise
@@ -11002,6 +11008,14 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.2',
+    date: '2026-07-28',
+    title: 'Smoother Scrolling on School Comparison',
+    items: [
+      'On phones, the School Comparison table no longer scrolls inside its own box — the column headers used to float and lag over the rows while you scrolled, which felt janky. The page now scrolls as one piece',
+    ]
+  },
   {
     version: '9.1',
     date: '2026-07-28',
