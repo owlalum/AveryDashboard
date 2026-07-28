@@ -2871,7 +2871,7 @@
       <div style="margin-top:8px;line-height:1.6;">
         <a href="https://www.niche.com/colleges/search/best-colleges-for-agricultural-sciences/" target="_blank" rel="noopener"><strong>Niche Ag Science</strong></a> &mdash; US undergrad, agriculture-wide. (Niche's separate "Best Colleges <em>with</em> Animal Sciences Degrees" list is <em>not</em> used: it only re-sorts schools by their overall national rank.)<br>
         <a href="https://www.collegefactual.com/majors/agriculture-ag-operations/animal-science/rankings/top-ranked/" target="_blank" rel="noopener"><strong>CF Animal Science</strong></a> &mdash; US undergrad, animal-science-specific: the closest published match to Avery's major. Top 50 published, so a few schools show &mdash;.<br>
-        <a href="https://www.topuniversities.com/university-subject-rankings/agriculture-forestry" target="_blank" rel="noopener"><strong>QS Ag &amp; Forestry (US)</strong></a> &mdash; research strength, shown as a US rank derived from the global table. QS ranks only the top 50 individually and bands the rest alphabetically, so schools past that show &mdash; rather than a fake number.<br>
+        <a href="https://www.topuniversities.com/university-subject-rankings/agriculture-forestry" target="_blank" rel="noopener"><strong>QS Ag &amp; Forestry (US)</strong></a> &mdash; research strength, shown as a US rank derived from the global table. A dash means not yet verified, not unranked.<br>
         <a href="https://www.usnews.com/best-graduate-schools/top-health-schools/veterinarian-rankings" target="_blank" rel="noopener"><strong>US News Vet (Grad)</strong></a> &mdash; the school's <em>graduate</em> vet school, not its undergrad program. Only schools with a vet school have one.
       </div>
     </div>
@@ -3838,9 +3838,13 @@ const schoolDB = {
 //           and does not measure ag program strength.
 //   qs    = QS Agriculture & Forestry 2026, expressed as a US rank derived by
 //           filtering the global table to US institutions (QS publishes no
-//           US-only subject ranking). QS ranks only the top 50 individually
-//           and then bands alphabetically, so schools past the top 50 get no
-//           derivable US rank and are left blank rather than faked.
+//           US-only subject ranking). CAUTION: these are derived, not printed
+//           on the QS page, so they cannot be spot-checked against the source
+//           — a US rank is only correct if EVERY US institution ranked above
+//           it is known. Verified only for schools inside the global top 50,
+//           which is as far as the accessible table goes; the blanks below are
+//           unverified, NOT confirmed-unranked (QS does rank past 50 — e.g.
+//           Georgia at 52 and Virginia Tech at 88 globally).
 const AG_RANK_PRESETS = {
   //                                    Niche Ag     QS Ag (US)  CF Animal Sci
   'Cornell University':              { niche:'#1',  qs:'#2',   cf:'#7'  },
@@ -11068,7 +11072,7 @@ const CHANGELOG = [
       'The Ag Program Rankings tab now shows four separate measures with no combined score. The old "Avg Rank" mixed a world rank, two US undergrad ranks, and a graduate vet-school rank into one number — schools were being scored against different things, so the average looked precise but meant very little',
       'Added a CollegeFactual Animal Science ranking — the closest published match to the major you would actually enroll in. Purdue #1, Penn State #2, Texas A&M #5, Cornell #7, UC Davis #9, Wisconsin #10, Florida #12, Auburn #13',
       'The QS column is now a US rank instead of a world rank, and the numbers were badly wrong before: Purdue is really #3 in the US (the table said #41 in the world), NC State #11, Cornell #2, UC Davis #1',
-      'Schools QS does not rank individually now show a dash instead of a fake number. QS only ranks the top 50 one-by-one and lumps everyone after that into unordered groups, so the old #101 / #151 / #251 values were never real ranks',
+      'The old #101 / #151 / #251 values in that column were never real ranks — they were the floor of a grouped range. Schools whose QS position has not been re-verified yet show a dash for now rather than a made-up number; those are being filled in',
       'How to read it: no single column is "the" answer. Strong animal science with mid-tier research is a real and useful distinction — and none of these should outweigh the things on your Comparison tab that actually change your odds, like guaranteed-seat programs and in-state advantages',
     ]
   },
