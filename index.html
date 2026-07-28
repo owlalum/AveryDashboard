@@ -42,6 +42,11 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* Mobile browsers "boost" long text blocks inside wide scrollable content
+     (like the notes rows in the 800px+ comparison table), inflating their
+     font size well past the authored size. Lock it to 100%. */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
   body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
@@ -1645,6 +1650,16 @@
     }
     .next-up-strip { padding: 8px 14px; gap: 8px; }
     .content { padding: 22px 16px 40px; }
+    /* Info (research-notes) rows in the School Comparison table: the cell
+       spans the full 800px+ table, so pin the text block to the visible
+       edge of the scrollport and cap it to the screen width — otherwise
+       reading notes means scrolling sideways. */
+    .school-notes-row td { padding: 10px 12px 12px; }
+    .school-notes-body {
+      position: sticky;
+      left: 12px;
+      max-width: calc(100vw - 56px); /* content 16×2 + cell 12×2 padding */
+    }
     #summary .section-head { margin: 28px 0 14px; }
     #summary thead th { padding: 12px 10px; font-size: 0.62rem; letter-spacing: 0.1em; }
     #summary tbody td { padding: 12px 10px; font-size: 0.85rem; }
@@ -10987,6 +11002,15 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '9.1',
+    date: '2026-07-28',
+    title: 'Info Notes Readable on Your Phone',
+    items: [
+      'Fixed the oversized text in the ⓘ Info sections under each school on the School Comparison tab — phones were auto-inflating that text, and it now renders at the intended size',
+      'Bonus: on a phone, the Info notes now stay pinned to the screen while you scroll the comparison table sideways, so you can read them without scrolling back and forth',
+    ]
+  },
   {
     version: '9.0',
     date: '2026-07-26',
