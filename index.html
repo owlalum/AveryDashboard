@@ -2868,7 +2868,7 @@
       <p>Rankings specific to agricultural / animal sciences programs &mdash; the closest published proxies for pre-vet program strength.</p>
     </div>
     <div style="padding:10px 14px;margin-bottom:14px;background:#fff8e6;border:1px solid #f0d86e;border-radius:8px;font-size:0.82rem;color:#7a6a1e;">
-      <strong>Four separate measures &mdash; read them individually, not as one score.</strong> There is deliberately no average: each column answers a different question over a different set of schools, so blending them produced a number that looked precise and meant nothing. Where they disagree, that disagreement is the useful part. All cells are editable &mdash; click any to update.
+      <strong>Three separate measures &mdash; read them individually, not as one score.</strong> There is deliberately no average: each column answers a different question over a different set of schools, so blending them produced a number that looked precise and meant nothing. Where they disagree, that disagreement is the useful part. All cells are editable &mdash; click any to update.
       <div style="margin-top:8px;line-height:1.6;">
         <a href="https://www.niche.com/colleges/search/best-colleges-for-agricultural-sciences/" target="_blank" rel="noopener"><strong>Niche Ag Science</strong></a> &mdash; US undergrad, agriculture-wide. (Niche's separate "Best Colleges <em>with</em> Animal Sciences Degrees" list is <em>not</em> used: it only re-sorts schools by their overall national rank.)<br>
         <a href="https://www.collegefactual.com/majors/agriculture-ag-operations/animal-science/rankings/top-ranked/" target="_blank" rel="noopener"><strong>CF Animal Science</strong></a> &mdash; US undergrad, animal-science-specific: the closest published match to Avery's major. Top 50 published, so a few schools show &mdash;.<br>
@@ -3838,12 +3838,16 @@ const schoolDB = {
 // slightly different question, so a blended number would hide exactly the
 // disagreement that is worth reading.
 //   niche = Niche "Best Colleges FOR Agricultural Sciences" (US undergrad,
-//           agriculture-wide). Note this is Niche's major-specific list, NOT
-//           "Best Colleges WITH <major> Degrees", which is only a filter over
-//           each school's OVERALL national rank and says nothing about the
-//           program. These values predate the 2026 edition and could not be
-//           re-verified: Niche blocks automated access, and its numbers must
-//           not be taken from search summaries (they return overall ranks).
+//           agriculture-wide), 2026 edition, read manually 2026-07-28.
+//           Note this is Niche's major-specific list, NOT "Best Colleges WITH
+//           <major> Degrees", which is only a filter over each school's
+//           OVERALL national rank and says nothing about the program.
+//           These numbers CANNOT be refreshed by tooling: Niche blocks
+//           automated access behind bot detection, and its ranks must never
+//           be taken from web-search summaries — those return each school's
+//           overall national rank relabeled as a subject rank (they reported
+//           Texas A&M as #59 and Auburn as #88, which are overall ranks).
+//           Update by reading the live list only.
 //   cf    = CollegeFactual "Best Animal Science Schools" 2026, verified
 //           2026-07-28 from the published list (162 schools evaluated, top 50
 //           published). Deliberately the animal-science list, not their
@@ -3857,28 +3861,31 @@ const schoolDB = {
 const AG_RANK_PRESETS = {
   //                                    Niche Ag     CF Animal Sci
   'Cornell University':              { niche:'#1',  cf:'#7'  },
-  'Texas A&M University':            { niche:'#4',  cf:'#5'  },
-  'University of Wisconsin-Madison': { niche:'#5',  cf:'#10' },
-  'Purdue University':               { niche:'#6',  cf:'#1'  },
-  'University of Florida':           { niche:'#7',  cf:'#12' },
-  'University of Illinois':          { niche:'#9',  cf:'#16' },
-  'University of Georgia':           { niche:'#10', cf:'#23' },
-  'Penn State University':           { niche:'#14', cf:'#2'  },
-  'Ohio State University':           { niche:'#15', cf:'#35' },
-  'Michigan State University':       { niche:'#16', cf:'#21' },
-  'North Carolina State University': { niche:'#18', cf:'#18' },
-  'Virginia Tech':                   { niche:'#20', cf:'#28' },
-  'Auburn University':               { niche:'#22', cf:'#13' },
-  'Colorado State University':       { niche:'#25', cf:'#34' },
-  'University of Missouri':          { niche:'#28', cf:'#15' },
-  'Clemson University':              { niche:'#29', cf:'#50' },
-  'University of Tennessee':         { niche:'#30', cf:''    }, // outside CF's published top 50
-  'Oklahoma State University':       { niche:'#32', cf:'#33' },
-  'University of Kentucky':          { niche:'#34', cf:''    }, // outside CF's published top 50
-  'Mississippi State University':    { niche:'#38', cf:'#24' },
-  // Niche #7 could not be verified (see note above) and currently ties Florida
-  // at #7, so one of the two is stale — flagged for a manual Niche check.
+  'Texas A&M University':            { niche:'#2',  cf:'#5'  },
+  'University of Florida':           { niche:'#3',  cf:'#12' },
+  'University of Illinois':          { niche:'#4',  cf:'#16' },
+  'North Carolina State University': { niche:'#6',  cf:'#18' },
   'University of California, Davis': { niche:'#7',  cf:'#9'  },
+  'Oklahoma State University':       { niche:'#8',  cf:'#33' },
+  'University of Georgia':           { niche:'#9',  cf:'#23' },
+  'Purdue University':               { niche:'#10', cf:'#1'  },
+  'Virginia Tech':                   { niche:'#13', cf:'#28' },
+  'Clemson University':              { niche:'#16', cf:'#50' },
+  'Auburn University':               { niche:'#17', cf:'#13' },
+  'Michigan State University':       { niche:'#18', cf:'#21' },
+  'Ohio State University':           { niche:'#19', cf:'#35' },
+  'University of Wisconsin-Madison': { niche:'#28', cf:'#10' },
+  'University of Tennessee':         { niche:'#37', cf:''    }, // outside CF's published top 50
+  // Blank pending a Niche lookup: these five were not captured in the 2026
+  // read, and their prior values came from an older edition. Left empty
+  // rather than mixing editions — schools moved a long way between them
+  // (Wisconsin #5 -> #28, NC State #18 -> #6), so a stale number is not a
+  // safe approximation here.
+  'Penn State University':           { niche:'',    cf:'#2'  },
+  'Colorado State University':       { niche:'',    cf:'#34' },
+  'University of Missouri':          { niche:'',    cf:'#15' },
+  'University of Kentucky':          { niche:'',    cf:''    }, // outside CF's published top 50
+  'Mississippi State University':    { niche:'',    cf:'#24' },
   'Florida State University':        { niche:'',    cf:''    }, // no ag program
   'University of South Carolina':    { niche:'',    cf:''    }, // no ag program
 };
@@ -3950,7 +3957,9 @@ const VET_STATUS_GROUPS = [
 // Rev history: 1 = 2026-07-28 rebuild — no average, CF = animal science,
 //              QS = US-derived rank, banded schools blanked.
 //              2 = 2026-07-28 QS column dropped entirely (see note above).
-const AG_RANK_REV = 2;
+//              3 = 2026-07-28 Niche refreshed to the 2026 edition from a
+//                  manual read; five schools blanked pending lookup.
+const AG_RANK_REV = 3;
 
 const schoolNames = Object.keys(schoolDB);
 // Aliases so common abbreviations also match
@@ -7508,10 +7517,10 @@ function renderAgRankings() {
   if (schools.length === 0) { tbody.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
   if (empty) empty.style.display = 'none';
 
-  // No composite/average column by design: these four measure different things
-  // (US undergrad ag reputation, US undergrad animal-science outcomes, global
-  // research strength, graduate vet-school quality) over different populations.
-  // Averaging them produced a number that looked precise and meant nothing.
+  // No composite/average column by design: these three measure different things
+  // (US undergrad ag reputation, US undergrad animal-science outcomes,
+  // graduate vet-school quality) over different populations. Averaging them
+  // produced a number that looked precise and meant nothing.
   const rows = schools.map(s => {
     const db = schoolDB[s.name] || {};
     const ag = getAgRanking(s.name);
@@ -11203,6 +11212,16 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '10.0',
+    date: '2026-07-28',
+    title: 'Niche Ag Rankings Brought Current',
+    items: [
+      'The Niche Ag Science column is now the 2026 edition. The old numbers were several years stale and some schools had moved a long way: NC State jumped from #18 to #6, Oklahoma State from #32 to #8, and Wisconsin fell from #5 to #28',
+      'Your list looks stronger than it did: Cornell #1, Texas A&M #2, Florida #3, Illinois #4, NC State #6, UC Davis #7, Oklahoma State #8, UGA #9, Purdue #10 — nine of your schools in the national top 10',
+      'Penn State, Colorado State, Missouri, Kentucky, and Mississippi State show a dash for now. Their old numbers were from the outdated edition, and given how far schools moved, showing a stale rank would have been worse than showing none',
+    ]
+  },
   {
     version: '9.9',
     date: '2026-07-28',
