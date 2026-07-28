@@ -4243,7 +4243,12 @@ function runMigrations() {
   //                 forgiveness cap = 2; Cornell BS/DVM CALS-wide; NCSU scholar
   //                 program details; TAMU honors/chem/merit-waiver; UGA FAVIP
   //                 timing; UK Tuskegee wind-down; UW seat cap 37/100).
-  const NOTES_SYNC_REV = 6;
+  //             7 = 2026-07-28 student-facing rewrite: all 16 detailed notes
+  //                 restructured to lead with the takeaway, then short labeled
+  //                 bullets. Dropped withdrawn-program histories, corrections
+  //                 aimed at past dashboard claims, and verification metadata.
+  //                 Facts unchanged; roughly half the length.
+  const NOTES_SYNC_REV = 7;
   if ((data.schoolNotesSyncRev || 0) < NOTES_SYNC_REV) {
     (data.schools || []).forEach(s => {
       const db = schoolDB[s.name];
@@ -4507,18 +4512,6 @@ function runMigrations() {
       if (dbEntry && dbEntry.notes && dbEntry.notes !== s.notes) s.notes = dbEntry.notes;
     });
     data.notesSyncMigrationApplied = true;
-  }
-
-  // Re-sync notes after the 2026-07-28 rewrite (stale/withdrawn programs
-  // removed, verification meta-commentary dropped, takeaway-first phrasing).
-  // Needs its own sentinel — notesSyncMigrationApplied is already true on
-  // every existing dataset, so that block alone would never re-run.
-  if (!data.notesRewrite2026Applied) {
-    data.schools.forEach(s => {
-      const dbEntry = schoolDB[s.name];
-      if (dbEntry && dbEntry.notes && dbEntry.notes !== s.notes) s.notes = dbEntry.notes;
-    });
-    data.notesRewrite2026Applied = true;
   }
 
   // Backfill US News rankings (conditional — fills missing fields only)
