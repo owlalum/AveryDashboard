@@ -3806,11 +3806,22 @@ function getDefaults() {
 function uid() { return Math.random().toString(36).slice(2, 10); }
 
 // ─── Pre-Vet School Database ───
+// ACTIVE APPLICATION ROSTER (Avery's finalized Fall 2027 list, confirmed
+// 2026-08-31) — the 11 schools the weekly refresh scan should research:
+//   University of Georgia, Georgia Tech, Auburn, University of Florida,
+//   University of Tennessee (Knoxville), North Carolina State, Virginia Tech,
+//   University of Wisconsin-Madison, Purdue, Ohio State, Clemson.
+// Dropped from the prior research roster (no longer application targets):
+//   Cornell, Texas A&M, University of Kentucky. They remain in schoolDB below
+//   as reference/comparison data and are NOT removed from any saved list here
+//   (that is the user's call, in the app). Georgia Tech and Florida were the
+//   two additions to the scan roster this run.
 const schoolDB = {
   'Texas A&M University':           { domain:'tamu.edu', color:'#500000', location:'College Station, TX', conference:'SEC', notes:'The #4 vet school and the best hands-on undergrad access on this list — but as a Georgia resident, that vet school is nearly closed to you.★ VET SCHOOL ODDS: Texas law caps out-of-state DVM seats at about 10%, and A&M\'s own admissions FAQ says Aggie undergrads get no preference. Treat A&M as a strong undergrad, not a path into this vet school.★ WHY IT STILL EARNS A LOOK: Paid student jobs at the only vet teaching hospital in Texas, plus research alongside vet faculty.★ MONEY: Win $4,000+/yr in competitive A&M scholarships and you unlock the Non-Resident Tuition Waiver — in-state rates, worth about $28K/yr. Scholarship deadline is Dec 1.★ GRADING: Chemistry grades below the campus average, and there is no grade forgiveness — every attempt counts forever. You can drop a class with no grade until about week 12, but only 4 times in your whole career.★ HONORS: Animal Science Honors needs a top-10% class rank and a 28 ACT.', tuitionIn:'$12,191', tuitionOut:'$40,676', fees:'incl.', roomBoard:'$12,944', booksSupplies:'$882', deadline:'December 1', earlyDecision:'N/A', testReq:'ACT 24-32', acceptRate:'52%', oosAcceptRate:'41%', avgGPA:'3.78', usNewsOverall:'#51', usNewsPublic:'#21', vetSchoolRank:'#4', lastVerified:'2026-07-26' },
   'University of Georgia':          { domain:'uga.edu', color:'#BA0C2F', location:'Athens, GA', conference:'SEC', notes:'Your in-state pick, and the strongest vet-school odds you have anywhere.★ GEORGIA ADVANTAGE (the big one): About 100 of UGA\'s 150 vet seats go to Georgia residents — roughly a 35-40% admit rate, versus about 3% for the at-large seats — and in-state vet tuition saves $110-120K. This advantage follows you no matter where you go to undergrad, because vet-school residency tracks your family\'s home, not your college.★ 3+1 ACCELERATED PATH: Animal Health majors can apply to UGA\'s vet school after 3 years and earn the bachelor\'s during vet year 1 — saves a full year. It is an accelerated application track, not a guaranteed seat.★ FAVIP: If food-animal work interests you, apply after freshman year (due June 30, 3.2 GPA) for assured UGA vet admission, subject to committee approval. Up to 10 students a year.★ YOUR ACT: UGA counts your composite as 34 — the top of their 31-34 range.★ ESSAY: Just the Common App essay (250-650 words). No UGA supplement for your year.★ TRANSCRIPTS: New for Fall 2027 — Georgia students now send an official GAfutures transcript instead of self-reporting grades on the application (the same transcript UGA uses for HOPE and Zell Miller).★ GRADING: Chemistry is deliberately held near a B- average, and there is no grade forgiveness. Your shield is unlimited withdrawals through about week 11. Watch HOPE — your GPA gets checked at 30, 60, and 90 credit hours.', tuitionIn:'$10,134', tuitionOut:'$31,804', fees:'$1,494', roomBoard:'$12,440', booksSupplies:'$978', deadline:'January 1', earlyDecision:'October 15', testReq:'ACT 31-34', acceptRate:'30%', oosAcceptRate:'9%', avgGPA:'4.27', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#9', lastVerified:'2026-08-02' },
+  'Georgia Tech':                   { domain:'gatech.edu', color:'#003057', location:'Atlanta, GA', conference:'ACC', notes:'Georgia Tech is a top-10 public university literally in your backyard, but it has no vet school, no Animal Science major, and no pre-vet track — the pre-health path here is one you build yourself.★ NO VET PIPELINE: Georgia Tech has no College of Veterinary Medicine and no Animal Science program. "Pre-vet" means majoring in Biology (or Biochemistry) and assembling the DVM prerequisites yourself with pre-health advising — there are no campus farms, teaching hospital, or animal-facility jobs like the vet-school campuses on your list offer.★ GEORGIA ADVANTAGE: As an in-state student you pay about $10,600 in tuition and qualify for HOPE/Zell Miller, and the campus sits in midtown Atlanta — essentially at home.★ YOUR ODDS: Georgia residents are admitted at about 30% versus 9% for out-of-state applicants, so your in-state status is a real edge. Admitted students average about a 4.14 GPA with a 30-34 ACT; your 30 sits at the low end, so apply Early Action.★ ESSAY: New for your Fall 2027 cycle — Georgia Tech dropped its short-answer supplement, so you now submit only the Common App personal essay.★ DEADLINE: Georgia students apply Early Action I by October 15 (non-binding, and required to be considered for merit scholarships); Regular Decision is January 6.★ TEST REQUIRED: Georgia Tech requires the SAT or ACT — it is not test-optional. Scores are superscored and the ACT Writing section is not required.★ GRADING: One of the most demanding STEM grading environments in the country. The pre-health prerequisites — chemistry, biology, physics — are rigorous weed-outs, so protecting a vet-school-competitive GPA here is harder than at any Animal Science program on your list.', tuitionIn:'$10,618', tuitionOut:'$34,604', fees:'$1,516', roomBoard:'$14,628', booksSupplies:'$800', deadline:'January 6', earlyDecision:'October 15', testReq:'ACT 30-34', acceptRate:'13%', oosAcceptRate:'9%', avgGPA:'4.14', usNewsOverall:'#32', usNewsPublic:'#9', vetSchoolRank:'N/A', lastVerified:'2026-08-31' },
   'Colorado State University':      { domain:'colostate.edu', color:'#1E4D2B', location:'Fort Collins, CO', conference:'Other', notes:'Top-5 vet school; Animal Science pre-vet track with early clinical exposure; strong equine and large animal programs', tuitionIn:'$13,747', tuitionOut:'$36,407', fees:'incl.', roomBoard:'$17,508', booksSupplies:'$1,200', deadline:'February 1', earlyDecision:'N/A', testReq:'ACT 23-29', acceptRate:'89%', oosAcceptRate:'82%', avgGPA:'3.68', usNewsOverall:'#151', usNewsPublic:'#79', vetSchoolRank:'#3', lastVerified:'2026-03-27' },
-  'University of Florida':          { domain:'ufl.edu', color:'#FA4616', location:'Gainesville, FL', conference:'SEC', notes:'Great school, but as a Georgia resident you land in UF\'s self-funded vet pool (about $45.5K/yr) no matter where you do undergrad.★ VET SCHOOL: UF runs 100 state-funded seats for Florida residents plus 50 self-funded seats. There is no early-admission pathway into UF\'s vet school.★ GRADING: Harsh core with no undo button — no grade forgiveness, no published grade data, and chemistry is an exam-dominated weed-out. You can withdraw late (about week 13), but only twice per 60 credits, so spend them carefully.★ HONORS: CALS Honors Scholar in Animal Sciences — 3.75 GPA, 9 honors credits, and a thesis.', tuitionIn:'$6,381', tuitionOut:'$28,659', fees:'incl.', roomBoard:'$12,615', booksSupplies:'$1,235', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'19%', oosAcceptRate:'14%', avgGPA:'3.92', usNewsOverall:'#30', usNewsPublic:'#7', vetSchoolRank:'#5', lastVerified:'2026-07-03' },
+  'University of Florida':          { domain:'ufl.edu', color:'#FA4616', location:'Gainesville, FL', conference:'SEC', notes:'Great school, but as a Georgia resident you land in UF\'s self-funded vet pool (about $45.5K/yr) no matter where you do undergrad.★ VET SCHOOL: UF runs 100 state-funded seats for Florida residents plus 50 self-funded seats. There is no early-admission pathway into UF\'s vet school.★ NEW — EARLY DECISION: For your Fall 2027 cycle UF is adding a binding Early Decision option (apply by October 15, decision by December 11). It can lift your admit odds but commits you to enroll if admitted, so use it only if UF is your clear first choice — the non-binding Early Action (November 1) and Regular Decision (January 15) tracks remain.★ GRADING: Harsh core with no undo button — no grade forgiveness, no published grade data, and chemistry is an exam-dominated weed-out. You can withdraw late (about week 13), but only twice per 60 credits, so spend them carefully.★ HONORS: CALS Honors Scholar in Animal Sciences — 3.75 GPA, 9 honors credits, and a thesis.', tuitionIn:'$6,381', tuitionOut:'$28,659', fees:'incl.', roomBoard:'$12,615', booksSupplies:'$1,235', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 29-33', acceptRate:'19%', oosAcceptRate:'14%', avgGPA:'3.92', usNewsOverall:'#30', usNewsPublic:'#7', vetSchoolRank:'#5', lastVerified:'2026-07-03' },
   'Ohio State University':          { domain:'osu.edu', color:'#BB0000', location:'Columbus, OH', conference:'Big Ten', notes:'Top-10 vet school with a big class and real undergrad hospital access — just no admissions edge for Ohio State undergrads.★ VET SCHOOL: 165 seats a year drawing from more than 30 states, but OSU explicitly gives its own undergrads no preference. The real draw is student roles at the on-campus Veterinary Medical Center.★ PREREQ SHIFT: OSU\'s vet school now asks for biochemistry, microbiology, physiology, and communication rather than the traditional gen chem / organic / physics sequence. UGA still requires the full sequences, so plan for those anyway.★ MONEY: The National Buckeye award runs up to $13,500/yr, automatic with an application by Nov 1, and stacks with $1-3K awards. Your 34 sits well above their admitted average.★ GRADING: CHEM 1210 is the campus-famous weed-out, and the withdrawal window is the shortest here (10th Friday). OSU does forgive up to 3 course grades, but vet schools still count both attempts.', tuitionIn:'$14,050', tuitionOut:'$44,271', fees:'incl.', roomBoard:'$15,738', booksSupplies:'$1,020', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 27-32', acceptRate:'49%', oosAcceptRate:'27%', avgGPA:'3.81', usNewsOverall:'#41', usNewsPublic:'#15', vetSchoolRank:'#9', lastVerified:'2026-07-26' },
   'Purdue University':              { domain:'purdue.edu', color:'#000000', location:'West Lafayette, IN', conference:'Big Ten', notes:'Solid on-campus vet school and the best out-of-state admit rate on the list — but the early-admission program is gone.★ EARLY VET PROGRAM CLOSED: Purdue suspended its Veterinary Scholars early-admission program and is not admitting new students. Do not plan around it. (Their remaining early route, Vet Up!, is limited to first-generation, low-income, and rural students.)★ ESSAYS: Two required 250-word supplements, plus four 200-word essays if you apply to the Honors College.★ GRADING: The toughest-graded campus here (average around 3.13) but also the most transparent — BoilerGrades shows every instructor\'s grade history, so you can shop sections. Gen Chem II is the trap (about 25% D/F/W); intro bio is not a weed-out. Strong safety nets: withdraw through week 13, and on repeats only your most recent grade counts.', tuitionIn:'$9,992', tuitionOut:'$28,794', fees:'incl.', roomBoard:'$16,734', booksSupplies:'$1,090', deadline:'January 15', earlyDecision:'November 1', testReq:'ACT 28-34', acceptRate:'43%', oosAcceptRate:'44%', avgGPA:'3.81', usNewsOverall:'#46', usNewsPublic:'#19', vetSchoolRank:'#13', lastVerified:'2026-08-16' },
   'Michigan State University':      { domain:'msu.edu', color:'#18453B', location:'East Lansing, MI', conference:'Big Ten', notes:'Top vet school with a genuine contingent-admission pathway that is open to out-of-state students.★ VETERINARY SCHOLARS PATHWAY: Up to 10 students a year through the Honors College — apply around junior year with a 3.5 GPA for contingent MSU vet admission. No residency restriction, which is rare.★ GRADING: Gen Chem I averages 2.66, and the no-grade drop window closes around week 7 — the shortest here. The offset is generous repeats: any course, up to 3 attempts, most recent grade counts.★ WATCH OUT: MSU\'s own vet school accepts a one-semester organic chemistry shortcut. UGA does not. Take the full two-semester sequence or you close your best vet-school door.', tuitionIn:'$17,000', tuitionOut:'$44,300', fees:'$458', roomBoard:'$12,928', booksSupplies:'$1,420', deadline:'February 1', earlyDecision:'November 1', testReq:'ACT 24-30', acceptRate:'84%', oosAcceptRate:'80%', avgGPA:'3.74', usNewsOverall:'#64', usNewsPublic:'#29', vetSchoolRank:'#15', lastVerified:'2026-07-03' },
@@ -3888,6 +3899,7 @@ const AG_RANK_PRESETS = {
   'Mississippi State University':    { niche:'',    cf:'#24' },
   'Florida State University':        { niche:'',    cf:''    }, // no ag program
   'University of South Carolina':    { niche:'',    cf:''    }, // no ag program
+  'Georgia Tech':                    { niche:'',    cf:''    }, // no ag / animal science program
 };
 
 // ─── US Vet Schools (AVMA Council on Education, verified 2026-07-28) ───
@@ -3971,6 +3983,7 @@ const schoolAliases = {
   'Ohio State University': ['osu'],
   'Michigan State University': ['msu'],
   'Virginia Tech': ['vt','virginia polytechnic'],
+  'Georgia Tech': ['gt','ga tech','georgia institute of technology','georgia tech','yellow jackets'],
   'Penn State University': ['psu','pennsylvania state'],
   'University of Illinois': ['uiuc','u of i'],
   'University of Wisconsin-Madison': ['uw madison','badgers'],
@@ -3990,6 +4003,7 @@ const ATLANTA_COORDS = { lat: 33.749, lng: -84.388 };
 const cityCoords = {
   'College Station, TX': { lat: 30.628, lng: -96.334 },
   'Athens, GA': { lat: 33.951, lng: -83.357 },
+  'Atlanta, GA': { lat: 33.7756, lng: -84.3963 },
   'Fort Collins, CO': { lat: 40.585, lng: -105.084 },
   'Gainesville, FL': { lat: 29.652, lng: -82.325 },
   'Columbus, OH': { lat: 39.961, lng: -82.999 },
@@ -4211,6 +4225,46 @@ function runMigrations() {
     data.ucDavisAdded20260726MigrationApplied = true;
   }
 
+  // ── Georgia Tech added to the active list (2026-08-31) ──
+  // Avery finalized an 11-school application list that includes Georgia Tech,
+  // which was not previously in schoolDB or her saved list. GT has no vet school
+  // and no Animal Science program — she is applying anyway, by her own choice.
+  // Append it to data.schools from schoolDB if not already present (same shape
+  // as the UC Davis migration / addSchool()). GT plays in the ACC, so it already
+  // fits her P5-athletics campus preference — no studentPreferences exception is
+  // needed. Because GT is brand-new to every dataset, copying schoolDB here IS
+  // its field sync, so no separate weeklyScan* sentinel is required for it.
+  // Data-level sentinel so it travels with the dataset via Firestore.
+  if (!data.georgiaTechAdded20260831MigrationApplied) {
+    const gtName = 'Georgia Tech';
+    if (!(data.schools || []).some(s => s.name === gtName)) {
+      const db = schoolDB[gtName];
+      data.schools.push({
+        id: uid(),
+        name: gtName,
+        domain: db.domain,
+        location: db.location,
+        notes: db.notes,
+        avgGPA: db.avgGPA,
+        testReq: db.testReq,
+        acceptRate: db.acceptRate,
+        oosAcceptRate: db.oosAcceptRate,
+        tuitionIn: db.tuitionIn,
+        tuitionOut: db.tuitionOut,
+        fees: db.fees,
+        roomBoard: db.roomBoard,
+        booksSupplies: db.booksSupplies,
+        deadline: db.deadline,
+        earlyDecision: db.earlyDecision,
+        usNewsOverall: db.usNewsOverall,
+        usNewsPublic: db.usNewsPublic,
+        vetSchoolRank: db.vetSchoolRank,
+        status: 'researching'
+      });
+    }
+    data.georgiaTechAdded20260831MigrationApplied = true;
+  }
+
   // Per-rating descriptors (empty by default; fill in over time via Rankings tab)
   Object.keys(data.rankings || {}).forEach(name => {
     const r = data.rankings[name];
@@ -4427,7 +4481,16 @@ function runMigrations() {
   //                 the Regent-approved 4% out-of-state tuition increase at
   //                 UW-Madison for 2026-27 (wisconsin.edu). All notes-only, so
   //                 this rev bump is the sync path.
-  const NOTES_SYNC_REV = 10;
+  //            11 = 2026-08-31 weekly scan: University of Florida note gains a
+  //                 ★ NEW — EARLY DECISION line. UF is adding a binding Early
+  //                 Decision option for the Fall 2027 cycle (apply Oct 15,
+  //                 decision Dec 11), alongside its existing non-binding Early
+  //                 Action (Nov 1) and Regular Decision (Jan 15) tracks. Verified
+  //                 on UF\'s own news.ufl.edu and admissions.ufl.edu deadlines
+  //                 page. Notes-only change, synced via this rev. (Georgia Tech
+  //                 was also added this run, but as a brand-new school its notes
+  //                 sync via the georgiaTechAdded20260831 migration above.)
+  const NOTES_SYNC_REV = 11;
   if ((data.schoolNotesSyncRev || 0) < NOTES_SYNC_REV) {
     (data.schools || []).forEach(s => {
       const db = schoolDB[s.name];
@@ -7945,6 +8008,7 @@ const FIN_DATA = [
   { school:'Penn State University', res:'OOS', tuition:42860, rb:15346, books:1200, merit:1500, costYear:'2025-26' },
   { school:'Florida State University', res:'OOS', tuition:21683, rb:14020, books:1200, merit:2000, notes:'Zell Miller', costYear:'2025-26' },
   { school:'University of Georgia', res:'In-State', tuition:11628, rb:12440, books:978, merit:5000, notes:'Zell Miller', costYear:'2026-27' },
+  { school:'Georgia Tech', res:'In-State', tuition:12134, rb:14628, books:800, merit:5000, notes:'HOPE/Zell Miller', costYear:'2026-27' }, // In-state tuition $10,618 + mandatory fees $1,516 (Bursar Fall 2026, $5,309+$758/sem). Housing $8,318 + food $6,310. Verified finaid.gatech.edu + bursar.gatech.edu 2026-08-31. No dynamic HOPE calc for GT (only UK/UGA/UTK) — static merit roughly representative.
   { school:'University of Florida', res:'OOS', tuition:28659, rb:12615, books:1235, merit:0, costYear:'2025-26' },
   { school:'Cornell University', res:'OOS', tuition:74970, rb:21348, books:1234, merit:0, notes:'Need-based aid only; CALS contract college. Tuition $73,946 + mandatory fees $1,024 (activity + health).', costYear:'2026-27 (trustees 3/20/26; +3.76% over 2025-26)' },
   { school:'University of California, Davis', res:'OOS', tuition:57348, rb:22157, books:1240, merit:0, notes:'Nonresident supplemental $39,270 incl. UC gives essentially no OOS merit (Regents $7.5K/yr, competitive — not penciled). Tuition Stability Plan: tuition+supplement frozen 6 yrs from entry.', costYear:'2026-27' }
@@ -11274,6 +11338,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '10.4',
+    date: '2026-08-31',
+    title: 'Georgia Tech Added; Florida Adds Binding Early Decision',
+    items: [
+      'Georgia Tech is now on your list. You told us it is one of your 11 application schools, so it has been added to every tab — Comparison, Financials, Strategic Fit, and the rest. Straight talk on fit: GT has no vet school and no Animal Science major, so "pre-vet" there means a Biology degree where you assemble the DVM prerequisites yourself with pre-health advising, and the grading is among the most demanding in the country. Its real advantages for you are being in-state (about $10,600 tuition, plus HOPE/Zell Miller), the ~30% Georgia-resident admit rate versus 9% out-of-state, and a campus essentially at home in midtown Atlanta',
+      'Good news for your Georgia Tech application: new for your Fall 2027 cycle, GT dropped its short-answer supplement — you now submit only the Common App personal essay. GT still requires the SAT or ACT (it is not test-optional). Georgia students apply Early Action I by October 15; Regular Decision is January 6',
+      'Georgia Tech costs are its own official 2026-27 figures, verified on the GT Bursar and Financial Aid pages: in-state tuition $10,618 and fees $1,516 (out-of-state tuition would be $34,604), housing $8,318 + food $6,310, books $800. US News 2026 has GT at #32 nationally and #9 among public universities',
+      'University of Florida is adding a binding Early Decision option for your Fall 2027 cycle — apply by October 15, decision by December 11. It can lift your odds but commits you to enroll if admitted, so use it only if UF is your clear first choice. UF\'s non-binding Early Action (November 1) and Regular Decision (January 15) tracks are unchanged. Your UF note now says so (verified on UF\'s own newsroom and admissions site)',
+    ]
+  },
   {
     version: '10.3',
     date: '2026-08-25',
