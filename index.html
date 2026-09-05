@@ -4881,13 +4881,23 @@ function runMigrations() {
       }
     }
 
-    // Phase 1.3 — NC State: the "guaranteed interview program" note was wrong.
-    // Verified 9/5/26 against NC State CVM admissions + VetPAC pages.
-    getRankingForSchool('North Carolina State University').notes =
-      'CVM currently conducts no interviews (paused); evaluates same criteria regardless of undergrad institution. ~80% of seats to NC residents.';
-    // Phase 1.4 — Clemson: "No vet school" contradicted the (correct) long note.
-    getRankingForSchool('Clemson University').notes =
-      'New CVM opened 2026 — unproven; treat as uncertain, not a Program uplift yet.';
+    // Phase 1.3 / 1.4 — two wrong claims in ranking notes. The 9/5 export shows
+    // each note also carries a correct clause the audit did not quote ("Research
+    // Triangle biotech jobs." / "Close to home, good culture."), so only the
+    // wrong clause is swapped out; a note without the stale phrase just gets the
+    // corrected text prepended once.
+    const fixNoteClause = (name, staleRe, fixed) => {
+      const rk = getRankingForSchool(name);
+      const cur = rk.notes || '';
+      if (staleRe.test(cur)) rk.notes = cur.replace(staleRe, fixed).replace(/\s{2,}/g, ' ').trim();
+      else if (!cur.includes(fixed)) rk.notes = (fixed + ' ' + cur).trim();
+    };
+    // NC State: verified 9/5/26 against NC State CVM admissions + VetPAC pages.
+    fixNoteClause('North Carolina State University', /Guaranteed interview program\.?/i,
+      'CVM currently conducts no interviews (paused); evaluates same criteria regardless of undergrad institution. ~80% of seats to NC residents.');
+    // Clemson: "No vet school" contradicted the (correct) long school note.
+    fixNoteClause('Clemson University', /No vet school\.?/i,
+      'New CVM opened 2026 — unproven; treat as uncertain, not a Program uplift yet.');
     // Phase 1.5 — Georgia Tech: prevent the audit's "unvisited = neutral"
     // misread from recurring. Appended to whatever note is already there.
     const gt = getRankingForSchool('Georgia Tech');
@@ -5026,8 +5036,8 @@ function runMigrations() {
 
   // ── Plan B resolution (Steve + Carey, 2026-09-05) ──
   // The change set left the "UT/Auburn Plan B = 2" question open. Resolved:
-  // Tennessee moves 2 → 3 (UT lands 3.80 under the current model, still Strong
-  // Fit); Auburn stays at 2. Also backfills Auburn's fitEvidenceDate (4/6/26
+  // Tennessee moves 2 → 3 (on the 9/5 export UT goes 3.30 → 3.60 under the
+  // current model, still Strong Fit); Auburn stays at 2. Also backfills Auburn's fitEvidenceDate (4/6/26
   // visit) for any dataset that ran the change-set block before the date was
   // known. Own sentinel so it applies even where the block above already ran.
   if (!data.planBResolution20260905MigrationApplied) {
@@ -11973,7 +11983,7 @@ const CHANGELOG = [
       'Every Fit rating now carries its provenance — rubric (visit gut-check ratings on record), synthesis (a post-visit judgment, like Purdue\'s "tied for top" 5 next to its visit-rubric 4; both stay and both show), or provisional (no visit yet) — and the date of the evidence. A provisional Fit (Wisconsin, Florida, Clemson) shows a scenario band: the Combined score recomputed at Fit 2 and Fit 5 with everything else held fixed. Weights are never renormalized',
       'Honors is now recorded per school on the Rankings tab — program, role, status, deadline and terms. It is display only and was never in the score (we checked the code: no honors bonus exists). Roles as agreed: Tennessee\'s Chancellor\'s Honors Program is a gate (application due Nov 18, decisions mid-December, roughly the top 5%); Ohio State honors is a mitigant for the documented size concern; Auburn is none until Avery reacts; UGA and Purdue are uplift; Wisconsin is TBD until the Oct 12 visit',
       'The one real model change: Program is moving from "US News vet-school rank" to a three-part Undergraduate Prep score — animal/clinical access 40%, advising and prerequisite support 35%, DVM ecosystem proximity 25% — same 20% weight, same 1–5 scale. For now it runs as a shadow: the Rankings tab shows both scores and the difference, the US News rank still drives your ranking, and any school that would move more than 0.30 needs a written reason before the switch (Ohio State, Wisconsin and Florida already have one). The first-pass component scores were seeded from the dashboard\'s verified research notes; components with no evidence are a flagged provisional 3 for you to fill in',
-      'Plan B, resolved: Tennessee moves from 2 to 3 (its score goes 3.50 to 3.80, still Strong Fit); Auburn stays at 2. Auburn\'s Fit now carries its April 6 visit date',
+      'Plan B, resolved: Tennessee moves from 2 to 3 (its score goes 3.30 to 3.60, still Strong Fit); Auburn stays at 2. Auburn\'s Fit now carries its April 6 visit date',
       'Not changing, on purpose: weights stay 20 / 30 / 30 / 20 (the AP Bio drop is fresh evidence that DVM-path uncertainty is real, so Plan B keeps its weight), Scoir labels and merit aid stay outside the formula, no school is removed for a low rank, and UGA\'s baseline treatment stays'
     ]
   },
