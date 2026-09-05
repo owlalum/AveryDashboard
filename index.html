@@ -765,6 +765,34 @@
   .rank-table td:nth-child(2) { text-align: left; font-weight: 600; }
   .rank-table tr:hover td { background: #fafcfd; }
   .rank-table select { padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; text-align: center; }
+  /* Strategic Fit v1.1 (Sept 2026): provenance, prep shadow score, honors chips */
+  .rank-model-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 18px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; font-size: 0.82rem; color: var(--text-light); }
+  .rank-model-bar label { font-weight: 700; color: var(--primary-dark); }
+  .rank-model-bar select { font-size: 0.8rem; padding: 3px 8px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; }
+  .rank-meta { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; font-size: 0.68rem; color: var(--text-light); align-items: center; }
+  .rank-meta select, .rank-meta input[type=date] { font-size: 0.66rem; padding: 1px 4px; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; }
+  .rank-active-tag, .rank-shadow-tag, .rank-prov-tag { display: inline-block; font-size: 0.56rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 5px; border-radius: 4px; margin-top: 3px; white-space: nowrap; }
+  .rank-active-tag { background: var(--leaf-soft); color: var(--leaf); border: 1px solid var(--leaf); }
+  .rank-shadow-tag { background: transparent; color: var(--text-light); border: 1px dashed var(--border); }
+  .rank-prov-tag { background: var(--sun-soft); color: #7A5A00; border: 1px solid #B5832A; margin-left: 3px; }
+  .rank-delta-big { color: #b04040; font-weight: 800; }
+  .rank-reason-input { display: block; width: 100%; min-width: 150px; font-size: 0.68rem; padding: 2px 4px; border: 1px solid #b04040; border-radius: 4px; font-family: inherit; margin-top: 3px; background: #fff7f7; }
+  .rank-reason-input.ok { border-color: var(--border); background: #fff; }
+  .rank-btn-mini { font-size: 0.64rem; padding: 1px 6px; border: 1px solid var(--border); border-radius: 4px; background: #fff; cursor: pointer; font-family: inherit; margin-top: 3px; color: var(--text-light); }
+  .rank-btn-mini:hover { border-color: var(--primary); color: var(--primary-dark); }
+  .fit-band { font-size: 0.68rem; font-weight: 600; color: var(--text-light); white-space: nowrap; margin-top: 2px; }
+  .honors-chip { cursor: pointer; border-radius: 12px; padding: 2px 8px; font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; border: 1.5px solid; background: #fff; font-family: inherit; }
+  .honors-gate { color: #b04040; border-color: #b04040; background: #fdeaea; }
+  .honors-mitigant { color: #7A5A00; border-color: #B5832A; background: var(--sun-soft); }
+  .honors-uplift { color: var(--leaf); border-color: var(--leaf); background: var(--leaf-soft); }
+  .honors-none { color: var(--text-light); border-color: var(--border); }
+  .honors-tbd { color: var(--text-light); border-color: var(--border); border-style: dashed; }
+  .honors-sub { font-size: 0.64rem; color: var(--text-light); margin-top: 3px; max-width: 150px; white-space: normal; line-height: 1.3; }
+  .summary-honors-tag { display: inline-block; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 10px; border: 1.5px solid; }
+  .rank-modal-note { font-size: 0.82rem; color: var(--text-light); margin: -8px 0 14px; line-height: 1.5; }
+  .prep-row { display: grid; grid-template-columns: 1fr 64px; gap: 8px; align-items: start; }
+  .prep-explainer { margin-top: 14px; padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--primary-light); border-radius: 8px; font-size: 0.85rem; }
+  .prep-explainer h5 { font-size: 0.9rem; color: var(--primary-dark); margin: 0 0 6px; }
   .rank-notes-input { border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.82rem; font-family: inherit; width: 100%; min-width: 140px; }
   .rank-weights { display: flex; gap: 16px; flex-wrap: wrap; padding: 14px 18px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 18px; font-size: 0.82rem; color: var(--text-light); }
   .rank-weights span { font-weight: 600; color: var(--primary-dark); }
@@ -2777,7 +2805,7 @@
   <div id="rankings" class="sub-panel">
     <div class="section-head">
       <h2>Final Rankings</h2>
-      <p>Strategic Fit ranking. Combines Program, Fit, Plan B, and Cost into one composite score; the Scoir column tracks admission probability separately.</p>
+      <p>Strategic Fit ranking. Combines Program, Fit, Plan B, and Cost into one composite score; the Scoir column tracks admission probability separately. Program is mid-transition: the new Undergraduate Prep score runs beside the US News rank until the family flips the switch below. Honors is recorded per school but never scored.</p>
     </div>
     <div class="rank-weights">
       <div>Program: <span>20%</span></div>
@@ -2785,7 +2813,13 @@
       <div>Plan B: <span>30%</span></div>
       <div>Cost: <span>20%</span></div>
       <div>Merit: <span>reference only</span></div>
+      <div>Honors: <span>display only</span></div>
       <div style="margin-left:auto;font-style:italic;">Rating key: 5 = Excellent, 4 = Strong, 3 = Average, 2 = Below Avg, 1 = Weak</div>
+    </div>
+    <div class="rank-model-bar">
+      <label for="programModelSelect">Program input:</label>
+      <select id="programModelSelect" onchange="setProgramModel(this.value)"></select>
+      <span id="programModelNote"></span>
     </div>
     <div class="table-wrap" style="max-height:none;">
       <table class="rank-table">
@@ -2794,11 +2828,14 @@
             <th>Rank</th>
             <th>School</th>
             <th>Program</th>
+            <th>Prep (new)</th>
+            <th>&Delta;</th>
             <th>Fit</th>
             <th>Plan B</th>
             <th>Cost</th>
             <th>Merit (ref)</th>
             <th>Combined</th>
+            <th>Honors</th>
             <th>Scoir</th>
             <th>Notes</th>
           </tr>
@@ -2946,7 +2983,7 @@
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;">Program</td>
             <td style="padding:8px 12px;">20%</td>
-            <td style="padding:8px 12px;">Vet program strength and pre-vet infrastructure (access to a DVM is the whole point of undergrad)</td>
+            <td style="padding:8px 12px;">Vet program strength and pre-vet infrastructure (access to a DVM is the whole point of undergrad). Input is moving from US News vet rank to the Undergraduate Prep score &mdash; see the rubric below</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:8px 12px 8px 0;font-weight:600;">Fit</td>
@@ -2980,8 +3017,21 @@
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">4</td><td>US News rank #11&ndash;20 (e.g., Auburn, Purdue, Virginia Tech)</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">3</td><td>US News rank #21&ndash;30 (e.g., Tennessee, Oklahoma State, Mississippi State)</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>US News rank #31+, OR new CVM not yet ranked (e.g., Clemson)</td></tr>
-        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>No vet school on campus (e.g., Kentucky, Penn State)</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>No vet school on campus (e.g., Kentucky, Penn State, Georgia Tech)</td></tr>
       </table>
+      <div class="prep-explainer">
+        <h5>Program &rarr; Undergraduate Prep (new model, September 2026 &mdash; running side by side)</h5>
+        <p>The rank-driven Program input above is being replaced by a three-component <strong>Undergraduate Prep</strong> score. Same 20% weight, same 1&ndash;5 scale. Until the family switches the Program input on the Rankings tab, the new score is a <em>shadow</em>: it is computed and shown next to the current one but does not drive the displayed ranking. Any school whose Combined score would move more than 0.30 between the two models needs a written reason before the switch.</p>
+        <table style="width:100%;font-size:0.85rem;border-collapse:collapse;margin-top:6px;">
+          <thead><tr style="border-bottom:2px solid var(--border);text-align:left;"><th style="padding:4px 10px 4px 0;">Component</th><th style="padding:4px 10px;">Share</th><th style="padding:4px 10px;">What counts</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Animal / clinical access</td><td style="padding:4px 10px;">40%</td><td style="padding:4px 10px;">Documented undergrad access to hours, shadowing, a teaching hospital, wildlife/shelter partners. Count each facility once.</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Advising + prerequisite support</td><td style="padding:4px 10px;">35%</td><td style="padding:4px 10px;">Pre-vet advising office, prerequisite feasibility in the intended major, GPA-protection culture (grade replacement etc.), tutoring.</td></tr>
+            <tr><td style="padding:4px 10px 4px 0;font-weight:600;">DVM ecosystem proximity</td><td style="padding:4px 10px;">25%</td><td style="padding:4px 10px;">Vet school on/near campus; reserved-seat or early-assurance pathways Avery is eligible for. New or unproven programs (Clemson) score conservatively.</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:8px;">Rules: each component is scored 1&ndash;5 with a one-line evidence note. No evidence &rarr; provisional 3, flagged. A pathway benefit does not transfer across majors (Virginia Tech&rsquo;s Dairy Science route does not apply to Animal &amp; Poultry Sciences without eligibility evidence).</p>
+      </div>
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Fit</h4>
       <p style="font-size:0.85rem;color:var(--muted);margin:4px 0 6px;">Subjective rating set manually after visits and research. Captures how well the campus culture, student body, and day-to-day experience match Avery&rsquo;s preferences.</p>
@@ -2992,6 +3042,7 @@
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">2</td><td>Weak fit &mdash; would consider only as a last resort</td></tr>
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">1</td><td>Poor fit &mdash; effectively ruled out based on visit / cultural mismatch</td></tr>
       </table>
+      <p style="font-size:0.85rem;color:var(--muted);margin:8px 0 6px;"><strong>Provenance.</strong> Every Fit rating carries where it came from and the date of the evidence it rests on: <em>rubric</em> (three visit gut-check ratings on record), <em>synthesis</em> (a post-visit or lived-experience judgment &mdash; Purdue&rsquo;s ranking Fit of 5 is the post-trip &ldquo;tied for top&rdquo; call while its visit rubric shows 4; both are displayed), or <em>provisional</em> (no visit or judgment yet). A provisional Fit displays with a <strong>scenario band</strong>: the Combined score recomputed at Fit 2 and Fit 5 with every other input held fixed. Weights are never renormalized for a provisional Fit &mdash; the point is to show the range, not hide the unknown. Georgia Tech&rsquo;s Fit is a synthesis judgment from lifelong proximity, not an unknown.</p>
 
       <h4 style="margin-top:18px;margin-bottom:6px;color:var(--primary);">Plan B</h4>
       <table style="width:100%;font-size:0.85rem;border-collapse:collapse;">
@@ -3019,6 +3070,19 @@
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Target</td><td>Balanced odds &mdash; realistic admit at current stats</td></tr>
         <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Reach</td><td>Admit possible but not expected at current stats</td></tr>
         <tr><td style="padding:4px 10px 4px 0;font-weight:600;">Far Reach</td><td>Very low admit probability for this profile (e.g., Cornell)</td></tr>
+      </table>
+    </div>
+
+    <!-- Honors (display only) -->
+    <div class="strat-explainer">
+      <h3>Honors Programs (display only)</h3>
+      <p>Honors is <strong>not</strong> in the score formula &mdash; a September 2026 code check found no honors bonus anywhere in the ranking code, so there was nothing to remove. Instead each school carries an honors record on the Rankings tab that says what the program would do for that school&rsquo;s case, plus status, deadline and the actual terms once known.</p>
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse;margin-top:8px;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;width:90px;">Gate</td><td>A condition of attending (e.g., Tennessee&rsquo;s Chancellor&rsquo;s Honors Program is the condition for being OK with UT)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Mitigant</td><td>Addresses a documented weakness (e.g., Ohio State&rsquo;s size concern)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">Uplift</td><td>Nice to have; the school is compelling without it (UGA, Purdue)</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:4px 10px 4px 0;font-weight:600;">None</td><td>Honors does not change the picture (Auburn &mdash; honors does not repair a flopped campus reaction)</td></tr>
+        <tr><td style="padding:4px 10px 4px 0;font-weight:600;">TBD</td><td>Role not yet assessed (Wisconsin until the Oct 12 visit; schools not yet applied to)</td></tr>
       </table>
     </div>
 
@@ -4132,6 +4196,88 @@ function setupSchoolAutocomplete(inputId) {
 
 let data = loadData();
 
+// ─── Strategic Fit v1.1 — bounded change set 2026-09-05 ───
+// Fit provenance (Phase 2), a per-school honors record (Phase 3 — display
+// only, NEVER in the score formula) and the Undergraduate Prep program model
+// (Phase 4 — a shadow score beside the legacy US-News-rank Program input until
+// the family flips data.programModel on the Rankings tab). Defined ahead of
+// runMigrations because the one-time seed migration calls these helpers; the
+// file's later `const`s are still in their temporal dead zone at that point.
+const FIT_PROVENANCE_VALUES = ['rubric', 'synthesis', 'provisional'];
+const FIT_PROVENANCE_LABELS = {
+  rubric: 'Rubric — three visit gut-check ratings on record',
+  synthesis: 'Synthesis — post-visit or lived-experience judgment, not a rubric score',
+  provisional: 'Provisional — no visit or judgment yet; placeholder 3'
+};
+// The change set's own initial table needs an "unknown / TBD" state (Wisconsin
+// until the Oct 12 visit; schools not yet applied to), so the enum carries
+// `tbd` alongside the four roles the spec names.
+const HONORS_ROLES = ['gate', 'mitigant', 'uplift', 'none', 'tbd'];
+const HONORS_ROLE_LABELS = {
+  gate: 'Gate — a condition of attending',
+  mitigant: 'Mitigant — addresses a documented weakness',
+  uplift: 'Uplift — nice to have; the school is compelling without it',
+  none: 'None — honors does not change the picture',
+  tbd: 'TBD — role not yet assessed'
+};
+const HONORS_STATUSES = ['not applied', 'applied', 'admitted', 'denied'];
+const PREP_WEIGHTS = { access: 0.40, advising: 0.35, ecosystem: 0.25 };
+const PREP_COMPONENTS = [
+  { key: 'access',    label: 'Animal / clinical access',        share: 40, what: 'Documented undergrad access to hours, shadowing, a teaching hospital, wildlife/shelter partners. Count each facility once.' },
+  { key: 'advising',  label: 'Advising + prerequisite support', share: 35, what: 'Pre-vet advising office, prerequisite feasibility in the intended major, GPA-protection culture (grade replacement etc.), tutoring.' },
+  { key: 'ecosystem', label: 'DVM ecosystem proximity',         share: 25, what: 'Vet school on/near campus; reserved-seat or early-assurance pathways Avery is eligible for. New or unproven programs (Clemson) score conservatively.' }
+];
+const PROGRAM_MODELS = { legacy: 'US News vet rank (current)', prep: 'Undergraduate Prep (new)' };
+// A school whose composite moves more than this between the two Program
+// models needs a written reason before the new model goes live.
+const PREP_SHIFT_THRESHOLD = 0.3;
+
+function defaultHonors() {
+  return { program: '', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: '' };
+}
+function defaultPrepComponent() {
+  return { score: 3, evidence: '', provisional: true };
+}
+// Idempotent field backfill for one data.rankings entry. Never overwrites a
+// value that is already valid.
+function ensureRankingV11Fields(rk) {
+  if (!FIT_PROVENANCE_VALUES.includes(rk.fitProvenance)) rk.fitProvenance = 'provisional';
+  if (typeof rk.fitEvidenceDate !== 'string') rk.fitEvidenceDate = '';
+  if (!rk.honors || typeof rk.honors !== 'object') rk.honors = defaultHonors();
+  const h = rk.honors, hd = defaultHonors();
+  Object.keys(hd).forEach(k => { if (typeof h[k] !== 'string') h[k] = hd[k]; });
+  if (!HONORS_ROLES.includes(h.role)) h.role = 'tbd';
+  if (!HONORS_STATUSES.includes(h.status)) h.status = 'not applied';
+  if (!rk.prep || typeof rk.prep !== 'object') rk.prep = {};
+  PREP_COMPONENTS.forEach(c => {
+    const cur = rk.prep[c.key];
+    if (!cur || typeof cur !== 'object') { rk.prep[c.key] = defaultPrepComponent(); return; }
+    const n = parseInt(cur.score, 10);
+    cur.score = (n >= 1 && n <= 5) ? n : 3;
+    if (typeof cur.evidence !== 'string') cur.evidence = '';
+    cur.provisional = !!cur.provisional;
+  });
+  if (typeof rk.prepShiftReason !== 'string') rk.prepShiftReason = '';
+  return rk;
+}
+function getProgramModel() {
+  return data && data.programModel === 'prep' ? 'prep' : 'legacy';
+}
+// Undergraduate Prep score: 40/35/25 blend of the three components, 1–5 scale.
+function computePrepScore(rk) {
+  ensureRankingV11Fields(rk);
+  const raw = PREP_COMPONENTS.reduce((sum, c) => sum + (rk.prep[c.key].score || 3) * PREP_WEIGHTS[c.key], 0);
+  return Math.round(raw * 100) / 100;
+}
+function isPrepProvisional(rk) {
+  ensureRankingV11Fields(rk);
+  return PREP_COMPONENTS.some(c => rk.prep[c.key].provisional);
+}
+// The Program input the Strategic Fit formula consumes under a given model.
+function programInputFor(rk, model) {
+  return model === 'prep' ? computePrepScore(rk) : (rk.vetProgram || 3);
+}
+
 // ─── Run structural migrations (no Firestore writes) ───
 function runMigrations() {
   // Core arrays first: renderers and sync functions (.filter/.length) assume
@@ -4275,6 +4421,8 @@ function runMigrations() {
     // arrive via the one-time preset migration below)
     if (r.scoirLabel === undefined) r.scoirLabel = '';
     if (r.fit === undefined) r.fit = 3;
+    // Strategic Fit v1.1 fields (provenance / honors / prep) — idempotent backfill
+    ensureRankingV11Fields(r);
   });
 
   // ── Strategic Fit v1 one-time preset migration ──
@@ -4703,6 +4851,177 @@ function runMigrations() {
       rk.costScore = costScorePresets[name];
     });
     data.costRubricV2MigrationApplied = true;
+  }
+
+  // ── Bounded change set 2026-09-05 (Phases 1–4) ──
+  // Family-approved scope after adversarial review of the independent audit.
+  // The live dataset lives in Firestore, so the Phase 1 "data hygiene" edits
+  // ship as this one-time data-level migration (same sentinel pattern as the
+  // blocks above) rather than as hand-edits to the JSON export. Architecture
+  // is frozen after this set. No weights change. No school is removed.
+  if (!data.changeSet20260905MigrationApplied) {
+    // Phase 1.1 — Georgia Tech is on the application list (family decision,
+    // Aug 2026). List = 11.
+    (data.schools || []).forEach(s => { if (s.name === 'Georgia Tech') s.finalList = true; });
+
+    // Phase 1.2 — ACT superscore 30 → 34. The 30 was the stale pre-July value;
+    // the 7/22/2026 release is composite 34 / E34 / M32 / R35 / S33. The old
+    // value moves to a history note, not the live field.
+    if (data.actScores) {
+      if (!Array.isArray(data.actScores.history)) data.actScores.history = [];
+      if (data.actScores.superscore !== 34) {
+        data.actScores.history.push({
+          date: '2026-09-05',
+          field: 'superscore',
+          from: data.actScores.superscore,
+          to: 34,
+          note: 'Stale pre-July value replaced. Composite 34 / E34 / M32 / R35 / S33 after the 7/22/2026 score release.'
+        });
+        data.actScores.superscore = 34;
+      }
+    }
+
+    // Phase 1.3 — NC State: the "guaranteed interview program" note was wrong.
+    // Verified 9/5/26 against NC State CVM admissions + VetPAC pages.
+    getRankingForSchool('North Carolina State University').notes =
+      'CVM currently conducts no interviews (paused); evaluates same criteria regardless of undergrad institution. ~80% of seats to NC residents.';
+    // Phase 1.4 — Clemson: "No vet school" contradicted the (correct) long note.
+    getRankingForSchool('Clemson University').notes =
+      'New CVM opened 2026 — unproven; treat as uncertain, not a Program uplift yet.';
+    // Phase 1.5 — Georgia Tech: prevent the audit's "unvisited = neutral"
+    // misread from recurring. Appended to whatever note is already there.
+    const gt = getRankingForSchool('Georgia Tech');
+    const gtAdd = 'Fit is NOT unknown — lifelong proximity. Known-weak on spirit/energy/Greek preferences. Score is propped by Plan B 5 + Cost 5.';
+    if (!(gt.notes || '').includes('Fit is NOT unknown')) {
+      gt.notes = (gt.notes ? gt.notes.replace(/\s+$/, '') + ' ' : '') + gtAdd;
+    }
+
+    // Phase 2 — Fit provenance + evidence date. Ratings themselves are NOT
+    // touched (Purdue keeps ranking Fit 5 beside its rubric overallFit of 4;
+    // the UI shows both). Road-trip dates come from TRIP_DAYS (March 2026);
+    // UGA's is the scheduled 3/21 visit; UTK is the 8/29 visit. Auburn's visit
+    // date is not recorded anywhere in the dashboard — left blank (open item).
+    const fitProvenanceSeed = {
+      'University of Georgia':           { p: 'synthesis',   d: '2026-03-21' },
+      'Purdue University':               { p: 'synthesis',   d: '2026-03-05' },
+      'Virginia Tech':                   { p: 'rubric',      d: '2026-03-03' },
+      'North Carolina State University': { p: 'rubric',      d: '2026-03-02' },
+      'University of Tennessee':         { p: 'rubric',      d: '2026-08-29' },
+      'Auburn University':               { p: 'rubric',      d: '' },
+      'Ohio State University':           { p: 'rubric',      d: '2026-03-04' },
+      'University of Wisconsin-Madison': { p: 'provisional', d: '2026-10-12' }, // expected Madison visit — replace after
+      'University of Florida':           { p: 'provisional', d: '' },
+      'Clemson University':              { p: 'provisional', d: '' },
+      'Georgia Tech':                    { p: 'synthesis',   d: '' }
+    };
+    Object.keys(fitProvenanceSeed).forEach(name => {
+      if (!(data.schools || []).some(s => s.name === name) && !data.rankings[name]) return;
+      const rk = getRankingForSchool(name);
+      rk.fitProvenance = fitProvenanceSeed[name].p;
+      rk.fitEvidenceDate = fitProvenanceSeed[name].d;
+    });
+
+    // Phase 3 — per-school honors record. Display only; the code check found
+    // no honors bonus anywhere in the ranking formula, so nothing to remove.
+    const honorsSeed = {
+      'University of Tennessee':         { program: 'Chancellor\'s Honors Program', role: 'gate',     addresses: 'Steve\'s condition for being OK with UT.', status: 'not applied', deadline: '2026-11-18', terms: 'App: 300-word why-honors + 400-word community-problem essays. Decisions mid-December; ~top 5% (~500 students). Re-review available with updated grades.' },
+      'Ohio State University':           { program: 'Honors & Scholars (verify the route for the intended college)', role: 'mitigant', addresses: 'Documented size concern — three gut-check 3s on the visit.', status: 'not applied', deadline: '', terms: 'Verify the honors route for the intended college before relying on it.' },
+      'Auburn University':               { program: 'Auburn Honors College', role: 'none',     addresses: '', status: 'not applied', deadline: '2026-11-15', terms: 'Honors does not repair a flopped campus reaction. Revisit only if Avery reacts.' },
+      'University of Georgia':           { program: 'Morehead Honors College', role: 'uplift', addresses: '', status: 'not applied', deadline: '', terms: 'Compelling without it.' },
+      'Purdue University':               { program: 'John Martinson Honors College', role: 'uplift', addresses: '', status: 'not applied', deadline: '', terms: 'Compelling without it. Four 200-word honors essays if applying.' },
+      'University of Wisconsin-Madison': { program: '', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: 'Verify the CALS-specific honors route on the Oct 12 visit.' },
+      'Clemson University':              { program: 'Calhoun Honors College', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: 'Fill in as applications go in.' },
+      'University of Florida':           { program: 'CALS Honors Scholar (Animal Sciences)', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: 'Fill in as applications go in.' },
+      'North Carolina State University': { program: '', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: 'Fill in as applications go in.' },
+      'Virginia Tech':                   { program: '', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: 'Fill in as applications go in.' },
+      'Georgia Tech':                    { program: '', role: 'tbd', addresses: '', status: 'not applied', deadline: '', terms: 'Fill in as applications go in.' }
+    };
+    Object.keys(honorsSeed).forEach(name => {
+      if (!(data.schools || []).some(s => s.name === name) && !data.rankings[name]) return;
+      getRankingForSchool(name).honors = Object.assign(defaultHonors(), honorsSeed[name]);
+    });
+
+    // Phase 4 — Undergraduate Prep seed. First pass scored from the verified
+    // research notes in schoolDB, one evidence line per component. Where the
+    // notes carry no evidence the component is a provisional 3 and says so.
+    // These are a starting point for the side-by-side review cycle, not a
+    // verdict — the family edits them on the Rankings tab.
+    const prepSeed = {
+      'University of Georgia': {
+        access:    { score: 3, evidence: 'CVM and teaching hospital on campus (3/21 facilities walkthrough); undergrad hours/shadowing/paid-role access not yet documented.', provisional: true },
+        advising:  { score: 4, evidence: 'Animal Health major is built around the DVM prerequisites; no grade forgiveness, but unlimited withdrawals through ~week 11.', provisional: false },
+        ecosystem: { score: 5, evidence: 'CVM on campus; the 3+1 accelerated track and FAVIP assured-admission pathway are both open to her.', provisional: false }
+      },
+      'Purdue University': {
+        access:    { score: 3, evidence: 'CVM on campus with new facilities; specific undergrad hospital/shadowing access not documented.', provisional: true },
+        advising:  { score: 4, evidence: 'Animal Sciences Pre-Vet Medicine concentration; BoilerGrades transparency, withdraw through week 13, repeats count only the latest grade.', provisional: false },
+        ecosystem: { score: 3, evidence: 'CVM on campus but no eligible pathway: Veterinary Scholars suspended, Vet Up! limited to first-gen/low-income/rural students.', provisional: false }
+      },
+      'Virginia Tech': {
+        access:    { score: 3, evidence: 'VA-MD CVM on campus; undergrad hospital/shadowing access not documented.', provisional: true },
+        advising:  { score: 2, evidence: 'Strictest GPA structure on the list: no grade replacement ever, 3 late withdrawals for the whole degree.', provisional: false },
+        ecosystem: { score: 3, evidence: 'CVM on campus; the 3+1 guaranteed-interview track is Dairy Science only — not transferable to Animal & Poultry Sciences.', provisional: false }
+      },
+      'North Carolina State University': {
+        access:    { score: 4, evidence: 'VetPAC internships and event network; top-4 CVM on campus.', provisional: false },
+        advising:  { score: 4, evidence: 'VetPAC is a dedicated vet-professions advising center; no public grade data, withdrawals only through ~week 8-9 within a 16-credit budget.', provisional: false },
+        ecosystem: { score: 4, evidence: 'Equine Scholars and Food Animal Scholars hold real CVM seats and are open to OOS students, but require a specialty commitment; at-large OOS odds ~1%.', provisional: false }
+      },
+      'University of Tennessee': {
+        access:    { score: 3, evidence: 'CVM on campus; undergrad hospital/shadowing access not documented.', provisional: true },
+        advising:  { score: 4, evidence: 'Friendliest GPA culture on the list: grade replacement in up to 3 courses, withdrawals nearly to term end (6 per career); pre-vet advising office not documented.', provisional: false },
+        ecosystem: { score: 3, evidence: 'CVM on campus, ~30 of 100 seats OOS (one of the better ratios), but no UTK-undergrad preference or eligible pathway.', provisional: false }
+      },
+      'Auburn University': {
+        access:    { score: 4, evidence: 'Teaching-hospital jobs for undergrads documented.', provisional: false },
+        advising:  { score: 3, evidence: 'Average grading difficulty; latest withdrawal window on the list (~week 14-15); GAP erases up to 3 D/F grades locally but not for vet applications.', provisional: false },
+        ecosystem: { score: 3, evidence: 'CVM on campus; 51 of 130 seats open to all applicants (3.4 GPA floor OOS); no undergrad pathway.', provisional: false }
+      },
+      'Ohio State University': {
+        access:    { score: 4, evidence: 'Student roles at the on-campus Veterinary Medical Center documented.', provisional: false },
+        advising:  { score: 3, evidence: 'CHEM 1210 weed-out and the shortest withdrawal window here (10th Friday); forgives up to 3 grades; OSU\'s own DVM prereqs now diverge from UGA\'s, so plan both.', provisional: false },
+        ecosystem: { score: 3, evidence: 'Top-10 CVM on campus (165 seats) but explicitly no preference for OSU undergrads and no pathway.', provisional: false }
+      },
+      'University of Wisconsin-Madison': {
+        access:    { score: 3, evidence: '"Strong research access" noted; no specific undergrad hospital/shadowing evidence yet — confirm on the Oct 12 visit.', provisional: true },
+        advising:  { score: 3, evidence: 'Animal & Veterinary Biosciences major; drop with no W through week 13, but no grade forgiveness and Zoology 101 is a documented weed-out.', provisional: false },
+        ecosystem: { score: 3, evidence: 'CVM on campus; nonresident seats capped at 37 of ~100, no UW-undergrad preference; FAVeMedS is 4/yr and food-animal only.', provisional: false }
+      },
+      'University of Florida': {
+        access:    { score: 3, evidence: '#5 CVM on campus; undergrad access not documented and no visit planned unless an offer is in hand.', provisional: true },
+        advising:  { score: 2, evidence: 'Harsh core with no grade forgiveness and only two late withdrawals per 60 credits; exam-dominated chemistry weed-out.', provisional: false },
+        ecosystem: { score: 3, evidence: 'CVM on campus but no early-admission pathway; a Georgia resident lands in the self-funded pool regardless of undergrad.', provisional: false }
+      },
+      'Clemson University': {
+        access:    { score: 3, evidence: 'No teaching hospital for undergrads; farm-based facilities (dairy, beef, swine, poultry, equine) with ground-floor faculty and research access.', provisional: false },
+        advising:  { score: 3, evidence: 'Per-instructor grade histories published back to 2013; withdrawals to ~week 10; no lighter chemistry lane; pre-vet advising office not documented.', provisional: false },
+        ecosystem: { score: 2, evidence: 'Brand-new CVM (opened Aug 2026, unproven), no undergrad pathway, 20 of 80 seats for non-SC students — scored conservatively per the rule.', provisional: false }
+      },
+      'Georgia Tech': {
+        access:    { score: 1, evidence: 'No CVM, no campus farms, no teaching hospital, no animal-facility jobs.', provisional: false },
+        advising:  { score: 2, evidence: 'Pre-health advising only; DVM prerequisites assembled by hand inside a Biology major; the most demanding STEM grading on the list.', provisional: false },
+        ecosystem: { score: 1, evidence: 'No vet school and no pathway; the nearest CVM (UGA) is ~70 miles away.', provisional: false }
+      }
+    };
+    // Written reasons for the schools whose composite moves more than 0.30
+    // between the two models on the seeded values (rule: any >0.3 move needs
+    // one). The Rankings tab flags any other school that crosses the line.
+    const prepShiftReasonSeed = {
+      'Ohio State University': 'Legacy 5 came from the US News #9 rank. As undergrad prep it is strong on hospital roles but offers no admissions edge and the shortest withdrawal window, so the new score lands near 3.4.',
+      'University of Wisconsin-Madison': 'Legacy 5 came from the US News rank. For a Georgia undergrad there is no UW preference, a 37-seat nonresident cap, and access evidence is still provisional until the Oct 12 visit.',
+      'University of Florida': 'Legacy 5 came from the US News #5 rank. UF gives a Georgia undergrad no pathway, the harshest GPA environment on the list, and undocumented access; the drop is the model working as intended.'
+    };
+    Object.keys(prepSeed).forEach(name => {
+      if (!(data.schools || []).some(s => s.name === name) && !data.rankings[name]) return;
+      const rk = getRankingForSchool(name);
+      rk.prep = {};
+      PREP_COMPONENTS.forEach(c => { rk.prep[c.key] = Object.assign(defaultPrepComponent(), prepSeed[name][c.key]); });
+      if (prepShiftReasonSeed[name]) rk.prepShiftReason = prepShiftReasonSeed[name];
+    });
+    // The new Program score runs as a shadow for one cycle before it drives
+    // the displayed ranking. Flip on the Rankings tab when the review is done.
+    if (data.programModel === undefined) data.programModel = 'legacy';
+    data.changeSet20260905MigrationApplied = true;
   }
 
   if (!data.gpa) data.gpa = 0;
@@ -5944,11 +6263,14 @@ const RANKING_COLUMNS = [
   { field: 'finalRank',  label: 'Rank',       sortType: 'numeric' },
   { field: 'name',       label: 'School',     sortType: 'text' },
   { field: 'vetProgram', label: 'Program',    sortType: 'numeric' },
+  { field: 'prepScore',  label: 'Prep (new)', sortType: 'numeric' },
+  { field: 'delta',      label: '\u0394',     sortType: 'numeric' },
   { field: 'fit',        label: 'Fit',        sortType: 'numeric' },
   { field: 'planB',      label: 'Plan B',     sortType: 'numeric' },
   { field: 'costScore',  label: 'Cost',       sortType: 'numeric' },
   { field: 'meritAid',   label: 'Merit (ref)',sortType: 'numeric' },
   { field: 'combined',   label: 'Combined',   sortType: 'numeric' },
+  { field: 'honorsRole', label: 'Honors',     sortType: 'text' },
   { field: 'scoirLabel', label: 'Scoir',      sortType: 'scoir' },
   { field: 'notes',      label: 'Notes',      sortType: null },
 ];
@@ -7446,6 +7768,8 @@ function maybeTriggerVisitMigration() {
 // calculation. Visit impressions are now represented through the manually-set
 // Fit rating, not an auto-derived visit score.
 const RANK_WEIGHTS = { program: 0.20, fit: 0.30, planB: 0.30, cost: 0.20 };
+// Program input is model-dependent since Sept 2026 — see getProgramModel() /
+// programInputFor(). Weights are fixed; the change set froze them.
 
 function getRankingForSchool(name) {
   if (!data.rankings[name]) {
@@ -7456,11 +7780,11 @@ function getRankingForSchool(name) {
       'Texas A&M University':            { vetProgram:5, costScore:3, planB:5, meritAid:1, notes:'Top pre-vet reputation. Aggie network. Limited OOS merit — but a non-resident tuition WAIVER requires ≥$4K/yr in competitive TAMU scholarships, so merit is the lever for affordability. Scholarship priority deadline Dec 1 (no separate app). Freshman ANSC Honors wants 28 ACT AND top-10% rank — verify Avery\'s rank.' },
       'Purdue University':               { vetProgram:4, costScore:4, planB:5, meritAid:2, notes:'Best value elite OOS. New vet facilities. Strong co-op.' },
       'Ohio State University':           { vetProgram:5, costScore:3, planB:5, meritAid:2, notes:'Massive resources. #9 in US News 2026 (down from #4).' },
-      'North Carolina State University': { vetProgram:5, costScore:3, planB:4, meritAid:2, notes:'Research Triangle biotech jobs. Strong pre-vet (VetPAC advising); CVM uses holistic review, no interviews.' },
+      'North Carolina State University': { vetProgram:5, costScore:3, planB:4, meritAid:2, notes:'CVM currently conducts no interviews (paused); evaluates same criteria regardless of undergrad institution. ~80% of seats to NC residents.' },
       'Auburn University':               { vetProgram:4, costScore:4, planB:3, meritAid:4, notes:'Close to home. Strong equine & small animal.' },
       'University of Kentucky':          { vetProgram:1, costScore:5, planB:3, meritAid:5, notes:'Best OOS merit aid: Avery (3.66 UW + ACT 34) clears the top automatic OOS tier — Bluegrass Spirit $12,500/yr — and her 34 now meets the ACT bar for the competitive Singletary (full OOS tuition, ACT 33+; separate scholarship-section app). Apply by Dec 1 (EA) to keep honors + scholarship eligibility. Unmatched equine program.' },
       'Virginia Tech':                   { vetProgram:4, costScore:3, planB:3, meritAid:2, notes:'VA-MD CVM on campus. Beautiful but isolated.' },
-      'Clemson University':              { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'New CVM opens Fall 2026 (not yet ranked). Close to home, good culture.' },
+      'Clemson University':              { vetProgram:2, costScore:3, planB:3, meritAid:3, notes:'New CVM opened 2026 — unproven; treat as uncertain, not a Program uplift yet.' },
       'University of Tennessee':         { vetProgram:3, costScore:4, planB:3, meritAid:3, notes:'Accredited CVM. Solid SEC safety. Volunteer Scholarship is auto by recalculated WEIGHTED CORE GPA (not reported 3.8) + ACT — with ACT 34 the tier hinges entirely on that recalc: 4.0+ core → $18K/yr, 3.8-3.99 → $3K/yr. Apply by Dec 15. Test REQUIRED.' },
       'University of Florida':           { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Excellent program but hardest admission, limited merit.' },
       'University of Wisconsin-Madison': { vetProgram:5, costScore:2, planB:4, meritAid:1, notes:'Great vet school. Very limited OOS merit.' },
@@ -7476,7 +7800,10 @@ function getRankingForSchool(name) {
       'University of Massachusetts Amherst': { vetProgram:1, costScore:3, planB:3, meritAid:2, notes:'No vet school. Pre-vet track available.' },
       'Florida State University':         { vetProgram:1, costScore:3, planB:4, meritAid:3, notes:'No vet school. Strong bio program. Tallahassee near UF CVM.' },
       'University of South Carolina':    { vetProgram:1, costScore:3, planB:3, meritAid:3, notes:'No vet school. Pre-vet advising available. SEC school.' },
-      'Cornell University':              { vetProgram:5, costScore:1, planB:5, meritAid:1, notes:'#2 vet school (UC Davis #1 in US News 2026). 7-yr BS/DVM pathway. Need-based aid only (meets 100% demonstrated need). Ivy League reach.' }
+      'Cornell University':              { vetProgram:5, costScore:1, planB:5, meritAid:1, notes:'#2 vet school (UC Davis #1 in US News 2026). 7-yr BS/DVM pathway. Need-based aid only (meets 100% demonstrated need). Ivy League reach.' },
+      // ── Added to the active list 2026-08-31 (no vet school → Program 1 per rubric;
+      //    Plan B 5 / Cost 5 per the Sept 2026 change set; HOPE/Zell merit like UGA) ──
+      'Georgia Tech':                    { vetProgram:1, costScore:5, planB:5, meritAid:4, notes:'Fit is NOT unknown — lifelong proximity. Known-weak on spirit/energy/Greek preferences. Score is propped by Plan B 5 + Cost 5.' }
     };
     data.rankings[name] = presets[name] || { vetProgram:3, costScore:3, planB:3, meritAid:3, notes:'' };
   }
@@ -7487,40 +7814,78 @@ function getRankingForSchool(name) {
   // one-time preset migration in runMigrations for the seeded list)
   if (data.rankings[name].fit === undefined) data.rankings[name].fit = 3;
   if (data.rankings[name].scoirLabel === undefined) data.rankings[name].scoirLabel = '';
+  ensureRankingV11Fields(data.rankings[name]);
   return data.rankings[name];
+}
+
+function fmtDelta(d) {
+  if (d == null || isNaN(d)) return '—';
+  const sign = d > 0 ? '+' : (d < 0 ? '−' : '±');
+  return sign + Math.abs(d).toFixed(2);
+}
+
+// Program-model toggle in the Rankings header bar. The shadow model is
+// computed and shown regardless; this only picks which one drives the score.
+function renderProgramModelToggle() {
+  const sel = document.getElementById('programModelSelect');
+  if (!sel) return;
+  const model = getProgramModel();
+  sel.innerHTML = Object.keys(PROGRAM_MODELS).map(k =>
+    `<option value="${k}"${k === model ? ' selected' : ''}>${esc(PROGRAM_MODELS[k])}</option>`).join('');
+  const note = document.getElementById('programModelNote');
+  if (note) {
+    note.textContent = model === 'prep'
+      ? 'Undergraduate Prep now drives the score; the US News rank column is shown for reference.'
+      : 'Side-by-side cycle: the new Prep score is computed and shown, but the US News rank still drives the score.';
+  }
+}
+
+function setProgramModel(model) {
+  data.programModel = model === 'prep' ? 'prep' : 'legacy';
+  saveData();
+  renderRankings();
+  if (typeof renderSummary === 'function') renderSummary();
 }
 
 function renderRankings() {
   const tbody = document.getElementById('rankingsBody');
   const empty = document.getElementById('rankingsEmpty');
+  renderProgramModelToggle();
   if (data.schools.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
+  const model = getProgramModel();
   const rows = getVisibleSchools().map(s => {
     const rk = getRankingForSchool(s.name);
+    const sf = computeStrategicFit(s.name);
+    const legacy = computeStrategicFit(s.name, { model: 'legacy' });
+    const prep = computeStrategicFit(s.name, { model: 'prep' });
+    const ev = (data.evaluations || {})[s.name] || {};
     return {
       name: s.name,
       vetProgram: rk.vetProgram || 3,
+      prepScore: computePrepScore(rk),
+      prepProvisional: isPrepProvisional(rk),
+      delta: Math.round((prep.score - legacy.score) * 100) / 100,
+      prepShiftReason: rk.prepShiftReason || '',
       fit: rk.fit || 3,
+      fitProvenance: rk.fitProvenance,
+      fitEvidenceDate: rk.fitEvidenceDate || '',
+      visitFit: ev.overallFit != null ? ev.overallFit : null,
+      fitBand: sf.fitBand || null,
       planB: rk.planB || 3,
       costScore: rk.costScore || 3,
       meritAid: rk.meritAid || 3,
+      honorsRole: rk.honors.role,
+      honors: rk.honors,
       scoirLabel: rk.scoirLabel || '',
       notes: rk.notes || '',
-      combined: 0
+      combined: sf.score
     };
   });
 
-  // Calculate combined scores (Strategic Fit v1: Program 20% | Fit 30% | Plan B 30% | Cost 20%)
-  rows.forEach(r => {
-    r.combined = Math.round((
-      r.vetProgram * RANK_WEIGHTS.program +
-      r.fit        * RANK_WEIGHTS.fit +
-      r.planB      * RANK_WEIGHTS.planB +
-      r.costScore  * RANK_WEIGHTS.cost
-    ) * 100) / 100;
-  });
-
+  // Ranked on the ACTIVE Program model (Strategic Fit v1 weights:
+  // Program 20% | Fit 30% | Plan B 30% | Cost 20%).
   rows.sort((a, b) => b.combined - a.combined);
   rows.forEach((r, i) => r.finalRank = i + 1);
 
@@ -7534,24 +7899,56 @@ function renderRankings() {
   function scoirSelect(school, val) {
     const opts = ['', 'Very Likely', 'Likely', 'Target', 'Reach', 'Far Reach'];
     return `<select onchange="setRankingField('${esc(escJS(school))}','scoirLabel',this.value)">
-      ${opts.map(o => `<option value="${esc(o)}" ${val===o?'selected':''}>${o || '\u2014'}</option>`).join('')}
+      ${opts.map(o => `<option value="${esc(o)}" ${val===o?'selected':''}>${o || '—'}</option>`).join('')}
     </select>`;
   }
+  const activeTag = '<span class="rank-active-tag" title="This column drives the Combined score">drives score</span>';
+  const shadowTag = '<span class="rank-shadow-tag" title="Computed and shown, but not in the Combined score yet">shadow</span>';
 
   tbody.innerHTML = sortedRows.map(r => {
-    const scoirClass = scoirBadgeClass(r.scoirLabel);
+    const js = esc(escJS(r.name));
+    const bigShift = Math.abs(r.delta) > PREP_SHIFT_THRESHOLD;
+    const provOpts = FIT_PROVENANCE_VALUES.map(p =>
+      `<option value="${p}"${r.fitProvenance === p ? ' selected' : ''}>${p}</option>`).join('');
+    const fitCell = `
+      ${ratingSelect(r.name, 'fit', r.fit)}
+      ${r.fitProvenance === 'provisional' ? '<span class="rank-prov-tag" title="No visit or judgment yet — placeholder 3. See the band in the Combined column.">provisional</span>' : ''}
+      <div class="rank-meta">
+        <select title="${esc(FIT_PROVENANCE_LABELS[r.fitProvenance] || '')}" onchange="setRankingField('${js}','fitProvenance',this.value)">${provOpts}</select>
+        <input type="date" title="Date of the visit or judgment this Fit rests on" value="${esc(r.fitEvidenceDate)}" onchange="setRankingField('${js}','fitEvidenceDate',this.value)">
+        ${r.visitFit != null ? `<span title="Visit-form overallFit rubric rating (Visits tab). Shown beside the ranking Fit; both stay.">visit rubric: ${r.visitFit}</span>` : ''}
+      </div>`;
+    const prepCell = `
+      <span style="font-weight:700">${r.prepScore.toFixed(2)}</span>
+      ${r.prepProvisional ? '<span class="rank-prov-tag" title="At least one component has no evidence yet (provisional 3)">prov</span>' : ''}
+      <br>${model === 'prep' ? activeTag : shadowTag}
+      <br><button type="button" class="rank-btn-mini" onclick="openPrepEditor('${js}')">components</button>`;
+    const deltaCell = `
+      <span class="${bigShift ? 'rank-delta-big' : ''}" title="Combined score under Undergraduate Prep minus Combined under US News rank">${fmtDelta(r.delta)}</span>
+      ${bigShift ? `<input class="rank-reason-input${r.prepShiftReason ? ' ok' : ''}" placeholder="Reason required (move > 0.30)" title="Any school moving more than 0.30 between models needs a written reason before the switch" value="${esc(r.prepShiftReason)}" onchange="setRankingField('${js}','prepShiftReason',this.value)">` : ''}`;
+    const combinedCell = `
+      <span style="font-weight:700">${r.combined.toFixed(2)}</span>
+      ${r.fitBand ? `<div class="fit-band" title="Fit is provisional: Combined recomputed at Fit 2 and Fit 5 with every other input held fixed. Weights are not renormalized.">band ${r.fitBand.low.toFixed(2)}–${r.fitBand.high.toFixed(2)}</div>` : ''}`;
+    const h = r.honors || defaultHonors();
+    const honorsSub = [h.program, h.status !== 'not applied' ? h.status : (h.deadline ? 'due ' + h.deadline : '')].filter(Boolean).join(' · ');
+    const honorsCell = `
+      <button type="button" class="honors-chip honors-${esc(h.role)}" title="${esc(HONORS_ROLE_LABELS[h.role] || '')} — click to edit" onclick="openHonorsEditor('${js}')">${esc(h.role)}</button>
+      ${honorsSub ? `<div class="honors-sub">${esc(honorsSub)}</div>` : ''}`;
     return `
     <tr>
       <td>${r.finalRank}</td>
       <td style="white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px">${schoolLogoHTML(r.name, 22)} ${esc(r.name)}</span></td>
-      <td>${ratingSelect(r.name,'vetProgram',r.vetProgram)}</td>
-      <td>${ratingSelect(r.name,'fit',r.fit)}</td>
+      <td>${ratingSelect(r.name,'vetProgram',r.vetProgram)}<br>${model === 'legacy' ? activeTag : shadowTag}</td>
+      <td>${prepCell}</td>
+      <td>${deltaCell}</td>
+      <td>${fitCell}</td>
       <td>${ratingSelect(r.name,'planB',r.planB)}</td>
       <td>${ratingSelect(r.name,'costScore',r.costScore)}</td>
       <td>${ratingSelect(r.name,'meritAid',r.meritAid)}</td>
-      <td style="font-weight:700">${r.combined}</td>
+      <td>${combinedCell}</td>
+      <td>${honorsCell}</td>
       <td>${scoirSelect(r.name, r.scoirLabel)}</td>
-      <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${esc(escJS(r.name))}','notes',this.value)"></td>
+      <td><input class="rank-notes-input" value="${esc(r.notes)}" onchange="setRankingField('${js}','notes',this.value)"></td>
     </tr>`;
   }).join('');
 
@@ -7560,11 +7957,144 @@ function renderRankings() {
 
 function setRankingField(school, field, val) {
   const rk = getRankingForSchool(school);
+  if (field === 'fitProvenance' && !FIT_PROVENANCE_VALUES.includes(val)) return;
   rk[field] = val;
   saveData();
   renderRankings();
   // Summary table now depends on editable fit/scoirLabel fields, so re-render
   // the Overview summary to keep badges and row order in sync.
+  if (typeof renderSummary === 'function') renderSummary();
+}
+
+// ─── Undergraduate Prep component editor (Phase 4) ───
+function openPrepEditor(school) {
+  const rk = getRankingForSchool(school);
+  let overlay = document.getElementById('prepEditorModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'prepEditorModal';
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.body.appendChild(overlay);
+  }
+  const legacy = computeStrategicFit(school, { model: 'legacy' }).score;
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:560px;">
+      <h3>Undergraduate Prep — ${esc(school)}</h3>
+      <p class="rank-modal-note">Three components, 40 / 35 / 25, each 1–5 with a one-line evidence note. No evidence &rarr; leave it a provisional 3 and say so. A pathway benefit does not transfer across majors.</p>
+      ${PREP_COMPONENTS.map(c => {
+        const comp = rk.prep[c.key];
+        return `
+        <div class="form-group">
+          <label>${esc(c.label)} <span style="font-weight:400">(${c.share}%)</span></label>
+          <div style="font-size:0.76rem;color:var(--text-light);margin-bottom:6px;">${esc(c.what)}</div>
+          <div class="prep-row">
+            <input type="text" id="prepEdit_${c.key}_evidence" value="${esc(comp.evidence)}" placeholder="One-line evidence note" oninput="previewPrepScore()">
+            <select id="prepEdit_${c.key}_score" onchange="previewPrepScore()">
+              ${[1,2,3,4,5].map(n => `<option value="${n}"${comp.score === n ? ' selected' : ''}>${n}</option>`).join('')}
+            </select>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin-top:4px;">
+            <input type="checkbox" id="prepEdit_${c.key}_provisional" style="width:auto;" ${comp.provisional ? 'checked' : ''} onchange="previewPrepScore()"> provisional (no evidence yet)
+          </label>
+        </div>`;
+      }).join('')}
+      <div class="form-group">
+        <label>Reason for a move over 0.30 <span style="font-weight:400">(required only when the Combined score shifts more than 0.30 between models)</span></label>
+        <textarea id="prepEdit_reason" rows="2">${esc(rk.prepShiftReason || '')}</textarea>
+      </div>
+      <p id="prepEdit_preview" style="font-size:0.85rem;font-weight:600;color:var(--primary-dark);margin:6px 0 0;"></p>
+      <p style="font-size:0.78rem;color:var(--text-light);margin:4px 0 0;">Current Program (US News rank) = ${rk.vetProgram || 3}; Combined under that model = ${legacy.toFixed(2)}.</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="document.getElementById('prepEditorModal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="savePrepEditor('${esc(escJS(school))}')">Save</button>
+      </div>
+    </div>`;
+  overlay.classList.add('open');
+  previewPrepScore(school);
+}
+
+function previewPrepScore(school) {
+  const el = document.getElementById('prepEdit_preview');
+  if (!el) return;
+  const draft = { prep: {} };
+  PREP_COMPONENTS.forEach(c => {
+    draft.prep[c.key] = {
+      score: parseInt((document.getElementById('prepEdit_' + c.key + '_score') || {}).value, 10) || 3,
+      evidence: '',
+      provisional: !!(document.getElementById('prepEdit_' + c.key + '_provisional') || {}).checked
+    };
+  });
+  const score = computePrepScore(draft);
+  el.textContent = 'Prep score preview: ' + score.toFixed(2) + (isPrepProvisional(draft) ? ' (provisional)' : '');
+}
+
+function savePrepEditor(school) {
+  const rk = getRankingForSchool(school);
+  PREP_COMPONENTS.forEach(c => {
+    const n = parseInt(document.getElementById('prepEdit_' + c.key + '_score').value, 10);
+    rk.prep[c.key] = {
+      score: (n >= 1 && n <= 5) ? n : 3,
+      evidence: (document.getElementById('prepEdit_' + c.key + '_evidence').value || '').trim(),
+      provisional: !!document.getElementById('prepEdit_' + c.key + '_provisional').checked
+    };
+  });
+  rk.prepShiftReason = (document.getElementById('prepEdit_reason').value || '').trim();
+  document.getElementById('prepEditorModal').classList.remove('open');
+  saveData();
+  renderRankings();
+  if (typeof renderSummary === 'function') renderSummary();
+}
+
+// ─── Honors record editor (Phase 3 — display only, never in the formula) ───
+function openHonorsEditor(school) {
+  const rk = getRankingForSchool(school);
+  const h = rk.honors;
+  let overlay = document.getElementById('honorsEditorModal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'honorsEditorModal';
+    overlay.className = 'modal-overlay';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:480px;">
+      <h3>Honors — ${esc(school)}</h3>
+      <p class="rank-modal-note">Display only. Honors never enters the Strategic Fit score; this records what the program does for this school’s case.</p>
+      <div class="form-group"><label>Program</label><input type="text" id="honorsEdit_program" value="${esc(h.program)}" placeholder="e.g., Chancellor’s Honors Program"></div>
+      <div class="form-group"><label>Role</label>
+        <select id="honorsEdit_role">${HONORS_ROLES.map(r => `<option value="${r}"${h.role === r ? ' selected' : ''}>${esc(HONORS_ROLE_LABELS[r])}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Addresses <span style="font-weight:400">(which weakness it fixes, if any)</span></label><input type="text" id="honorsEdit_addresses" value="${esc(h.addresses)}"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="honorsEdit_status">${HONORS_STATUSES.map(s => `<option value="${s}"${h.status === s ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Deadline</label><input type="date" id="honorsEdit_deadline" value="${esc(h.deadline)}"></div>
+      <div class="form-group"><label>Terms <span style="font-weight:400">(actual benefits once known)</span></label><textarea id="honorsEdit_terms" rows="3">${esc(h.terms)}</textarea></div>
+      <div class="modal-actions">
+        <button class="btn" onclick="document.getElementById('honorsEditorModal').classList.remove('open')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveHonorsEditor('${esc(escJS(school))}')">Save</button>
+      </div>
+    </div>`;
+  overlay.classList.add('open');
+}
+
+function saveHonorsEditor(school) {
+  const rk = getRankingForSchool(school);
+  const v = id => (document.getElementById(id).value || '').trim();
+  const role = v('honorsEdit_role'), status = v('honorsEdit_status');
+  rk.honors = {
+    program: v('honorsEdit_program'),
+    role: HONORS_ROLES.includes(role) ? role : 'tbd',
+    addresses: v('honorsEdit_addresses'),
+    status: HONORS_STATUSES.includes(status) ? status : 'not applied',
+    deadline: v('honorsEdit_deadline'),
+    terms: v('honorsEdit_terms')
+  };
+  document.getElementById('honorsEditorModal').classList.remove('open');
+  saveData();
+  renderRankings();
   if (typeof renderSummary === 'function') renderSummary();
 }
 
@@ -7691,14 +8221,11 @@ function setAgRanking(school, field, raw) {
 // Fit and Plan B drive the label; Fit also acts as a soft gate so a school
 // that scores high overall but poorly on fit cannot land at the top tier.
 
-function computeStrategicFit(schoolName) {
-  const rk = getRankingForSchool(schoolName);
-  const program = rk.vetProgram || 3;
-  const fit     = rk.fit || 3;
-  const planB   = rk.planB || 3;
-  const cost    = rk.costScore || 3;
-
-  const score = (program * 0.20) + (fit * 0.30) + (planB * 0.30) + (cost * 0.20);
+// Pure formula. `program` is whichever Program input the active model supplies
+// (legacy US News rank rating, or the Undergraduate Prep blend).
+function computeStrategicFitFrom(inputs) {
+  const program = inputs.program, fit = inputs.fit, planB = inputs.planB, cost = inputs.cost;
+  const score = (program * RANK_WEIGHTS.program) + (fit * RANK_WEIGHTS.fit) + (planB * RANK_WEIGHTS.planB) + (cost * RANK_WEIGHTS.cost);
 
   let label;
   if (score >= 4.0) {
@@ -7710,6 +8237,34 @@ function computeStrategicFit(schoolName) {
   }
 
   return { label, score: Math.round(score * 100) / 100 };
+}
+
+// opts.model — 'legacy' | 'prep' to evaluate a specific Program model instead
+//              of the active one (side-by-side display).
+// opts.fit   — override the Fit input (used for the provisional band).
+// A provisional Fit adds fitBand = { low, high }: the composite recomputed at
+// Fit 2 and Fit 5 with every other input held fixed. Weights are NOT
+// renormalized — the rule is to show the range, not to hide the unknown.
+function computeStrategicFit(schoolName, opts) {
+  opts = opts || {};
+  const rk = getRankingForSchool(schoolName);
+  const model = opts.model === 'prep' || opts.model === 'legacy' ? opts.model : getProgramModel();
+  const program = programInputFor(rk, model);
+  const fit     = opts.fit != null ? opts.fit : (rk.fit || 3);
+  const planB   = rk.planB || 3;
+  const cost    = rk.costScore || 3;
+
+  const out = computeStrategicFitFrom({ program, fit, planB, cost });
+  out.model = model;
+  out.program = program;
+  out.fitProvisional = rk.fitProvenance === 'provisional';
+  if (out.fitProvisional && opts.fit == null) {
+    out.fitBand = {
+      low:  computeStrategicFitFrom({ program, fit: 2, planB, cost }).score,
+      high: computeStrategicFitFrom({ program, fit: 5, planB, cost }).score
+    };
+  }
+  return out;
 }
 
 function strategicFitBadgeClass(label) {
@@ -7798,7 +8353,10 @@ function renderSummary() {
       cost: costInfo.cost,
       noMerit: costInfo.noMerit || false,
       notes: rk.notes || '',
-      combined: sf.score
+      combined: sf.score,
+      fitBand: sf.fitBand || null,
+      honorsRole: (rk.honors && rk.honors.role) || 'tbd',
+      honorsProgram: (rk.honors && rk.honors.program) || ''
     };
   });
 
@@ -7815,13 +8373,21 @@ function renderSummary() {
     const starIcon   = r.finalList ? '\u2B50' : '\u2606';
     const starTitle  = r.finalList ? 'On Final List — click to remove' : 'Add to Final List';
     const combinedDisplay = r.combined.toFixed(2);
+    // Provisional Fit: show the Fit-2..Fit-5 band under the point score.
+    const bandHtml = r.fitBand
+      ? `<div class="fit-band" title="Fit is provisional (no visit yet): score recomputed at Fit 2 and Fit 5, all other inputs fixed">band ${r.fitBand.low.toFixed(2)}\u2013${r.fitBand.high.toFixed(2)}</div>`
+      : '';
+    // Honors is display-only; surface only the roles that change a decision.
+    const honorsTag = (r.honorsRole === 'gate' || r.honorsRole === 'mitigant')
+      ? `<span class="summary-honors-tag honors-${r.honorsRole}" title="${esc(HONORS_ROLE_LABELS[r.honorsRole])}${r.honorsProgram ? ' \u2014 ' + esc(r.honorsProgram) : ''}">honors: ${r.honorsRole}</span>`
+      : '';
     return `<tr${r.finalList ? ' class="summary-on-final-list"' : ''}>
       <td class="summary-rank-cell compact">${r.rank}</td>
-      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span><button class="summary-final-toggle${r.finalList ? ' on' : ''}" type="button" onclick="toggleFinalList('${r.id}')" title="${starTitle}" aria-label="${starTitle}">${starIcon}</button></span><div class="summary-badge-stack"><span class="badge ${fitClass}">${r.strategicFit}</span><span class="badge ${scoirClass}">${esc(scoirText)}</span></div></td>
-      <td class="compact"><span class="badge ${fitClass}">${r.strategicFit}</span></td>
+      <td class="summary-school-cell" style="font-weight:700;white-space:nowrap"><span class="summary-school-wrap" style="display:inline-flex;align-items:center;gap:8px"><span class="summary-school-rank-inline" aria-hidden="true">#${r.rank}</span>${schoolLogoHTML(r.name, 24)}<span class="summary-school-name">${esc(r.name)}</span><button class="summary-final-toggle${r.finalList ? ' on' : ''}" type="button" onclick="toggleFinalList('${r.id}')" title="${starTitle}" aria-label="${starTitle}">${starIcon}</button></span><div class="summary-badge-stack"><span class="badge ${fitClass}">${r.strategicFit}</span><span class="badge ${scoirClass}">${esc(scoirText)}</span>${honorsTag}</div></td>
+      <td class="compact"><span class="badge ${fitClass}">${r.strategicFit}</span>${honorsTag ? '<div style="margin-top:4px">' + honorsTag + '</div>' : ''}</td>
       <td class="compact"><span class="badge ${scoirClass}">${esc(scoirText)}</span></td>
       <td class="compact" style="font-weight:700">${r.cost}</td>
-      <td class="compact" style="font-weight:800;color:var(--hot-deep)">${combinedDisplay}</td>
+      <td class="compact" style="font-weight:800;color:var(--hot-deep)">${combinedDisplay}${bandHtml}</td>
       <td style="font-size:0.82rem;max-width:260px;color:var(--ink-2)">${esc(r.notes)}</td>
     </tr>`;
   }).join('');
@@ -9028,7 +9594,7 @@ function syncEssayStatusToChecklists() {
 // Versioned system prompt. Bump the version (and PROMPT_VERSION) whenever the
 // prompt content changes — cached analyses with an older promptVersion are
 // invalidated automatically.
-const PROMPT_VERSION = 'v14g';
+const PROMPT_VERSION = 'v14h';
 const SYSTEM_PROMPT_V2 = [
   "You are a strategic college counselor helping a family think through their daughter's college list. You have deep expertise in pre-veterinary pathways, admissions strategy, and financial fit analysis. You are not a cheerleader or a validator — you are a thinking partner who helps the family see what they might be missing.",
   "",
@@ -9053,6 +9619,12 @@ const SYSTEM_PROMPT_V2 = [
   "The student's residency status determines which admit rate applies for schools where that distinction matters. Use the `student.residency` field and each school's location to determine whether the in-state or out-of-state admit rate is the relevant reference point. For this student, Georgia public universities apply in-state rates; all others apply out-of-state rates.",
   "",
   "**Strategic Fit (strategic value).** Each school has a `strategicFit` object with a label (Priority Target / Strong Fit / Happy Landing) computed from four ratings: Program, Fit, Plan B, and Cost (weighted 20/30/30/20), with Fit also acting as a soft gate. This reflects how well the school serves the student's goals — independent of admission chances. The Strategic Fit label is authoritative for the strategic-value axis. Use it when discussing whether a school is worth pursuing. Do not generate your own composite judgments about school quality; reason from the label and its underlying ratings.",
+  "",
+  "**Fit provenance and provisional Fit.** Each school's Fit rating carries a provenance (rubric = visit gut-check ratings on record; synthesis = a post-visit or lived-experience judgment; provisional = no visit or judgment yet, a placeholder 3) and the date of the evidence it rests on. Treat a provisional Fit as unknown, not neutral: when it matters, cite the school's fit band (the composite recomputed at Fit 2 and Fit 5 with everything else fixed) rather than the point score, and never describe an unvisited school's fit as 'neutral' or 'average'. Georgia Tech's fit is NOT unknown — it is a synthesis judgment from lifelong proximity, known-weak on spirit, energy and Greek life.",
+  "",
+  "**Honors is display-only.** Each school's honors record (program, role, status, deadline, terms) says what an honors program would do for that school's case: gate (a condition of attending), mitigant (addresses a documented weakness), uplift (nice to have), none, or tbd. It is never part of the Strategic Fit score. Do not add, imply, or recommend an honors bonus to the ranking.",
+  "",
+  "**The Program input is mid-transition.** The payload's program model says which input currently drives each composite: legacy (US News vet-school rank) or prep (Undergraduate Prep — animal/clinical access 40%, advising and prerequisite support 35%, DVM ecosystem proximity 25%, each with an evidence note; components without evidence are a provisional 3). Both scores and both composites are in each school's program object. Reason from the active model. You may point out a school whose composite moves more than 0.30 between models as worth the family's attention (and quote its written shift reason if one exists), but do not propose new component scores — those come from evidence the family enters.",
   "",
   "**The two axes are independent.** A Priority Target can be a Reach in Scoir (high-value pursuit with low odds — Cornell is an example). A Happy Landing can be Very Likely (safe outcome but not strategically optimal). Your job is to reason across both dimensions, not to collapse them into a single \"how good is this school\" judgment.",
   "",
@@ -9246,7 +9818,17 @@ function gatherAIData() {
           descriptor: [ev.loved, ev.concerned && ('Concern: ' + ev.concerned)].filter(Boolean).join(' / ') || desc.visit || ''
         },
         vetProgram: { score: rk.vetProgram || 3, descriptor: desc.vetProgram || '' },
-        fit:        { score: rk.fit || 3,        descriptor: '' },
+        fit:        {
+          score: rk.fit || 3,
+          descriptor: '',
+          // Strategic Fit v1.1 — where the Fit came from and what it rests on.
+          provenance: rk.fitProvenance,
+          evidenceDate: rk.fitEvidenceDate || null,
+          visitRubricFit: ev.overallFit != null ? ev.overallFit : null,
+          // Present only when provenance is 'provisional': combined score at
+          // Fit 2 and Fit 5 with every other input held fixed.
+          fitBand: sf.fitBand || null
+        },
         cost:       { score: rk.costScore || 3,  descriptor: desc.cost || '' },
         meritAid:   { score: rk.meritAid || 3,   descriptor: desc.meritAid || '' },
         planB:      { score: rk.planB || 3,      descriptor: desc.planB || '' },
@@ -9262,7 +9844,24 @@ function gatherAIData() {
           : (sticker ? 'Competitive estimate — no published grid' : 'N/A')
       },
       applicationNotes: s.notes || '',
-      rankingNotes: rk.notes || ''
+      rankingNotes: rk.notes || '',
+      // Strategic Fit v1.1 — Program is mid-transition. `model` says which input
+      // produced combinedScore; the other model's composite rides along.
+      program: {
+        model: getProgramModel(),
+        legacyUsNewsScore: rk.vetProgram || 3,
+        prepScore: computePrepScore(rk),
+        prepIsProvisional: isPrepProvisional(rk),
+        prepComponents: PREP_COMPONENTS.map(c => ({
+          component: c.key, share: PREP_WEIGHTS[c.key],
+          score: rk.prep[c.key].score, evidence: rk.prep[c.key].evidence, provisional: rk.prep[c.key].provisional
+        })),
+        combinedUnderLegacy: computeStrategicFit(s.name, { model: 'legacy' }).score,
+        combinedUnderPrep: computeStrategicFit(s.name, { model: 'prep' }).score,
+        shiftReason: rk.prepShiftReason || ''
+      },
+      // Display-only honors record — never part of any score.
+      honors: Object.assign({}, rk.honors)
     };
   });
 
@@ -9426,15 +10025,19 @@ function gatherAIData() {
         'Far Reach': 'Very low admit probability for this profile (e.g., Cornell)'
       },
       ratingAnchors: {
-        vetProgram: 'Rank-driven from US News Best Veterinary Medicine Programs. 5 = #1-10; 4 = #11-20; 3 = #21-30; 2 = #31+ or new CVM not yet ranked (Clemson); 1 = no vet school on campus.',
-        fit: '5 = strong fit; 3 = neutral; 1 = poor fit / effectively ruled out — manually set based on visits and cultural match',
+        vetProgram: 'LEGACY Program input. Rank-driven from US News Best Veterinary Medicine Programs. 5 = #1-10; 4 = #11-20; 3 = #21-30; 2 = #31+ or new CVM not yet ranked (Clemson); 1 = no vet school on campus.',
+        prep: 'NEW Program input (Undergraduate Prep): animal/clinical access 40% + advising/prerequisite support 35% + DVM ecosystem proximity 25%, each 1-5 with an evidence note; a component with no evidence is a provisional 3. Same 20% weight and 1-5 scale as the legacy input. See each school\'s program.model for which one currently drives combinedScore.',
+        fit: '5 = strong fit; 3 = neutral; 1 = poor fit / effectively ruled out — manually set based on visits and cultural match. Carries a provenance: rubric (visit gut-check ratings on record), synthesis (post-visit or lived-experience judgment), or provisional (no visit or judgment yet — treat as unknown, not neutral; use fitBand).',
+        honors: 'Display only, never scored. role: gate = a condition of attending; mitigant = addresses a documented weakness; uplift = nice to have; none = does not change the picture; tbd = not yet assessed.',
         planB: '5 = strong across many majors if pre-vet doesn\'t work out; 1 = narrowly useful only for this path',
         cost: '5 = minimal out-of-pocket after merit; 1 = full sticker, no aid',
         meritAid: 'Reference only — not part of the composite score. 5 = guaranteed large merit based on current stats; 1 = no merit available'
       },
       weightings: {
         program: 0.20, fit: 0.30, planB: 0.30, cost: 0.20,
-        note: 'Merit aid is reference-only and NOT in the composite score. combinedScore in each school reflects Program/Fit/Plan B/Cost weights.'
+        programModel: getProgramModel(),
+        prepComponentShares: PREP_WEIGHTS,
+        note: 'Merit aid and honors are reference-only and NOT in the composite score. combinedScore in each school reflects Program/Fit/Plan B/Cost weights, with the Program input taken from programModel (legacy = US News vet rank, prep = Undergraduate Prep).'
       }
     },
     meta: {
@@ -9458,6 +10061,10 @@ function aiCacheFingerprint(aiData) {
     sc: s.scoirLabel,
     sf: s.strategicFit && s.strategicFit.label,
     r: [s.ratings.vetProgram.score, s.ratings.fit.score, s.ratings.planB.score, s.ratings.cost.score, s.ratings.meritAid.score],
+    fp: s.ratings.fit.provenance,
+    pm: s.program && s.program.model,
+    ps: s.program && s.program.prepScore,
+    hr: s.honors && s.honors.role,
     f: [s.financials.stickerAnnual, s.financials.guaranteedMeritAnnual, s.financials.estimatedCompetitiveMeritAnnual]
   }));
   const sig = {
@@ -11338,6 +11945,19 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '10.5',
+    date: '2026-09-05',
+    title: 'Bounded Change Set: Fit Provenance, Honors Roles, Undergraduate Prep',
+    items: [
+      'Georgia Tech is now starred on your Final List (11 schools). Your ACT superscore shows 34 everywhere — the 30 was a stale pre-July number; the old value is kept in a history note on your profile data, not on the live field',
+      'Two ranking notes were wrong and are fixed: NC State\'s CVM conducts no interviews right now (paused) and evaluates the same criteria regardless of where you did undergrad, with about 80% of seats going to North Carolina residents; Clemson\'s note no longer says "No vet school" — its new CVM opened in 2026 and is treated as unproven, not as a Program uplift. Georgia Tech\'s note now says plainly that its Fit is not unknown: it is a lifelong-proximity judgment, known-weak on spirit, energy and Greek life, with the score propped up by Plan B 5 and Cost 5',
+      'Every Fit rating now carries its provenance — rubric (visit gut-check ratings on record), synthesis (a post-visit judgment, like Purdue\'s "tied for top" 5 next to its visit-rubric 4; both stay and both show), or provisional (no visit yet) — and the date of the evidence. A provisional Fit (Wisconsin, Florida, Clemson) shows a scenario band: the Combined score recomputed at Fit 2 and Fit 5 with everything else held fixed. Weights are never renormalized',
+      'Honors is now recorded per school on the Rankings tab — program, role, status, deadline and terms. It is display only and was never in the score (we checked the code: no honors bonus exists). Roles as agreed: Tennessee\'s Chancellor\'s Honors Program is a gate (application due Nov 18, decisions mid-December, roughly the top 5%); Ohio State honors is a mitigant for the documented size concern; Auburn is none until Avery reacts; UGA and Purdue are uplift; Wisconsin is TBD until the Oct 12 visit',
+      'The one real model change: Program is moving from "US News vet-school rank" to a three-part Undergraduate Prep score — animal/clinical access 40%, advising and prerequisite support 35%, DVM ecosystem proximity 25% — same 20% weight, same 1–5 scale. For now it runs as a shadow: the Rankings tab shows both scores and the difference, the US News rank still drives your ranking, and any school that would move more than 0.30 needs a written reason before the switch (Ohio State, Wisconsin and Florida already have one). The first-pass component scores were seeded from the dashboard\'s verified research notes; components with no evidence are a flagged provisional 3 for you to fill in',
+      'Not changing, on purpose: weights stay 20 / 30 / 30 / 20 (the AP Bio drop is fresh evidence that DVM-path uncertainty is real, so Plan B keeps its weight), Plan B scores stay put pending the UT/Auburn = 2 conversation, Scoir labels and merit aid stay outside the formula, no school is removed for a low rank, and UGA\'s baseline treatment stays'
+    ]
+  },
   {
     version: '10.4',
     date: '2026-08-31',

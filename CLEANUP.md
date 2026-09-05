@@ -78,6 +78,29 @@ reference and we're confident we won't re-surface these panels:
 - `ARCHIVED_SUBTABS` set + the guard in `restoreTab()`: delete.
 - CSS for `.visit-archive`, `.archive-back-link`, `.archive-badge`: delete.
 
+## v10.5 — Program model transition (Sept 2026 change set)
+
+The Program input is running two models side by side: the legacy
+`rankings[school].vetProgram` (US News rank rating) and the new
+`rankings[school].prep` blend (Undergraduate Prep). `data.programModel`
+picks which one `computeStrategicFit` consumes; the Rankings tab shows both
+plus the delta. Nothing here is dead yet — the legacy column still drives the
+score until the family flips the switch.
+
+Once the cycle is over and `programModel` has been `prep` for a while:
+
+- `vetProgram` can stop being an input: drop the `ratingSelect` for it in
+  `renderRankings`, the `Program` column in `RANKING_COLUMNS`, the
+  `legacyUsNewsScore` / `combinedUnderLegacy` fields in `gatherAIData`, and
+  the `legacy` branch of `programInputFor`. Keep the stored `vetProgram`
+  values (or fold the US News rank display into the Ag Rankings tab) rather
+  than deleting user data.
+- The Δ column, `prepShiftReason`, `PREP_SHIFT_THRESHOLD`, and the
+  `rank-delta-big` / `rank-reason-input` CSS exist only for the side-by-side
+  review; delete with the above.
+- The legacy Program rubric table on the How Rankings Work page becomes
+  history — trim to the Undergraduate Prep table.
+
 ## Anything I should add here
 
 When you finish a refactor and leave dead code behind on purpose, drop a

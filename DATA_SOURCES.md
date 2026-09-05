@@ -123,6 +123,30 @@ Application checklists with deadlines, requirements, and tasks per school.
 
 ---
 
+## data.rankings (Strategic Fit inputs — per school, saved in Firestore)
+
+Editable on the **Rankings** tab. These are family judgments, not researched facts, so the "source" column names where the judgment comes from. Added Sept 2026 by the bounded change set (v10.5); architecture is frozen after that set.
+
+| Field | Source | Notes |
+|-------|--------|-------|
+| `vetProgram` | US News vet-school rank (rubric: 5 = #1–10 … 1 = no vet school) | Legacy Program input. Still drives the score while `data.programModel` is `legacy`. |
+| `prep.access` / `prep.advising` / `prep.ecosystem` | Each `{ score 1–5, evidence, provisional }` — scored from the school's verified `schoolDB.notes`; no evidence → provisional 3 | New Program input (Undergraduate Prep, 40 / 35 / 25). Shadow score until `data.programModel` is flipped to `prep`. |
+| `prepShiftReason` | Written by the family | Required when the Combined score moves more than 0.30 between the two Program models. |
+| `fit` | Visit gut-check ratings or a post-visit judgment | Unchanged by the change set. |
+| `fitProvenance` | `rubric` / `synthesis` / `provisional` | Where the Fit came from. A `provisional` Fit renders with a Fit-2..Fit-5 scenario band; weights are never renormalized. |
+| `fitEvidenceDate` | Visit or judgment date (`YYYY-MM-DD`) | Road-trip dates from `TRIP_DAYS`; UGA 3/21; UTK 8/29. Auburn's date is not recorded in the dashboard — fill in. |
+| `honors` | `{ program, role, addresses, status, deadline, terms }` | **Display only — never in the formula.** `role` ∈ gate / mitigant / uplift / none / tbd. |
+| `planB`, `costScore`, `meritAid`, `scoirLabel`, `notes` | Family / Financial Analysis tab / Scoir | Unchanged. Merit and Scoir stay outside the formula. |
+
+Also on `data`: `programModel` (`legacy` | `prep`, which Program input drives the score) and `actScores.history` (audit trail for score edits — the 30 → 34 superscore correction lives there).
+
+### Re-verification priority
+1. **Provisional fields** — every `provisional: true` prep component and every `fitProvenance: provisional` is a placeholder waiting on a visit or evidence (Wisconsin: Oct 12).
+2. **Honors deadlines/status** — update as applications go in.
+3. **Program model switch** — flip only after the side-by-side cycle and after every >0.30 mover has a written reason.
+
+---
+
 ## SCHOOL_ESSAYS
 
 Essay prompts, word counts, and requirements per school.

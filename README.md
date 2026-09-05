@@ -16,6 +16,7 @@ Tracks every aspect of the college search and application process in one place �
 |---|---|
 | 🏫 School Comparison | 19+ data points across 20+ pre-vet programs |
 | ⭐ Visit Evaluations | Weighted scoring system feeding into final rankings |
+| 🧭 Strategic Fit Rankings | Program / Fit / Plan B / Cost composite with Fit provenance, per-school honors roles (display only), and a side-by-side Undergraduate Prep model |
 | ✅ Application Checklists | Verified essay prompts, test policies, honors college requirements |
 | ✍️ Essay Tracker | Status tracking across all schools |
 | 💰 Financial Analysis | 4-year cost modeling with merit aid estimates |
