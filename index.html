@@ -4899,15 +4899,15 @@ function runMigrations() {
     // Phase 2 — Fit provenance + evidence date. Ratings themselves are NOT
     // touched (Purdue keeps ranking Fit 5 beside its rubric overallFit of 4;
     // the UI shows both). Road-trip dates come from TRIP_DAYS (March 2026);
-    // UGA's is the scheduled 3/21 visit; UTK is the 8/29 visit. Auburn's visit
-    // date is not recorded anywhere in the dashboard — left blank (open item).
+    // UGA's is the scheduled 3/21 visit; UTK is the 8/29 visit; Auburn is the
+    // 4/6 visit (Steve, 2026-09-05).
     const fitProvenanceSeed = {
       'University of Georgia':           { p: 'synthesis',   d: '2026-03-21' },
       'Purdue University':               { p: 'synthesis',   d: '2026-03-05' },
       'Virginia Tech':                   { p: 'rubric',      d: '2026-03-03' },
       'North Carolina State University': { p: 'rubric',      d: '2026-03-02' },
       'University of Tennessee':         { p: 'rubric',      d: '2026-08-29' },
-      'Auburn University':               { p: 'rubric',      d: '' },
+      'Auburn University':               { p: 'rubric',      d: '2026-04-06' },
       'Ohio State University':           { p: 'rubric',      d: '2026-03-04' },
       'University of Wisconsin-Madison': { p: 'provisional', d: '2026-10-12' }, // expected Madison visit — replace after
       'University of Florida':           { p: 'provisional', d: '' },
@@ -5022,6 +5022,24 @@ function runMigrations() {
     // the displayed ranking. Flip on the Rankings tab when the review is done.
     if (data.programModel === undefined) data.programModel = 'legacy';
     data.changeSet20260905MigrationApplied = true;
+  }
+
+  // ── Plan B resolution (Steve + Carey, 2026-09-05) ──
+  // The change set left the "UT/Auburn Plan B = 2" question open. Resolved:
+  // Tennessee moves 2 → 3 (UT lands 3.80 under the current model, still Strong
+  // Fit); Auburn stays at 2. Also backfills Auburn's fitEvidenceDate (4/6/26
+  // visit) for any dataset that ran the change-set block before the date was
+  // known. Own sentinel so it applies even where the block above already ran.
+  if (!data.planBResolution20260905MigrationApplied) {
+    if ((data.schools || []).some(s => s.name === 'University of Tennessee') || data.rankings['University of Tennessee']) {
+      getRankingForSchool('University of Tennessee').planB = 3;
+    }
+    if ((data.schools || []).some(s => s.name === 'Auburn University') || data.rankings['Auburn University']) {
+      const au = getRankingForSchool('Auburn University');
+      au.planB = 2; // decided value — pinned so a fresh dataset (preset 3) agrees with the live one
+      if (!au.fitEvidenceDate) au.fitEvidenceDate = '2026-04-06';
+    }
+    data.planBResolution20260905MigrationApplied = true;
   }
 
   if (!data.gpa) data.gpa = 0;
@@ -11955,7 +11973,8 @@ const CHANGELOG = [
       'Every Fit rating now carries its provenance — rubric (visit gut-check ratings on record), synthesis (a post-visit judgment, like Purdue\'s "tied for top" 5 next to its visit-rubric 4; both stay and both show), or provisional (no visit yet) — and the date of the evidence. A provisional Fit (Wisconsin, Florida, Clemson) shows a scenario band: the Combined score recomputed at Fit 2 and Fit 5 with everything else held fixed. Weights are never renormalized',
       'Honors is now recorded per school on the Rankings tab — program, role, status, deadline and terms. It is display only and was never in the score (we checked the code: no honors bonus exists). Roles as agreed: Tennessee\'s Chancellor\'s Honors Program is a gate (application due Nov 18, decisions mid-December, roughly the top 5%); Ohio State honors is a mitigant for the documented size concern; Auburn is none until Avery reacts; UGA and Purdue are uplift; Wisconsin is TBD until the Oct 12 visit',
       'The one real model change: Program is moving from "US News vet-school rank" to a three-part Undergraduate Prep score — animal/clinical access 40%, advising and prerequisite support 35%, DVM ecosystem proximity 25% — same 20% weight, same 1–5 scale. For now it runs as a shadow: the Rankings tab shows both scores and the difference, the US News rank still drives your ranking, and any school that would move more than 0.30 needs a written reason before the switch (Ohio State, Wisconsin and Florida already have one). The first-pass component scores were seeded from the dashboard\'s verified research notes; components with no evidence are a flagged provisional 3 for you to fill in',
-      'Not changing, on purpose: weights stay 20 / 30 / 30 / 20 (the AP Bio drop is fresh evidence that DVM-path uncertainty is real, so Plan B keeps its weight), Plan B scores stay put pending the UT/Auburn = 2 conversation, Scoir labels and merit aid stay outside the formula, no school is removed for a low rank, and UGA\'s baseline treatment stays'
+      'Plan B, resolved: Tennessee moves from 2 to 3 (its score goes 3.50 to 3.80, still Strong Fit); Auburn stays at 2. Auburn\'s Fit now carries its April 6 visit date',
+      'Not changing, on purpose: weights stay 20 / 30 / 30 / 20 (the AP Bio drop is fresh evidence that DVM-path uncertainty is real, so Plan B keeps its weight), Scoir labels and merit aid stay outside the formula, no school is removed for a low rank, and UGA\'s baseline treatment stays'
     ]
   },
   {

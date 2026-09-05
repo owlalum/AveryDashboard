@@ -134,9 +134,9 @@ Editable on the **Rankings** tab. These are family judgments, not researched fac
 | `prepShiftReason` | Written by the family | Required when the Combined score moves more than 0.30 between the two Program models. |
 | `fit` | Visit gut-check ratings or a post-visit judgment | Unchanged by the change set. |
 | `fitProvenance` | `rubric` / `synthesis` / `provisional` | Where the Fit came from. A `provisional` Fit renders with a Fit-2..Fit-5 scenario band; weights are never renormalized. |
-| `fitEvidenceDate` | Visit or judgment date (`YYYY-MM-DD`) | Road-trip dates from `TRIP_DAYS`; UGA 3/21; UTK 8/29. Auburn's date is not recorded in the dashboard — fill in. |
+| `fitEvidenceDate` | Visit or judgment date (`YYYY-MM-DD`) | Road-trip dates from `TRIP_DAYS`; UGA 3/21; Auburn 4/6; UTK 8/29. |
 | `honors` | `{ program, role, addresses, status, deadline, terms }` | **Display only — never in the formula.** `role` ∈ gate / mitigant / uplift / none / tbd. |
-| `planB`, `costScore`, `meritAid`, `scoirLabel`, `notes` | Family / Financial Analysis tab / Scoir | Unchanged. Merit and Scoir stay outside the formula. |
+| `planB`, `costScore`, `meritAid`, `scoirLabel`, `notes` | Family / Financial Analysis tab / Scoir | Plan B resolved 2026-09-05: Tennessee 2 → 3, Auburn stays 2. Merit and Scoir stay outside the formula. |
 
 Also on `data`: `programModel` (`legacy` | `prep`, which Program input drives the score) and `actScores.history` (audit trail for score edits — the 30 → 34 superscore correction lives there).
 
