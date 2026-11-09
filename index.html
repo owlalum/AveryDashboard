@@ -6194,6 +6194,26 @@ const DECISION_TIMELINE = {
   }
 };
 
+// Short, scannable chips for the decision grid (presentation layer over
+// DECISION_TIMELINE; the full sentences stay in DECISION_TIMELINE and show as
+// hover tooltips). housingKind drives the traffic-light pill colour:
+//   "go"      = get into the housing queue early / before committing
+//   "wait"    = enrollment deposit or commitment required first
+//   "neutral" = guaranteed by deadline, or processed in order received
+const DECISION_SHORT = {
+  "Auburn University":               { decision: "—",         honors: "Nov 16 app",     deposit: "$250 · May 1",  housing: "Queue now",      housingKind: "go" },
+  "University of Georgia":           { decision: "Nov 20",    honors: "with decision",  deposit: "~$300 · May 1", housing: "Register early", housingKind: "go" },
+  "Georgia Tech":                    { decision: "early Dec", honors: "Mar 12",         deposit: "~$250 · May 1", housing: "Deposit first",  housingKind: "wait" },
+  "Clemson University":              { decision: "mid-Dec",   honors: "mid-Jan",        deposit: "$200 · May 1",  housing: "Deposit first",  housingKind: "wait" },
+  "University of Tennessee":         { decision: "mid-Dec",   honors: "mid-Dec",        deposit: "$250 · May 1",  housing: "After commit",   housingKind: "wait" },
+  "Purdue University":               { decision: "Jan 15",    honors: "with decision",  deposit: "$500 · May 1",  housing: "By deadline",    housingKind: "neutral" },
+  "Ohio State University":           { decision: "Jan 22",    honors: "Jan–Apr",        deposit: "$100 · May 1",  housing: "Order received", housingKind: "neutral" },
+  "University of Florida":           { decision: "late Jan",  honors: "with decision",  deposit: "$200 · May 1",  housing: "Queue now",      housingKind: "go" },
+  "North Carolina State University": { decision: "Jan 30",    honors: "early Apr",      deposit: "$300 · May 1",  housing: "After admit",    housingKind: "neutral" },
+  "University of Wisconsin-Madison": { decision: "by Jan 31", honors: "~end May",       deposit: "~$100 · May 1", housing: "By deadline",    housingKind: "neutral" },
+  "Virginia Tech":                   { decision: "late Feb",  honors: "after decision", deposit: "$400 · May 1",  housing: "Deposit first",  housingKind: "wait" }
+};
+
 function renderAppStatus() {
   const body = document.getElementById('appStatusBody');
   if (!body) return;
@@ -6235,27 +6255,39 @@ function renderAppStatus() {
       return (a.d.order ?? 99999999) - (b.d.order ?? 99999999);  // then pending by soonest date
     });
   if (tlRows.length) {
-    html += '<div style="margin-top:16px;padding-top:10px;border-top:2px solid var(--border);font-weight:700;">Decision &amp; deposit timeline</div>';
-    html += '<div style="color:var(--text-light);font-size:0.78rem;margin-bottom:6px;">Expected Fall 2027 dates — confirm on each portal as they near. Financial-aid award letters: none received yet; this panel will track net cost as they arrive.</div>';
-    let pendingHeaderDone = false;
+    html += '<div style="margin-top:16px;padding-top:10px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;">';
+    html += '<span style="font-weight:700;">Decision tracker</span>';
+    html += '<span style="color:var(--text-light);font-size:0.72rem;">Expected Fall 2027 dates &middot; tap / hover a cell for detail</span>';
+    html += '</div>';
+    const kindColor = { go: '#15803d', wait: '#b45309', neutral: '#4b5563' };
+    const kindBg = { go: 'rgba(22,163,74,0.14)', wait: 'rgba(217,119,6,0.15)', neutral: 'rgba(107,114,128,0.14)' };
+    const stBg = { accepted: 'rgba(22,163,74,0.16)', waitlisted: 'rgba(202,138,4,0.16)', rejected: 'rgba(220,38,38,0.13)', applying: 'rgba(107,114,128,0.12)', researching: 'rgba(107,114,128,0.12)' };
+    const pill = (txt, bg, col, title) => '<span title="' + (title || '') + '" style="display:inline-block;white-space:nowrap;padding:1px 8px;border-radius:11px;font-size:0.72rem;font-weight:600;background:' + bg + ';color:' + col + ';">' + txt + '</span>';
+    html += '<div style="overflow-x:auto;margin-top:8px;"><table style="border-collapse:collapse;width:100%;font-size:0.8rem;min-width:540px;">';
+    html += '<thead><tr style="text-align:left;color:var(--text-light);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.03em;">';
+    ['School', 'Status', 'Decision', 'Honors', 'Deposit', 'Housing'].forEach(h => { html += '<th style="padding:4px 6px;font-weight:700;">' + h + '</th>'; });
+    html += '</tr></thead><tbody>';
     tlRows.forEach(({ s, d }) => {
       const st = s.status || 'researching';
       const decided = st === 'accepted' || st === 'rejected' || st === 'waitlisted';
-      if (!decided && !pendingHeaderDone) {
-        pendingHeaderDone = true;
-        html += '<div style="margin-top:8px;font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-light);">Awaiting decision &mdash; soonest first</div>';
-      }
+      const sd = DECISION_SHORT[s.name] || {};
       const short = esc(s.name.replace(/^University of /, 'U ').replace(/ University$/, ''));
-      const decisionText = decided
-        ? ((icons[st] || '') + ' ' + st.charAt(0).toUpperCase() + st.slice(1))
-        : esc(d.ea || '—');
-      html += '<div style="padding:6px 0;border-bottom:1px solid var(--border);">';
-      html += '<div style="font-weight:600;">' + short + ' <span style="font-weight:500;color:var(--text-light);">&middot; ' + decisionText + '</span></div>';
-      if (!decided && d.rd) html += '<div style="font-size:0.78rem;color:var(--text-light);">&#8618; if deferred: ' + esc(d.rd) + '</div>';
-      if (d.honors) html += '<div style="font-size:0.8rem;">&#127891; ' + esc(d.honors) + '</div>';
-      html += '<div style="font-size:0.8rem;color:var(--text-light);">&#127968; ' + esc(d.housing || '—') + ' &middot; &#128181; Deposit ' + esc(d.enroll || '—') + '</div>';
-      html += '</div>';
+      const dot = (schoolDB[s.name] && schoolDB[s.name].color) || '#999';
+      const stLabel = st.charAt(0).toUpperCase() + st.slice(1);
+      const decCell = decided ? '&mdash;' : esc(sd.decision || d.ea || '—');
+      const decTitle = esc((d.ea || '') + (!decided && d.rd ? ' · if deferred: ' + d.rd : ''));
+      const k = sd.housingKind || 'neutral';
+      html += '<tr style="border-top:1px solid var(--border);">';
+      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:600;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + dot + ';margin-right:6px;vertical-align:middle;"></span>' + short + '</td>';
+      html += '<td style="padding:5px 6px;">' + pill((icons[st] || '') + ' ' + stLabel, stBg[st] || stBg.researching, colors[st] || 'var(--ink)', '') + '</td>';
+      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:700;" title="' + decTitle + '">' + decCell + '</td>';
+      html += '<td style="padding:5px 6px;white-space:nowrap;color:var(--text-light);" title="' + esc(d.honors || '') + '">' + esc(sd.honors || '—') + '</td>';
+      html += '<td style="padding:5px 6px;white-space:nowrap;color:var(--text-light);" title="' + esc(d.enroll || '') + '">' + esc(sd.deposit || '—') + '</td>';
+      html += '<td style="padding:5px 6px;">' + pill(esc(sd.housing || '—'), kindBg[k], kindColor[k], esc(d.housing || '')) + '</td>';
+      html += '</tr>';
     });
+    html += '</tbody></table></div>';
+    html += '<div style="color:var(--text-light);font-size:0.72rem;margin-top:6px;">&#128181; No financial-aid award letters yet &mdash; net cost will appear here as they arrive.</div>';
   }
   body.innerHTML = html;
 }
@@ -12224,7 +12256,7 @@ const CHANGELOG = [
     date: '2026-11-09',
     title: 'Decision Season: Admission, Honors & Deposit Timeline',
     items: [
-      'Applications are in, so the dashboard is shifting into decision mode. Auburn is marked Accepted — your first result. The Overview\'s "Where things stand" card now carries a Decision & Deposit Timeline: for every school, the expected Fall 2027 admission-decision date, the honors-decision date (honors runs on a separate, usually later calendar), and the enrollment- and housing-deposit details — sorted by what comes next. First up: UGA Early Action on Friday, November 20 at 4pm ET',
+      'Applications are in, so the dashboard is shifting into decision mode. Auburn is marked Accepted — your first result. The Overview\'s "Where things stand" card now carries an at-a-glance Decision Tracker — a color-coded grid with one row per school and columns for Status, Decision date, Honors, Deposit and Housing. It is built to scan in seconds: short date chips, colored status pills, and a traffic-light housing tag (green "queue now" vs. amber "deposit first"); hover any cell for the full detail. Results sit on top (Auburn, Accepted), then pending schools by soonest date — first up, UGA Early Action on Friday, November 20 at 4pm ET',
       'Housing can matter before you even commit. A couple of schools — Auburn and UF most strongly — let you (and encourage you to) get into the housing queue before paying any enrollment deposit, and assign rooms by the date you apply. Auburn\'s housing application is open now, with priority set by your application timestamp. Others — Clemson, Georgia Tech, Virginia Tech, Tennessee — require the enrollment deposit first, and a couple are not first-come at all. The timeline notes each school\'s rule',
       'The Applications tab is now hidden — the checklists and essays did their job. Nothing was deleted; the data is preserved and the tab can be brought back anytime',
       'Financial-aid award letters: none have arrived yet. The timeline has a slot for them and will track net cost as they come in',
