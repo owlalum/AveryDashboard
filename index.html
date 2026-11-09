@@ -6220,6 +6220,26 @@ const DECISION_SHORT = {
   "Virginia Tech":                   { decision: "late Feb",  honors: "after decision", deposit: "$400 · May 1",  housing: "Deposit first",  housingKind: "wait" }
 };
 
+// Expected merit-aid / scholarship NOTIFICATION timing (Fall 2027), shown in the
+// expanded tracker row so you know when the real award should replace the net-cost
+// estimate. Researched 2026-11-09. Only Georgia Tech (Stamps) has posted 2027
+// dates; the rest are most-recent-cycle timings — treat as expected and reconfirm
+// as schools publish 2027 calendars. Key gotcha: UF / UGA / Wisconsin send the
+// award by a SEPARATE later email, not on the acceptance letter.
+const MERIT_NOTIFY = {
+  "Auburn University":               "~January, by separate email (you're already admitted)",
+  "University of Georgia":           "separate email, ~by early April (Foundation Fellowship finalists late Jan)",
+  "Georgia Tech":                    "Stamps: semifinalist late Jan → finalist late Feb; award by spring",
+  "Clemson University":              "with / after admission; National Scholars finalists ~mid-Jan",
+  "University of Tennessee":         "with / after admission, on the aid offer",
+  "Purdue University":               "with the admission decision",
+  "Ohio State University":           "with the admission decision (~late Jan for out-of-state)",
+  "University of Florida":           "separate email, early–mid March (not on the acceptance)",
+  "North Carolina State University": "with / after admission (spring); Park finalists in spring",
+  "University of Wisconsin-Madison": "separate email, ~late March (no email = no award)",
+  "Virginia Tech":                   "notified individually in spring; limited out-of-state merit"
+};
+
 // ── Decision tracker: expandable rows + recordable outcomes (2026-11-09) ──
 // Collapsed cells show expected dates/rules; recording an outcome in the
 // expanded row flips the cell to it. State persists on each school object
@@ -6292,6 +6312,7 @@ function renderDecisionDetail(s, d) {
       + (real ? 'award ' : 'est. merit ') + fmt(merit) + ' = <strong>' + fmt(netv) + '</strong>'
       + (real ? ' <span style="color:#15803d;font-weight:700;">&#10003; recorded</span>' : ' <span style="color:var(--text-light);">(estimate)</span>') + '</div>';
   }
+  if (MERIT_NOTIFY[s.name]) detail += line('&#128276;', 'Merit award expected: ' + MERIT_NOTIFY[s.name]);
   const ctrl = (label, field) => '<label style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 6px 0;font-size:0.68rem;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;color:var(--text-light);">' + label + decisionSelect(s.id, field, s[field]) + '</label>';
   let controls = '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);">';
   controls += '<div style="font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-light);margin-bottom:6px;">Record outcomes &rarr; saves automatically</div>';
@@ -12359,6 +12380,14 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '11.1',
+    date: '2026-11-09',
+    title: 'When to Expect Each Merit Award',
+    items: [
+      'Each school\'s expanded row now shows when Avery should learn her merit-aid award — so you know when the estimated net cost should get replaced by the real number. Big heads-up from the research: at several schools (UF, UGA, Wisconsin) the scholarship amount does NOT come on the acceptance letter — it arrives weeks later by a separate email or portal update (often February–April), and "no email yet" does not mean "no award." Auburn\'s is expected around January by separate email; Purdue and Ohio State include it with the admission decision; Georgia Tech\'s big money runs through the Stamps competition (semifinalist late January, finalist late February). Only Georgia Tech has posted 2027 dates, so treat the rest as expected timing and reconfirm as schools publish their 2027 calendars',
+    ]
+  },
   {
     version: '11.0',
     date: '2026-11-09',
