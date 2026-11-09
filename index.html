@@ -2625,7 +2625,9 @@
   <button class="tab-btn active" data-group="group-overview">Overview</button>
   <button class="tab-btn" data-group="group-schools">Schools</button>
   <button class="tab-btn" data-group="group-visits">Visits</button>
-  <button class="tab-btn" data-group="group-apps">Applications</button>
+  <!-- Applications tab hidden 2026-11-09 (decision phase): checklists/essays are
+       complete. Data is preserved in #group-apps; remove style to restore. -->
+  <button class="tab-btn" data-group="group-apps" style="display:none">Applications</button>
 </nav>
 
 <div id="nextUpStrip" class="next-up-strip"></div>
@@ -4627,6 +4629,19 @@ function runMigrations() {
     data.weeklyScan20261108SyncApplied = true;
   }
 
+  // ── Auburn acceptance seed (2026-11-09) ──
+  // Avery was admitted to Auburn (EA Round 1). Reflect it on the board so the
+  // decision-phase views sort it as decided. Guarded: only set when the school
+  // is still in a pre-decision state, so this never clobbers a status the
+  // family set by hand (accepted/rejected/waitlisted all stay as-is).
+  if (!data.auburnAcceptedSeed20261109Applied) {
+    const au = (data.schools || []).find(s => s.name === 'Auburn University');
+    if (au && (!au.status || au.status === 'researching' || au.status === 'applying')) {
+      au.status = 'accepted';
+    }
+    data.auburnAcceptedSeed20261109Applied = true;
+  }
+
   // ── School-notes sync revision ──
   // schoolDB is the master copy of research notes, but each saved school
   // carries a cached copy (s.notes). Whenever ANY school's notes change in
@@ -6081,6 +6096,104 @@ function onScoresChanged() {
   renderScholarships();
 }
 
+// ─── Decision-season timeline (post-application phase, added 2026-11-09) ───
+// Expected admission-decision, honors, and deposit/housing dates for the
+// Fall 2027 cycle, read LIVE by renderAppStatus — NOT cached onto
+// data.schools, so no sync migration is needed. Avery is a Georgia resident
+// (in-state for UGA + Georgia Tech). Dates are "expected" windows taken from
+// each school's own pages in Nov 2026; confirm on the portal as each nears.
+// `order` = next expected admission-decision date as YYYYMMDD for sorting
+// (0 = already decided).
+const DECISION_TIMELINE = {
+  "Auburn University": {
+    order: 0,
+    ea: "Accepted (EA Round 1)",
+    honors: "Honors College — SEPARATE app due Nov 16, 2026; decision ~late Feb",
+    enroll: "$250, due ~May 1",
+    housing: "Apply NOW — timeslot-based, priority by app timestamp; $100 fee; no enrollment deposit needed first"
+  },
+  "University of Georgia": {
+    order: 20261120,
+    ea: "EA decision Fri Nov 20, 4pm ET (in-state)",
+    rd: "final decision early–mid March",
+    honors: "Morehead Honors auto-considered for EA — arrives WITH the Nov 20 decision",
+    enroll: "commitment deposit (~$300), due May 1",
+    housing: "$50 reg fee; priority by registration date (can register before the deposit)"
+  },
+  "Georgia Tech": {
+    order: 20261210,
+    ea: "EA1 (GA students) decision early–mid December",
+    rd: "RD decision mid-March",
+    honors: "JMHP — SEPARATE app after admission: EA app Feb 22 → decision Mar 12, 2027",
+    enroll: "~$250, due May 1",
+    housing: "Pay enrollment deposit FIRST; lottery (not first-come); housing NOT guaranteed"
+  },
+  "Clemson University": {
+    order: 20261215,
+    ea: "EA decision ~mid-December",
+    rd: "deferred/RD decision mid-February",
+    honors: "Calhoun Honors (separate app): priority ~mid-Jan, general ~early March",
+    enroll: "$200, by May 1",
+    housing: "Pay the $200 deposit BEFORE applying; first-years guaranteed + required on campus"
+  },
+  "University of Tennessee": {
+    order: 20261215,
+    ea: "EA decision mid-December (non-resident)",
+    rd: "RD early March (~Mar 9)",
+    honors: "Chancellor's Honors: invitation after EA deadline (~Nov 18); decision ~mid-December",
+    enroll: "$250, due May 1",
+    housing: "Housing app opens only AFTER you confirm enrollment; housing is tight (lottery)"
+  },
+  "Purdue University": {
+    order: 20270115,
+    ea: "EA decision Jan 15, 2027",
+    rd: "RD by Mar 31",
+    honors: "Honors indicated on Common App by the Nov 1 EA deadline; tied to admission; accept by May 5",
+    enroll: "$500, due ~May 1",
+    housing: "Guaranteed if contract signed by deadline (~mid-May); not first-come"
+  },
+  "Ohio State University": {
+    order: 20270122,
+    ea: "EA decision Jan 22, 2027 (non-resident)",
+    rd: "RD ~Mar 5",
+    honors: "Honors/Scholars on Common App (final Feb 1); decision rolls Jan–April after admission",
+    enroll: "$100 acceptance fee, due May 1",
+    housing: "Contracts processed in order received; 2-year live-on"
+  },
+  "University of Florida": {
+    order: 20270125,
+    ea: "EA decision ~late January",
+    rd: "RD ~late March",
+    honors: "Honors on the main app (not separate); tied to the UF decision",
+    enroll: "$200, confirm by May 1",
+    housing: "Apply right after applying, BEFORE committing; priority by housing-app date + $25 fee; NOT guaranteed — apply ASAP"
+  },
+  "North Carolina State University": {
+    order: 20270130,
+    ea: "EA decision Jan 30, 2027 (some ~Dec 19)",
+    rd: "RD ~Mar 31",
+    honors: "University Honors (separate app): decisions early April — ~2 weeks AFTER admission",
+    enroll: "$300, due May 1",
+    housing: "Agreement opens after admission; first-years required on campus"
+  },
+  "University of Wisconsin-Madison": {
+    order: 20270131,
+    ea: "EA decision by Jan 31, 2027",
+    rd: "RD by Mar 31",
+    honors: "L&S Honors (separate app, opens Jan 1): reviewed only after admission; decision ~end of May",
+    enroll: "deposit due May 1",
+    housing: "~$100 deposit (refundable before May 1); NOT first-come; space guaranteed if paid by deadline"
+  },
+  "Virginia Tech": {
+    order: 20270225,
+    ea: "EA decision late February",
+    rd: "RD rolling; respond by May 1",
+    honors: "Honors College: indicate on the VT app; notice shortly after the decision; honors scholarships due Jan 8",
+    enroll: "$400 (refundable if withdrawn before May 1)",
+    housing: "Pay the $400 deposit to unlock the housing contract (due June 1); LLPs fill early"
+  }
+};
+
 function renderAppStatus() {
   const body = document.getElementById('appStatusBody');
   if (!body) return;
@@ -6112,6 +6225,38 @@ function renderAppStatus() {
     html += '<span style="color:var(--text-light);font-size:0.82rem;">' + names.join(', ') + '</span>';
     html += '</div>';
   });
+  // ── Decision & deposit timeline (admission / honors / deposits) ──
+  const tlRows = visible
+    .map(s => ({ s, d: DECISION_TIMELINE[s.name] }))
+    .filter(x => x.d)
+    .sort((a, b) => {
+      const dec = x => (x.s.status === 'accepted' || x.s.status === 'rejected' || x.s.status === 'waitlisted') ? 1 : 0;
+      if (dec(a) !== dec(b)) return dec(b) - dec(a);              // decided (results) first
+      return (a.d.order ?? 99999999) - (b.d.order ?? 99999999);  // then pending by soonest date
+    });
+  if (tlRows.length) {
+    html += '<div style="margin-top:16px;padding-top:10px;border-top:2px solid var(--border);font-weight:700;">Decision &amp; deposit timeline</div>';
+    html += '<div style="color:var(--text-light);font-size:0.78rem;margin-bottom:6px;">Expected Fall 2027 dates — confirm on each portal as they near. Financial-aid award letters: none received yet; this panel will track net cost as they arrive.</div>';
+    let pendingHeaderDone = false;
+    tlRows.forEach(({ s, d }) => {
+      const st = s.status || 'researching';
+      const decided = st === 'accepted' || st === 'rejected' || st === 'waitlisted';
+      if (!decided && !pendingHeaderDone) {
+        pendingHeaderDone = true;
+        html += '<div style="margin-top:8px;font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-light);">Awaiting decision &mdash; soonest first</div>';
+      }
+      const short = esc(s.name.replace(/^University of /, 'U ').replace(/ University$/, ''));
+      const decisionText = decided
+        ? ((icons[st] || '') + ' ' + st.charAt(0).toUpperCase() + st.slice(1))
+        : esc(d.ea || '—');
+      html += '<div style="padding:6px 0;border-bottom:1px solid var(--border);">';
+      html += '<div style="font-weight:600;">' + short + ' <span style="font-weight:500;color:var(--text-light);">&middot; ' + decisionText + '</span></div>';
+      if (!decided && d.rd) html += '<div style="font-size:0.78rem;color:var(--text-light);">&#8618; if deferred: ' + esc(d.rd) + '</div>';
+      if (d.honors) html += '<div style="font-size:0.8rem;">&#127891; ' + esc(d.honors) + '</div>';
+      html += '<div style="font-size:0.8rem;color:var(--text-light);">&#127968; ' + esc(d.housing || '—') + ' &middot; &#128181; Deposit ' + esc(d.enroll || '—') + '</div>';
+      html += '</div>';
+    });
+  }
   body.innerHTML = html;
 }
 
@@ -6167,8 +6312,10 @@ const ARCHIVED_SUBTABS = new Set(['tourchk', 'roadtrip', 'nationalRankings']);
 
 // ─── Restore active tab on refresh ───
 (function restoreTab() {
-  const savedTab = sessionStorage.getItem('activeTab');
+  let savedTab = sessionStorage.getItem('activeTab');
   const savedSub = sessionStorage.getItem('activeSubtab');
+  // Applications tab is hidden (decision phase) — never restore onto it.
+  if (savedTab === 'group-apps') savedTab = 'group-overview';
   if (savedTab) {
     document.querySelectorAll('.tab-btn[data-group]').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-group').forEach(g => g.classList.remove('active'));
@@ -12072,6 +12219,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '10.8',
+    date: '2026-11-09',
+    title: 'Decision Season: Admission, Honors & Deposit Timeline',
+    items: [
+      'Applications are in, so the dashboard is shifting into decision mode. Auburn is marked Accepted — your first result. The Overview\'s "Where things stand" card now carries a Decision & Deposit Timeline: for every school, the expected Fall 2027 admission-decision date, the honors-decision date (honors runs on a separate, usually later calendar), and the enrollment- and housing-deposit details — sorted by what comes next. First up: UGA Early Action on Friday, November 20 at 4pm ET',
+      'Housing can matter before you even commit. A couple of schools — Auburn and UF most strongly — let you (and encourage you to) get into the housing queue before paying any enrollment deposit, and assign rooms by the date you apply. Auburn\'s housing application is open now, with priority set by your application timestamp. Others — Clemson, Georgia Tech, Virginia Tech, Tennessee — require the enrollment deposit first, and a couple are not first-come at all. The timeline notes each school\'s rule',
+      'The Applications tab is now hidden — the checklists and essays did their job. Nothing was deleted; the data is preserved and the tab can be brought back anytime',
+      'Financial-aid award letters: none have arrived yet. The timeline has a slot for them and will track net cost as they come in',
+    ]
+  },
   {
     version: '10.7',
     date: '2026-11-08',
