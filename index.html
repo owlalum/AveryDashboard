@@ -6325,14 +6325,14 @@ function renderAppStatus() {
       try { const sf = computeStrategicFit(name); if (sf && typeof sf.score === 'number') return { str: sf.score.toFixed(2), title: sf.label || '' }; } catch (e) {}
       return { str: '—', title: '' };
     };
-    html += '<div style="overflow-x:auto;margin-top:8px;"><table style="border-collapse:collapse;width:100%;font-size:0.8rem;min-width:720px;"><thead><tr style="text-align:left;color:var(--text-light);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.03em;">';
+    html += '<div style="overflow-x:auto;margin-top:8px;"><table style="border-collapse:collapse;width:100%;font-size:0.8rem;min-width:720px;text-align:left;"><thead><tr style="text-align:left;color:var(--text-light);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.03em;">';
     ['School', 'Status', 'Decision', 'Fit', 'Net / yr', 'Honors', 'Deposit', 'Housing'].forEach(h => { html += '<th style="padding:4px 6px;font-weight:700;">' + h + '</th>'; });
     html += '</tr></thead><tbody>';
     tlRows.forEach(({ s, d }) => {
       const st = s.status || 'researching';
       const decided = st === 'accepted' || st === 'waitlisted';
       const sd = DECISION_SHORT[s.name] || {};
-      const short = esc(s.name.replace(/^University of /, 'U ').replace(/ University$/, ''));
+      const short = esc(s.name === 'University of Wisconsin-Madison' ? 'Wisconsin' : s.name.replace(/^University of /, 'U ').replace(/ University$/, ''));
       const stLabel = st === 'applying' ? 'Awaiting' : st.charAt(0).toUpperCase() + st.slice(1);
       const decCell = decided ? '&mdash;' : esc(sd.decision || d.ea || '—');
       const decTitle = esc((d.ea || '') + (!decided && d.rd ? ' · if deferred: ' + d.rd : ''));
@@ -6349,14 +6349,14 @@ function renderAppStatus() {
         : '<span style="color:var(--text-light);">' + esc(sd.deposit || '—') + '</span>';
       const caret = '<span style="display:inline-block;width:10px;color:var(--text-light);font-size:0.7rem;">' + (isOpen ? '&#9662;' : '&#9656;') + '</span>';
       html += '<tr style="border-top:1px solid var(--border);cursor:pointer;" onclick="toggleDecisionRow(\'' + s.id + '\')">';
-      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:600;"><span style="display:inline-flex;align-items:center;gap:6px;">' + caret + schoolLogoHTML(s.name, 18) + '<span>' + short + '</span></span></td>';
-      html += '<td style="padding:5px 6px;">' + pill((icons[st] || '') + ' ' + stLabel, stBg[st] || stBg.researching, colors[st] || 'var(--ink)', '') + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:700;" title="' + decTitle + '">' + decCell + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:700;color:var(--primary);" title="' + esc(fit.title) + '">' + esc(fit.str) + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:600;" title="' + esc(net.title) + '">' + esc(net.str) + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;">' + honorsCell + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;">' + depositCell + '</td>';
-      html += '<td style="padding:5px 6px;">' + housingCell + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;white-space:nowrap;font-weight:600;"><span style="display:inline-flex;align-items:center;gap:6px;">' + caret + schoolLogoHTML(s.name, 18) + '<span>' + short + '</span></span></td>';
+      html += '<td style="padding:5px 6px;text-align:left;">' + pill((icons[st] || '') + ' ' + stLabel, stBg[st] || stBg.researching, colors[st] || 'var(--ink)', '') + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;white-space:nowrap;font-weight:700;" title="' + decTitle + '">' + decCell + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;white-space:nowrap;font-weight:700;color:var(--primary);" title="' + esc(fit.title) + '">' + esc(fit.str) + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;white-space:nowrap;font-weight:600;" title="' + esc(net.title) + '">' + esc(net.str) + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;white-space:nowrap;">' + honorsCell + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;white-space:nowrap;">' + depositCell + '</td>';
+      html += '<td style="padding:5px 6px;text-align:left;">' + housingCell + '</td>';
       html += '</tr>';
       if (isOpen) html += renderDecisionDetail(s, d);
     });
