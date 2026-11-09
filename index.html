@@ -2630,7 +2630,7 @@
   <button class="tab-btn" data-group="group-apps" style="display:none">Applications</button>
 </nav>
 
-<div id="nextUpStrip" class="next-up-strip"></div>
+<!-- "Next Up" deadline strip removed 2026-11-09 (decision phase: deadlines / checklists / essays are no longer the focus). renderNextUp() no-ops without #nextUpStrip. -->
 <div id="backupBanner" class="backup-banner" style="display:none;">
   <span>It's been a while since your last backup — download one now to keep your data safe.</span>
   <div style="display:flex;gap:8px;flex-shrink:0;">
@@ -6220,6 +6220,63 @@ const DECISION_SHORT = {
   "Virginia Tech":                   { decision: "late Feb",  honors: "after decision", deposit: "$400 · May 1",  housing: "Deposit first",  housingKind: "wait" }
 };
 
+// ── Decision tracker: expandable rows + recordable outcomes (2026-11-09) ──
+// Collapsed cells show expected dates/rules; recording an outcome in the
+// expanded row flips the cell to it. State persists on each school object
+// (s.status / s.honorsResult / s.housingStatus / s.enrollDeposit) and syncs via
+// saveData(). expandedDecisionRows survives re-renders so a row stays open
+// while you edit it.
+const expandedDecisionRows = new Set();
+const HONORS_RESULT = {
+  pending:  { label: 'Pending',  bg: 'rgba(107,114,128,0.16)', co: '#4b5563' },
+  invited:  { label: 'Invited',  bg: 'rgba(37,99,235,0.14)',   co: '#1d4ed8' },
+  accepted: { label: 'Accepted', bg: 'rgba(22,163,74,0.16)',   co: '#15803d' },
+  denied:   { label: 'Denied',   bg: 'rgba(220,38,38,0.13)',   co: '#b91c1c' }
+};
+const HOUSING_STATUS = {
+  applied:  { label: 'Applied',       bg: 'rgba(37,99,235,0.14)', co: '#1d4ed8' },
+  deposit:  { label: 'Deposit paid',  bg: 'rgba(22,163,74,0.16)', co: '#15803d' },
+  assigned: { label: 'Room assigned', bg: 'rgba(22,163,74,0.16)', co: '#15803d' }
+};
+const DECISION_RECORD_OPTS = {
+  status:        [['researching','Researching'], ['applying','Awaiting'], ['accepted','Accepted'], ['waitlisted','Waitlisted'], ['rejected','Rejected']],
+  honorsResult:  [['','—'], ['pending','Pending'], ['invited','Invited'], ['accepted','Accepted'], ['denied','Denied']],
+  housingStatus: [['','—'], ['applied','Applied'], ['deposit','Deposit paid'], ['assigned','Room assigned']],
+  enrollDeposit: [['','Not paid'], ['paid','Paid']]
+};
+function toggleDecisionRow(id) {
+  if (expandedDecisionRows.has(id)) expandedDecisionRows.delete(id);
+  else expandedDecisionRows.add(id);
+  renderAppStatus();
+}
+function setDecisionField(id, field, value) {
+  const s = (data.schools || []).find(x => x.id === id);
+  if (!s) return;
+  s[field] = value;
+  saveData();
+  renderAppStatus();
+}
+function decisionSelect(id, field, current) {
+  const opts = DECISION_RECORD_OPTS[field] || [];
+  let h = '<select onclick="event.stopPropagation()" onchange="setDecisionField(\'' + id + '\',\'' + field + '\',this.value)" style="font-size:0.78rem;padding:2px 5px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--ink);">';
+  opts.forEach(function (o) { h += '<option value="' + esc(o[0]) + '"' + ((current || '') === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; });
+  return h + '</select>';
+}
+function renderDecisionDetail(s, d) {
+  const line = (icon, txt) => txt ? '<div style="margin:2px 0;"><span style="opacity:0.7;">' + icon + '</span> ' + esc(txt) + '</div>' : '';
+  let detail = '';
+  detail += line('&#128197;', 'Decision: ' + (d.ea || '') + (d.rd ? '  ·  if deferred: ' + d.rd : ''));
+  detail += line('&#127891;', 'Honors: ' + (d.honors || ''));
+  detail += line('&#128181;', 'Enrollment deposit: ' + (d.enroll || ''));
+  detail += line('&#127968;', 'Housing: ' + (d.housing || ''));
+  const ctrl = (label, field) => '<label style="display:inline-flex;align-items:center;gap:5px;margin:0 12px 6px 0;font-size:0.68rem;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;color:var(--text-light);">' + label + decisionSelect(s.id, field, s[field]) + '</label>';
+  let controls = '<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);">';
+  controls += '<div style="font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:var(--text-light);margin-bottom:6px;">Record outcomes &rarr; saves automatically</div>';
+  controls += ctrl('Admission', 'status') + ctrl('Honors', 'honorsResult') + ctrl('Housing', 'housingStatus') + ctrl('Deposit', 'enrollDeposit');
+  controls += '</div>';
+  return '<tr class="decision-detail"><td colspan="8" style="padding:8px 12px 12px 28px;background:rgba(0,0,0,0.025);font-size:0.82rem;line-height:1.5;color:var(--ink);">' + detail + controls + '</td></tr>';
+}
+
 function renderAppStatus() {
   const body = document.getElementById('appStatusBody');
   if (!body) return;
@@ -6251,7 +6308,7 @@ function renderAppStatus() {
       return (a.d.order ?? 99999999) - (b.d.order ?? 99999999);  // then pending by soonest date
     });
   if (tlRows.length) {
-    html += '<div style="margin-top:16px;padding-top:10px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;"><span style="font-weight:700;">Decision tracker</span><span style="color:var(--text-light);font-size:0.72rem;">Expected Fall 2027 dates &middot; est. net cost until award letters &middot; hover for detail</span></div>';
+    html += '<div style="margin-top:16px;padding-top:10px;border-top:2px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;"><span style="font-weight:700;">Decision tracker</span><span style="color:var(--text-light);font-size:0.72rem;">Expected dates &middot; est. net cost &middot; click a row for detail &amp; to record outcomes</span></div>';
     const kindColor = { go: '#15803d', wait: '#b45309', neutral: '#4b5563' };
     const kindBg = { go: 'rgba(22,163,74,0.14)', wait: 'rgba(217,119,6,0.15)', neutral: 'rgba(107,114,128,0.14)' };
     const stBg = { accepted: 'rgba(22,163,74,0.16)', waitlisted: 'rgba(202,138,4,0.16)', applying: 'rgba(107,114,128,0.12)', researching: 'rgba(107,114,128,0.12)' };
@@ -6276,22 +6333,32 @@ function renderAppStatus() {
       const decided = st === 'accepted' || st === 'waitlisted';
       const sd = DECISION_SHORT[s.name] || {};
       const short = esc(s.name.replace(/^University of /, 'U ').replace(/ University$/, ''));
-      const dot = (schoolDB[s.name] && schoolDB[s.name].color) || '#999';
       const stLabel = st === 'applying' ? 'Awaiting' : st.charAt(0).toUpperCase() + st.slice(1);
       const decCell = decided ? '&mdash;' : esc(sd.decision || d.ea || '—');
       const decTitle = esc((d.ea || '') + (!decided && d.rd ? ' · if deferred: ' + d.rd : ''));
       const k = sd.housingKind || 'neutral';
       const net = netOf(s.name); const fit = fitOf(s.name);
-      html += '<tr style="border-top:1px solid var(--border);">';
-      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:600;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + dot + ';margin-right:6px;vertical-align:middle;"></span>' + short + '</td>';
+      const isOpen = expandedDecisionRows.has(s.id);
+      // Recorded outcomes override the expected date/rule in the cell.
+      const hr = s.honorsResult && HONORS_RESULT[s.honorsResult];
+      const honorsCell = hr ? pill(hr.label, hr.bg, hr.co, '') : '<span style="color:var(--text-light);">' + esc(sd.honors || '—') + '</span>';
+      const hs = s.housingStatus && HOUSING_STATUS[s.housingStatus];
+      const housingCell = hs ? pill(hs.label, hs.bg, hs.co, '') : pill(esc(sd.housing || '—'), kindBg[k], kindColor[k], esc(d.housing || ''));
+      const depositCell = s.enrollDeposit === 'paid'
+        ? pill('Paid ✓', 'rgba(22,163,74,0.16)', '#15803d', '')
+        : '<span style="color:var(--text-light);">' + esc(sd.deposit || '—') + '</span>';
+      const caret = '<span style="display:inline-block;width:10px;color:var(--text-light);font-size:0.7rem;">' + (isOpen ? '&#9662;' : '&#9656;') + '</span>';
+      html += '<tr style="border-top:1px solid var(--border);cursor:pointer;" onclick="toggleDecisionRow(\'' + s.id + '\')">';
+      html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:600;"><span style="display:inline-flex;align-items:center;gap:6px;">' + caret + schoolLogoHTML(s.name, 18) + '<span>' + short + '</span></span></td>';
       html += '<td style="padding:5px 6px;">' + pill((icons[st] || '') + ' ' + stLabel, stBg[st] || stBg.researching, colors[st] || 'var(--ink)', '') + '</td>';
       html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:700;" title="' + decTitle + '">' + decCell + '</td>';
       html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:700;color:var(--primary);" title="' + esc(fit.title) + '">' + esc(fit.str) + '</td>';
       html += '<td style="padding:5px 6px;white-space:nowrap;font-weight:600;" title="' + esc(net.title) + '">' + esc(net.str) + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;color:var(--text-light);" title="' + esc(d.honors || '') + '">' + esc(sd.honors || '—') + '</td>';
-      html += '<td style="padding:5px 6px;white-space:nowrap;color:var(--text-light);" title="' + esc(d.enroll || '') + '">' + esc(sd.deposit || '—') + '</td>';
-      html += '<td style="padding:5px 6px;">' + pill(esc(sd.housing || '—'), kindBg[k], kindColor[k], esc(d.housing || '')) + '</td>';
+      html += '<td style="padding:5px 6px;white-space:nowrap;">' + honorsCell + '</td>';
+      html += '<td style="padding:5px 6px;white-space:nowrap;">' + depositCell + '</td>';
+      html += '<td style="padding:5px 6px;">' + housingCell + '</td>';
       html += '</tr>';
+      if (isOpen) html += renderDecisionDetail(s, d);
     });
     html += '</tbody></table></div>';
     html += '<div style="color:var(--text-light);font-size:0.72rem;margin-top:6px;">&#128181; Net cost is an estimate (sticker &minus; est. merit) until award letters arrive &middot; Fit = Strategic Fit score (higher is better).</div>';
@@ -12258,6 +12325,17 @@ authReady.then(() => docRef.onSnapshot(
 // (not a technical commit log). Bump the version (newest-first). Skip
 // internal-only work (validator tuning, migration plumbing, prompt edits).
 const CHANGELOG = [
+  {
+    version: '10.9',
+    date: '2026-11-09',
+    title: 'Decision Tracker: Logos, Click-to-Expand, Recordable Outcomes',
+    items: [
+      'The decision tracker is now interactive. Every school row shows its logo, and clicking a row expands it to reveal the full detail (the admission, honors, deposit, and housing specifics) plus quick dropdowns to record what happens as it happens. Click the row again to collapse it',
+      'You can now log outcomes right in the tracker and the grid updates to match: set an Honors result (Invited / Accepted / Denied) and the Honors column shows it in place of the expected date; mark Housing (Applied / Deposit paid / Room assigned) or the Enrollment deposit (Paid) and those cells reflect it. Admission status is settable here too. Everything saves automatically and syncs across devices',
+      'If a school is marked rejected it drops off the tracker — no reminders of doors that closed',
+      'Removed the old "Next Up" strip (next deadline / checklist / essay). That was application-season info, and applications are done',
+    ]
+  },
   {
     version: '10.8',
     date: '2026-11-09',
