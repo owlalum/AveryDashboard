@@ -2655,45 +2655,8 @@
   <div id="group-overview" class="tab-group active">
   <div id="summary" class="sub-panel active">
     <section class="hero">
-      <div class="hero-eyebrow">Student Profile <button class="hero-edit" onclick="openScoreEditor()" title="Edit scores">edit scores &rarr;</button></div>
       <h1 class="hero-name" id="profileStudentName">Avery <em>Denney</em></h1>
       <p class="hero-sub">Aspiring <strong>Doctor of Veterinary Medicine</strong> &middot; Animal Science &middot; Georgia resident (in-state for UGA) &middot; Class of 2027</p>
-
-      <div id="profileCard">
-        <div class="stat-grid">
-          <div class="stat-tile pink">
-            <div class="st-label">Weighted GPA</div>
-            <div class="st-value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></div>
-            <div class="st-foot">current weighted</div>
-            <div class="st-foot" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">Unweighted: <span class="act-edit" data-field="unweightedGPA" contenteditable="true">3.66</span></div>
-          </div>
-          <div class="stat-tile coral">
-            <div class="st-label">HOPE GPA</div>
-            <div class="st-value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.657</span></div>
-            <div class="st-foot" data-field="hopeGPA-status">&mdash;</div>
-          </div>
-          <div class="stat-tile sun">
-            <div class="st-label">ACT Composite</div>
-            <div class="st-value"><span class="act-edit" data-act="composite" contenteditable="true">27</span></div>
-            <div class="st-foot" data-act="composite-pct">(87th %ile)</div>
-            <div class="st-foot" data-act="composite-recompute" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">w/ Sci 31 &middot; w/o Sci 30</div>
-          </div>
-        </div>
-
-        <div class="act-breakdown">
-          <span class="act-title">ACT subscores &nearr;</span>
-          <span class="act-sub">Eng <b><span class="act-edit" data-act="english" contenteditable="true">23</span></b><small data-act="english-pct">(73rd)</small></span>
-          <span class="act-sub">Math <b><span class="act-edit" data-act="math" contenteditable="true">28</span></b><small data-act="math-pct">(90th)</small></span>
-          <span class="act-sub">Read <b><span class="act-edit" data-act="reading" contenteditable="true">30</span></b><small data-act="reading-pct">(90th)</small></span>
-          <span class="act-sub">Sci <b><span class="act-edit" data-act="science" contenteditable="true">33</span></b><small data-act="science-pct">(97th)</small></span>
-        </div>
-        <div class="act-breakdown" id="actPerSchool" style="margin-top:6px;">
-          <span class="act-title">Per-school composite &nearr;</span>
-          <span class="act-sub">UGA <b data-per-school="uga">31</b></span>
-          <span class="act-sub">UTK <b data-per-school="utk">31</b></span>
-          <span class="act-sub">Others <b data-per-school="others">30</b></span>
-        </div>
-      </div>
     </section>
 
     <section class="status-card" id="appStatusCard">
@@ -2771,6 +2734,49 @@
         <tbody id="summaryRankBody"></tbody>
       </table>
     </div>
+
+    <!-- Applicant profile / scores — moved below the decision tracker 2026-11-09
+         (decision phase: the tracker leads; GPA/ACT are reference now). The
+         stat-tile / act-edit elements and ids are unchanged, so the score
+         editor and all profile-render code keep working. -->
+    <section class="hero" id="profileStatsSection" style="margin-top:4px;">
+      <div class="hero-eyebrow">Student Profile <button class="hero-edit" onclick="openScoreEditor()" title="Edit scores">edit scores &rarr;</button></div>
+      <div id="profileCard">
+        <div class="stat-grid">
+          <div class="stat-tile pink">
+            <div class="st-label">Weighted GPA</div>
+            <div class="st-value"><span class="act-edit" data-field="gpa" contenteditable="true">3.85</span></div>
+            <div class="st-foot">current weighted</div>
+            <div class="st-foot" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">Unweighted: <span class="act-edit" data-field="unweightedGPA" contenteditable="true">3.66</span></div>
+          </div>
+          <div class="stat-tile coral">
+            <div class="st-label">HOPE GPA</div>
+            <div class="st-value"><span class="act-edit" data-field="hopeGPA" contenteditable="true">3.657</span></div>
+            <div class="st-foot" data-field="hopeGPA-status">&mdash;</div>
+          </div>
+          <div class="stat-tile sun">
+            <div class="st-label">ACT Composite</div>
+            <div class="st-value"><span class="act-edit" data-act="composite" contenteditable="true">27</span></div>
+            <div class="st-foot" data-act="composite-pct">(87th %ile)</div>
+            <div class="st-foot" data-act="composite-recompute" style="font-size:0.78rem;margin-top:2px;opacity:0.85;">w/ Sci 31 &middot; w/o Sci 30</div>
+          </div>
+        </div>
+
+        <div class="act-breakdown">
+          <span class="act-title">ACT subscores &nearr;</span>
+          <span class="act-sub">Eng <b><span class="act-edit" data-act="english" contenteditable="true">23</span></b><small data-act="english-pct">(73rd)</small></span>
+          <span class="act-sub">Math <b><span class="act-edit" data-act="math" contenteditable="true">28</span></b><small data-act="math-pct">(90th)</small></span>
+          <span class="act-sub">Read <b><span class="act-edit" data-act="reading" contenteditable="true">30</span></b><small data-act="reading-pct">(90th)</small></span>
+          <span class="act-sub">Sci <b><span class="act-edit" data-act="science" contenteditable="true">33</span></b><small data-act="science-pct">(97th)</small></span>
+        </div>
+        <div class="act-breakdown" id="actPerSchool" style="margin-top:6px;">
+          <span class="act-title">Per-school composite &nearr;</span>
+          <span class="act-sub">UGA <b data-per-school="uga">31</b></span>
+          <span class="act-sub">UTK <b data-per-school="utk">31</b></span>
+          <span class="act-sub">Others <b data-per-school="others">30</b></span>
+        </div>
+      </div>
+    </section>
   </div>
 
   </div><!-- /group-overview -->
